@@ -1,0 +1,4 @@
+graft src/plone
+graft docs
+include *.rst
+global-exclude *.pyc

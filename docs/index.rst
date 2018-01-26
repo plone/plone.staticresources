@@ -1,0 +1,5 @@
+====================
+plone.staticresources
+====================
+
+User documentation
