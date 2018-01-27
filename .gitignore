@@ -32,4 +32,5 @@ report.html
 !.gitignore
 !.gitkeep
 !.travis.yml
+!.yarnrc
 !src/plone

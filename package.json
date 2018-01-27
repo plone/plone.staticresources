@@ -1,0 +1,8 @@
+{
+  "name": "plone.staticresource",
+  "repository": "git@github.com:plone/plone.staticresources.git",
+  "license": "GPLv2",
+  "dependencies": {
+    "mockup": ""
+  }
+}
