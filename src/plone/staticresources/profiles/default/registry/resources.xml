@@ -1,13 +1,6 @@
 <?xml version="1.0"?>
 <registry>
 
-  <records interface="Products.CMFPlone.interfaces.ITinyMCESchema"
-           prefix="plone">
-    <value key="content_css">
-      <element>++plone++static/components/tinymce-builded/js/tinymce/skins/lightgray/content.min.css</element>
-    </value>
-  </records>
-
   <record name="plone.resources.requirejs">
     <field type="plone.registry.field.ASCII">
       <title>URL of require.js</title>
@@ -25,7 +18,19 @@
       <value key="js">++plone++static/components/less/dist/less.js</value>
   </records>
 
+  <record name="plone.resources/jquery.js">
+    <field type="plone.registry.field.ASCII">
+      <title>URL of jquery.js</title>
+    </field>
+    <value>++plone++static/components/jquery/dist/jquery.min.js</value>
+  </record>
 
+  <records interface="Products.CMFPlone.interfaces.ITinyMCESchema"
+           prefix="plone">
+    <value key="content_css">
+      <element>++plone++static/components/tinymce-builded/js/tinymce/skins/lightgray/content.min.css</element>
+    </value>
+  </records>
 
   <!-- mockup core reqs -->
   <records prefix="plone.resources/mockup-patterns-base"
