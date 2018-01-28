@@ -43,13 +43,6 @@
       <value key="js">++plone++static/components/jquery/dist/jquery.min.js</value>
   </records>
 
-
-  <records prefix="plone.resources/JSXTransformer"
-            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-      <value key="js">++plone++static/components/react/JSXTransformer.js</value>
-      <value key="export">window.JSXTransformer</value>
-  </records>
-
   <records prefix="plone.resources/underscore"
             interface='Products.CMFPlone.interfaces.IResourceRegistry'>
       <value key="js">++plone++static/components/underscore/underscore.js</value>
@@ -179,12 +172,6 @@
       </value>
   </records>
 
-  <records prefix="plone.resources/expect"
-            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-      <value key="js">++plone++static/components/expect/index.js</value>
-      <value key="export">window.expect</value>
-  </records>
-
   <records prefix="plone.resources/jquery.cookie"
             interface='Products.CMFPlone.interfaces.IResourceRegistry'>
       <value key="js">++plone++static/components/jquery.cookie/jquery.cookie.js</value>
@@ -206,20 +193,9 @@
       <value key="deps">jqtree</value>
   </records>
 
-  <records prefix="plone.resources/js-shortcuts"
-            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-      <value key="js">++plone++static/components/js-shortcuts/js-shortcuts.js</value>
-      <value key="deps">jquery</value>
-  </records>
-
   <records prefix="plone.resources/jquery.form"
             interface='Products.CMFPlone.interfaces.IResourceRegistry'>
       <value key="js">++plone++static/components/jquery-form/jquery.form.js</value>
-  </records>
-
-  <records prefix="plone.resources/marked"
-            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-      <value key="js">++plone++static/components/marked/lib/marked.js</value>
   </records>
 
   <records prefix="plone.resources/moment"
@@ -253,23 +229,12 @@
       <value key="deps">picker</value>
   </records>
 
-  <records prefix="plone.resources/react"
-            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-      <value key="js">++plone++static/components/react/react.js</value>
-  </records>
-
   <records prefix="plone.resources/select2"
             interface='Products.CMFPlone.interfaces.IResourceRegistry'>
       <value key="js">++plone++static/components/select2/select2.js</value>
       <value key="css">
         <element>++plone++static/components/select2/select2.css</element>
       </value>
-  </records>
-
-  <records prefix="plone.resources/sinon"
-            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-      <value key="js">++plone++static/components/sinonjs/sinon.js</value>
-      <value key="export">window.sinon</value>
   </records>
 
   <records prefix="plone.resources/text"
@@ -883,11 +848,6 @@
   <records prefix="plone.resources/mockup-ui"
             interface='Products.CMFPlone.interfaces.IResourceRegistry'>
       <value key="url">++resource++mockupjs/ui</value>
-  </records>
-
-  <records prefix="plone.resources/rjs"
-            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-      <value key="js">++plone++static/components/r.js/dist/r.js</value>
   </records>
 
   <!-- patternslib dependencies -->

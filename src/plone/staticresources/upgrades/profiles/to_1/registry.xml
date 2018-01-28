@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<registry>
+
+  <records remove="True" prefix="plone.resources/expect" interface='Products.CMFPlone.interfaces.IResourceRegistry'/>
+  <records remove="True" prefix="plone.resources/js-shortcuts" interface='Products.CMFPlone.interfaces.IResourceRegistry'/>
+  <records remove="True" prefix="plone.resources/marked" interface='Products.CMFPlone.interfaces.IResourceRegistry'/>
+  <records remove="True" prefix="plone.resources/rjs" interface='Products.CMFPlone.interfaces.IResourceRegistry'/>
+  <records remove="True" prefix="plone.resources/react" interface='Products.CMFPlone.interfaces.IResourceRegistry'/>
+  <records remove="True" prefix="plone.resources/JSXTransformer" interface='Products.CMFPlone.interfaces.IResourceRegistry'/>
+  <records remove="True" prefix="plone.resources/sinon" interface='Products.CMFPlone.interfaces.IResourceRegistry'/>
+
+</registry>

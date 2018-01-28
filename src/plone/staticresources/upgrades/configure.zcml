@@ -1,0 +1,28 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
+    i18n_domain="plone">
+
+  <genericsetup:registerProfile
+      name="to1"
+      title="Unregister resources from Plone 5.1"
+      description=""
+      directory="profiles/to_1"
+      for="Products.CMFPlone.interfaces.IMigratingPloneSiteRoot"
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      />
+
+  <genericsetup:upgradeSteps
+      source="0"
+      destination="1"
+      profile="plone.staticresources:default">
+    <genericsetup:upgradeDepends
+        title="Unregister resources from Plone 5.1"
+        description=""
+        import_profile="plone.staticresources:to1"
+        import_steps="plone.app.registry"
+        run_deps="false"
+        />
+  </genericsetup:upgradeSteps>
+
+</configure>
