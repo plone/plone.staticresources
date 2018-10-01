@@ -2,8 +2,7 @@
     xmlns="http://namespaces.zope.org/zope"
     xmlns:browser="http://namespaces.zope.org/browser"
     xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
-    xmlns:plone="http://namespaces.plone.org/plone"
-    i18n_domain="plone.staticresources">
+    xmlns:plone="http://namespaces.plone.org/plone">
 
   <include package="plone.resource"/>
 
@@ -42,7 +41,6 @@
       directory="profiles/default"
       description="Installs the plone.staticresources add-on."
       provides="Products.GenericSetup.interfaces.EXTENSION"
-      post_handler=".setuphandlers.post_install"
       />
 
   <genericsetup:registerProfile
@@ -51,7 +49,6 @@
       directory="profiles/uninstall"
       description="Uninstalls the plone.staticresources add-on."
       provides="Products.GenericSetup.interfaces.EXTENSION"
-      post_handler=".setuphandlers.uninstall"
       />
 
   <utility

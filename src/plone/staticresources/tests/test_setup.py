@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Setup tests for this package."""
-from plone import api
 from plone.staticresources.testing import PLONE_STATICRESOURCES_INTEGRATION_TESTING  # noqa
+from zope.component import getMultiAdapter
 
 import unittest
 
@@ -14,42 +14,24 @@ class TestSetup(unittest.TestCase):
     def setUp(self):
         """Custom shared utility setup for tests."""
         self.portal = self.layer['portal']
-        self.installer = api.portal.get_tool('portal_quickinstaller')
+        self.request = self.layer['request']
 
-    def test_product_installed(self):
-        """Test if plone.staticresources is installed."""
-        self.assertTrue(self.installer.isProductInstalled(
-            'plone.staticresources'))
+    def test_install_uninstall(self):
+        """Test if plone.staticresources is installed and is able to be
+        uninstalled."""
 
-    def test_browserlayer(self):
-        """Test that IPloneStaticresourcesLayer is registered."""
-        from plone.staticresources.interfaces import (
-            IPloneStaticresourcesLayer)
-        from plone.browserlayer import utils
-        self.assertIn(
-            IPloneStaticresourcesLayer,
-            utils.registered_layers())
+        installer = getMultiAdapter(
+            (self.portal, self. request),
+            name=u'prefs_install_products_form'
+        )
 
+        # Install
+        self.assertTrue(installer.is_product_installed(
+            'plone.staticresources')
+        )
 
-class TestUninstall(unittest.TestCase):
-
-    layer = PLONE_STATICRESOURCES_INTEGRATION_TESTING
-
-    def setUp(self):
-        self.portal = self.layer['portal']
-        self.installer = api.portal.get_tool('portal_quickinstaller')
-        self.installer.uninstallProducts(['plone.staticresources'])
-
-    def test_product_uninstalled(self):
-        """Test if plone.staticresources is cleanly uninstalled."""
-        self.assertFalse(self.installer.isProductInstalled(
-            'plone.staticresources'))
-
-    def test_browserlayer_removed(self):
-        """Test that IPloneStaticresourcesLayer is removed."""
-        from plone.staticresources.interfaces import \
-            IPloneStaticresourcesLayer
-        from plone.browserlayer import utils
-        self.assertNotIn(
-           IPloneStaticresourcesLayer,
-           utils.registered_layers())
+        # Uninstall
+        installer.uninstall_product('plone.staticresources')
+        self.assertFalse(installer.is_product_installed(
+            'plone.staticresources')
+        )
