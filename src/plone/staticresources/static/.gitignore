@@ -79,6 +79,7 @@ components/pickadate/lib/compressed
 components/pickadate/lib/themes-source/
 components/pickadate/version-bump.js
 components/pickadate/version-commit.js
+!components/pickadate/lib
 components/pikaday/
 components/prefixfree
 components/requirejs-tpl-jcbrand/
