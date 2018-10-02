@@ -514,9 +514,9 @@
 
   <records prefix="plone.resources/plone-patterns-toolbar"
             interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-      <value key="js">++plone++static/patterns/toolbar/src/toolbar.js</value>
+      <value key="js">++resource++mockup/toolbar/pattern.js</value>
       <value key="css">
-        <element>++plone++static/patterns/toolbar/src/css/toolbar.plone.less</element>
+        <element>++resource++mockup/toolbar/pattern.toolbar.less</element>
       </value>
   </records>
 

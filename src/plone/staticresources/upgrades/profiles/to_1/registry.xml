@@ -9,4 +9,11 @@
   <records remove="True" prefix="plone.resources/JSXTransformer" interface='Products.CMFPlone.interfaces.IResourceRegistry'/>
   <records remove="True" prefix="plone.resources/sinon" interface='Products.CMFPlone.interfaces.IResourceRegistry'/>
 
+  <records prefix="plone.resources/plone-patterns-toolbar" interface='Products.CMFPlone.interfaces.IResourceRegistry'>
+    <value key="js">++resource++mockup/toolbar/pattern.js</value>
+    <value key="css">
+      <element>++resource++mockup/toolbar/pattern.toolbar.less</element>
+    </value>
+  </records>
+
 </registry>
