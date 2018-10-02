@@ -46,7 +46,9 @@ setup(
         ],
     },
     entry_points="""
+    [console_scripts]
+    plone-compile-resources = plone.staticresources._scripts.compile_resources:main
     [z3c.autoinclude.plugin]
     target = plone
-    """,
+    """,  # noqa
 )
