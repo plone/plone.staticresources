@@ -22,14 +22,14 @@ if (window.jQuery) {
 }
 
 require([
-  'mockup-patterns-textareamimetypeselector',
-  'mockup-patterns-relateditems',
-  'mockup-patterns-querystring',
-  'mockup-patterns-tinymce',
   'mockup-patterns-inlinevalidation',
+  'mockup-patterns-querystring',
+  'mockup-patterns-recurrence',
+  'mockup-patterns-relateditems',
   'mockup-patterns-structure',
   'mockup-patterns-structureupdater',
-  'mockup-patterns-recurrence',
+  'mockup-patterns-textareamimetypeselector',
+  'mockup-patterns-tinymce',
   'plone-patterns-portletmanager',
   'plone-patterns-toolbar',
 ], function() {

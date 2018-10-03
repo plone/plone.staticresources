@@ -26,20 +26,21 @@ require([
   'pat-registry',
   'mockup-patterns-base',
 
-  'mockup-patterns-select2',
-  'mockup-patterns-pickadate',
   'mockup-patterns-autotoc',
+  'mockup-patterns-contentloader',
   'mockup-patterns-cookietrigger',
-  'mockup-patterns-formunloadalert',
-  'mockup-patterns-preventdoublesubmit',
   'mockup-patterns-formautofocus',
+  'mockup-patterns-formunloadalert',
+  'mockup-patterns-livesearch',
   'mockup-patterns-markspeciallinks',
   'mockup-patterns-modal',
-  'mockup-patterns-livesearch',
-  'mockup-patterns-contentloader',
   'mockup-patterns-moment',
-  'bootstrap-dropdown',
+  'mockup-patterns-pickadate',
+  'mockup-patterns-preventdoublesubmit',
+  'mockup-patterns-select2',
+
   'bootstrap-collapse',
+  'bootstrap-dropdown',
   'bootstrap-tooltip',
 ], function($, registry, Base) {
   'use strict';
