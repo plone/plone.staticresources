@@ -23,7 +23,13 @@
         <element>++plone++static/resourceregistry.less</element>
       </value>
   </records>
-
+  <records prefix="plone.resources/thememapper"
+            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
+      <value key="js">++plone++static/thememapper.js</value>
+      <value key="css">
+        <element>++plone++static/thememapper.less</element>
+      </value>
+  </records>
 
   <!-- Bundles -->
   <records prefix="plone.bundles/plone"
@@ -109,6 +115,17 @@
     <value key="stub_js_modules">
       <element>jquery</element>
     </value>
+  </records>
+
+  <records prefix="plone.bundles/thememapper"
+            interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+    <value key="resources">
+      <element>thememapper</element>
+    </value>
+    <value key="enabled">False</value>
+    <value key="jscompilation">++plone++static/thememapper-compiled.min.js</value>
+    <value key="csscompilation">++plone++static/thememapper-compiled.css</value>
+    <value key="last_compilation">2018-10-01 23:00:00</value>
   </records>
 
   <!-- legacy js -->

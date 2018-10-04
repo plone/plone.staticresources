@@ -38,6 +38,7 @@ setup(
     install_requires=[
         'Products.GenericSetup',
         'setuptools',
+        'plone.resource',
     ],
     extras_require={
         'test': [

@@ -922,5 +922,22 @@
       <value key="deps">jquery</value>
   </records>
 
+  <!-- thememappper registrations -->
+  <records prefix="plone.resources/mockup-patterns-filemanager"
+            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
+      <value key="url">++resource++mockup/filemanager</value>
+      <value key="js">++resource++mockup/filemanager/pattern.js</value>
+      <value key="css">
+        <element>++resource++mockup/filemanager/pattern.filemanager.less</element>
+      </value>
+  </records>
+  <records prefix="plone.resources/mockup-patterns-thememapper"
+            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
+      <value key="url">++resource++mockup/thememapper</value>
+      <value key="js">++resource++mockup/thememapper/pattern.js</value>
+      <value key="css">
+        <element>++resource++mockup/thememapper/pattern.thememapper.less</element>
+      </value>
+  </records>
 
 </registry>
