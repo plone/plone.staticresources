@@ -940,4 +940,29 @@
       </value>
   </records>
 
+
+  <!-- Plone generated resources -->
+  <!-- These are also defined in CMFPlone since their browser views are in
+       CMFPlone/resources/browser, but these values are needed during install
+       for the combine_bundles step.
+  -->
+  <record name="plone.resources.configjs">
+    <field type="plone.registry.field.ASCII">
+      <title>config.js</title>
+    </field>
+    <value>config.js</value>
+  </record>
+  <record name="plone.resources.less-modify">
+    <field type="plone.registry.field.ASCII">
+      <title>less-modify js</title>
+    </field>
+    <value>less-modify.js</value>
+  </record>
+  <record name="plone.resources.less-variables">
+    <field type="plone.registry.field.ASCII">
+      <title>LESS variables js definer</title>
+    </field>
+    <value key="js">less-variables.js</value>
+  </record>
+
 </registry>
