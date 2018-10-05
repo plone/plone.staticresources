@@ -3670,566 +3670,6 @@ define('pat-base',[
     return Base;
 });
 
-/* i18n integration. This is forked from jarn.jsi18n
- *
- * This is a singleton.
- * Configuration is done on the body tag data-i18ncatalogurl attribute
- *     <body data-i18ncatalogurl="/plonejsi18n">
- *
- *  Or, it'll default to "/plonejsi18n"
- */
-define('mockup-i18n',[
-  'jquery'
-], function($) {
-  'use strict';
-
-  var I18N = function() {
-    var self = this;
-    self.baseUrl = $('body').attr('data-i18ncatalogurl');
-
-    if (!self.baseUrl) {
-      self.baseUrl = '/plonejsi18n';
-    }
-    self.currentLanguage = $('html').attr('lang') || 'en';
-
-    // Fix for country specific languages
-    if (self.currentLanguage.split('-').length > 1) {
-      self.currentLanguage = self.currentLanguage.split('-')[0] + '_' + self.currentLanguage.split('-')[1].toUpperCase();
-    }
-
-    self.storage = null;
-    self.catalogs = {};
-    self.ttl = 24 * 3600 * 1000;
-
-    // Internet Explorer 8 does not know Date.now() which is used in e.g. loadCatalog, so we "define" it
-    if (!Date.now) {
-      Date.now = function() {
-        return new Date().valueOf();
-      };
-    }
-
-    try {
-      if ('localStorage' in window && window.localStorage !== null && 'JSON' in window && window.JSON !== null) {
-        self.storage = window.localStorage;
-      }
-    } catch (e) {}
-
-    self.configure = function(config) {
-      for (var key in config){
-        self[key] = config[key];
-      }
-    };
-
-    self._setCatalog = function (domain, language, catalog) {
-      if (domain in self.catalogs) {
-        self.catalogs[domain][language] = catalog;
-      } else {
-        self.catalogs[domain] = {};
-        self.catalogs[domain][language] = catalog;
-      }
-    };
-
-    self._storeCatalog = function (domain, language, catalog) {
-      var key = domain + '-' + language;
-      if (self.storage !== null && catalog !== null) {
-        self.storage.setItem(key, JSON.stringify(catalog));
-        self.storage.setItem(key + '-updated', Date.now());
-      }
-    };
-
-    self.getUrl = function(domain, language) {
-      return self.baseUrl + '?domain=' + domain + '&language=' + language;
-    };
-
-    self.loadCatalog = function (domain, language) {
-      if (language === undefined) {
-        language = self.currentLanguage;
-      }
-      if (self.storage !== null) {
-        var key = domain + '-' + language;
-        if (key in self.storage) {
-          if ((Date.now() - parseInt(self.storage.getItem(key + '-updated'), 10)) < self.ttl) {
-            var catalog = JSON.parse(self.storage.getItem(key));
-            self._setCatalog(domain, language, catalog);
-            return;
-          }
-        }
-      }
-      $.getJSON(self.getUrl(domain, language), function (catalog) {
-        if (catalog === null) {
-          return;
-        }
-        self._setCatalog(domain, language, catalog);
-        self._storeCatalog(domain, language, catalog);
-      });
-    };
-
-    self.MessageFactory = function (domain, language) {
-      language = language || self.currentLanguage;
-      return function translate (msgid, keywords) {
-        var msgstr;
-        if ((domain in self.catalogs) && (language in self.catalogs[domain]) && (msgid in self.catalogs[domain][language])) {
-          msgstr = self.catalogs[domain][language][msgid];
-        } else {
-          msgstr = msgid;
-        }
-        if (keywords) {
-          var regexp, keyword;
-          for (keyword in keywords) {
-            if (keywords.hasOwnProperty(keyword)) {
-              regexp = new RegExp('\\$\\{' + keyword + '\\}', 'g');
-              msgstr = msgstr.replace(regexp, keywords[keyword]);
-            }
-          }
-        }
-        return msgstr;
-      };
-    };
-  };
-
-  return I18N;
-});
-
-/* i18n integration.
- *
- * This is a singleton.
- * Configuration is done on the body tag data-i18ncatalogurl attribute
- *     <body data-i18ncatalogurl="/plonejsi18n">
- *
- *  Or, it'll default to "/plonejsi18n"
- */
-
-define('translate',[
-  'mockup-i18n'
-], function(I18N) {
-  'use strict';
-
-  // we're creating a singleton here so we can potentially
-  // delay the initialization of the translate catalog
-  // until after the dom is available
-  var _t = null;
-  return function(msgid, keywords) {
-    if (_t === null) {
-      var i18n = new I18N();
-      i18n.loadCatalog('widgets');
-      _t = i18n.MessageFactory('widgets');
-    }
-    return _t(msgid, keywords);
-  };
-});
-
-/**
- * @license text 2.0.15 Copyright jQuery Foundation and other contributors.
- * Released under MIT license, http://github.com/requirejs/text/LICENSE
- */
-/*jslint regexp: true */
-/*global require, XMLHttpRequest, ActiveXObject,
-  define, window, process, Packages,
-  java, location, Components, FileUtils */
-
-define('text',['module'], function (module) {
-    'use strict';
-
-    var text, fs, Cc, Ci, xpcIsWindows,
-        progIds = ['Msxml2.XMLHTTP', 'Microsoft.XMLHTTP', 'Msxml2.XMLHTTP.4.0'],
-        xmlRegExp = /^\s*<\?xml(\s)+version=[\'\"](\d)*.(\d)*[\'\"](\s)*\?>/im,
-        bodyRegExp = /<body[^>]*>\s*([\s\S]+)\s*<\/body>/im,
-        hasLocation = typeof location !== 'undefined' && location.href,
-        defaultProtocol = hasLocation && location.protocol && location.protocol.replace(/\:/, ''),
-        defaultHostName = hasLocation && location.hostname,
-        defaultPort = hasLocation && (location.port || undefined),
-        buildMap = {},
-        masterConfig = (module.config && module.config()) || {};
-
-    function useDefault(value, defaultValue) {
-        return value === undefined || value === '' ? defaultValue : value;
-    }
-
-    //Allow for default ports for http and https.
-    function isSamePort(protocol1, port1, protocol2, port2) {
-        if (port1 === port2) {
-            return true;
-        } else if (protocol1 === protocol2) {
-            if (protocol1 === 'http') {
-                return useDefault(port1, '80') === useDefault(port2, '80');
-            } else if (protocol1 === 'https') {
-                return useDefault(port1, '443') === useDefault(port2, '443');
-            }
-        }
-        return false;
-    }
-
-    text = {
-        version: '2.0.15',
-
-        strip: function (content) {
-            //Strips <?xml ...?> declarations so that external SVG and XML
-            //documents can be added to a document without worry. Also, if the string
-            //is an HTML document, only the part inside the body tag is returned.
-            if (content) {
-                content = content.replace(xmlRegExp, "");
-                var matches = content.match(bodyRegExp);
-                if (matches) {
-                    content = matches[1];
-                }
-            } else {
-                content = "";
-            }
-            return content;
-        },
-
-        jsEscape: function (content) {
-            return content.replace(/(['\\])/g, '\\$1')
-                .replace(/[\f]/g, "\\f")
-                .replace(/[\b]/g, "\\b")
-                .replace(/[\n]/g, "\\n")
-                .replace(/[\t]/g, "\\t")
-                .replace(/[\r]/g, "\\r")
-                .replace(/[\u2028]/g, "\\u2028")
-                .replace(/[\u2029]/g, "\\u2029");
-        },
-
-        createXhr: masterConfig.createXhr || function () {
-            //Would love to dump the ActiveX crap in here. Need IE 6 to die first.
-            var xhr, i, progId;
-            if (typeof XMLHttpRequest !== "undefined") {
-                return new XMLHttpRequest();
-            } else if (typeof ActiveXObject !== "undefined") {
-                for (i = 0; i < 3; i += 1) {
-                    progId = progIds[i];
-                    try {
-                        xhr = new ActiveXObject(progId);
-                    } catch (e) {}
-
-                    if (xhr) {
-                        progIds = [progId];  // so faster next time
-                        break;
-                    }
-                }
-            }
-
-            return xhr;
-        },
-
-        /**
-         * Parses a resource name into its component parts. Resource names
-         * look like: module/name.ext!strip, where the !strip part is
-         * optional.
-         * @param {String} name the resource name
-         * @returns {Object} with properties "moduleName", "ext" and "strip"
-         * where strip is a boolean.
-         */
-        parseName: function (name) {
-            var modName, ext, temp,
-                strip = false,
-                index = name.lastIndexOf("."),
-                isRelative = name.indexOf('./') === 0 ||
-                             name.indexOf('../') === 0;
-
-            if (index !== -1 && (!isRelative || index > 1)) {
-                modName = name.substring(0, index);
-                ext = name.substring(index + 1);
-            } else {
-                modName = name;
-            }
-
-            temp = ext || modName;
-            index = temp.indexOf("!");
-            if (index !== -1) {
-                //Pull off the strip arg.
-                strip = temp.substring(index + 1) === "strip";
-                temp = temp.substring(0, index);
-                if (ext) {
-                    ext = temp;
-                } else {
-                    modName = temp;
-                }
-            }
-
-            return {
-                moduleName: modName,
-                ext: ext,
-                strip: strip
-            };
-        },
-
-        xdRegExp: /^((\w+)\:)?\/\/([^\/\\]+)/,
-
-        /**
-         * Is an URL on another domain. Only works for browser use, returns
-         * false in non-browser environments. Only used to know if an
-         * optimized .js version of a text resource should be loaded
-         * instead.
-         * @param {String} url
-         * @returns Boolean
-         */
-        useXhr: function (url, protocol, hostname, port) {
-            var uProtocol, uHostName, uPort,
-                match = text.xdRegExp.exec(url);
-            if (!match) {
-                return true;
-            }
-            uProtocol = match[2];
-            uHostName = match[3];
-
-            uHostName = uHostName.split(':');
-            uPort = uHostName[1];
-            uHostName = uHostName[0];
-
-            return (!uProtocol || uProtocol === protocol) &&
-                   (!uHostName || uHostName.toLowerCase() === hostname.toLowerCase()) &&
-                   ((!uPort && !uHostName) || isSamePort(uProtocol, uPort, protocol, port));
-        },
-
-        finishLoad: function (name, strip, content, onLoad) {
-            content = strip ? text.strip(content) : content;
-            if (masterConfig.isBuild) {
-                buildMap[name] = content;
-            }
-            onLoad(content);
-        },
-
-        load: function (name, req, onLoad, config) {
-            //Name has format: some.module.filext!strip
-            //The strip part is optional.
-            //if strip is present, then that means only get the string contents
-            //inside a body tag in an HTML string. For XML/SVG content it means
-            //removing the <?xml ...?> declarations so the content can be inserted
-            //into the current doc without problems.
-
-            // Do not bother with the work if a build and text will
-            // not be inlined.
-            if (config && config.isBuild && !config.inlineText) {
-                onLoad();
-                return;
-            }
-
-            masterConfig.isBuild = config && config.isBuild;
-
-            var parsed = text.parseName(name),
-                nonStripName = parsed.moduleName +
-                    (parsed.ext ? '.' + parsed.ext : ''),
-                url = req.toUrl(nonStripName),
-                useXhr = (masterConfig.useXhr) ||
-                         text.useXhr;
-
-            // Do not load if it is an empty: url
-            if (url.indexOf('empty:') === 0) {
-                onLoad();
-                return;
-            }
-
-            //Load the text. Use XHR if possible and in a browser.
-            if (!hasLocation || useXhr(url, defaultProtocol, defaultHostName, defaultPort)) {
-                text.get(url, function (content) {
-                    text.finishLoad(name, parsed.strip, content, onLoad);
-                }, function (err) {
-                    if (onLoad.error) {
-                        onLoad.error(err);
-                    }
-                });
-            } else {
-                //Need to fetch the resource across domains. Assume
-                //the resource has been optimized into a JS module. Fetch
-                //by the module name + extension, but do not include the
-                //!strip part to avoid file system issues.
-                req([nonStripName], function (content) {
-                    text.finishLoad(parsed.moduleName + '.' + parsed.ext,
-                                    parsed.strip, content, onLoad);
-                });
-            }
-        },
-
-        write: function (pluginName, moduleName, write, config) {
-            if (buildMap.hasOwnProperty(moduleName)) {
-                var content = text.jsEscape(buildMap[moduleName]);
-                write.asModule(pluginName + "!" + moduleName,
-                               "define(function () { return '" +
-                                   content +
-                               "';});\n");
-            }
-        },
-
-        writeFile: function (pluginName, moduleName, req, write, config) {
-            var parsed = text.parseName(moduleName),
-                extPart = parsed.ext ? '.' + parsed.ext : '',
-                nonStripName = parsed.moduleName + extPart,
-                //Use a '.js' file name so that it indicates it is a
-                //script that can be loaded across domains.
-                fileName = req.toUrl(parsed.moduleName + extPart) + '.js';
-
-            //Leverage own load() method to load plugin value, but only
-            //write out values that do not have the strip argument,
-            //to avoid any potential issues with ! in file names.
-            text.load(nonStripName, req, function (value) {
-                //Use own write() method to construct full module value.
-                //But need to create shell that translates writeFile's
-                //write() to the right interface.
-                var textWrite = function (contents) {
-                    return write(fileName, contents);
-                };
-                textWrite.asModule = function (moduleName, contents) {
-                    return write.asModule(moduleName, fileName, contents);
-                };
-
-                text.write(pluginName, nonStripName, textWrite, config);
-            }, config);
-        }
-    };
-
-    if (masterConfig.env === 'node' || (!masterConfig.env &&
-            typeof process !== "undefined" &&
-            process.versions &&
-            !!process.versions.node &&
-            !process.versions['node-webkit'] &&
-            !process.versions['atom-shell'])) {
-        //Using special require.nodeRequire, something added by r.js.
-        fs = require.nodeRequire('fs');
-
-        text.get = function (url, callback, errback) {
-            try {
-                var file = fs.readFileSync(url, 'utf8');
-                //Remove BOM (Byte Mark Order) from utf8 files if it is there.
-                if (file[0] === '\uFEFF') {
-                    file = file.substring(1);
-                }
-                callback(file);
-            } catch (e) {
-                if (errback) {
-                    errback(e);
-                }
-            }
-        };
-    } else if (masterConfig.env === 'xhr' || (!masterConfig.env &&
-            text.createXhr())) {
-        text.get = function (url, callback, errback, headers) {
-            var xhr = text.createXhr(), header;
-            xhr.open('GET', url, true);
-
-            //Allow plugins direct access to xhr headers
-            if (headers) {
-                for (header in headers) {
-                    if (headers.hasOwnProperty(header)) {
-                        xhr.setRequestHeader(header.toLowerCase(), headers[header]);
-                    }
-                }
-            }
-
-            //Allow overrides specified in config
-            if (masterConfig.onXhr) {
-                masterConfig.onXhr(xhr, url);
-            }
-
-            xhr.onreadystatechange = function (evt) {
-                var status, err;
-                //Do not explicitly handle errors, those should be
-                //visible via console output in the browser.
-                if (xhr.readyState === 4) {
-                    status = xhr.status || 0;
-                    if (status > 399 && status < 600) {
-                        //An http 4xx or 5xx error. Signal an error.
-                        err = new Error(url + ' HTTP status: ' + status);
-                        err.xhr = xhr;
-                        if (errback) {
-                            errback(err);
-                        }
-                    } else {
-                        callback(xhr.responseText);
-                    }
-
-                    if (masterConfig.onXhrComplete) {
-                        masterConfig.onXhrComplete(xhr, url);
-                    }
-                }
-            };
-            xhr.send(null);
-        };
-    } else if (masterConfig.env === 'rhino' || (!masterConfig.env &&
-            typeof Packages !== 'undefined' && typeof java !== 'undefined')) {
-        //Why Java, why is this so awkward?
-        text.get = function (url, callback) {
-            var stringBuffer, line,
-                encoding = "utf-8",
-                file = new java.io.File(url),
-                lineSeparator = java.lang.System.getProperty("line.separator"),
-                input = new java.io.BufferedReader(new java.io.InputStreamReader(new java.io.FileInputStream(file), encoding)),
-                content = '';
-            try {
-                stringBuffer = new java.lang.StringBuffer();
-                line = input.readLine();
-
-                // Byte Order Mark (BOM) - The Unicode Standard, version 3.0, page 324
-                // http://www.unicode.org/faq/utf_bom.html
-
-                // Note that when we use utf-8, the BOM should appear as "EF BB BF", but it doesn't due to this bug in the JDK:
-                // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4508058
-                if (line && line.length() && line.charAt(0) === 0xfeff) {
-                    // Eat the BOM, since we've already found the encoding on this file,
-                    // and we plan to concatenating this buffer with others; the BOM should
-                    // only appear at the top of a file.
-                    line = line.substring(1);
-                }
-
-                if (line !== null) {
-                    stringBuffer.append(line);
-                }
-
-                while ((line = input.readLine()) !== null) {
-                    stringBuffer.append(lineSeparator);
-                    stringBuffer.append(line);
-                }
-                //Make sure we return a JavaScript string and not a Java string.
-                content = String(stringBuffer.toString()); //String
-            } finally {
-                input.close();
-            }
-            callback(content);
-        };
-    } else if (masterConfig.env === 'xpconnect' || (!masterConfig.env &&
-            typeof Components !== 'undefined' && Components.classes &&
-            Components.interfaces)) {
-        //Avert your gaze!
-        Cc = Components.classes;
-        Ci = Components.interfaces;
-        Components.utils['import']('resource://gre/modules/FileUtils.jsm');
-        xpcIsWindows = ('@mozilla.org/windows-registry-key;1' in Cc);
-
-        text.get = function (url, callback) {
-            var inStream, convertStream, fileObj,
-                readData = {};
-
-            if (xpcIsWindows) {
-                url = url.replace(/\//g, '\\');
-            }
-
-            fileObj = new FileUtils.File(url);
-
-            //XPCOM, you so crazy
-            try {
-                inStream = Cc['@mozilla.org/network/file-input-stream;1']
-                           .createInstance(Ci.nsIFileInputStream);
-                inStream.init(fileObj, 1, 0, false);
-
-                convertStream = Cc['@mozilla.org/intl/converter-input-stream;1']
-                                .createInstance(Ci.nsIConverterInputStream);
-                convertStream.init(inStream, "utf-8", inStream.available(),
-                Ci.nsIConverterInputStream.DEFAULT_REPLACEMENT_CHARACTER);
-
-                convertStream.readString(inStream.available(), readData);
-                convertStream.close();
-                inStream.close();
-                callback(readData.value);
-            } catch (e) {
-                throw new Error((fileObj && fileObj.path || '') + ': ' + e);
-            }
-        };
-    }
-    return text;
-});
-
-
-define('text!mockup-patterns-thememapper-url/templates/inspector.xml',[],function () { return '<div class="frame-panel mapper-box col-md-6">\n  <div class="panel-toolbar">\n    <a class="refresh" href="#" title="Refresh mockup. You can also right-click on the mockup to use your browser\'s native refresh."\n      i18n:attributes="title">\n      <span class="glyphicon glyphicon-refresh"></span>\n    </a>\n    <a class="fullscreen" href="#" title="Toggle fullscreen" i18n:attributes="title">\n      <span class="glyphicon glyphicon-fullscreen"></span>\n    </a>\n  </div>\n\n  <label i18n:translate="heading_theme"><%= name %></label>\n\n  <iframe class="frame" src="<%= url %>"></iframe>\n\n  <div class="frame-info">\n    <div class="frame-shelf-container" style="display:none">\n      <span i18n:translate="theming_mapper_shelf_label">Selected:</span>\n      <span class="selector-info"></span>\n      <a class="clearInspector" href="#clearInspector"\n         title="Clear selection" i18n:attributes="title">x</a>\n    </div>\n    <span class="current-selector"></span>\n  </div>\n\n  <div class="panel-footer">\n    <div class="btn-group">\n      <button class="btn btn-default turnon" disabled i18n:translate="">Inspector on</button>\n      <button class="btn btn-default turnoff" i18n:translate="">Inspector off</button>\n    </div>\n  </div>\n\n  <div class="discreet footer-help" i18n:translate="help_highlighter_selection">\n    Hover over an element to see its selector.\n    Left-click or press <em>Enter</em> to save.\n    Press <em>Esc</em> to select parent.\n  </div>\n\n</div>\n';});
-
 (function(root) {
 define("jqtree", ["jquery"], function() {
   return (function() {
@@ -27473,6 +26913,415 @@ define('mockup-patterns-texteditor',[
 
 });
 
+/**
+ * @license text 2.0.15 Copyright jQuery Foundation and other contributors.
+ * Released under MIT license, http://github.com/requirejs/text/LICENSE
+ */
+/*jslint regexp: true */
+/*global require, XMLHttpRequest, ActiveXObject,
+  define, window, process, Packages,
+  java, location, Components, FileUtils */
+
+define('text',['module'], function (module) {
+    'use strict';
+
+    var text, fs, Cc, Ci, xpcIsWindows,
+        progIds = ['Msxml2.XMLHTTP', 'Microsoft.XMLHTTP', 'Msxml2.XMLHTTP.4.0'],
+        xmlRegExp = /^\s*<\?xml(\s)+version=[\'\"](\d)*.(\d)*[\'\"](\s)*\?>/im,
+        bodyRegExp = /<body[^>]*>\s*([\s\S]+)\s*<\/body>/im,
+        hasLocation = typeof location !== 'undefined' && location.href,
+        defaultProtocol = hasLocation && location.protocol && location.protocol.replace(/\:/, ''),
+        defaultHostName = hasLocation && location.hostname,
+        defaultPort = hasLocation && (location.port || undefined),
+        buildMap = {},
+        masterConfig = (module.config && module.config()) || {};
+
+    function useDefault(value, defaultValue) {
+        return value === undefined || value === '' ? defaultValue : value;
+    }
+
+    //Allow for default ports for http and https.
+    function isSamePort(protocol1, port1, protocol2, port2) {
+        if (port1 === port2) {
+            return true;
+        } else if (protocol1 === protocol2) {
+            if (protocol1 === 'http') {
+                return useDefault(port1, '80') === useDefault(port2, '80');
+            } else if (protocol1 === 'https') {
+                return useDefault(port1, '443') === useDefault(port2, '443');
+            }
+        }
+        return false;
+    }
+
+    text = {
+        version: '2.0.15',
+
+        strip: function (content) {
+            //Strips <?xml ...?> declarations so that external SVG and XML
+            //documents can be added to a document without worry. Also, if the string
+            //is an HTML document, only the part inside the body tag is returned.
+            if (content) {
+                content = content.replace(xmlRegExp, "");
+                var matches = content.match(bodyRegExp);
+                if (matches) {
+                    content = matches[1];
+                }
+            } else {
+                content = "";
+            }
+            return content;
+        },
+
+        jsEscape: function (content) {
+            return content.replace(/(['\\])/g, '\\$1')
+                .replace(/[\f]/g, "\\f")
+                .replace(/[\b]/g, "\\b")
+                .replace(/[\n]/g, "\\n")
+                .replace(/[\t]/g, "\\t")
+                .replace(/[\r]/g, "\\r")
+                .replace(/[\u2028]/g, "\\u2028")
+                .replace(/[\u2029]/g, "\\u2029");
+        },
+
+        createXhr: masterConfig.createXhr || function () {
+            //Would love to dump the ActiveX crap in here. Need IE 6 to die first.
+            var xhr, i, progId;
+            if (typeof XMLHttpRequest !== "undefined") {
+                return new XMLHttpRequest();
+            } else if (typeof ActiveXObject !== "undefined") {
+                for (i = 0; i < 3; i += 1) {
+                    progId = progIds[i];
+                    try {
+                        xhr = new ActiveXObject(progId);
+                    } catch (e) {}
+
+                    if (xhr) {
+                        progIds = [progId];  // so faster next time
+                        break;
+                    }
+                }
+            }
+
+            return xhr;
+        },
+
+        /**
+         * Parses a resource name into its component parts. Resource names
+         * look like: module/name.ext!strip, where the !strip part is
+         * optional.
+         * @param {String} name the resource name
+         * @returns {Object} with properties "moduleName", "ext" and "strip"
+         * where strip is a boolean.
+         */
+        parseName: function (name) {
+            var modName, ext, temp,
+                strip = false,
+                index = name.lastIndexOf("."),
+                isRelative = name.indexOf('./') === 0 ||
+                             name.indexOf('../') === 0;
+
+            if (index !== -1 && (!isRelative || index > 1)) {
+                modName = name.substring(0, index);
+                ext = name.substring(index + 1);
+            } else {
+                modName = name;
+            }
+
+            temp = ext || modName;
+            index = temp.indexOf("!");
+            if (index !== -1) {
+                //Pull off the strip arg.
+                strip = temp.substring(index + 1) === "strip";
+                temp = temp.substring(0, index);
+                if (ext) {
+                    ext = temp;
+                } else {
+                    modName = temp;
+                }
+            }
+
+            return {
+                moduleName: modName,
+                ext: ext,
+                strip: strip
+            };
+        },
+
+        xdRegExp: /^((\w+)\:)?\/\/([^\/\\]+)/,
+
+        /**
+         * Is an URL on another domain. Only works for browser use, returns
+         * false in non-browser environments. Only used to know if an
+         * optimized .js version of a text resource should be loaded
+         * instead.
+         * @param {String} url
+         * @returns Boolean
+         */
+        useXhr: function (url, protocol, hostname, port) {
+            var uProtocol, uHostName, uPort,
+                match = text.xdRegExp.exec(url);
+            if (!match) {
+                return true;
+            }
+            uProtocol = match[2];
+            uHostName = match[3];
+
+            uHostName = uHostName.split(':');
+            uPort = uHostName[1];
+            uHostName = uHostName[0];
+
+            return (!uProtocol || uProtocol === protocol) &&
+                   (!uHostName || uHostName.toLowerCase() === hostname.toLowerCase()) &&
+                   ((!uPort && !uHostName) || isSamePort(uProtocol, uPort, protocol, port));
+        },
+
+        finishLoad: function (name, strip, content, onLoad) {
+            content = strip ? text.strip(content) : content;
+            if (masterConfig.isBuild) {
+                buildMap[name] = content;
+            }
+            onLoad(content);
+        },
+
+        load: function (name, req, onLoad, config) {
+            //Name has format: some.module.filext!strip
+            //The strip part is optional.
+            //if strip is present, then that means only get the string contents
+            //inside a body tag in an HTML string. For XML/SVG content it means
+            //removing the <?xml ...?> declarations so the content can be inserted
+            //into the current doc without problems.
+
+            // Do not bother with the work if a build and text will
+            // not be inlined.
+            if (config && config.isBuild && !config.inlineText) {
+                onLoad();
+                return;
+            }
+
+            masterConfig.isBuild = config && config.isBuild;
+
+            var parsed = text.parseName(name),
+                nonStripName = parsed.moduleName +
+                    (parsed.ext ? '.' + parsed.ext : ''),
+                url = req.toUrl(nonStripName),
+                useXhr = (masterConfig.useXhr) ||
+                         text.useXhr;
+
+            // Do not load if it is an empty: url
+            if (url.indexOf('empty:') === 0) {
+                onLoad();
+                return;
+            }
+
+            //Load the text. Use XHR if possible and in a browser.
+            if (!hasLocation || useXhr(url, defaultProtocol, defaultHostName, defaultPort)) {
+                text.get(url, function (content) {
+                    text.finishLoad(name, parsed.strip, content, onLoad);
+                }, function (err) {
+                    if (onLoad.error) {
+                        onLoad.error(err);
+                    }
+                });
+            } else {
+                //Need to fetch the resource across domains. Assume
+                //the resource has been optimized into a JS module. Fetch
+                //by the module name + extension, but do not include the
+                //!strip part to avoid file system issues.
+                req([nonStripName], function (content) {
+                    text.finishLoad(parsed.moduleName + '.' + parsed.ext,
+                                    parsed.strip, content, onLoad);
+                });
+            }
+        },
+
+        write: function (pluginName, moduleName, write, config) {
+            if (buildMap.hasOwnProperty(moduleName)) {
+                var content = text.jsEscape(buildMap[moduleName]);
+                write.asModule(pluginName + "!" + moduleName,
+                               "define(function () { return '" +
+                                   content +
+                               "';});\n");
+            }
+        },
+
+        writeFile: function (pluginName, moduleName, req, write, config) {
+            var parsed = text.parseName(moduleName),
+                extPart = parsed.ext ? '.' + parsed.ext : '',
+                nonStripName = parsed.moduleName + extPart,
+                //Use a '.js' file name so that it indicates it is a
+                //script that can be loaded across domains.
+                fileName = req.toUrl(parsed.moduleName + extPart) + '.js';
+
+            //Leverage own load() method to load plugin value, but only
+            //write out values that do not have the strip argument,
+            //to avoid any potential issues with ! in file names.
+            text.load(nonStripName, req, function (value) {
+                //Use own write() method to construct full module value.
+                //But need to create shell that translates writeFile's
+                //write() to the right interface.
+                var textWrite = function (contents) {
+                    return write(fileName, contents);
+                };
+                textWrite.asModule = function (moduleName, contents) {
+                    return write.asModule(moduleName, fileName, contents);
+                };
+
+                text.write(pluginName, nonStripName, textWrite, config);
+            }, config);
+        }
+    };
+
+    if (masterConfig.env === 'node' || (!masterConfig.env &&
+            typeof process !== "undefined" &&
+            process.versions &&
+            !!process.versions.node &&
+            !process.versions['node-webkit'] &&
+            !process.versions['atom-shell'])) {
+        //Using special require.nodeRequire, something added by r.js.
+        fs = require.nodeRequire('fs');
+
+        text.get = function (url, callback, errback) {
+            try {
+                var file = fs.readFileSync(url, 'utf8');
+                //Remove BOM (Byte Mark Order) from utf8 files if it is there.
+                if (file[0] === '\uFEFF') {
+                    file = file.substring(1);
+                }
+                callback(file);
+            } catch (e) {
+                if (errback) {
+                    errback(e);
+                }
+            }
+        };
+    } else if (masterConfig.env === 'xhr' || (!masterConfig.env &&
+            text.createXhr())) {
+        text.get = function (url, callback, errback, headers) {
+            var xhr = text.createXhr(), header;
+            xhr.open('GET', url, true);
+
+            //Allow plugins direct access to xhr headers
+            if (headers) {
+                for (header in headers) {
+                    if (headers.hasOwnProperty(header)) {
+                        xhr.setRequestHeader(header.toLowerCase(), headers[header]);
+                    }
+                }
+            }
+
+            //Allow overrides specified in config
+            if (masterConfig.onXhr) {
+                masterConfig.onXhr(xhr, url);
+            }
+
+            xhr.onreadystatechange = function (evt) {
+                var status, err;
+                //Do not explicitly handle errors, those should be
+                //visible via console output in the browser.
+                if (xhr.readyState === 4) {
+                    status = xhr.status || 0;
+                    if (status > 399 && status < 600) {
+                        //An http 4xx or 5xx error. Signal an error.
+                        err = new Error(url + ' HTTP status: ' + status);
+                        err.xhr = xhr;
+                        if (errback) {
+                            errback(err);
+                        }
+                    } else {
+                        callback(xhr.responseText);
+                    }
+
+                    if (masterConfig.onXhrComplete) {
+                        masterConfig.onXhrComplete(xhr, url);
+                    }
+                }
+            };
+            xhr.send(null);
+        };
+    } else if (masterConfig.env === 'rhino' || (!masterConfig.env &&
+            typeof Packages !== 'undefined' && typeof java !== 'undefined')) {
+        //Why Java, why is this so awkward?
+        text.get = function (url, callback) {
+            var stringBuffer, line,
+                encoding = "utf-8",
+                file = new java.io.File(url),
+                lineSeparator = java.lang.System.getProperty("line.separator"),
+                input = new java.io.BufferedReader(new java.io.InputStreamReader(new java.io.FileInputStream(file), encoding)),
+                content = '';
+            try {
+                stringBuffer = new java.lang.StringBuffer();
+                line = input.readLine();
+
+                // Byte Order Mark (BOM) - The Unicode Standard, version 3.0, page 324
+                // http://www.unicode.org/faq/utf_bom.html
+
+                // Note that when we use utf-8, the BOM should appear as "EF BB BF", but it doesn't due to this bug in the JDK:
+                // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4508058
+                if (line && line.length() && line.charAt(0) === 0xfeff) {
+                    // Eat the BOM, since we've already found the encoding on this file,
+                    // and we plan to concatenating this buffer with others; the BOM should
+                    // only appear at the top of a file.
+                    line = line.substring(1);
+                }
+
+                if (line !== null) {
+                    stringBuffer.append(line);
+                }
+
+                while ((line = input.readLine()) !== null) {
+                    stringBuffer.append(lineSeparator);
+                    stringBuffer.append(line);
+                }
+                //Make sure we return a JavaScript string and not a Java string.
+                content = String(stringBuffer.toString()); //String
+            } finally {
+                input.close();
+            }
+            callback(content);
+        };
+    } else if (masterConfig.env === 'xpconnect' || (!masterConfig.env &&
+            typeof Components !== 'undefined' && Components.classes &&
+            Components.interfaces)) {
+        //Avert your gaze!
+        Cc = Components.classes;
+        Ci = Components.interfaces;
+        Components.utils['import']('resource://gre/modules/FileUtils.jsm');
+        xpcIsWindows = ('@mozilla.org/windows-registry-key;1' in Cc);
+
+        text.get = function (url, callback) {
+            var inStream, convertStream, fileObj,
+                readData = {};
+
+            if (xpcIsWindows) {
+                url = url.replace(/\//g, '\\');
+            }
+
+            fileObj = new FileUtils.File(url);
+
+            //XPCOM, you so crazy
+            try {
+                inStream = Cc['@mozilla.org/network/file-input-stream;1']
+                           .createInstance(Ci.nsIFileInputStream);
+                inStream.init(fileObj, 1, 0, false);
+
+                convertStream = Cc['@mozilla.org/intl/converter-input-stream;1']
+                                .createInstance(Ci.nsIConverterInputStream);
+                convertStream.init(inStream, "utf-8", inStream.available(),
+                Ci.nsIConverterInputStream.DEFAULT_REPLACEMENT_CHARACTER);
+
+                convertStream.readString(inStream.available(), readData);
+                convertStream.close();
+                inStream.close();
+                callback(readData.value);
+            } catch (e) {
+                throw new Error((fileObj && fileObj.path || '') + ': ' + e);
+            }
+        };
+    }
+    return text;
+});
+
 
 define('text!mockup-patterns-filemanager-url/templates/app.xml',[],function () { return '<div id="toolbar">\n</div>\n<div id="toolbar-action">\n</div>\n<div class="container">\n    <div class="tree">\n    </div>\n    <div class="nav-and-editor">\n        <nav class="navbar navbar-default" role="navigation">\n            <div class="collapse navbar-collapse">\n              <ul class="nav navbar-nav">\n               </ul>\n            </div><!-- /.navbar-collapse -->\n            <div class="fileeditor">\n                <div class="editor">\n                </div>\n            </div>\n        </nav>\n</div>\n<ul id="contextual-menu" class="dropdown-menu">\n    <li data-item="newfile"><a>New File</a></li>\n    <li data-item="newfolder"><a>New Folder</a></li>\n    <li data-item="rename"><a>Rename</a></li>\n    <li data-item="delete"><a>Delete</a></li>\n    <li data-item="upload"><a>Upload Here</a></li>\n</ul>\n';});
 
@@ -29084,6 +28933,154 @@ define('text!mockup-patterns-filemanager-url/templates/app.xml',[],function () {
   return Backbone;
 
 }));
+
+/* i18n integration. This is forked from jarn.jsi18n
+ *
+ * This is a singleton.
+ * Configuration is done on the body tag data-i18ncatalogurl attribute
+ *     <body data-i18ncatalogurl="/plonejsi18n">
+ *
+ *  Or, it'll default to "/plonejsi18n"
+ */
+define('mockup-i18n',[
+  'jquery'
+], function($) {
+  'use strict';
+
+  var I18N = function() {
+    var self = this;
+    self.baseUrl = $('body').attr('data-i18ncatalogurl');
+
+    if (!self.baseUrl) {
+      self.baseUrl = '/plonejsi18n';
+    }
+    self.currentLanguage = $('html').attr('lang') || 'en';
+
+    // Fix for country specific languages
+    if (self.currentLanguage.split('-').length > 1) {
+      self.currentLanguage = self.currentLanguage.split('-')[0] + '_' + self.currentLanguage.split('-')[1].toUpperCase();
+    }
+
+    self.storage = null;
+    self.catalogs = {};
+    self.ttl = 24 * 3600 * 1000;
+
+    // Internet Explorer 8 does not know Date.now() which is used in e.g. loadCatalog, so we "define" it
+    if (!Date.now) {
+      Date.now = function() {
+        return new Date().valueOf();
+      };
+    }
+
+    try {
+      if ('localStorage' in window && window.localStorage !== null && 'JSON' in window && window.JSON !== null) {
+        self.storage = window.localStorage;
+      }
+    } catch (e) {}
+
+    self.configure = function(config) {
+      for (var key in config){
+        self[key] = config[key];
+      }
+    };
+
+    self._setCatalog = function (domain, language, catalog) {
+      if (domain in self.catalogs) {
+        self.catalogs[domain][language] = catalog;
+      } else {
+        self.catalogs[domain] = {};
+        self.catalogs[domain][language] = catalog;
+      }
+    };
+
+    self._storeCatalog = function (domain, language, catalog) {
+      var key = domain + '-' + language;
+      if (self.storage !== null && catalog !== null) {
+        self.storage.setItem(key, JSON.stringify(catalog));
+        self.storage.setItem(key + '-updated', Date.now());
+      }
+    };
+
+    self.getUrl = function(domain, language) {
+      return self.baseUrl + '?domain=' + domain + '&language=' + language;
+    };
+
+    self.loadCatalog = function (domain, language) {
+      if (language === undefined) {
+        language = self.currentLanguage;
+      }
+      if (self.storage !== null) {
+        var key = domain + '-' + language;
+        if (key in self.storage) {
+          if ((Date.now() - parseInt(self.storage.getItem(key + '-updated'), 10)) < self.ttl) {
+            var catalog = JSON.parse(self.storage.getItem(key));
+            self._setCatalog(domain, language, catalog);
+            return;
+          }
+        }
+      }
+      $.getJSON(self.getUrl(domain, language), function (catalog) {
+        if (catalog === null) {
+          return;
+        }
+        self._setCatalog(domain, language, catalog);
+        self._storeCatalog(domain, language, catalog);
+      });
+    };
+
+    self.MessageFactory = function (domain, language) {
+      language = language || self.currentLanguage;
+      return function translate (msgid, keywords) {
+        var msgstr;
+        if ((domain in self.catalogs) && (language in self.catalogs[domain]) && (msgid in self.catalogs[domain][language])) {
+          msgstr = self.catalogs[domain][language][msgid];
+        } else {
+          msgstr = msgid;
+        }
+        if (keywords) {
+          var regexp, keyword;
+          for (keyword in keywords) {
+            if (keywords.hasOwnProperty(keyword)) {
+              regexp = new RegExp('\\$\\{' + keyword + '\\}', 'g');
+              msgstr = msgstr.replace(regexp, keywords[keyword]);
+            }
+          }
+        }
+        return msgstr;
+      };
+    };
+  };
+
+  return I18N;
+});
+
+/* i18n integration.
+ *
+ * This is a singleton.
+ * Configuration is done on the body tag data-i18ncatalogurl attribute
+ *     <body data-i18ncatalogurl="/plonejsi18n">
+ *
+ *  Or, it'll default to "/plonejsi18n"
+ */
+
+define('translate',[
+  'mockup-i18n'
+], function(I18N) {
+  'use strict';
+
+  // we're creating a singleton here so we can potentially
+  // delay the initialization of the translate catalog
+  // until after the dom is available
+  var _t = null;
+  return function(msgid, keywords) {
+    if (_t === null) {
+      var i18n = new I18N();
+      i18n.loadCatalog('widgets');
+      _t = i18n.MessageFactory('widgets');
+    }
+    return _t(msgid, keywords);
+  };
+});
 
 define('mockup-ui-url/views/base',[
   'jquery',
@@ -39845,1579 +39842,6 @@ define('mockup-patterns-filemanager',[
 
 });
 
-define('mockup-patterns-thememapper-url/js/rulebuilder',[
-  'jquery',
-  'underscore'
-], function($, _) {
-  'use strict';
-
-  var RuleBuilder = function(thememapper) {
-    /**
-     * Rule builder
-     *
-     * Contains functions to build CSS and XPath selectors as well as a Diazo rule
-     * from a given node, and acts as a state machine for the rules wizard.
-     *
-     */
-
-    var self = this;
-    self.thememapper = thememapper;
-
-    self.themeInspector = null;
-    self.unthemedInspector = null;
-
-    self.active = false;
-    self.currentScope = null;
-    self.haveScrolled = false;
-
-    self.ruleType = null;
-    self.subtype = null;
-
-    self._contentElement = null;
-    self._themeElement = null;
-
-    self.rulesFilename = 'rules.xml';
-
-    self.ruleBuilderPopover = {
-      el: self.thememapper.rulebuilderView.el,
-      button: self.thememapper.rulebuilderView.triggerView.el,
-      isOpened: function() {
-        return $(this.el).is(':visible');
-      },
-      close: function() {
-        if (this.isOpened()) {
-          if (self.active && $els.step2.is(':visible')) {
-            self.end();
-          } else {
-            $(this.button).click();
-          }
-        }
-      },
-      load: function() {
-        if (!this.isOpened()) {
-          $(this.button).click();
-        }
-      }
-    };
-
-    var $els = {
-      reusePanel: $('#new-rule-reuse-panel'),
-      reuseSelectors: $('#new-rule-reuse-selectors'),
-      selectTheme: $('#new-rule-select-theme'),
-      selectThemeNext: $('#new-rule-select-theme .next'),
-      selectContentNext: $('#new-rule-select-content .next'),
-      wizardSteps: $('.rule-wizard-step'),
-      selectContent: $('#new-rule-select-content'),
-      step1: $('#new-rule-step-1'),
-      step1Next: $('#new-rule-step-1 .next'),
-      step2: $('#new-rule-step-2'),
-      step2Insert: $('#new-rule-step-2 .insert'),
-      step2Copy: $('#new-rule-step-2 .copy'),
-      inspectors: self.thememapper.$inspectorContainer,
-      ruleOutput: $('#new-rule-output'),
-      themePanel: $('#inspectors .mockup-inspector'),
-      themePanelTop: $('.mockup-inspector .panel-toolbar'),
-      unthemedPanel: $('#inspectors .unthemed-inspector'),
-      unthemedPanelTop: $('.unthemed-inspector .panel-toolbar'),
-      newRuleThemeChildren: $('#new-rule-theme-children'),
-      newRuleUnthemedChildren: $('#new-rule-content-children'),
-      modifiers: $('.rule-modifier'),
-      selectors: $('.selector-info'),
-      closers: $('.new-rule .close, .new-rule .wizard-cancel')
-    };
-
-    $els.step1Next.click(function() {
-      var ruleType = self.getSelectedType();
-      self.start(ruleType);
-    });
-
-    $els.closers.click(function() {
-      self.end();
-      self.ruleBuilderPopover.close();
-    });
-
-    $els.selectThemeNext.click(function() {
-      self.themeInspector.on();
-
-      if (!$els.inspectors.is(':visible')) {
-        self.thememapper.showInspectors();
-      }
-
-      self.scrollTo($els.themePanelTop);
-      self.ruleBuilderPopover.close();
-
-      $els.themePanel.expose({
-        color: '#fff',
-        closeOnClick: false,
-        closeOnEsc: false,
-        closeSpeed: 0,
-        onLoad: function() {
-          self.scrollTo(this.getExposed());
-        },
-      });
-    });
-
-    $els.step2Copy.hide();
-    $els.step2Insert.click(function() {
-
-      var rule = $els.ruleOutput.val();
-
-      var aceEditor = self.thememapper.fileManager.ace.editor;
-      var session = aceEditor.getSession();
-
-      function findStartTag(backwards) {
-        aceEditor.find('<\\w+', {
-          backwards: backwards,
-          wrap: false,
-          wholeWord: false,
-          regExp: true
-        });
-      }
-
-      function indent(string, amount) {
-        var padding = '';
-        for (var i = 0; i < amount; ++i) {
-          padding += ' ';
-        }
-        return '\n' + padding + string.replace(/\n/g, '\n' + padding) + '\n';
-      }
-
-      //If we're already starting at the very end, go back to the beginning
-      if (session.getDocument().$lines.length == aceEditor.getSelectionRange().end.row + 1) {
-        aceEditor.navigateFileStart();
-      }
-
-      // Go to the next opening tag - we want to insert before this
-      findStartTag(false);
-      if (aceEditor.getCursorPosition().row <= 1) {
-        // Probably the opening rules tag
-        findStartTag(false);
-      }
-
-      var selectionText = aceEditor.getSelectedText();
-
-      // If we didn't find anything, look for the end of the current tag
-      if (selectionText === '') {
-        aceEditor.find('(/>|</)', {
-          backwards: false,
-          wrap: false,
-          wholeWord: false,
-          regExp: true
-        });
-
-        selectionText = aceEditor.getSelectedText();
-        if (selectionText === '') {
-          // Still nothing? Go to the end
-          aceEditor.navigateFileEnd();
-        } else {
-          // Go one past the end tag, but first figure out how far we should i
-          aceEditor.navigateDown();
-        }
-      }
-
-      var indentation = aceEditor.getSelectionRange().start.column;
-      var cursorPosition = aceEditor.getCursorPosition();
-      var newlines = rule.match(/\n/g);
-      var rows = 0;
-      if (newlines != null) {
-        rows = newlines.length;
-      }
-
-      aceEditor.gotoLine(cursorPosition.row);
-      aceEditor.insert(indent(rule, indentation));
-      aceEditor.getSelection().selectTo(cursorPosition.row + rows + 1, 0);
-      aceEditor.gotoLine(cursorPosition.row);
-      aceEditor.container.focus();
-
-      self.ruleBuilderPopover.close();
-
-      self.scrollTo(self.thememapper.fileManager.$el);
-
-      // Clear the selection now that we're done with it
-      self.unthemedInspector.save(null);
-      self.themeInspector.save(null);
-    });
-
-    $els.selectContentNext.click(function() {
-      self.unthemedInspector.on();
-      if (!$els.inspectors.is(':visible')) {
-        self.thememapper.showInspectors();
-      }
-
-      self.scrollTo($els.unthemedPanelTop);
-      self.ruleBuilderPopover.close();
-
-      $els.unthemedPanel.expose({
-        color: '#fff',
-        closeOnClick: false,
-        closeOnEsc: false,
-        closeSpeed: 0,
-        onLoad: function() {
-          self.scrollTo(this.getExposed());
-        },
-      });
-    });
-
-    $els.modifiers.change(function() {
-      self.updateRule();
-    });
-    self.end = function() {
-      self._contentElement = null;
-      self._themeElement = null;
-      self.currentScope = null;
-      self.active = false;
-      self.ruleType = null;
-      self.subtype = null;
-
-      self.callback(this);
-    };
-
-    self.start = function(ruleType) {
-      var self = this;
-
-      if (ruleType === undefined) {
-        ruleType = self.getSelectedType();
-      }
-
-      self.themeInspector = self.thememapper.mockupInspector;
-      self.unthemedInspector = self.thememapper.unthemedInspector;
-
-      self._contentElement = null;
-      self._themeElement = null;
-      self.currentScope = 'theme';
-
-      // Drop rules get e.g. drop:content or drop:theme,
-      // which predetermines the scope
-      var ruleSplit = ruleType.split(':');
-      if (ruleSplit.length >= 2) {
-        self.ruleType = ruleSplit[0];
-        self.subtype = ruleSplit[1];
-        self.currentScope = self.subtype;
-      } else {
-        self.ruleType = ruleType;
-        self.subtype = null;
-      }
-
-      self.active = true;
-
-      self.callback(self);
-    };
-
-    /**
-     * Build a diazo rule. 'themeChildren' and 'contentChildren' should be true or
-     * false to indicate whether a -children selector is to be used.
-     */
-    self.buildRule = function(themeChildren, contentChildren) {
-      if (self.ruleType === null) {
-        return '';
-      }
-
-      if (self.subtype !== null) {
-        if (self.subtype === 'content') {
-          return '<' + self.ruleType + '\n    ' +
-            self.calculateDiazoSelector(self._contentElement, 'content', contentChildren) +
-            '\n    />';
-        } else if (self.subtype === 'theme') {
-          return '<' + self.ruleType + '\n    ' +
-            self.calculateDiazoSelector(self._themeElement, 'theme', themeChildren) +
-            '\n    />';
-        }
-
-      } else {
-        return '<' + self.ruleType + '\n    ' +
-          self.calculateDiazoSelector(self._themeElement, 'theme', themeChildren) + '\n    ' +
-          self.calculateDiazoSelector(self._contentElement, 'content', contentChildren) +
-          '\n    />';
-      }
-
-      // Should never happen
-      return 'Error';
-    };
-
-    /**
-     * Return a valid (but not necessarily unique) CSS selector for the given
-     * element.
-     */
-    self.calculateCSSSelector = function(element) {
-      var selector = element.tagName.toLowerCase();
-
-      if (element.id) {
-        selector += '#' + element.id;
-      } else {
-        var classes = $(element).attr('class');
-        if (classes !== undefined) {
-          var splitClasses = classes.split(/\s+/);
-          for (var i = 0; i < splitClasses.length; i = i + 1) {
-            if (splitClasses[i] !== '' && splitClasses[i].indexOf('_theming') === -1) {
-              selector += '.' + splitClasses[i];
-              break;
-            }
-          }
-        }
-      }
-
-      return selector;
-    };
-
-    /**
-     * Return a valid, unqiue CSS selector for the given element. Returns null if
-     * no reasoanble unique selector can be built.
-     */
-    self.calculateUniqueCSSSelector = function(element) {
-      var paths = [];
-      var path = null;
-
-      var parents = $(element).parents();
-      var ultimateParent = parents[parents.length - 1];
-
-      while (element && element.nodeType === 1) {
-        var selector = this.calculateCSSSelector(element);
-        paths.splice(0, 0, selector);
-        path = paths.join(' ');
-
-        // The ultimateParent constraint is necessary since
-        // this may be inside an iframe
-        if ($(path, ultimateParent).length === 1) {
-          return path;
-        }
-
-        element = element.parentNode;
-      }
-
-      return null;
-    };
-
-    /**
-     * Return a valid, unique XPath selector for the given element.
-     */
-    self.calculateUniqueXPathExpression = function(element) {
-      var parents = $(element).parents();
-
-      function elementIndex(e) {
-        var siblings = $(e).siblings(e.tagName.toLowerCase());
-        if (siblings.length > 0) {
-          return '[' + ($(e).index() + 1) + ']';
-        } else {
-          return '';
-        }
-      }
-
-      var xpathString = '/' + element.tagName.toLowerCase();
-      if (element.id) {
-        return '/' + xpathString + '[@id=\'' + element.id + '\']';
-      } else {
-        xpathString += elementIndex(element);
-      }
-
-      for (var i = 0; i < parents.length; i = i + 1) {
-        var p = parents[i];
-        var pString = '/' + p.tagName.toLowerCase();
-
-        if (p.id) {
-          return '/' + pString + '[@id=\'' + p.id + '\']' + xpathString;
-        } else {
-          xpathString = pString + elementIndex(p) + xpathString;
-        }
-      }
-
-      return xpathString;
-    };
-
-    /**
-     * Return a unique CSS or XPath selector, preferring a CSS one.
-     */
-    self.bestSelector = function(element) {
-      return self.calculateUniqueCSSSelector(element) ||
-        self.calculateUniqueXPathExpression(element);
-    };
-
-    self.openRuleFile = function() {
-
-      var fileManager = self.thememapper.fileManager;
-
-      var treeNodes = fileManager.$tree.tree('getTree');
-      var opened = false;
-
-      _.each(treeNodes.children, function(node) {
-        if (node.name == self.rulesFilename) {
-          //if it's open already, don't reopen it.
-          //That will move the cursors location
-          if (fileManager.$tabs.find('.active').data('path') != '/' + self.rulesFilename) {
-            self.thememapper.fileManager.openFile({
-              node: node
-            });
-          }
-          opened = true;
-        }
-      });
-      return opened;
-    };
-
-    /**
-     * Build a Diazo selector element with the appropriate namespace.
-     */
-    self.calculateDiazoSelector = function(element, scope, children) {
-      var selectorType = scope;
-      if (children) {
-        selectorType += '-children';
-      }
-
-      var cssSelector = self.calculateUniqueCSSSelector(element);
-      if (cssSelector) {
-        return 'css:' + selectorType + '="' + cssSelector + '"';
-      } else {
-        var xpathSelector = self.calculateUniqueXPathExpression(element);
-        return selectorType + '="' + xpathSelector + '"';
-      }
-
-    };
-
-    self.select = function(element) {
-      if (this.currentScope == 'theme') {
-        this._themeElement = element;
-      } else if (this.currentScope == 'content') {
-        this._contentElement = element;
-      }
-    };
-
-    self.getSelectedType = function() {
-      var type = $('input[name=\'new-rule-type\']:checked').val();
-      return type;
-    };
-
-    self.next = function() {
-      var self = this;
-      if (self.subtype !== null) {
-        // Drop rules have only one scope
-        self.currentScope = null;
-      } else {
-        // Other rules have content and theme
-        if (self.currentScope == 'theme') {
-          self.currentScope = 'content';
-        } else if (self.currentScope == 'content') {
-          self.currentScope = null;
-        }
-      }
-      this.callback(this);
-    };
-
-    self.updateRule = function() {
-      $els.ruleOutput.val(
-        self.buildRule(
-          $els.newRuleThemeChildren.is(':checked'),
-          $els.newRuleUnthemedChildren.is(':checked')
-        )
-      );
-    };
-
-    self.scrollTo = function(selector) {
-      if ($(selector).length == 0) {
-        return;
-      }
-
-      $('html,body').animate({
-        scrollTop: $(selector).offset().top
-      }, 600);
-    };
-
-    /**
-     *   Called by the rulebuilderView. If there are selected
-     *   elements in the inspectors, we want to give the user the
-     *   option to use those.
-     */
-    self.checkSelectors = function() {
-      var selected = false;
-      $('.selector-info').each(function() {
-        if ($(this).text() != '') {
-          //Theres an item selected, so show the option to use it
-          $els.reusePanel.show();
-          selected = true;
-        }
-      });
-      if (!selected) {
-        //if we opened the panel previously, close it now
-        $els.reusePanel.hide();
-      }
-      return selected;
-    };
-    self.callback = function(ruleBuilder) {
-      $els.wizardSteps.hide();
-
-      var themeFrameHighlighter = this.thememapper.mockupInspector;
-      var unthemedFrameHighlighter = this.thememapper.unthemedInspector;
-
-      if ($.mask.isLoaded(true) && !self.ruleBuilderPopover.isOpened()) {
-        self.scrollTo(self.thememapper.fileManager.$el);
-        $.mask.close();
-      }
-
-      if (ruleBuilder.currentScope == 'theme') {
-        if (themeFrameHighlighter.saved != null && $els.reuseSelectors.is(':checked')) {
-          self.ruleBuilderPopover.close();
-
-          // Use saved rule
-          ruleBuilder.select(themeFrameHighlighter.saved);
-          ruleBuilder.next();
-        } else {
-          // Let the frame highlighter perform a selection
-          $els.selectTheme.show();
-          if (!self.ruleBuilderPopover.isOpened()) {
-            self.ruleBuilderPopover.load();
-          }
-        }
-
-      } else if (ruleBuilder.currentScope == 'content') {
-        if (unthemedFrameHighlighter.saved != null && $els.reuseSelectors.is(':checked')) {
-          self.ruleBuilderPopover.close();
-
-          // Use saved rule
-          ruleBuilder.select(unthemedFrameHighlighter.saved);
-          ruleBuilder.next();
-        } else {
-          // Let the frame highlighter perform a selection
-          $els.selectContent.show();
-          if (!self.ruleBuilderPopover.isOpened()) {
-            self.ruleBuilderPopover.load();
-          }
-        }
-
-      } else if (ruleBuilder.ruleType != null && ruleBuilder.currentScope == null) {
-
-        $els.wizardSteps.hide();
-        $els.step2.show();
-        self.updateRule(ruleBuilder);
-
-        if (self.openRuleFile()) {
-          $els.step2Insert.show();
-        } else {
-          $els.step2Insert.hide();
-        }
-
-        if (!self.ruleBuilderPopover.isOpened()) {
-          self.ruleBuilderPopover.load();
-        }
-
-      } else { // end
-
-        if (self.ruleBuilderPopover.isOpened()) {
-          self.ruleBuilderPopover.close();
-        }
-
-        $els.wizardSteps.hide();
-        $els.step1.show();
-      }
-    };
-  };
-
-  return RuleBuilder;
-});
-
-
-define('text!mockup-patterns-thememapper-url/templates/rulebuilder.xml',[],function () { return '<div class="new-rule">\n    <h1 class="documentFirstHeading">Build rule</h1>\n\n    <div id="new-rule-step-1" class="rule-wizard-step" style="display: block;">\n        <div class="documentDescription">\n            This wizard will help you build a Diazo rule by selecting relevant elements using\n            the <strong>HTML mockup</strong> and <strong>Unthemed content</strong> inspectors.\n        </div>\n\n        <form>\n            <div id="new-rule-type-panel" class="inputs">\n                <div>\n                    <input type="radio" name="new-rule-type" value="replace" id="new-rule-replace" checked="checked" />\n                    <label for="new-rule-replace">\n                        <strong>Replace</strong> an element of the theme with an element from the content\n                    </label>\n                </div>\n                <div>\n                    <input type="radio" name="new-rule-type" value="before" id="new-rule-before" />\n                    <label for="new-rule-before">\n                        Insert an element from the content <strong>before</strong> an element in the theme\n                    </label>\n                </div>\n                <div>\n                    <input type="radio" name="new-rule-type" value="after" id="new-rule-after" />\n                    <label for="new-rule-after">\n                        Insert an element from the content <strong>after</strong> an element in the theme\n                    </label>\n                </div>\n                <div>\n                    <input type="radio" name="new-rule-type" value="drop:content" id="new-rule-drop-content" />\n                    <label for="new-rule-drop-content">\n                        <strong>Drop</strong> an element in the <strong>content</strong>\n                    </label>\n                </div>\n                <div>\n                    <input type="radio" name="new-rule-type" value="drop:theme" id="new-rule-drop-theme" />\n                    <label for="new-rule-drop-theme">\n                        <strong>Drop</strong> an element in the <strong>theme</strong>\n                    </label>\n                </div>\n            </div>\n            <div class="field inputs" id="new-rule-reuse-panel" style="display: none;">\n                <input type="checkbox" name="new-rule-reuse-selectors" value="yes" id="new-rule-reuse-selectors" checked="checked" />\n                <label for="new-rule-reuse-selectors">\n                    Use selected elements\n                </label>\n                <div class="formHelp">\n                    If selected, the rule builder will use the elements you have currently selected\n                    in the <strong>HTML mockup</strong> and/or <strong>Unthemed content</strong>\n                    inspectors instead of prompting you to select new ones.\n                </div>\n            </div>\n        </form>\n\n        <div class="formControls new-rule-actions">\n            <input type="submit" class="btn btn-primary next submitting" value="Next" />\n            <input type="submit" class="btn btn-default standalone close" value="Cancel" />\n        </div>\n\n    </div>\n    <div id="new-rule-select-theme" class="rule-wizard-step" style="display: none;">\n        <div class="documentDescription">\n            Please select an element using the <strong>HTML mockup</strong> inspector.\n        </div>\n        <div class="formControls new-rule-actions">\n            <input type="submit" class="btn btn-primary next" value="Ok" />\n            <input type="submit" class="btn btn-default standalone wizard-cancel" value="Cancel" />\n        </div>\n    </div>\n    <div id="new-rule-select-content" class="rule-wizard-step" style="display: none;">\n        <div class="documentDescription">\n            Please select an element using the <strong>Unthemed content</strong> inspector.\n        </div>\n        <div class="formControls new-rule-actions">\n            <input type="submit" class="btn btn-primary next submitting" value="Ok" />\n            <input type="submit" class="btn btn-default standalone wizard-cancel" value="Cancel" />\n        </div>\n    </div>\n    <div id="new-rule-step-2" class="rule-wizard-step" style="display: none;">\n        <div class="documentDescription">\n            The rule can be found below. Use the checkboxes\n            to further refine it.\n        </div>\n        <form>\n            <div id="new-rule-output-panel">\n                <textarea name="new-rule-output" id="new-rule-output"></textarea>\n            </div>\n            <div id="new-rule-selector-panel">\n                <div>\n                    <input type="checkbox" class="rule-modifier" name="new-rule-theme-children" value="replace" id="new-rule-theme-children" />\n                    <label for="new-rule-theme-children">Apply rule to children of the matched theme node(s)</label>\n                </div>\n                <div>\n                    <input type="checkbox" class="rule-modifier" name="new-rule-content-children" value="replace" id="new-rule-content-children" />\n                    <label for="new-rule-content-children">Apply rule to children of the matched content node(s)</label>\n                </div>\n            </div>\n\n        </form>\n        <div class="formControls new-rule-actions">\n            <input type="submit" class="btn btn-primary insert submitting" title="Insert rule into the rules.xml file" value="Insert" />\n            <input type="submit" class="btn btn-primary copy" value="Copy to clipboard" style="display: none;" />\n            <input type="submit" class="btn btn-default close" value="Close" />\n        </div>\n    </div>\n</div>\n';});
-
-define('mockup-patterns-thememapper-url/js/rulebuilderview',[
-  'underscore',
-  'mockup-patterns-filemanager-url/js/basepopover',
-  'text!mockup-patterns-thememapper-url/templates/rulebuilder.xml',
-], function(_, PopoverView, RulebuilderTemplate) {
-  'use strict';
-  var rulebuilderTemplate = _.template(RulebuilderTemplate);
-
-  var RuleBuilderView = PopoverView.extend({
-    className: 'popover rulebuilderView',
-    title: _.template('<%= _t("Rule Builder") %>'),
-    content: rulebuilderTemplate,
-    render: function() {
-      PopoverView.prototype.render.call(this);
-      return this;
-    },
-    toggle: function(button, e) {
-      PopoverView.prototype.toggle.apply(this, [button, e]);
-      if (!this.opened) {
-        return;
-      } else {
-        this.app.ruleBuilder.checkSelectors();
-      }
-    }
-
-  });
-
-  return RuleBuilderView;
-});
-
-/*
- * much of this code is heavily barrowed from Rok Garbas's iframe
- * code that has since been removed from mockup
- */
-
-define('mockup-patterns-resourceregistry-url/js/iframe',[
-  'jquery'
-], function($) {
-  'use strict';
-
-  window.IFrame = function(options) { this.init(options); };
-  window.IFrame.prototype = {
-    defaults: {
-      doctype: '<!doctype html>',
-      title: '',
-      name: '',
-      resources: [],
-      callback: function(){},
-      configure: function(){},
-      onLoad: function(){}
-    },
-
-    init: function(options) {
-      var self = this;
-      self.options = $.extend({}, self.defaults, options);
-
-      // register this guy
-      if(!window.iframe){
-        window.iframe = {};
-      }
-      window.iframe[self.options.name] = self;
-
-      self.loaded = false;
-
-      // Create iframe
-      var iframe = window.document.createElement('iframe');
-
-      iframe.setAttribute('id', self.options.name);
-      iframe.setAttribute('name', self.options.name);
-      iframe.setAttribute('style', 'display:none;');
-      iframe.setAttribute('src', 'javascript:false');
-
-      window.document.body.appendChild(iframe);
-      self.el = iframe;
-      self.window = iframe.contentWindow;
-      self.document = self.window.document;
-
-      self.options.configure(self);
-
-      var resourcesData = '';
-      for(var i=0; i<self.options.resources.length; i=i+1){
-        var url = self.options.resources[i];
-        var resource;
-        if (url.slice( -3 ) === '.js') {
-          resource = window.document.createElement('script');
-          resource.src = url;
-          resource.type = 'text/javascript';
-          resource.async = false;
-        } else if (url.slice( -4 ) === '.css') {
-          resource = window.document.createElement('link');
-          resource.href = url;
-          resource.type = 'text/css';
-          resource.rel = 'stylesheet';
-        } else if (url.slice( -5 ) === '.less') {
-          resource = window.document.createElement('link');
-          resource.href = url;
-          resource.type = 'text/css';
-          resource.rel = 'stylesheet/less';
-        }
-        resourcesData += '\n' + resource.outerHTML;
-      }
-
-      self.document.open();
-      self.document.write(
-          self.options.doctype +
-          '<html>' +
-            '<head>' +
-              '<title>' + self.options.title + '</title>' +
-              '<meta http-equiv="X-UA-Compatible" content="IE=edge">' +
-            '</head>' +
-            '<body onload="parent.window.iframe[\'' +
-                self.options.name + '\'].load()">' +
-              resourcesData +
-            '</body>' +
-          '</html>'
-      );
-      self.document.close();
-    },
-
-    load: function() {
-      var self = this;
-
-      // check if already loaded
-      if ( self.loaded === true ) {
-        return;
-      }
-
-      // mark iframe as loaded
-      self.loaded = true;
-
-      self.options.onLoad(self);
-    },
-    destroy: function(){
-      delete window.iframe[this.options.name];
-      window.document.body.removeChild(this.el);
-    }
-  };
-
-  return window.IFrame;
-});
-
-define('mockup-patterns-thememapper-url/js/lessbuilderview',[
-  'jquery',
-  'underscore',
-  'mockup-patterns-filemanager-url/js/basepopover',
-  'mockup-patterns-resourceregistry-url/js/iframe'
-], function($, _, PopoverView, IFrame) {
-  'use strict';
-  var lessBuilderTemplate = _.template(
-    '<div id="lessBuilder">' +
-      '<span class="message"></span>' +
-      '<span style="display: none;" class="errorMessage"></span>' +
-      '<div class="buttonBox">' +
-        '<label for="lessFileName">Save as:</label>' +
-        '<input id="lessFileName" type="text" placeholder="filename" />' +
-        '<button id="compileBtn" class="btn btn-primary">Compile</button>' +
-        '<button id="errorBtn" class="btn btn-default">Clear</button>' +
-      '</div>' +
-    '</div>'
-  );
-
-  var LessBuilderView = PopoverView.extend({
-    className: 'popover lessbuilderview',
-    title: _.template('<%= _t("LESS Builder") %>'),
-    content: lessBuilderTemplate,
-    $button: null,
-    $start: null,
-    $working: null,
-    $done: null,
-    $error: null,
-    render: function() {
-      var self = this;
-      PopoverView.prototype.render.call(this);
-      self.$message = $('.message', this.$el);
-      self.$error = $('.errorMessage', this.$el);
-      self.$button = $('#compileBtn', this.$el);
-      self.$filename = $('#lessFileName', this.$el);
-      self.$errorButton = $('#errorBtn', this.$el);
-      self.$button.on('click', function() {
-        self.showLessBuilder();
-      });
-      self.$errorButton.on('click', function() {
-        self.start();
-        self.toggle();
-      });
-      self.start();
-      return this;
-    },
-    toggle: function(button, e) {
-      PopoverView.prototype.toggle.apply(this, [button, e]);
-      this.setFilename();
-    },
-    setFilename: function() {
-      var self = this;
-
-      if (self.app.lessPaths['save'] === undefined) {
-        return;
-      }
-
-      var filePath = self.app.lessPaths['less'];
-      var devPath = self.app.devPath[0];
-      var prodPath = self.app.prodPath[0];
-      var f;
-
-      if (filePath == devPath) {
-        f = prodPath;
-      } else {
-        f = self.app.lessPaths['save'];
-      }
-
-      f = f.substr(f.lastIndexOf('/') + 1, f.length);
-      self.$filename.attr('placeholder', f);
-    },
-    start: function() {
-      var self = this;
-      self.$button.show();
-      self.$errorButton.hide();
-      self.$message.text('Click to compile the current file');
-      self.$error.hide();
-    },
-    working: function() {
-      var self = this;
-      self.$button.hide();
-      self.$message.text('Working....');
-    },
-    end: function() {
-      var self = this;
-      self.$message.text('Compiled successfully');
-      setTimeout(self.reset.bind(self), 3000);
-    },
-    reset: function() {
-      var self = this;
-      self.start();
-      self.toggle();
-    },
-    showError: function(error) {
-      this.$message.text('');
-      this.$error.text(error).show();
-      this.$errorButton.show();
-    },
-    showLessBuilder: function() {
-      var self = this;
-
-      if (self.app.lessPaths['save'] === undefined) {
-        self.showError('Error: invalid filetype');
-        return false;
-      }
-
-      self.working();
-
-      var config = {
-        less: [self.app.lessVariableUrl,
-          self.app.lessPaths['less'],
-          self.app.lessUrl
-        ]
-      };
-
-      var iframe = new IFrame({
-        name: 'lessc',
-        resources: config.less,
-        callback: self.app.saveThemeCSS,
-        env: self.app,
-        configure: function(iframe) {
-          iframe.window.lessErrorReporting = function(what, error, href) {
-            if (error.href !== undefined) {
-              self.app.fileManager.ace.editor.scrollToLine(error.line, true);
-              if (error.type == 'Name') {
-                var reg = new RegExp('.*(@\\S+)\\s.*');
-                var matches = reg.exec(error.message);
-                if (matches !== null) {
-                  var varName = matches[1];
-                  var result = self.app.fileManager.ace.editor.findAll(varName);
-                }
-              } else {
-                //The line number is always off by 1? (and LESS indexes from 0) so -2
-                self.app.fileManager.ace.editor.moveCursorToPosition({
-                  row: error.line - 2,
-                  column: error.column
-                });
-                self.app.fileManager.ace.editor.focus();
-              }
-              self.showError(error);
-            }
-          };
-          iframe.styles = [];
-        },
-        onLoad: function(iframe) {
-          iframe.window.less.pageLoadFinished.then(
-            function() {
-              var $ = window.parent.$;
-              var iframe = window.iframe['lessc'];
-              var styles = $('style', iframe.document);
-
-              var css = '';
-
-              $(styles).each(function() {
-                css += this.innerHTML;
-              });
-
-              iframe.options.callback(css);
-            }
-          );
-        }
-      });
-
-    },
-  });
-
-  return LessBuilderView;
-});
-
-define('mockup-patterns-thememapper-url/js/cacheview',[
-  'jquery',
-  'underscore',
-  'mockup-patterns-filemanager-url/js/basepopover',
-  'mockup-utils'
-], function($, _, PopoverView, utils) {
-  'use strict';
-  var template = _.template(
-    '<div>' +
-      '<span id="clearMessage">Click to clear the site\'s theme cache, forcing a reload from the source.</span>' +
-      '<span style="display: none;" id="clearSuccess">Cache cleared successfully.</span>' +
-      '<a href="#" id="clearBtn" class="btn btn-block btn-primary">Clear</a>' +
-    '</div>'
-  );
-
-  var CacheView = PopoverView.extend({
-    className: 'popover',
-    title: _.template('<%= _t("Clear Cache") %>'),
-    content: template,
-    render: function() {
-      var self = this;
-      PopoverView.prototype.render.call(this);
-      self.$clear = $('#clearBtn', this.$el);
-      self.$message = $('#clearMessage', this.$el);
-      self.$success = $('#clearSuccess', this.$el);
-
-      self.$clear.on('click', function() {
-
-        var url = self.app.options.themeUrl;
-        url = url.substr(0, url.indexOf('portal_resource'));
-        url += '/theming-controlpanel';
-
-        $.ajax({
-          url: url,
-          data: {
-            'form.button.InvalidateCache': true,
-            '_authenticator': utils.getAuthenticator()
-          },
-          success: function() {
-            self.$message.hide();
-            self.$success.show();
-            self.$clear.hide();
-
-            setTimeout(function() {
-              self.$message.show();
-              self.$success.hide();
-              self.$clear.show();
-              self.triggerView.el.click();
-            }, 3000);
-          }
-        });
-      });
-      return this;
-    },
-    toggle: function(button, e) {
-      PopoverView.prototype.toggle.apply(this, [button, e]);
-    }
-
-  });
-
-  return CacheView;
-});
-
-/* Theme Mapper pattern.
- *
- * Options:
- *    filemanagerConfig(object): The file manager pattern config ({})
- *    mockupUrl(string): Mockup url (null)
- *    unthemedUrl(string): unthemed site url (null)
- *    helpUrl(string): Helper docs url (null)
- *    previewUrl(string): url to preview theme (null)
- *
- *
- * Documentation:
- *
- *    # Basic example
- *
- *    {{ example-1 }}
- *
- *
- * Example: example-1
- *
- *    <div class="pat-thememapper"
- *         data-pat-thememapper='filemanagerConfig:{"actionUrl":"/filemanager-actions"};
- *                               mockupUrl:/tests/files/mapper.html;
- *                               unthemedUrl:/tests/files/mapper.html;
- *                               previewUrl:http://www.google.com;
- *                               helpUrl:http://docs.diazo.org/en/latest'></div>
- *
- */
-
-define('mockup-patterns-thememapper',[
-  'jquery',
-  'pat-base',
-  'underscore',
-  'translate',
-  'text!mockup-patterns-thememapper-url/templates/inspector.xml',
-  'mockup-patterns-filemanager',
-  'mockup-patterns-thememapper-url/js/rulebuilder',
-  'mockup-patterns-thememapper-url/js/rulebuilderview',
-  'mockup-patterns-thememapper-url/js/lessbuilderview',
-  'mockup-patterns-thememapper-url/js/cacheview',
-  'mockup-ui-url/views/button',
-  'mockup-ui-url/views/buttongroup',
-  'mockup-ui-url/views/anchor',
-  'mockup-ui-url/views/dropdown',
-  'mockup-utils'
-], function($, Base, _, _t, InspectorTemplate, FileManager, RuleBuilder, RuleBuilderView,
-            LessBuilderView, CacheView, ButtonView, ButtonGroup,
-            AnchorView, DropdownView, utils) {
-  'use strict';
-
-  var inspectorTemplate = _.template(InspectorTemplate);
-
-  var Inspector = Base.extend({
-    name: 'thememapper-inspector',
-    trigger: '.pat-thememapper-inspector-dummy',
-    defaults: {
-      name: 'name',
-      ruleBuilder: null,
-      showReload: false
-    },
-    init: function() {
-      var self = this;
-      self.enabled = true;
-      self.currentOutline = null;
-      self.activeClass = '_theming-highlighted';
-      self.saved = null;
-      self.ruleBuilder = self.options.ruleBuilder;
-
-      self.$el.html(inspectorTemplate(self.options));
-      self.$on = $('.turnon', self.$el);
-      self.$off = $('.turnoff', self.$el);
-      self.$frame = $('iframe', self.$el);
-      self.$frameInfo = $('.frame-info', self.$el);
-      self.$frameShelfContainer = $('.frame-shelf-container', self.$el);
-      self.$selectorInfo = $('.selector-info', self.$frameShelfContainer);
-      self.$currentSelector = $('.current-selector', self.$frameInfo);
-
-      self.$reloadBtn = $('a.refresh', self.$el);
-
-      $('a.clearInspector', self.$frameShelfContainer).click(function(e) {
-        e.preventDefault();
-        self.save(null);
-      });
-      self.$reloadBtn.click(function(e) {
-        e.preventDefault();
-        self.$frame.attr('src', self.$frame.attr('src'));
-        self.setupFrame();
-      });
-      $('a.fullscreen', self.$el).click(function(e){
-        e.preventDefault();
-        if (self.$el.hasClass('show-fullscreen')){
-          self.$el.removeClass('show-fullscreen');
-        } else {
-          self.$el.addClass('show-fullscreen');
-        }
-      });
-
-      if (!self.options.showReload){
-        self.$reloadBtn.hide();
-      }
-
-      self.$on.click(function() {
-        self.on();
-      });
-      self.$off.click(function() {
-        self.off();
-      });
-
-      self.setupFrame();
-    },
-    on: function() {
-      var self = this;
-      self.$off.prop('disabled', false);
-      self.$on.prop('disabled', true);
-      self.enabled = true;
-    },
-    off: function() {
-      var self = this;
-      self.$on.prop('disabled', false);
-      self.$off.prop('disabled', true);
-      self.enabled = false;
-    },
-    setupFrame: function() {
-      var self = this;
-      /* messy way to check if iframe is loaded */
-      var checkit = function() {
-        if (self.$frame.contents().find('body').find('*').length > 0){
-          self._setupFrame();
-        } else {
-          setTimeout(checkit, 100);
-        }
-      };
-      setTimeout(checkit, 200);
-    },
-    _setupFrame: function() {
-      var self = this;
-
-      self.$frame.contents().find('*').hover(function(e) {
-        if(self.enabled) {
-          e.stopPropagation();
-          self.$frame.focus();
-          self.setOutline(this);
-        }
-      }, function() {
-        if($(this).hasClass(self.activeClass)) {
-          self.clearOutline(this);
-        }
-      }).click(function (e) {
-        if(self.enabled) {
-          e.stopPropagation();
-          e.preventDefault();
-
-          self.setOutline(this);
-          self.save(this);
-          return false;
-        }
-        return true;
-      });
-
-      self.$frame.contents().keyup(function(e) {
-        if (!self.enabled){
-          return true;
-        }
-
-        // ESC -> Move selection to parent node
-        if(e.keyCode === 27 && self.currentOutline !== null) {
-          e.stopPropagation();
-          e.preventDefault();
-
-          var parent = self.currentOutline.parentNode;
-          if(parent !== null && parent.tagName !== undefined) {
-            self.setOutline(parent);
-          }
-        }
-
-        // Enter -> Equivalent to clicking on selected node
-        if(e.keyCode === 13 && self.currentOutline !== null) {
-          e.stopPropagation();
-          e.preventDefault();
-
-          self.save(self.currentOutline);
-
-          return false;
-        }
-      });
-    },
-    save: function(element) {
-      var self = this;
-      this.saved = element;
-      if(element === null) {
-        self.$frameShelfContainer.hide();
-      } else {
-        self.$frameShelfContainer.show();
-      }
-
-      self.animateSelector();
-      self.$selectorInfo.text(element === null ? '' : self.ruleBuilder.bestSelector(element));
-
-      self.onsave(this, element);
-    },
-    clearOutline: function(element){
-      var self = this;
-      $(element).css('outline', '');
-      $(element).css('cursor', '');
-
-      $(element).removeClass(self.activeClass);
-
-      self.currentOutline = null;
-      self.$currentSelector.text('');
-      self.onselect(self, null);
-    },
-    setOutline: function(element) {
-      var self = this;
-      var $el = $(element);
-
-      $el.css('outline', 'solid red 1px');
-      $el.css('cursor', 'crosshair');
-
-      $el.addClass(self.activeClass);
-
-      if(self.currentOutline !== null) {
-        self.clearOutline(self.currentOutline);
-      }
-      self.currentOutline = element;
-      self.$currentSelector.text(self.ruleBuilder.bestSelector(element));
-
-      self.onselect(self, element);
-    },
-    animateSelector: function(highlightColor, duration) {
-      var self = this;
-      var highlightBg = highlightColor || '#FFFFE3';
-      var animateMs = duration || 750;
-      var originalBg = self.$frameInfo.css('background-color');
-
-      if (!originalBg || originalBg === highlightBg){
-        originalBg = '#FFFFFF'; // default to white
-      }
-
-      self.$frameInfo
-        .css('backgroundColor', highlightBg)
-        .animate({ backgroundColor: originalBg }, animateMs, null, function () {
-          self.$frameInfo.css('backgroundColor', originalBg);
-        });
-    },
-    onsave: function(highlighter, node) {
-      var self = this;
-      if(node == null) {
-        self.$el.find('.frame-shelf-container').hide();
-      } else {
-        self.$el.find('.frame-shelf-container').show();
-      }
-
-      self.animateSelector(self.$el.find('.frame-info'));
-      self.$el.find('.selector-info').text(node == null? '': self.ruleBuilder.bestSelector(node));
-
-      if(self.ruleBuilder.active) {
-        self.ruleBuilder.select(node);
-        self.ruleBuilder.next();
-      }
-
-    },
-    onselect: function(highlighter, node) {
-      var self = this;
-      self.$currentSelector.text(node == null? '': self.ruleBuilder.bestSelector(node));
-    }
-  });
-
-
-  var ThemeMapper = Base.extend({
-    name: 'thememapper',
-    trigger: '.pat-thememapper',
-    parser: 'mockup',
-    defaults: {
-      filemanagerConfig: {},
-      themeUrl: null,
-      mockupUrl: null,
-      unthemedUrl: null,
-      helpUrl: null,
-      previewUrl: null,
-      editable: false
-    },
-    buttonGroup: null,
-    showInspectorsButton: null,
-    buildRuleButton: null,
-    previewThemeButton: null,
-    helpButton: null,
-    hidden: true,
-    fileManager: null,
-    mockupInspector: null,
-    unthemedInspector: null,
-    ruleBuilder: null,
-    rulebuilderView: null,
-    devPath: null,
-    prodPath: null,
-    lessUrl: null,
-    lessPaths: {},
-    lessVariableUrl: null,
-    $fileManager: null,
-    $container: null,
-    $inspectorContainer: null,
-    $mockupInspector: null,
-    $unthemedInspector: null,
-    init: function() {
-      var self = this;
-      if(typeof(self.options.filemanagerConfig) === 'string'){
-        self.options.filemanagerConfig = $.parseJSON(self.options.filemanagerConfig);
-      }
-      self.$fileManager = $('<div class="pat-filemanager"/>').appendTo(self.$el);
-      self.$container = $('<div class="row"></div>').appendTo(self.$el);
-      self.$styleBox = $('<div id="styleBox"></div>').appendTo(self.$el);
-      self.$inspectorContainer = $('<div id="inspectors"></div>').appendTo(self.$container);
-      self.$mockupInspector = $('<div class="mockup-inspector"/>').appendTo(self.$inspectorContainer);
-      self.$unthemedInspector = $('<div class="unthemed-inspector"/>').appendTo(self.$inspectorContainer);
-
-      // initialize patterns now
-      self.lessUrl = (self.options.lessUrl !== undefined ) ? self.options.lessUrl : false;
-      self.lessVariableUrl = (self.options.lessVariables !== undefined ) ? self.options.lessVariables : false;
-
-      self.devPath = [];
-      self.prodPath = [];
-
-      self.options.filemanagerConfig.uploadUrl = self.options.themeUrl;
-      self.options.filemanagerConfig.theme = true;
-      self.fileManager = new FileManager(self.$fileManager, self.options.filemanagerConfig);
-      self.fileManager.setUploadUrl();
-
-      self.btns = {};
-      self.menus = {};
-      self.setupButtons();
-
-      self.ruleBuilder = new RuleBuilder(self, self.ruleBuilderCallback);
-
-      self.fileManager.on('fileChange', function() {
-        var node = self.fileManager.getSelectedNode();
-        self.setLessPaths(node);
-      });
-
-      self.mockupInspector = new Inspector(self.$mockupInspector, {
-        name: _t('HTML mockup'),
-        ruleBuilder: self.ruleBuilder,
-        url: self.options.mockupUrl,
-        showReload: true,
-      });
-      self.unthemedInspector = new Inspector(self.$unthemedInspector, {
-        name: _t('Unthemed content'),
-        ruleBuilder: self.ruleBuilder,
-        url: self.options.unthemedUrl,
-      });
-      self.btns.buildLessButton.disable();
-
-      if(!self.options.editable) {
-        if(self.fileManager.toolbar) {
-          var items = self.fileManager.toolbar.items;
-          $(items).each(function() {
-            this.disable();
-          });
-          self.lessbuilderView.triggerView.disable();
-        }
-      }
-
-      // initially, let's hide the panels
-      self.hideInspectors();
-      self.getManifest();
-    },
-    getManifest: function() {
-      var self = this;
-
-      self.fileManager.doAction('getFile', {
-        datatype: 'json',
-        data: {
-          path: 'manifest.cfg'
-        },
-        success: function(data) { this.setDefaultPaths(data); }.bind(self)
-      });
-    },
-    setSavePath: function() {
-      var self = this;
-      var filename = self.lessbuilderView.$filename.val();
-
-      if(filename === '') {
-        filename = self.lessbuilderView.$filename.attr('placeholder');
-      }
-
-      var s = self.lessPaths['save'];
-      var folder = s.substr(0, s.lastIndexOf('/'));
-
-      var savePath = folder + '/' + filename;
-      self.lessPaths['save'] = savePath;
-    },
-    setLessPaths: function(node) {
-      var self = this;
-
-      if(node.fileType === 'less'){
-        self.btns.buildLessButton.enable();
-      }
-      else {
-        self.btns.buildLessButton.disable();
-      }
-
-      if (node.path !== '') {
-        var reg = new RegExp('/(.*\\.)less$', 'm');
-        var path = reg.exec(node.path);
-
-        if( path === null ) {
-          self.lessPaths = {};
-          return false;
-        }
-        var lessPath = path[1] + 'less';
-        var cssPath = path[1] + 'css';
-
-        //file paths should be in the form of:
-        // "[directory/]filename.less"
-        self.lessPaths = {
-          'less': lessPath,
-          'save': cssPath
-        };
-
-        return true;
-      }
-      else {
-        self.lessPaths = {};
-        return false;
-      }
-    },
-    setDefaultPaths: function(manifest) {
-      var self = this;
-      var dev = new RegExp('development-css\\s*=\\s*\\/\\+\\+theme\\+\\+.*?\\/(.*)');
-      var prod = new RegExp('production-css\\s*=\\s*\\/\\+\\+theme\\+\\+.*?\\/(.*)');
-
-      var devUrl = dev.exec(manifest.contents)[1];
-      var prodUrl = prod.exec(manifest.contents)[1];
-
-      //The array lets us get around scoping issues.
-      self.devPath[0] = devUrl;
-      self.prodPath[0] = prodUrl;
-    },
-    saveThemeCSS: function(styles) {
-      var self = this.env;
-
-      if(styles === '' || styles === undefined) {
-        //There was probably a problem during compilation
-        return false;
-      }
-
-      self.setSavePath();
-
-      self.fileManager.doAction('saveFile', {
-        type: 'POST',
-        data: {
-          path: self.lessPaths['save'],
-          relativeUrls: true,
-          data: styles,
-          _authenticator: utils.getAuthenticator()
-        },
-        success: function(data) {
-          if (data.success === 'tmp') {
-            self.fileManager.fileData['_generated_.css'] = {
-              contents: data.value,
-              ext: 'css'
-            };
-            self.fileManager.openEditor('_generated_.css');
-          } else {
-            self.fileManager.refreshTree(function() {
-              //We need to make sure we open the newest version
-              delete self.fileManager.fileData['/' + self.lessPaths['save']];
-              self.fileManager.selectItem(self.lessPaths['save']);
-            });
-          }
-          self.lessbuilderView.end();
-        }
-      });
-
-      window.iframe['lessc'].destroy();
-
-    },
-    showInspectors: function(){
-      var self = this;
-      var $parent = self.$mockupInspector.parent();
-      $parent.slideDown();
-      self.hidden = false;
-      self.btns.showInspectorsButton.options.title = 'Hide inspectors';
-      self.btns.showInspectorsButton.applyTemplate();
-      $('html, body').animate({
-        scrollTop: $parent.offset().top - 50
-      }, 500);
-    },
-    hideInspectors: function(){
-      var self = this;
-      var $parent = self.$mockupInspector.parent();
-      $parent.slideUp();
-      self.hidden = true;
-      self.btns.showInspectorsButton.options.title = 'Show inspectors';
-      self.btns.showInspectorsButton.applyTemplate();
-    },
-    setupButtons: function(){
-      var self = this;
-      self.btns.showInspectorsButton = new ButtonView({
-        id: 'showinspectors',
-        title: _t('Show inspectors'),
-        icon: 'search',
-        tooltip: _t('Show inspector panels'),
-        context: 'default'
-      });
-      self.btns.showInspectorsButton.on('button:click', function(){
-        if (self.hidden) {
-          self.showInspectors();
-        } else {
-          self.hideInspectors();
-        }
-      });
-
-      self.btns.buildRuleButton = new AnchorView({
-        id: 'buildrule',
-        title: _t('Build rule'),
-        icon: 'wrench',
-        tooltip: _t('rule building wizard'),
-        context: 'default'
-      });
-      self.btns.fullscreenButton = new ButtonView({
-        id: 'fullscreenEditor',
-        title: _t('Fullscreen'),
-        icon: 'fullscreen',
-        tooltip: _t('view the editor in fullscreen'),
-        context: 'default'
-      });
-      self.btns.fullscreenButton.on('button:click', function() {
-        var btn = $('<a href="#">'+
-            '<span class="btn btn-danger closeeditor">' + _t('Close Fullscreen') + '</span>'+
-            '</a>').prependTo($('.tree'));
-
-        $(btn).click(function() {
-          $('.container').removeClass('fullscreen').trigger('resize');
-          $(btn).remove();
-        });
-        //resize tells the editor window to resize as well.
-        $('.container').addClass('fullscreen').trigger('resize');
-      });
-      self.previewThemeButton = new ButtonView({
-        id: 'previewtheme',
-        title: _t('Preview theme'),
-        icon: 'new-window',
-        tooltip: _t('preview theme in a new window'),
-        context: 'default'
-      });
-      self.previewThemeButton.on('button:click', function(){
-        window.open(self.options.previewUrl);
-      });
-      self.btns.buildLessButton = new AnchorView({
-        id: 'buildless',
-        title: _t('Build CSS'),
-        icon: 'cog',
-        tooltip: _t('Compile LESS file'),
-        context: 'default'
-      });
-      self.btns.refreshButton = new ButtonView({
-        id: 'refreshButton ',
-        title: _t('Refresh'),
-        icon: 'refresh',
-        tooltip: _t('Reload the current file'),
-        context: 'default'
-      });
-      self.btns.refreshButton.on('button:click', function() {
-        self.fileManager.refreshFile();
-      });
-      self.btns.cacheButton = new ButtonView({
-        id: 'cachebutton',
-        title: _t('Clear cache'),
-        icon: 'floppy-remove',
-        tooltip: _t('Clear site\'s theme cache'),
-        context: 'default'
-      });
-      self.btns.helpButton = new ButtonView({
-        id: 'helpbutton',
-        title: _t('Help'),
-        icon: 'question-sign',
-        tooltip: _t('Show help'),
-        context: 'default'
-      });
-      self.btns.helpButton.on('button:click', function(){
-        window.open(self.options.helpUrl);
-      });
-      self.rulebuilderView = new RuleBuilderView({
-        triggerView: self.btns.buildRuleButton,
-        app: self
-      });
-      self.cacheView = new CacheView({
-        triggerView: self.btns.cacheButton,
-        app: self
-      });
-      self.lessbuilderView = new LessBuilderView({
-        triggerView: self.btns.buildLessButton,
-        app: self
-      });
-
-
-      self.menus.tools = new DropdownView({
-        title: _t('Tools'),
-        items: [
-          self.btns.buildRuleButton,
-          self.btns.buildLessButton,
-        ],
-        id: 'file_menu',
-        app: self,
-        icon: 'file',
-        disable: function() {}
-      });
-
-      self.buttonGroup = new ButtonGroup({
-        items: [
-          self.menus.tools,
-          self.btns.showInspectorsButton,
-          self.previewThemeButton,
-          self.btns.fullscreenButton,
-          self.btns.refreshButton,
-          self.btns.cacheButton,
-          self.btns.helpButton
-        ],
-        id: 'mapper'
-      });
-      $('#toolbar .navbar', self.$el).append(self.buttonGroup.render().el);
-      $('#toolbar .navbar', self.$el).append(self.rulebuilderView.render().el);
-      $('#toolbar .navbar', self.$el).append(self.cacheView.render().el);
-      $('#toolbar .navbar', self.$el).append(self.lessbuilderView.render().el);
-    }
-  });
-
-  return ThemeMapper;
-
-});
-
 /* globals requirejs */
 // Copyright (C) 2010 Plone Foundation
 //
@@ -41443,10 +39867,10 @@ if (window.jQuery) {
 }
 
 require([
-  'mockup-patterns-thememapper'
+  'mockup-patterns-filemanager'
 ], function() {
   'use strict';
 });
 
-define("/home/_thet/data/dev/plone/buildout.coredev-1653/src/plone.staticresources/src/plone/staticresources/static/thememapper.js", function(){});
+define("/home/_thet/data/dev/plone/buildout.coredev-1653/src/plone.staticresources/src/plone/staticresources/static/filemanager.js", function(){});
 
