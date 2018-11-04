@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<registry>
+
+  <!-- Plone bundle resources -->
+  <!--records remove="True" prefix="plone.resources/plone" interface='Products.CMFPlone.interfaces.IResourceRegistry'/-->
+  <!--records remove="True" prefix="plone.resources/plone-logged-in" interface='Products.CMFPlone.interfaces.IResourceRegistry'/-->
+  <!--records remove="True" prefix="plone.resources/resourceregistry" interface='Products.CMFPlone.interfaces.IResourceRegistry'/-->
+  <!--records remove="True" prefix="plone.resources/thememapper" interface='Products.CMFPlone.interfaces.IResourceRegistry'/-->
+  <!--records remove="True" prefix="plone.resources/filemanager" interface='Products.CMFPlone.interfaces.IResourceRegistry'/-->
+
+  <!-- Bundles -->
+  <!--records remove="True" prefix="plone.bundles/plone" interface='Products.CMFPlone.interfaces.IBundleRegistry'/-->
+  <!--records remove="True" prefix="plone.bundles/plone-logged-in" interface='Products.CMFPlone.interfaces.IBundleRegistry'/-->
+  <!--records remove="True" prefix="plone.bundles/plone-legacy" interface='Products.CMFPlone.interfaces.IBundleRegistry'/-->
+  <!--records remove="True" prefix="plone.bundles/resourceregistry" interface='Products.CMFPlone.interfaces.IBundleRegistry'/-->
+  <!--records remove="True" prefix="plone.bundles/thememapper" interface='Products.CMFPlone.interfaces.IBundleRegistry'/-->
+  <!--records remove="True" prefix="plone.bundles/filemanager" interface='Products.CMFPlone.interfaces.IBundleRegistry'/-->
+
+</registry>
