@@ -6,8 +6,6 @@
 
   <include package="plone.resource"/>
 
-  <include package=".upgrades"/>
-
   <plone:static
     directory="static"
     type="plone"
