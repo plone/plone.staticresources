@@ -7,7 +7,8 @@ from zope.interface import implementer
 class HiddenProfiles(object):
 
     def getNonInstallableProfiles(self):
-        """Hide uninstall profile from site-creation and quickinstaller."""
+        """Hide all profiles from site-creation and quickinstaller."""
         return [
+            'plone.staticresources:default',
             'plone.staticresources:uninstall',
         ]
