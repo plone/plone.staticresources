@@ -8,11 +8,13 @@
 bin/
 buildout-cache/
 develop-eggs/
+devsrc/
 eggs/
 htmlcov/
 include/
 lib/
 local/
+node_modules/
 parts/
 src/*
 test.plone_addon/
