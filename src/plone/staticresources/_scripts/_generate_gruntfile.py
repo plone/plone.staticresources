@@ -10,8 +10,8 @@ from Products.CMFPlone.interfaces import IBundleRegistry
 from Products.CMFPlone.interfaces import IResourceRegistry
 from Products.Five.browser.resource import DirectoryResource
 from Products.Five.browser.resource import FileResource
-from zope.component import getUtility
 from zope.component import getSiteManager
+from zope.component import getUtility
 from zope.interface import alsoProvides
 from zope.site.hooks import setSite
 
@@ -21,6 +21,7 @@ import pkg_resources
 import plone.staticresources
 import six
 import uuid
+
 
 try:
     pkg_resources.get_distribution('plonetheme.barceloneta')

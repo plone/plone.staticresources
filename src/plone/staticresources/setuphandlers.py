@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from zope.interface import implementer
 
+
 try:
     from Products.CMFPlone.interfaces import INonInstallable
 except ImportError:

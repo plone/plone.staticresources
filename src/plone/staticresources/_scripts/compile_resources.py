@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 import argparse
 import os
-import sys
 import subprocess
+import sys
+
 
 this_dir = os.path.dirname(os.path.realpath(__file__))
 
