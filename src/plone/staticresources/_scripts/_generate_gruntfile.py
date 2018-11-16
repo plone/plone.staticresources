@@ -41,15 +41,10 @@ def applyBrowserLayers(site):
 
 
 # some initial script setup
-if 'SITE_ID' in os.environ:
-    site_id = os.environ['SITE_ID']
-else:
-    site_id = 'Plone'
+site_id = os.environ.get('SITE_ID', 'Plone')
 print('Using site id: {0}'.format(site_id))
 
-compile_path = ''
-if 'COMPILE_DIR' in os.environ:
-    compile_path = os.environ['COMPILE_DIR']
+compile_path = os.environ.get('COMPILE_DIR', '')
 print('Target compile path: {0}'.format(compile_path or 'fetch from bundles'))
 
 # app was injected by the script calling instance
