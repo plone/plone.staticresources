@@ -60,10 +60,10 @@ applyBrowserLayers(portal)
 temp_resource_folder = 'temp_resources'
 registry = getUtility(IRegistry)
 bundles = registry.collectionOfInterface(
-    IBundleRegistry, prefix="plone.bundles", check=False
+    IBundleRegistry, prefix='plone.bundles', check=False
 )
 resources = registry.collectionOfInterface(
-    IResourceRegistry, prefix="plone.resources", check=False
+    IResourceRegistry, prefix='plone.resources', check=False
 )
 lessvariables = registry.records['plone.lessvariables'].value
 
@@ -176,10 +176,10 @@ def resource_to_dir(resource, file_type='.js'):
     if resource.__module__ == 'Products.Five.metaclass':
         try:
             return resource.chooseContext().path
-        except:
+        except Exception:
             try:
                 return resource.context.path
-            except:
+            except Exception:
                 try:
                     if callable(resource):
                         file_name = uuid.uuid4().hex
@@ -196,10 +196,10 @@ def resource_to_dir(resource, file_type='.js'):
 
                         return os.getcwd() + '/' + full_file_name
                     else:
-                        print("Missing resource type")
+                        print('Missing resource type')
                         return None
-                except:
-                    print("Missing resource type")
+                except Exception:
+                    print('Missing resource type')
                     return None
     elif isinstance(resource, FilesystemFile):
         return resource.path
@@ -212,7 +212,7 @@ def resource_to_dir(resource, file_type='.js'):
     elif isinstance(resource, FSFile):
         return resource._filepath
     else:
-        print("Missing resource type")
+        print('Missing resource type')
         return None
 
 
@@ -260,7 +260,7 @@ for requirejs, script in resources.items():
                 if inits != '' and inits is not None:
                     shims[requirejs]['init'] = inits
         else:
-            print("No file found: " + script.js)
+            print('No file found: ' + script.js)
     if script.url:
         # Resources available under name-url name
         paths[requirejs + '-url'] = resource_to_dir(
@@ -306,7 +306,7 @@ for name, value in lessvariables.items():
             modify_vars[name] = "'%s/'" % t_file
         else:
             print(
-                "No file found: "
+                'No file found: '
                 + str(t.replace('LOCAL/', '').replace('\\"', ''))
             )  #
     else:
@@ -443,7 +443,7 @@ for bkey, bundle in bundles.items():
                 for css_file in res_obj.css:
                     css = portal.unrestrictedTraverse(css_file, None)
                     if not css:
-                        print("No file found: " + css_file)
+                        print('No file found: ' + css_file)
                         continue
                     # We count how many folders to bundle to plone
                     elements = len(css_file.split('/'))

@@ -47,7 +47,7 @@ def generate_gruntfile(base_path, instance, site_id, compile_dir):
         elif 'client1' in files:
             instance = os.path.join(bin_path, 'client1')
     if not instance:
-        print("Could not find plone instance to run command against.")
+        print('Could not find plone instance to run command against.')
         sys.exit()
     script_path = os.path.join(this_dir, '_generate_gruntfile.py')
     cmd = [instance, 'run', script_path]
@@ -150,7 +150,7 @@ def main(argv=sys.argv):
     gruntfile = os.path.join(base_path, 'Gruntfile.js')
     if not os.path.exists(gruntfile):
         print(
-            "Error, no Gruntfile.js generated at {0} where expected".format(
+            'Error, no Gruntfile.js generated at {0} where expected'.format(
                 gruntfile
             )
         )
