@@ -14,7 +14,7 @@ include/
 lib/
 local/
 parts/
-src/*
+devsrc/
 test.plone_addon/
 var/
 # files
