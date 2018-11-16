@@ -12,7 +12,6 @@ except ImportError:
 
 @implementer(INonInstallable)
 class HiddenProfiles(object):
-
     def getNonInstallableProfiles(self):
         """Hide all profiles from site-creation and quickinstaller."""
         return [

@@ -23,5 +23,5 @@ PLONE_STATICRESOURCES_FIXTURE = PloneStaticresourcesLayer()
 
 PLONE_STATICRESOURCES_INTEGRATION_TESTING = IntegrationTesting(
     bases=(PLONE_STATICRESOURCES_FIXTURE,),
-    name='PloneStaticresourcesLayer:IntegrationTesting'
+    name='PloneStaticresourcesLayer:IntegrationTesting',
 )

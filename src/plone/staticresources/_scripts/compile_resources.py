@@ -60,16 +60,16 @@ def generate_gruntfile(base_path, instance, site_id, compile_dir):
 def main(argv=sys.argv):
     parser = argparse.ArgumentParser(
         description='Generate and setup Grunt infrastructure, '
-                    'then compile JS/LESS bundles for Plone.',
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter
+        'then compile JS/LESS bundles for Plone.',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument(
         '-i',
         '--instance',
         dest='instance',
         help='path to instance executable. If not provided, '
-             'will look in bin this was executed from for '
-             'instance or client1'
+        'will look in bin this was executed from for '
+        'instance or client1',
     )
     parser.add_argument(
         '-s',
@@ -77,22 +77,22 @@ def main(argv=sys.argv):
         dest='site_id',
         default='Plone',
         help='ID of the Plone site to fetch the configuration from. '
-             'Used only while Gruntfile generation.'
+        'Used only while Gruntfile generation.',
     )
     parser.add_argument(
         '-b',
         '--bundle',
         dest='bundle',
         default='all',
-        help='Name of bundle to compile. Used while compile step.'
+        help='Name of bundle to compile. Used while compile step.',
     )
     parser.add_argument(
         '--compile-dir',
         dest='compile_dir',
         default='',
         help='Output directory for the compiled bundle files. '
-             'Used only while Gruntfile generation. '
-             'If not given the directory is looked up from Plone registry. '
+        'Used only while Gruntfile generation. '
+        'If not given the directory is looked up from Plone registry. ',
     )
     parser.add_argument(
         '-d',
@@ -100,14 +100,14 @@ def main(argv=sys.argv):
         dest='base_dir',
         default='.',
         help='Base directory for this script '
-             '(by default current working directory).'
+        '(by default current working directory).',
     )
     parser.add_argument(
         '-G',
         '--skip-generate-gruntfile',
         dest='skip_gruntfile',
         action='store_true',
-        help='Skip generation of Gruntfile.js'
+        help='Skip generation of Gruntfile.js',
     )
     parser.add_argument(
         '-I',
@@ -140,18 +140,11 @@ def main(argv=sys.argv):
 
     # Generate Gruntfile
     grunt = os.path.join(
-        base_path,
-        'node_modules',
-        'grunt-cli',
-        'bin',
-        'grunt'
+        base_path, 'node_modules', 'grunt-cli', 'bin', 'grunt'
     )
     if not args.skip_gruntfile:
         generate_gruntfile(
-            base_path,
-            args.instance,
-            args.site_id,
-            args.compile_dir
+            base_path, args.instance, args.site_id, args.compile_dir
         )
     gruntfile = os.path.join(base_path, 'Gruntfile.js')
     if not os.path.exists(gruntfile):
@@ -166,7 +159,7 @@ def main(argv=sys.argv):
         cmd = [
             grunt,
             '--gruntfile={0}'.format(gruntfile),
-            'compile-{0}'.format(args.bundle)
+            'compile-{0}'.format(args.bundle),
         ]
         print('Running command: %s' % ' '.join(cmd))
         subprocess.check_call(cmd)
