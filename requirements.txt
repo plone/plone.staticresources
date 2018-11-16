@@ -1,2 +1,1 @@
-zc.buildout==2.8.0
-setuptools==33.1.1
+-r https://raw.githubusercontent.com/plone/buildout.coredev/5.2/requirements.txt
