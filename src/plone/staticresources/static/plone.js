@@ -36,6 +36,7 @@ require([
   'mockup-patterns-modal',
   'mockup-patterns-moment',
   'mockup-patterns-pickadate',
+  'mockup-patterns-navigationmarker',
   'mockup-patterns-preventdoublesubmit',
   'mockup-patterns-select2',
 

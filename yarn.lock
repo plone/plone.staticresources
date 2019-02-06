@@ -672,7 +672,7 @@ mkdirp@~0.3.5:
 
 "mockup@https://github.com/plone/mockup.git#thet-npm":
   version "3.0.0"
-  resolved "https://github.com/plone/mockup.git#270c120174cc79d65810b640f309d332a8a274f1"
+  resolved "https://github.com/plone/mockup.git#0f4e1d014f305723bdbc7bd8826218ac69168d62"
   dependencies:
     ace-builds "https://github.com/ajaxorg/ace-builds.git#v1.2.6"
     backbone "https://github.com/jashkenas/backbone.git#1.1.2"

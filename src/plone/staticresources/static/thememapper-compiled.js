@@ -3686,10 +3686,6 @@ define('mockup-i18n',[
   var I18N = function() {
     var self = this;
     self.baseUrl = $('body').attr('data-i18ncatalogurl');
-
-    if (!self.baseUrl) {
-      self.baseUrl = '/plonejsi18n';
-    }
     self.currentLanguage = $('html').attr('lang') || 'en';
 
     // Fix for country specific languages
@@ -3754,6 +3750,9 @@ define('mockup-i18n',[
             return;
           }
         }
+      }
+      if (!self.baseUrl) {
+        return;
       }
       $.getJSON(self.getUrl(domain, language), function (catalog) {
         if (catalog === null) {

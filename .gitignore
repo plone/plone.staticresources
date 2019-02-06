@@ -35,3 +35,5 @@ node_modules
 !.yarnrc
 !src/plone
 **/bin/
+**/news/
+!/news/
