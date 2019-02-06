@@ -3191,7 +3191,7 @@ log4js@^3.0.0:
     rfdc "^1.1.2"
     streamroller "0.7.0"
 
-"logging@https://github.com/Patternslib/logging.git#1.0.2":
+"logging@https://github.com/Patternslib/logging.git#v1.0.2":
   version "1.0.2"
   resolved "https://github.com/Patternslib/logging.git#a31a550c2083089de2c677c169d7e0b0fb7a7967"
 

@@ -1,46 +1,39 @@
 Changelog
 =========
 
-3.0 (unreleased)
-----------------
+.. You should *NOT* be adding new change log entries to this file.
+   You should create a file in the news directory instead.
+   For helpful instructions, please see:
+   https://github.com/plone/plone.releaser/blob/master/ADD-A-NEWS-ITEM.rst
 
-TODO:
+.. towncrier release notes start
 
-- Refactor docs like in Patterns to get rid of react.
-- since we removed marked and react, refactor docs like in Patterns.
-
-- Refactor jquery.recurrenceinput.js dependencies
-
-
-Breaking changes:
-
-* Uses now ``yarn`` instead of ``bower``.
-  ``bower.json`` is dropped, ``package.json`` is extended and all packages go into ``mockup/node_modules``.
-  Note: you have to use ``yarn`` for that to work, as with npm there is no way to customize the modules directory.
-  All references in LESS files to ``bowerPath`` are kept for a frictionless upgrade.
-  [thet]
-
-* Remove obsolete dependencies:
-    - console-polyfill
-    - es5-shim
-    - selectivizr
-    - js-shortcuts    
-    - marked
-    - react
-    - JSXTransformer
-  [thet]
-
-* Remove support for IE < 9.
-  [thet]
+2.7.7 (2018-12-10)
+------------------
 
 New features:
 
-* Add ``plone-patterns-toolbar`` pattern from CMFPlone.
-  [thet]
+- pat-resourceregistry:
+  - Add input fiels for ``merge_with``, ``last_compilation``, ``jscompilation`` and ``csscompilation``.
+  - Add ``load_async`` and ``load_defer`` options.
 
 Bug fixes:
 
-* add items here
+- Improve docs styles
+  [ale-rt]
+
+
+2.7.6 (2018-10-08)
+------------------
+
+Bug fixes:
+
+- Structure pattern: Fix URL for current path for popovers.
+  Refs: https://github.com/plone/mockup/issues/857
+  [thet]
+
+- Structure pattern: Fix spacing for attribute-columns popover.
+  [tmassman]
 
 
 2.7.5 (2018-09-28)
@@ -58,7 +51,7 @@ New features:
 - Include TinyMCE 4.7.13
   [erral]
 
-- pat-structure: Use the datatables pattern for sorting columns 
+- pat-structure: Use the datatables pattern for sorting columns
   [frapell]
 
 - pat-structure: Add a '250' option for the pagination.
@@ -68,7 +61,7 @@ New features:
   https://datatables.net/
   [frapell]
 
-- Add package-lock.json to git. 
+- Add package-lock.json to git.
   See https://github.com/npm/npm/blob/v5.0.0/doc/files/package-lock.json.md
   [sunew]
 
@@ -91,9 +84,9 @@ Bug fixes:
 - Fix error when running tests: "Some of your tests did a full page reload!", due to a form submit with no preventDefault.
   [sunew]
 
-- Fix WARN [watcher]: Pattern "..../patterns/foo.js" does not match any file, 
-  by excluding all requirements ending with '-url', 
-  since they point to a folder and not to a .js file. 
+- Fix WARN [watcher]: Pattern "..../patterns/foo.js" does not match any file,
+  by excluding all requirements ending with '-url',
+  since they point to a folder and not to a .js file.
   The folder contents are already included by 'patterns/**/*'.
   [sunew]
 
