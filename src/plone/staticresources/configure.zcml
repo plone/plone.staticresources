@@ -49,6 +49,22 @@
       provides="Products.GenericSetup.interfaces.EXTENSION"
       />
 
+  <genericsetup:registerProfile
+      name="patternslib"
+      title="plone.staticresources Patternslib registration"
+      directory="profiles/patternslib"
+      description="Installs the plone.staticresources add-on with Patternslib registrations."
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      />
+
+  <genericsetup:registerProfile
+      name="patternslib-uninstall"
+      title="plone.staticresources (Patternslib uninstall)"
+      directory="profiles/patternslib-uninstall"
+      description="Uninstalls the plone.staticresources Patternslib registrations."
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      />
+
   <utility
       factory=".setuphandlers.HiddenProfiles"
       name="plone.staticresources-hiddenprofiles"

@@ -1,0 +1,33 @@
+<?xml version="1.0" ?>
+<registry>
+
+    <!-- Registration of the patternslib patterns into the plone bundle -->
+    <records prefix="plone.resources/patterns"
+            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
+        <value key="js">++resource++patterns.js</value>
+    </records>
+    <records prefix="plone.bundles/patterns"
+             interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+        <value key="resources" purge="false">
+            <element>patterns</element>
+        </value>
+        <value key="enabled">True</value>
+        <value key="depends">plone</value>
+        <value key="jscompilation">++plone++static/patterns-compiled.min.js</value>
+        <value key="last_compilation">2015-11-23 22:55:00</value>
+        <value key="stub_js_modules">
+          <element>jquery.form</element>
+          <element>jquery</element>
+          <element>pat-base</element>
+          <element>pat-compat</element>
+          <element>pat-logger</element>
+          <element>pat-mockup-parser</element>
+          <element>pat-registry</element>
+          <element>pat-utils</element>
+          <element>select2</element>
+          <element>underscore</element>
+          <element>moment</element>
+        </value>
+    </records>
+
+</registry>
