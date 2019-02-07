@@ -211,15 +211,7 @@ datatables.net-bs@^1.10.15:
     datatables.net-buttons "1.4.2"
     jquery ">=1.7"
 
-datatables.net-buttons@1.4.2:
-  version "1.4.2"
-  resolved "https://registry.yarnpkg.com/datatables.net-buttons/-/datatables.net-buttons-1.4.2.tgz#e391e1da4c20e381bc67bb1b8ce0ae36c9a3da49"
-  integrity sha1-45Hh2kwg44G8Z7sbjOCuNsmj2kk=
-  dependencies:
-    datatables.net "^1.10.15"
-    jquery ">=1.7"
-
-"datatables.net-buttons@https://github.com/DataTables/Dist-DataTables-Buttons.git#1.4.2":
+datatables.net-buttons@1.4.2, "datatables.net-buttons@https://github.com/DataTables/Dist-DataTables-Buttons.git#1.4.2":
   version "1.4.2"
   resolved "https://github.com/DataTables/Dist-DataTables-Buttons.git#99f12c2e45ad598b0a4442f6fb34720aba9ccc37"
   dependencies:
@@ -279,15 +271,7 @@ datatables.net-fixedheader@3.1.3, "datatables.net-fixedheader@https://github.com
     datatables.net-keytable "2.3.2"
     jquery ">=1.7"
 
-datatables.net-keytable@2.3.2:
-  version "2.3.2"
-  resolved "https://registry.yarnpkg.com/datatables.net-keytable/-/datatables.net-keytable-2.3.2.tgz#2b1f787492a9482f7be353e4345a34df7d0e4b81"
-  integrity sha1-Kx94dJKpSC9741PkNFo0330OS4E=
-  dependencies:
-    datatables.net "^1.10.15"
-    jquery ">=1.7"
-
-"datatables.net-keytable@https://github.com/DataTables/Dist-DataTables-KeyTable.git#2.3.2":
+datatables.net-keytable@2.3.2, "datatables.net-keytable@https://github.com/DataTables/Dist-DataTables-KeyTable.git#2.3.2":
   version "2.3.2"
   resolved "https://github.com/DataTables/Dist-DataTables-KeyTable.git#3510a2651d65c72f3c635f922355f70ed6c0ad53"
   dependencies:
@@ -628,7 +612,7 @@ jstransform@~3.0.0:
     request "2.81.0"
     source-map "^0.5.3"
 
-"logging@https://github.com/Patternslib/logging.git#v1.0.2":
+"logging@https://github.com/Patternslib/logging.git#1.0.2":
   version "1.0.2"
   resolved "https://github.com/Patternslib/logging.git#a31a550c2083089de2c677c169d7e0b0fb7a7967"
 
@@ -679,9 +663,9 @@ mkdirp@~0.3.5:
   resolved "https://registry.yarnpkg.com/mkdirp/-/mkdirp-0.3.5.tgz#de3e5f8961c88c787ee1368df849ac4413eca8d7"
   integrity sha1-3j5fiWHIjHh+4TaN+EmsRBPsqNc=
 
-"mockup@https://github.com/plone/mockup.git":
+"mockup@https://github.com/plone/mockup.git#momentjsLazyLoadLocales":
   version "3.0.0"
-  resolved "https://github.com/plone/mockup.git#40d3fa3e9eb3ac2030464cc71de0515e8c71b716"
+  resolved "https://github.com/plone/mockup.git#635c546e10328392c9d0fe80fb5c863d1fabbfdd"
   dependencies:
     ace-builds "https://github.com/ajaxorg/ace-builds.git#v1.2.6"
     backbone "https://github.com/jashkenas/backbone.git#1.1.2"
@@ -717,8 +701,8 @@ mkdirp@~0.3.5:
     jquery.browser "https://github.com/gabceb/jquery-browser-plugin.git#v0.1.0"
     jquery.cookie "https://github.com/carhartl/jquery-cookie.git#v1.4.1"
     jquery.recurrenceinput.js "https://github.com/collective/jquery.recurrenceinput.js.git#master"
-    logging "https://github.com/Patternslib/logging.git#v1.0.2"
-    moment "https://github.com/moment/moment.git#2.10.6"
+    logging "https://github.com/Patternslib/logging.git#1.0.2"
+    moment "2.24.0"
     patternslib "https://github.com/Patternslib/Patterns.git#2.1.2"
     pickadate "https://github.com/amsul/pickadate.js.git#3.5.6"
     react "https://github.com/facebook/react.git#v0.10.0"
@@ -726,9 +710,10 @@ mkdirp@~0.3.5:
     select2 "https://github.com/ivaynberg/select2.git#3.5.4"
     tinymce-builded "https://github.com/artursmirnov/tinymce_builded.git#4.7.13"
 
-"moment@https://github.com/moment/moment.git#2.10.6":
-  version "2.10.6"
-  resolved "https://github.com/moment/moment.git#f3fbef9d9875bbff340b527dbe3f1c447a942f69"
+moment@2.24.0:
+  version "2.24.0"
+  resolved "https://registry.yarnpkg.com/moment/-/moment-2.24.0.tgz#0d055d53f5052aa653c9f6eb68bb5d12bf5c2b5b"
+  integrity sha512-bV7f+6l2QigeBBZSM/6yTNq4P2fNpSWj/0e7jQcy87A8e7o2nAfP/34/2ky5Vw4B9S446EtIhodAzkFCcR4dQg==
 
 oauth-sign@~0.8.1:
   version "0.8.2"
