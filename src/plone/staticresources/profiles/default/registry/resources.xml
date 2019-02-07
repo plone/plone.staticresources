@@ -193,7 +193,8 @@
 
   <records prefix="plone.resources/moment"
             interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-      <value key="js">++plone++static/components/moment/min/moment-with-locales.min.js</value>
+      <value key="js">++plone++static/components/moment/min/moment.min.js</value>
+      <value key="url">++plone++static/components/moment/locale</value>
   </records>
 
   <records prefix="plone.resources/picker"
