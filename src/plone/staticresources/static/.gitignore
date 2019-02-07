@@ -1,6 +1,5 @@
 components/**/*.coffee
 components/**/*.map
-components/**/*.md
 components/**/*.sass
 components/**/*.scss
 components/**/*.ts
