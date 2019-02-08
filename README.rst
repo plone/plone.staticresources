@@ -9,7 +9,7 @@ This add on contains all JavaScript and CSS resources from Plone.
 Prior to Plone 5.2, they were located in Products.CMFPlone.
 
 .. note::
-  A note on yarn: We require the use of yarn, because yarn supports installing the packages in a cursom directory, which npm doesn't.
+  A note on yarn: We require the use of yarn, because yarn supports installing the packages in a custom directory, which npm doesn't.
   Our package directory is located at: ``src/plone/staticresources/static/components``.
 
 
@@ -26,7 +26,7 @@ For Patternslib, visit: http://github.com/patternslib/Patterns
 How to upgrade the resources in this package
 --------------------------------------------
 
-- Increase the nom package versions in package.json.
+- Increase the npm package versions in package.json.
 - Run ``yarn upgrade``.
 - Run ``./bin/plone-compile-resources -b plone``, ``./bin/plone-compile-resources -b plone-logged-in`` and whatever bundle you're going to build in your buildout's root directory.
   For more info on ``plone-compile-resources`` see: XXX
