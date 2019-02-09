@@ -1,4 +1,7 @@
 /*
+
+CUSTOMIZED VERSION FOR PLONE !!!
+
 Copyright 2012 Igor Vaynberg
 
 Version: 3.5.4 Timestamp: Sun Aug 30 13:30:32 EDT 2015
@@ -1728,7 +1731,7 @@ the specific language governing permissions and limitations under the Apache Lic
 
         // abstract
         findHighlightableChoices: function() {
-            return this.results.find(".select2-result-selectable:not(.select2-disabled):not(.select2-selected)");
+            return this.results.find(".select2-result-selectable:not(.select2-disabled)");
         },
 
         // abstract
@@ -1739,10 +1742,8 @@ the specific language governing permissions and limitations under the Apache Lic
             while (index > -1 && index < choices.length) {
                 index += delta;
                 var choice = $(choices[index]);
-                if (choice.hasClass("select2-result-selectable") && !choice.hasClass("select2-disabled") && !choice.hasClass("select2-selected")) {
-                    this.highlight(index);
-                    break;
-                }
+                this.highlight(index);
+                break;
             }
         },
 
@@ -2041,7 +2042,7 @@ the specific language governing permissions and limitations under the Apache Lic
               return;
             }
             var index=this.highlight(),
-                highlighted=this.results.find(".select2-highlighted"),
+                highlighted=this.results.find(".select2-highlighted:not(.select2-selected)"),
                 data = highlighted.closest('.select2-result').data("select2-data");
 
             if (data) {
@@ -2949,7 +2950,7 @@ the specific language governing permissions and limitations under the Apache Lic
                     }
                     return;
                 } else if (((e.which === KEY.BACKSPACE && this.keydowns == 1)
-                    || e.which == KEY.LEFT) && (pos.offset == 0 && !pos.length)) {
+                    || e.which == KEY.LEFT && !this.opened()) && (pos.offset == 0 && !pos.length)) {
 
                     this.selectChoice(selection.find(".select2-search-choice:not(.select2-locked)").last());
                     killEvent(e);
