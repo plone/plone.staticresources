@@ -1205,13 +1205,13 @@ define('text!mockup-patterns-relateditems-url/templates/breadcrumb.xml',[],funct
 define('text!mockup-patterns-relateditems-url/templates/favorite.xml',[],function () { return '<li><a href="<%- path %>" class="fav" aria-labelledby="blip"><%- title %></a></li>\n';});
 
 
-define('text!mockup-patterns-relateditems-url/templates/recentlyused.xml',[],function () { return '<div class="pattern-relateditems-recentlyused">\n  <a class="pattern-relateditems-recentlyused-select" data-uid="<%- UID %>">\n    <% if (getURL && (getIcon || portal_type === "Image")) { %><img src="<%- getURL %>/@@images/image/icon "><br><% } %>\n    <span class="pattern-relateditems-recentlyused-title<%- portal_type ? \' contenttype-\' + portal_type.toLowerCase() : \'\' %><%- review_state ? \' state-\' + review_state : \'\' %>" title="<%- portal_type %>"><%- Title %></span>\n    <span class="pattern-relateditems-recentlyused-path"><%- path %></span>\n  </a>\n</div>\n';});
+define('text!mockup-patterns-relateditems-url/templates/recentlyused.xml',[],function () { return '<li class="pattern-relateditems-recentlyused">\n  <a class="pattern-relateditems-recentlyused-select" data-uid="<%- UID %>">\n    <div class="pattern-relateditems-recentlyused-info">\n      <span class="pattern-relateditems-recentlyused-title<%- portal_type ? \' contenttype-\' + portal_type.toLowerCase() : \'\' %><%- review_state ? \' state-\' + review_state : \'\' %>" title="<%- portal_type %>"><%- Title %></span>\n      <span class="pattern-relateditems-recentlyused-path"><%- path %></span>\n    </div>\n    <% if (getURL && (getIcon || portal_type === "Image")) { %>\n    <div class="pattern-relateditems-recentlyused-image">\n      <img src="<%- getURL %>/@@images/image/tile">\n    </div>\n    <% } %>\n  </a>\n</li>\n';});
 
 
-define('text!mockup-patterns-relateditems-url/templates/result.xml',[],function () { return '<div class="pattern-relateditems-result<% if (oneLevelUp) { %> one-level-up<% } %>">\n  <span class="pattern-relateditems-buttons">\n  <% if (is_folderish) { %>\n    <a class="pattern-relateditems-result-browse" data-path="<%- path %>" title="<%- open_folder %>"></a>\n  <% } %>\n  </span>\n  <a class="pattern-relateditems-result-select<% if (selectable) { %> selectable<% } else if (browsing && is_folderish) { %> pattern-relateditems-result-browse<% } %><% if (oneLevelUp) { %> one-level-up<% } %>" data-path="<%- path %>">\n    <% if (getURL && (getIcon || portal_type === "Image")) { %><img src="<%- getURL %>/@@images/image/icon "><br><% } %>\n    <span class="pattern-relateditems-result-title<%- portal_type ? \' contenttype-\' + portal_type.toLowerCase() : \'\' %><%- review_state ? \' state-\' + review_state : \'\' %>" title="<%- portal_type %>"><%- Title %></span>\n    <span class="pattern-relateditems-result-path"><%- path %></span>\n  </a>\n</div>\n';});
+define('text!mockup-patterns-relateditems-url/templates/result.xml',[],function () { return '<div class="pattern-relateditems-result<% if (oneLevelUp) { %> one-level-up<% } %>">\n  <div class="pattern-relateditems-result-browse-wrapper">\n    <a class="pattern-relateditems-result-select<% if (selectable) { %> selectable<% } %><% if (oneLevelUp) { %> one-level-up<% } %>" data-path="<%- path %>">\n      <div class="pattern-relateditems-result-info">\n        <span class="pattern-relateditems-result-title<%- portal_type ? \' contenttype-\' + portal_type.toLowerCase() : \'\' %><%- review_state ? \' state-\' + review_state : \'\' %>" title="<%- portal_type %>"><%- Title %></span>\n        <span class="pattern-relateditems-result-path"><%- path %></span>\n      </div>\n    <% if (is_folderish) { %>\n      <a class="pattern-relateditems-result-browse" data-path="<%- path %>" title="<%- open_folder %>"><span class="<% if (oneLevelUp) { %>icon-left-circle<% } else { %>icon-right-circle<% } %>"></span></a>\n    <% } %>\n    </a>\n  </div>\n  <% if (getURL && (getIcon || portal_type === "Image")) { %>\n  <div class="pattern-relateditems-result-image">\n    <img src="<%- getURL %>/@@images/image/thumb">\n  </div>\n  <% } %>\n</div>\n';});
 
 
-define('text!mockup-patterns-relateditems-url/templates/selection.xml',[],function () { return '<span class="pattern-relateditems-item">\n  <% if (getURL && (getIcon || portal_type === "Image")) { %><img src="<%- getURL %>/@@images/image/icon"><br><% } %>\n  <span class="pattern-relateditems-item-title<%- portal_type ? \' contenttype-\' + portal_type.toLowerCase() : \'\' %><%- review_state ? \' state-\' + review_state : \'\' %>" title="<%- portal_type %>"><%- Title %></span>\n  <span class="pattern-relateditems-item-path"><%- path %></span>\n</span>\n';});
+define('text!mockup-patterns-relateditems-url/templates/selection.xml',[],function () { return '<div class="pattern-relateditems-item">\n  <div class="pattern-relateditems-result-info">\n    <span class="pattern-relateditems-item-title<%- portal_type ? \' contenttype-\' + portal_type.toLowerCase() : \'\' %><%- review_state ? \' state-\' + review_state : \'\' %>" title="<%- portal_type %>"><%- Title %></span>\n    <span class="pattern-relateditems-item-path"><%- path %></span>\n  </div>\n  <% if (getURL && (getIcon || portal_type === "Image")) { %>\n  <div class="pattern-relateditems-item-image">\n    <img src="<%- getURL %>/@@images/image/thumb">\n  </div>\n  <% } %>\n</div>\n';});
 
 
 define('text!mockup-patterns-relateditems-url/templates/toolbar.xml',[],function () { return '<% if (mode!==\'auto\') { %>\n<div class="btn-group mode-selector" role="group">\n  <button type="button" class="mode search btn <% if (mode==\'search\') { %>btn-primary<% } else {%>btn-default<% } %>"><%- searchModeText %></button>\n  <button type="button" class="mode browse btn <% if (mode==\'browse\') { %>btn-primary<% } else {%>btn-default<% } %>"><%- browseModeText %></button>\n</div>\n<% } %>\n<div class="path-wrapper">\n  <span class="pattern-relateditems-path-label"><%- searchText %></span>\n  <a class="crumb" href="/"><span class="glyphicon glyphicon-home"/></a>\n  <%= items %>\n</div>\n<div class="controls pull-right">\n\n  <% if (recentlyUsedItems) { %>\n  <div class="recentlyUsed dropdown pull-right">\n    <button type="button" class="recentlyUsed dropdown-toggle btn btn-primary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">\n      <span class="glyphicon glyphicon-time"/>\n      <%- recentlyUsedText %>\n      <span class="caret"/>\n    </button>\n    <ul class="dropdown-menu">\n      <%= recentlyUsedItems %>\n    </ul>\n  </div>\n  <% } %>\n\n  <% if (favorites.length > 0) { %>\n  <div class="favorites dropdown pull-right">\n    <button type="button" class="favorites dropdown-toggle btn btn-primary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">\n      <span class="glyphicon glyphicon-star"/>\n      <%- favText %>\n      <span class="caret"/>\n    </button>\n    <ul class="dropdown-menu">\n      <%= favItems %>\n    </ul>\n  </div>\n  <% } %>\n</div>\n';});
@@ -1228,7 +1228,7 @@ define('text!mockup-patterns-relateditems-url/templates/toolbar.xml',[],function
  *    favorites(array): Array of objects. These are favorites, which can be used to quickly jump to different locations. Objects have the attributes "title" and "path". Default: []
  *    maximumSelectionSize(integer): The maximum number of items that can be selected in a multi-select control. If this number is less than 1 selection is not limited. (-1)
  *    minimumInputLength: Select2 option. Number of characters necessary to start a search. Default: 0.
- *    mode(string): Initial widget mode. Possible values: 'search', 'browse'. If set to 'search', the catalog is searched for a searchterm. If set to 'browse', browsing starts at basePath. Default: 'search'.
+ *    mode(string): Initial widget mode. Possible values: are 'auto', 'search' and 'browse'. If set to 'search', the catalog is searched for a searchterm. If set to 'browse', browsing starts at basePath. Default: 'auto'.
  *    orderable(boolean): Whether or not items should be drag-and-drop sortable. (true)
  *    pageSize(int): Batch size to break down big result sets into multiple pages. (10).
  *    recentlyUsed(boolen): Show the recently used items dropdown (false).
@@ -1504,7 +1504,7 @@ define('mockup-patterns-relateditems',[
 
           // Filter out items:
           // While browsing: always include folderish items
-          // Browsing and searching: Only include selectable items, which are not already selected.
+          // Browsing and searching: Only include folders and selectable items which are not already selected.
           results = results.filter(
             function (item) {
               if (
@@ -1901,7 +1901,6 @@ define('mockup-patterns-relateditems',[
                 // Select2 3.5.4 throws an error in some cases in
                 // updateSelection, ``this.selection.find(".select2-search-choice").remove();``
                 // No idea why, hard to track.
-                console.log(data);
               }
 
               if (self.openAfterInit) {
@@ -1936,8 +1935,29 @@ define('mockup-patterns-relateditems',[
       self.$toolbar = $('<div class="toolbar ui-offset-parent" />');
       self.$container.prepend(self.$toolbar);
 
-      self.$el.on('select2-selecting', function(event) {
-        event.preventDefault();
+      $(document).on('keyup', self.$el, function(event) {
+        var path, browsableItem;
+        // Number 39 is the "arrow right" key on the keyboard
+        if (event.which === 39 && Select2.prototype.opened.call(self)) {
+          event.stopPropagation();
+          browsableItem = $('.select2-highlighted .pattern-relateditems-result-browse');
+          if (browsableItem.length !== 1) {
+            return
+          }
+          path = browsableItem.data('path');
+          self.browseTo(path);
+        }
+
+        // Number 37 is the "arrow left" key on the keyboard
+        if (event.which === 37 && Select2.prototype.opened.call(self)) {
+          event.stopPropagation();
+          browsableItem = $('.pattern-relateditems-result.one-level-up .pattern-relateditems-result-browse');
+          if (browsableItem.length !== 1) {
+            return
+          }
+          path = browsableItem.data('path');
+          self.browseTo(path);
+        }
       });
 
       self.renderToolbar();
@@ -94951,5 +94971,5 @@ require([
   'use strict';
 });
 
-define("/home/ale/Code/plone/buildout.coredev.alpine/src/plone.staticresources/src/plone/staticresources/static/plone-logged-in.js", function(){});
+define("/home/maik/develop/plonecore/buildout.coredev/src/plone.staticresources/src/plone/staticresources/static/plone-logged-in.js", function(){});
 
