@@ -6,7 +6,13 @@ Static JS and CSS resources for Plone.
 
 
 This add on contains all JavaScript and CSS resources used by Plone.
+
 Prior to Plone 5.2, they were located in ``static/`` directory of ``Products.CMFPlone`` package.
+
+Due to the specific tooling and workflows used to build frontend resources, and also the
+different maintenance and release needs of ``Products.CMFPlone`` itself, Plone static
+resources are now distributed in this package. For a complete list of reasons, read the
+`PLIP 1653<https://github.com/plone/Products.CMFPlone/issues/1653>`_.
 
 .. note::
   A note on yarn: We require the use of yarn, because it supports installing packages in a
@@ -44,10 +50,26 @@ Plone Core Developers
 Who want to want to help add/enhance this add-on itself.
 
 
-Motivation for this package
----------------------------
+Workflow
+--------
 
-XXX
+Default Plone buildout configuration adds an executable in `./bin/plone-compile-resources`
+which generates compiled bundles (normal, minified and respective maps) in `plone/staticresources/static/`.
+
+.. note::
+  You can see all the options of this executable by running ``./bin/plone-compile-resources --help``
+
+The files in this directory are served by Plone. In production mode URLs will be similar to:
+
+- http://localhost:8080//++plone++static/++unique++2019-01-08%2006%3A53%3A49.000248/plone-compiled.min.js
+- http://localhost:8080/++plone++static/++unique++2019-01-08%2006%3A53%3A49.040248/plone-logged-in-compiled.min.js
+
+In development mode, XXX: Explain what happens/entry point roles of:
+
+- http://localhost:8080/++resource++plone.js
+- http://localhost:8080/++resource++plone-logged-in.js
+- http://demo.plone.org/++plone++static/plone.less
+- http://localhost:8080//++plone++static/plone-logged-in.less
 
 
 How to develop on ``patterns``
@@ -55,8 +77,10 @@ How to develop on ``patterns``
 
 All JavaScript code in this package is downloaded via ``yarn`` into ``src/plone/staticresources/static/components``.
 Nothing in that directory should be manually edited.
-If you need to fix something, do it in the original repository and eventually upgrade its version (described below).
+If you need to fix something, do it in the original repository and eventually upgrade its version (next section).
+
 For Mockup, the original repository is: https://github.com/plone/mockup/
+
 For Patternslib, visit: http://github.com/patternslib/Patterns
 
 
