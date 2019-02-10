@@ -9,7 +9,8 @@ This add on contains all JavaScript and CSS resources used by Plone.
 Prior to Plone 5.2, they were located in ``static/`` directory of ``Products.CMFPlone`` package.
 
 .. note::
-  A note on yarn: We require the use of yarn, because it supports installing packages in a custom named directory, which npm doesn't.
+  A note on yarn: We require the use of yarn, because it supports installing packages in a
+  custom named directory, which npm doesn't (even using ``--prefix``, ``node_modules`` is hardcoded).
   Our package directory is located at: ``src/plone/staticresources/static/components``.
 
 
