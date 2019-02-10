@@ -5,20 +5,56 @@ plone.staticresources
 Static JS and CSS resources for Plone.
 
 
-This add on contains all JavaScript and CSS resources from Plone.
-Prior to Plone 5.2, they were located in Products.CMFPlone.
+This add on contains all JavaScript and CSS resources used by Plone.
+Prior to Plone 5.2, they were located in ``static/`` directory of ``Products.CMFPlone`` package.
 
 .. note::
-  A note on yarn: We require the use of yarn, because yarn supports installing the packages in a custom directory, which npm doesn't.
+  A note on yarn: We require the use of yarn, because it supports installing packages in a custom named directory, which npm doesn't.
   Our package directory is located at: ``src/plone/staticresources/static/components``.
 
 
-How to develop on patterns
---------------------------
+Target audience
+---------------
 
-All JavaScript code in this package is downloaded via yarn into ``src/plone/staticresources/static/components``.
-Nothing in this directory should be touched.
-If you need to fix something, fix it in the original repository and eventually upgrade the version (described below).
+This documentation aims at:
+
+Integrators and Developers
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Who want to customize and/or maintain the frontend of a Plone site for their customers:
+
+- upgrade existing versions or install new ``npm`` packages
+- integrate new JavaScript/CSS behavior, eventually wrapped in a ``pattern`` for optimal
+integration and reuse within Plone frontend ecosystem
+
+
+Themers
+^^^^^^^
+
+Who want to change the look and feel of a Plone site and need to:
+
+- understand how to correctly bundle changes made into existing or new frontend code
+-
+
+
+Plone Core Developers
+^^^^^^^^^^^^^^^^^^^^^
+
+Who want to want to help add/enhance this add-on itself.
+
+
+Motivation for this package
+---------------------------
+
+XXX
+
+
+How to develop on ``patterns``
+------------------------------
+
+All JavaScript code in this package is downloaded via ``yarn`` into ``src/plone/staticresources/static/components``.
+Nothing in that directory should be manually edited.
+If you need to fix something, do it in the original repository and eventually upgrade its version (described below).
 For Mockup, the original repository is: https://github.com/plone/mockup/
 For Patternslib, visit: http://github.com/patternslib/Patterns
 
@@ -26,8 +62,8 @@ For Patternslib, visit: http://github.com/patternslib/Patterns
 How to upgrade the resources in this package
 --------------------------------------------
 
-- Increase the npm package versions in package.json.
-- Run ``yarn upgrade``.
+- Increase ``npm`` package versions in ``package.json``, i.e. sections ``dependencies`` or ``devDependencies``.
+- Run ``yarn upgrade`` (cannot be ``npm``)
 - Run ``./bin/plone-compile-resources -b plone``, ``./bin/plone-compile-resources -b plone-logged-in`` and whatever bundle you're going to build in your buildout's root directory.
   For more info on ``plone-compile-resources`` see: XXX
 - Increase the ``last_compilation`` date in ``src/plone/staticresources/profiles/default/registry/bundles.xml``.
@@ -38,19 +74,20 @@ How to generate the ``plone-compile-resources`` script
 ------------------------------------------------------
 
 The ``plone-compile-resources`` script can be used to compile bundles from the command line.
-In a glimpse, the script starts up a Plone instance, reads the resource- and bundle registrations from the registry and compiles a JS/CSS bundle out of that information.
+In a glimpse, the script starts up a Plone instance, reads the resources and bundles configured in the registry and compiles a JS/CSS bundle based on that configuration.
 See ``plone-compile-resources --help`` for more information.
 
-When using the coredev buildout, the ``plone-compile-resources`` script is automatically generated.
-If you use a custom buildout, you might need to add something similar like::
+When using the coredev buildout, ``plone-compile-resources`` script is automatically generated.
+If you use a custom buildout, you might need to add something similar to:
 
+.. code-block:: ini
   [buildout]
   parts =
-    ...
+    # ...
     zopepy
-  ...
+  # ...
   [instance]
-  ...
+  # ...
 
   [zopepy]
   recipe = zc.recipe.egg
@@ -65,21 +102,20 @@ If you use a custom buildout, you might need to add something similar like::
 What has changed since Plone 5.1
 --------------------------------
 
-- All static resources - bundle resources, compiled bundles, external packages - from Products.CMFPlone.static has been moved here.
-- The bundle and resource registrations from the dependencies profile have been moved here.
+- All static resources - bundle resources, compiled bundles, external packages - from ``Products.CMFPlone.static`` have been moved here.
+- The bundle and resource registrations from ``Products.CMFPlone``'s ``dependencies`` profile have also been moved here.
 - The ``plone-compile-resources`` script has been moved here.
-- The toolbar pattern from Products.CMFPlone.static.toolbar has been moved to Mockup.
-- Mockup has been changed to use npm/yarn instead of bower.
-- The thememapper bundle from plone.app.theming has been moved here.
-- The resource editor bundle from plone.resourceeditor has been moved here.
+- The ``thememapper`` bundle from plone.app.theming has been moved here.
+- The ``plone.resourceeditor`` bundle from ``plone.resourceeditor`` package has been moved here.
+- The ``toolbar`` pattern from ``Products.CMFPlone.static.toolbar`` has been moved to ``mockup`` package.
+- ``mockup`` package now uses npm registry and yarn instead of bower.
 
 
 Warning
 -------
 
-If you update r.js or less, you'll need to manually re-apply a patch
-that gets us cache busting resource downloads so we can build
-TTW.
+If you update ``r.js`` or ``less``, you'll need to manually re-apply a patch
+that gets us cache busting resource downloads so we can build through the web.
 
 See https://github.com/plone/Products.CMFPlone/commit/2d3865805efc6b72dce236eb68e502d8c57717b6
 and https://github.com/plone/Products.CMFPlone/commit/bd1f9ba99d1ad40bb7fe1c00eaa32b8884aae5e2
