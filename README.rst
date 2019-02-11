@@ -5,7 +5,7 @@ plone.staticresources
 Static JS and CSS resources for Plone.
 
 
-This add on contains all JavaScript and CSS resources used by Plone.
+This add-on contains all JavaScript and CSS resources used by Plone.
 
 Prior to Plone 5.2, they were located in ``static/`` directory of
 ``Products.CMFPlone`` package.
@@ -18,8 +18,8 @@ complete list of reasons, read the§ `PLIP
 
 .. note::
 
-  A note on yarn: We require the use of yarn, because it supports installing
-  packages in a custom named directory, which npm doesn't (even using
+  A note on yarn: we require the use of yarn, because it supports installing
+  packages in a custom named directory, which npm does not (even using
   ``--prefix``, ``node_modules`` is hardcoded). Our package directory is
   located at: ``src/plone/staticresources/static/components``.
 
@@ -32,36 +32,36 @@ This documentation aims at:
 Integrators and Developers
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Who want to customize and/or maintain the frontend of a Plone site for their
+Who want to customize or maintain the front end of a Plone site for their
 customers:
 
 - upgrade existing versions or install new ``npm`` packages
 - integrate new JavaScript/CSS behavior, eventually wrapped in a ``pattern``
-for optimal integration and reuse within Plone frontend ecosystem
+  for optimal integration and reuse within Plone front end ecosystem
 
 
-Themers
-^^^^^^^
+Themer authors
+^^^^^^^^^^^^^^
 
 Who want to change the look and feel of a Plone site and need to:
 
 - understand how to correctly bundle changes made into existing or new frontend
 code
--
+- XXX
 
 
 Plone Core Developers
 ^^^^^^^^^^^^^^^^^^^^^
 
-Who want to want to help add/enhance this add-on itself.
+Who want to help enhance this add-on itself.
 
 
 Workflow
 --------
 
 Default Plone buildout configuration adds an executable in
-`./bin/plone-compile-resources` which generates compiled bundles (normal,
-minified and respective maps) in `plone/staticresources/static/`.
+``./bin/plone-compile-resources`` which generates compiled bundles (normal,
+minified and respective maps) in ``plone/staticresources/static/``.
 
 .. note::
 
@@ -98,15 +98,15 @@ For Patternslib, visit: http://github.com/patternslib/Patterns
 How to upgrade the resources in this package
 --------------------------------------------
 
-- Increase ``npm`` package versions in ``package.json``, i.e. sections
+- Increase ``npm`` package versions in ``package.json``, in sections
 ``dependencies`` or ``devDependencies``.
 - Run ``yarn upgrade`` (cannot be ``npm``)
 - Run ``./bin/plone-compile-resources -b plone``,
-``./bin/plone-compile-resources -b plone-logged-in`` and whatever bundle you're
-going to build in your buildout's root directory.
+  ``./bin/plone-compile-resources -b plone-logged-in`` and whatever bundle
+  you are going to build in your buildout's root directory.
   .. For more info on ``plone-compile-resources`` see: XXX
 - Increase the ``last_compilation`` date in
-``src/plone/staticresources/profiles/default/registry/bundles.xml``.
+  ``src/plone/staticresources/profiles/default/registry/bundles.xml``.
 - Submit a PR and run the tests on Jenkins.
 
 
@@ -114,7 +114,7 @@ How to generate the ``plone-compile-resources`` script
 ------------------------------------------------------
 
 The ``plone-compile-resources`` script can be used to compile bundles from the
-command line. In a glimpse, the script starts up a Plone instance, reads the
+command line. In short, the script starts up a Plone instance, reads the
 resources and bundles configured in the registry and compiles a JS/CSS bundle
 based on that configuration. See ``plone-compile-resources --help`` for more
 information.
@@ -146,25 +146,24 @@ What has changed since Plone 5.1
 --------------------------------
 
 - All static resources - bundle resources, compiled bundles, external packages -
-from ``Products.CMFPlone.static`` have been moved here.
+  from ``Products.CMFPlone.static`` have been moved here.
 - The bundle and resource registrations from ``Products.CMFPlone``'s
-``dependencies`` profile have also been moved here.
+  ``dependencies`` profile have also been moved here.
 - The ``plone-compile-resources`` script has been moved here.
 - The ``thememapper`` bundle from plone.app.theming has been moved here.
 - The ``plone.resourceeditor`` bundle from ``plone.resourceeditor``
-package has been moved here.
+  package has been moved here.
 - The ``toolbar`` pattern from ``Products.CMFPlone.static.toolbar`` has been
-moved to ``mockup`` package.
+  moved to ``mockup`` package.
 - ``mockup`` package now uses npm registry and yarn instead of bower.
 
 
 Warning
 -------
 
-If you update ``r.js`` or ``less``, you'll need to manually re-apply a patch
-that gets us cache busting resource downloads so we can build through the web. See:
+If you update ``r.js`` or ``less``, you willl need to manually re-apply a patch
+that gives us cache busting resource downloads so we can build through the web. See:
 - https://github.com/plone/Products.CMFPlone/commit/2d3865805efc6b72dce236eb68e502d8c57717b6
-and
 - https://github.com/plone/Products.CMFPlone/commit/bd1f9ba99d1ad40bb7fe1c00eaa32b8884aae5e2
 
 
