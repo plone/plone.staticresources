@@ -13,8 +13,8 @@ Prior to Plone 5.2, they were located in ``static/`` directory of
 Due to the specific tooling and workflows used to build frontend resources, and
 also the different maintenance and release needs of ``Products.CMFPlone``
 itself, Plone static resources are now distributed in this package. For a
-complete list of reasons, read the `PLIP
-1653<https://github.com/plone/Products.CMFPlone/issues/1653>`_.
+complete list of reasons, read the `PLIP 1653
+<https://github.com/plone/Products.CMFPlone/issues/1653>`_.
 
 .. note::
 
@@ -74,7 +74,7 @@ be similar to:
 - http://localhost:8080//++plone++static/++unique++2019-01-08%2006%3A53%3A49.000248/plone-compiled.min.js
 - http://localhost:8080/++plone++static/++unique++2019-01-08%2006%3A53%3A49.040248/plone-logged-in-compiled.min.js
 
-In development mode, XXX: Explain what happens/entry point roles of:
+In development mode, XXX: Explain what happens, including how the roles of entry points like:
 
 - http://localhost:8080/++resource++plone.js
 - http://localhost:8080/++resource++plone-logged-in.js
@@ -119,9 +119,9 @@ resources and bundles configured in the registry and compiles a JS/CSS bundle
 based on that configuration. See ``plone-compile-resources --help`` for more
 information.
 
-When using the coredev buildout, ``plone-compile-resources`` script is
-automatically generated. If you use a custom buildout, you might need to add
-something similar to:
+When using buildout, ``plone-compile-resources`` script is automatically
+generated. If you use a custom buildout, you might need to add something
+similar to:
 
 .. code-block:: ini
   [buildout]
@@ -150,7 +150,7 @@ What has changed since Plone 5.1
 - The bundle and resource registrations from ``Products.CMFPlone``'s
   ``dependencies`` profile have also been moved here.
 - The ``plone-compile-resources`` script has been moved here.
-- The ``thememapper`` bundle from plone.app.theming has been moved here.
+- The ``thememapper`` bundle from ``plone.app.theming`` has been moved here.
 - The ``plone.resourceeditor`` bundle from ``plone.resourceeditor``
   package has been moved here.
 - The ``toolbar`` pattern from ``Products.CMFPlone.static.toolbar`` has been
