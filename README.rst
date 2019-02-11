@@ -13,7 +13,7 @@ Prior to Plone 5.2, they were located in ``static/`` directory of
 Due to the specific tooling and workflows used to build frontend resources, and
 also the different maintenance and release needs of ``Products.CMFPlone``
 itself, Plone static resources are now distributed in this package. For a
-complete list of reasons, read the§ `PLIP
+complete list of reasons, read the `PLIP
 1653<https://github.com/plone/Products.CMFPlone/issues/1653>`_.
 
 .. note::
