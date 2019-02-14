@@ -9341,13 +9341,14 @@ llll:"ddd, D MMM YYYY HH:mm"},calendar:{sameDay:"[Hôm nay lúc] LT",nextDay:"[N
  *
  */
 
-
 define('mockup-patterns-moment',[
   'jquery',
   'pat-base',
-  'moment',
-  'mockup-i18n'
-], function($, Base, moment, i18n) {
+  'mockup-i18n',
+  'moment'
+], function($, Base, i18n, moment) {
+
+  lazyLoadMomentLocale();
 
   var Moment = Base.extend({
     name: 'moment',
@@ -9407,9 +9408,19 @@ define('mockup-patterns-moment',[
   });
 
   return Moment;
-
 });
 
+function lazyLoadMomentLocale() {
+  var lang = document.querySelector('html').lang || 'en';
+
+  if (lang === 'en') {
+    // English locale is built-in, no need to load
+    return;
+  }
+
+  require(['moment-url/' + lang]);
+}
+;
 /*!
  * pickadate.js v3.5.6, 2015/04/20
  * By Amsul, http://amsul.ca
@@ -19312,5 +19323,5 @@ require([
 
 });
 
-define("/home/ale/Code/plone/buildout.coredev.alpine/src/plone.staticresources/src/plone/staticresources/static/plone.js", function(){});
+define("/Users/esteele/projects/plone_5.2/src/plone.staticresources/src/plone/staticresources/static/plone.js", function(){});
 
