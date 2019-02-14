@@ -1,6 +1,10 @@
 /*
 
-CUSTOMIZED VERSION FOR PLONE !!!
+CUTOMIZED version for Plone RelatedItems pattern!
+See this for changes made, based on version 3.5.x branch of select2:
+https://github.com/collective/select2-3.5.3-custom
+
+
 
 Copyright 2012 Igor Vaynberg
 
@@ -806,8 +810,8 @@ the specific language governing permissions and limitations under the Apache Lic
 
             this.dropdown.on("mouseup", resultsSelector, this.bind(function (e) {
                 if ($(e.target).closest(".select2-result-selectable").length > 0) {
-                    this.highlightUnderEvent(e);
-                    this.selectHighlighted(e);
+                  this.highlightUnderEvent(e);
+                  this.selectHighlighted(e);
                 }
             }));
 
@@ -1742,8 +1746,10 @@ the specific language governing permissions and limitations under the Apache Lic
             while (index > -1 && index < choices.length) {
                 index += delta;
                 var choice = $(choices[index]);
-                this.highlight(index);
-                break;
+                if (choice.hasClass("select2-result-selectable") && !choice.hasClass("select2-disabled")) {
+                    this.highlight(index);
+                    break;
+                }
             }
         },
 
