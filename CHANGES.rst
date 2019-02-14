@@ -8,3 +8,12 @@ Changelog
 
 .. towncrier release notes start
 
+1.0a1 (2019-02-13)
+------------------
+
+New features:
+
+
+- Put together all Plone assets in a single package. [thet] (#1)
+
+
