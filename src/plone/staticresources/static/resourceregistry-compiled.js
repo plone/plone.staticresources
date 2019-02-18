@@ -34343,5 +34343,5 @@ require([
   'use strict';
 });
 
-define("/home/ale/Code/plone/buildout.coredev.alpine/src/plone.staticresources/src/plone/staticresources/static/resourceregistry.js", function(){});
+define("/Users/esteele/projects/plone_5.2/src/plone.staticresources/src/plone/staticresources/static/resourceregistry.js", function(){});
 

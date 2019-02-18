@@ -28950,10 +28950,6 @@ define('mockup-i18n',[
   var I18N = function() {
     var self = this;
     self.baseUrl = $('body').attr('data-i18ncatalogurl');
-
-    if (!self.baseUrl) {
-      self.baseUrl = '/plonejsi18n';
-    }
     self.currentLanguage = $('html').attr('lang') || 'en';
 
     // Fix for country specific languages
@@ -29018,6 +29014,9 @@ define('mockup-i18n',[
             return;
           }
         }
+      }
+      if (!self.baseUrl) {
+        return;
       }
       $.getJSON(self.getUrl(domain, language), function (catalog) {
         if (catalog === null) {
@@ -39872,5 +39871,5 @@ require([
   'use strict';
 });
 
-define("/home/_thet/data/dev/plone/buildout.coredev-1653/src/plone.staticresources/src/plone/staticresources/static/filemanager.js", function(){});
+define("/Users/esteele/projects/plone_5.2/src/plone.staticresources/src/plone/staticresources/static/filemanager.js", function(){});
 
