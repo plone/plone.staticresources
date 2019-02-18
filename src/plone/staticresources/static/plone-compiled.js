@@ -9341,14 +9341,13 @@ llll:"ddd, D MMM YYYY HH:mm"},calendar:{sameDay:"[Hôm nay lúc] LT",nextDay:"[N
  *
  */
 
+
 define('mockup-patterns-moment',[
   'jquery',
   'pat-base',
-  'mockup-i18n',
-  'moment'
-], function($, Base, i18n, moment) {
-
-  lazyLoadMomentLocale();
+  'moment',
+  'mockup-i18n'
+], function($, Base, moment, i18n) {
 
   var Moment = Base.extend({
     name: 'moment',
@@ -9408,19 +9407,9 @@ define('mockup-patterns-moment',[
   });
 
   return Moment;
+
 });
 
-function lazyLoadMomentLocale() {
-  var lang = document.querySelector('html').lang || 'en';
-
-  if (lang === 'en') {
-    // English locale is built-in, no need to load
-    return;
-  }
-
-  require(['moment-url/' + lang]);
-}
-;
 /*!
  * pickadate.js v3.5.6, 2015/04/20
  * By Amsul, http://amsul.ca
@@ -12958,6 +12947,13 @@ Picker.extend( 'pickatime', TimePicker )
 define("select2", [], function() {
   return (function() {
 /*
+
+CUTOMIZED version for Plone RelatedItems pattern!
+See this for changes made, based on version 3.5.x branch of select2:
+https://github.com/collective/select2-3.5.3-custom
+
+
+
 Copyright 2012 Igor Vaynberg
 
 Version: 3.5.4 Timestamp: Sun Aug 30 13:30:32 EDT 2015
@@ -13762,8 +13758,8 @@ the specific language governing permissions and limitations under the Apache Lic
 
             this.dropdown.on("mouseup", resultsSelector, this.bind(function (e) {
                 if ($(e.target).closest(".select2-result-selectable").length > 0) {
-                    this.highlightUnderEvent(e);
-                    this.selectHighlighted(e);
+                  this.highlightUnderEvent(e);
+                  this.selectHighlighted(e);
                 }
             }));
 
@@ -14687,7 +14683,7 @@ the specific language governing permissions and limitations under the Apache Lic
 
         // abstract
         findHighlightableChoices: function() {
-            return this.results.find(".select2-result-selectable:not(.select2-disabled):not(.select2-selected)");
+            return this.results.find(".select2-result-selectable:not(.select2-disabled)");
         },
 
         // abstract
@@ -14698,7 +14694,7 @@ the specific language governing permissions and limitations under the Apache Lic
             while (index > -1 && index < choices.length) {
                 index += delta;
                 var choice = $(choices[index]);
-                if (choice.hasClass("select2-result-selectable") && !choice.hasClass("select2-disabled") && !choice.hasClass("select2-selected")) {
+                if (choice.hasClass("select2-result-selectable") && !choice.hasClass("select2-disabled")) {
                     this.highlight(index);
                     break;
                 }
@@ -15000,7 +14996,7 @@ the specific language governing permissions and limitations under the Apache Lic
               return;
             }
             var index=this.highlight(),
-                highlighted=this.results.find(".select2-highlighted"),
+                highlighted=this.results.find(".select2-highlighted:not(.select2-selected)"),
                 data = highlighted.closest('.select2-result').data("select2-data");
 
             if (data) {
@@ -15908,7 +15904,7 @@ the specific language governing permissions and limitations under the Apache Lic
                     }
                     return;
                 } else if (((e.which === KEY.BACKSPACE && this.keydowns == 1)
-                    || e.which == KEY.LEFT) && (pos.offset == 0 && !pos.length)) {
+                    || e.which == KEY.LEFT && !this.opened()) && (pos.offset == 0 && !pos.length)) {
 
                     this.selectChoice(selection.find(".select2-search-choice:not(.select2-locked)").last());
                     killEvent(e);
@@ -17630,6 +17626,11 @@ define('mockup-patterns-select2',[
         self.$select2.addClass('select2-orderable');
       }
     },
+    opened: function () {
+      var self = this;
+      var isOpen = $('.select2-dropdown-open', self.$el.parent()).length === 1;
+      return isOpen;
+    },
     init: function() {
       var self = this;
 
@@ -19323,5 +19324,5 @@ require([
 
 });
 
-define("/Users/esteele/projects/plone_5.2/src/plone.staticresources/src/plone/staticresources/static/plone.js", function(){});
+define("/home/maik/develop/plonecore/buildout.coredev/src/plone.staticresources/src/plone/staticresources/static/plone.js", function(){});
 
