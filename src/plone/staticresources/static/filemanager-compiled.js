@@ -39922,5 +39922,5 @@ require([
   'use strict';
 });
 
-define("/home/maik/develop/plonecore/buildout.coredev/src/plone.staticresources/src/plone/staticresources/static/filemanager.js", function(){});
+define("/Users/esteele/projects/plone_5.2/src/plone.staticresources/src/plone/staticresources/static/filemanager.js", function(){});
 

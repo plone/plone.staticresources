@@ -94990,5 +94990,5 @@ require([
   'use strict';
 });
 
-define("/home/maik/develop/plonecore/buildout.coredev/src/plone.staticresources/src/plone/staticresources/static/plone-logged-in.js", function(){});
+define("/Users/esteele/projects/plone_5.2/src/plone.staticresources/src/plone/staticresources/static/plone-logged-in.js", function(){});
 
