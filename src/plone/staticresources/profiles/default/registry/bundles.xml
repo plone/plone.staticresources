@@ -48,7 +48,7 @@
     <value key="enabled">True</value>
     <value key="jscompilation">++plone++static/plone-compiled.min.js</value>
     <value key="csscompilation">++plone++static/plone-compiled.css</value>
-    <value key="last_compilation">2018-10-01 23:00:00</value>
+    <value key="last_compilation">2019-30-04 13:00:00</value>
     <value key="load_async">False</value>
     <value key="load_defer">False</value>
     <value key="stub_js_modules">
