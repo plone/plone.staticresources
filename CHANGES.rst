@@ -14,15 +14,15 @@ Changelog
 New features:
 
 
-- * Ship moment.js without locales, which are now lazily loaded in 'mockup' package
-    [davilima6] (#10)
+- Ship moment.js without locales, which are now lazily loaded in 'mockup' package
+  [davilima6] (#10)
 
 
 Bug fixes:
 
 
-- - customize select2 to work better with relateditems pattern, update compiled resources: plone, logged-in
-    [MrTango] (#16)
+- Customize select2 to work better with relateditems pattern, update compiled resources: plone, logged-in
+  [MrTango] (#16)
 
 
 1.0a1 (2019-02-13)
