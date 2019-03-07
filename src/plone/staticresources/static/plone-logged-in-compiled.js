@@ -1436,7 +1436,7 @@ define('mockup-patterns-relateditems',[
       var options = $.extend(true, {}, self.options, item, {
         'browsing': self.browsing,
         'open_folder': _t('Open folder'),
-        'urrent_directory': _t('current directory:'),
+        'current_directory': _t('current directory:'),
         'one_level_up': _t('Go one level up')
       });
       options._item = item;
@@ -94990,5 +94990,5 @@ require([
   'use strict';
 });
 
-define("/Users/esteele/projects/plone_5.2/src/plone.staticresources/src/plone/staticresources/static/plone-logged-in.js", function(){});
+define("/Users/davi/Projects/_others/buildout.coredev/src/plone.staticresources/src/plone/staticresources/static/plone-logged-in.js", function(){});
 
