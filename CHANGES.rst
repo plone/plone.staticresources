@@ -8,6 +8,20 @@ Changelog
 
 .. towncrier release notes start
 
+1.0.2 (2019-03-21)
+------------------
+
+Bug fixes:
+
+
+- Fix highlight of current item in nav for image and file.
+  [agitator] (#18)
+- Fix less building error.
+  [vangheem] (#19)
+- Update resources after alignment fix in Select2-based widgets
+  [davilima6] (#21)
+
+
 1.0.1 (2019-03-12)
 ------------------
 
