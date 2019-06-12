@@ -98,11 +98,14 @@ define('mockup-patterns-inlinevalidation',[
         var $input = $(input),
             $field = $input.closest('.field'),
             $form = $field.closest('form'),
+            $cloned_form = $form.clone(),
             fname = $field.attr('data-fieldname');
 
+        // XXX: Remove binary files so they are not uploaded to server
+        $cloned_form.find("input[type=file]").remove();
         this.queue($.proxy(function(next) {
-            $form.ajaxSubmit({
-                url: this.append_url_path($form.attr('action'), '@@formlib_validate_field'),
+            $cloned_form.ajaxSubmit({
+                url: this.append_url_path($cloned_form.attr('action'), '@@formlib_validate_field'),
                 data: {fname: fname},
                 iframe: false,
                 success: $.proxy(function (data) {
@@ -119,13 +122,16 @@ define('mockup-patterns-inlinevalidation',[
         var $input = $(input),
             $field = $input.closest('.field'),
             $form = $field.closest('form'),
+            $cloned_form = $form.clone(),
             fset = $input.closest('fieldset').attr('data-fieldset'),
             fname = $field.attr('data-fieldname');
 
+        // XXX: Remove binary files so they are not uploaded to server
+        $cloned_form.find("input[type=file]").remove();
         if (fname) {
           this.queue($.proxy(function(next) {
-              $form.ajaxSubmit({
-                  url: this.append_url_path($form.attr('action'), '@@z3cform_validate_field'),
+              $cloned_form.ajaxSubmit({
+                  url: this.append_url_path($cloned_form.attr('action'), '@@z3cform_validate_field'),
                   data: {fname: fname, fset: fset},
                   iframe: false,
                   success: $.proxy(function (data) {
@@ -1436,7 +1442,7 @@ define('mockup-patterns-relateditems',[
       var options = $.extend(true, {}, self.options, item, {
         'browsing': self.browsing,
         'open_folder': _t('Open folder'),
-        'urrent_directory': _t('current directory:'),
+        'current_directory': _t('current directory:'),
         'one_level_up': _t('Go one level up')
       });
       options._item = item;
@@ -94990,5 +94996,5 @@ require([
   'use strict';
 });
 
-define("/usr/local/plone-5.1/buildout.coredev/src/plone.staticresources/src/plone/staticresources/static/plone-logged-in.js", function(){});
+define("/Users/davilima/Projects/plone/coredev/src/plone.staticresources/src/plone/staticresources/static/plone-logged-in.js", function(){});
 
