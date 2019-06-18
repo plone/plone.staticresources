@@ -3783,5 +3783,5 @@ require([
 
 });
 
-define("/home/_thet/data/dev/plone/buildout.coredev/src/plone.staticresources/src/plone/staticresources/static/plone-base.js", function(){});
+define("/Users/peter/workspace/buildout.coredev52py37/src/plone.staticresources/src/plone/staticresources/static/plone-base.js", function(){});
 

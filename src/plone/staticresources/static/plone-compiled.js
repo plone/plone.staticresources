@@ -16568,11 +16568,7 @@ define('mockup-patterns-navigationmarker',[
             var href = document.querySelector('head link[rel="canonical"]').href || window.location.href;
 
             $('a', this.$el).each(function () {
-<<<<<<< HEAD
-                var navlink = this.href.replace('/view', '');
-=======
                 var navlink = this.href.replace('/view', '')
->>>>>>> 52d6153... recompile plone bundle without base
                 if (href.indexOf(navlink) !== -1) {
                     var parent = $(this).parent();
 
@@ -16584,19 +16580,10 @@ define('mockup-patterns-navigationmarker',[
 
                     // set "inPath" to all nav items which are within the current path
                     // check if parts of navlink are in canonical url parts
-<<<<<<< HEAD
-                    var hrefParts = href.split('/');
-                    var navParts = navlink.split('/');
-                    var inPath = false;
-                    for (var i = 0, size = navParts.length; i < size; i++) {
-                        // The last path-part must match.
-                        inPath = false;
-=======
                     var hrefParts = href.split('/')
                     var navParts = navlink.split('/')
                     for (var i = 0, size = navParts.length; i < size; i++) {
                         var inPath = false
->>>>>>> 52d6153... recompile plone bundle without base
                         if (navParts[i] === hrefParts[i]) {
                             inPath = true;
                         }
@@ -16616,7 +16603,6 @@ define('mockup-patterns-navigationmarker',[
 
     return Navigation;
 });
-
 /* PreventDoubleSubmit pattern.
  *
  * Options:
@@ -17655,9 +17641,5 @@ require([
 
 });
 
-<<<<<<< HEAD
-define("/home/_thet/data/dev/plone/buildout.coredev/src/plone.staticresources/src/plone/staticresources/static/plone.js", function(){});
-=======
 define("/Users/peter/workspace/buildout.coredev52py37/src/plone.staticresources/src/plone/staticresources/static/plone.js", function(){});
->>>>>>> 52d6153... recompile plone bundle without base
 
