@@ -37,7 +37,15 @@
       name="default"
       title="plone.staticresources"
       directory="profiles/default"
-      description="Installs the plone.staticresources add-on."
+      description="Installs the plone.staticresources for Plone."
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      />
+
+  <genericsetup:registerProfile
+      name="async"
+      title="plone.staticresources EXPERIMENTAL: Async Resource Loading"
+      directory="profiles/async"
+      description="plone.staticresources with asynchronous loading of resources"
       provides="Products.GenericSetup.interfaces.EXTENSION"
       />
 
