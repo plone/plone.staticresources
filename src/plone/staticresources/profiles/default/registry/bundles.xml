@@ -54,6 +54,9 @@
     <value key="last_compilation">2019-06-18 22:30:00</value>
     <value key="load_async">False</value>
     <value key="load_defer">False</value>
+    <value key="stub_js_modules">
+      <element>jquery</element>
+    </value>
   </records>
 
   <records prefix="plone.bundles/plone"
@@ -73,7 +76,7 @@
       <element>jquery</element>
       <element>pat-registry</element>
       <element>mockup-patterns-base</element>
-     </value>
+    </value>
   </records>
 
   <records prefix="plone.bundles/plone-logged-in"
