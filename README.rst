@@ -4,6 +4,44 @@ plone.staticresources
 
 This add-on contains all static JavaScript and CSS resources used by Plone.
 
+
+Target audience
+---------------
+
+This documentation aims at:
+
+- **Theme Authors:** who want to change the look and feel of a Plone site and need to:
+
+  - understand how to correctly bundle changes made into existing or new frontend code.
+
+- **Integrators and Developers:** who want to customize or maintain the front end of a Plone site for their customers:
+
+  - upgrade existing versions or install new ``npm`` packages.
+
+  - integrate new JavaScript/CSS behavior, eventually wrapped in a ``pattern`` for optimal integration and reuse within
+    Plone front end ecosystem.
+
+- **Plone Core Developers:** who want to fix Plone bugs or enhance this add-on.
+
+
+How to upgrade the resources in this package
+--------------------------------------------
+
+1. Increase ``npm`` package versions in ``package.json``, in sections ``dependencies`` or ``devDependencies``.
+
+2. Run ``yarn upgrade`` (important: cannot be ``npm``)
+
+3. Run ``./bin/plone-compile-resources -b plone`` or ``./bin/plone-compile-resources -b plone-logged-in`` (whichever
+   bundle you need to re-build).
+
+4. Increase the ``last_compilation`` date in ``src/plone/staticresources/profiles/default/registry/bundles.xml``.
+
+5. Submit a PR and run the tests on Jenkins.
+
+
+What has changed
+----------------
+
 Between Plone 5.0 and 5.1 these resources were located in ``static/`` directory of ``Products.CMFPlone`` package.
 Starting with Plone 5.2 they're distributed in this independent package due to the specific tooling and workflows used
 to build frontend resources and also the different maintenance and release needs of ``Products.CMFPlone``. For a
@@ -14,24 +52,19 @@ complete list of reasons, read `PLIP 1653 <https://github.com/plone/Products.CMF
   which npm does not (even using ``--prefix``, ``node_modules`` is hardcoded). Our package directory is located at:
   ``src/plone/staticresources/static/components``.
 
+Changes since Plone 5.1.x
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Target audience
----------------
+- The ``toolbar`` pattern from ``Products.CMFPlone.static.toolbar`` has been moved to ``mockup`` package.
+- ``mockup`` package now uses ``npm``'s registry and ``yarn`` instead of ``bower``.
 
-This documentation aims at:
+Besides the following has been moved in here:
 
-- **Theme Authors:** who want to change the look and feel of a Plone site and need to:
-
-  - understand how to correctly bundle changes made into existing or new frontend code
-
-- **Integrators and Developers:** who want to customize or maintain the front end of a Plone site for their customers:
-
-  - upgrade existing versions or install new ``npm`` packages.
-
-  - integrate new JavaScript/CSS behavior, eventually wrapped in a ``pattern`` for optimal integration and reuse within
-    Plone front end ecosystem.
-
-- **Plone Core Developers:** who want to fix Plone bugs or enhance this add-on
+- All static Resources from ``Products.CMFPlone.static``: bundle resources, compiled bundles, external packages
+- Bundle and Resource registrations from ``Products.CMFPlone``'s ``dependencies`` profile
+- ``plone-compile-resources`` script
+- ``thememapper`` bundle from ``plone.app.theming``
+- ``plone.resourceeditor`` bundle from ``plone.resourceeditor``
 
 
 Compiling Bundles
@@ -52,13 +85,14 @@ Building the ``plone-logged-in`` bundle::
 .. note::
   You can see all the options of this executable by running ``./bin/plone-compile-resources --help``
 
+
 Resources, Bundles, Patterns and the Resource Registry
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The ``plone-compile-resources`` script collects Resources from source packages (e.g. ``mockup``) and compiles them in
 ``plone/staticresources/static/`` into minified versions with source maps and, for JavaScript only, also into an
-unminified version. The output directory is configurable by using ``csscompilation`` and ``jscompilation`` attributes of
-the bundle registration.
+un-minified version. The output directory is configurable by using ``csscompilation`` and ``jscompilation`` attributes
+of the bundle registration.
 
 Bundles are groups of resources. By default Plone comes configured to serve two main bundles:
 
@@ -87,33 +121,37 @@ be done by checking where it's imported in the entry points above. The bundle na
   registered to default Plone bundles, which instead use the entry point approach. Pattern's resources may be useful if
   needed to be injected in specific views.
 
-In production mode, Plone will serve static resources in URLs similar to:
-
-- http://localhost:8080/++plone++static/++unique++TIMESTAMP/plone-compiled.min.js
-- http://localhost:8080/++plone++static/++unique++TIMESTAMP/plone-compiled.css
-- http://localhost:8080/++plone++static/++unique++TIMESTAMP/plone-logged-in-compiled.min.js
-- http://localhost:8080/++plone++static/++unique++TIMESTAMP/plone-logged-in-compiled.css
-
-If Plone is configured to serve singles files, URLs will be similar to:
+In production mode (``./bin/instance start``), since version 5.1, Plone is configured to serve Aggregate Bundles,
+single files to minimize network requests (`aggregate bundles
+<https://docs.plone.org/adapt-and-extend/theming/resourceregistry.html#resource-bundle-aggregation>`_).
+In that case final production resource URLs will be similar to:
 
 - http://localhost:8080//++plone++production/++unique++TIMESTAMP/default.js
 - http://localhost:8080//++plone++production/++unique++TIMESTAMP/default.css
 
-In development mode, Plone will omit timestamp from path and serve fresh copies of the resources of the selected
-bundle(s). Those are compiled in-browser, on the fly for each page load and requested through XHR requests to URLs like:
+If you enable Development Mode for JavaScript and CSS in Resource Registries control panel, Plone will omit timestamp
+from path and serve fresh copies of the resources of the selected bundle(s). Those are compiled in-browser, on the fly
+for each page load and requested by XHR requests to URLs like:
 
 - http://localhost:8080/++resource++plone.js
 - http://localhost:8080/++plone++static/plone.less
 - http://localhost:8080/++resource++plone-logged-in.js
 - http://localhost:8080/++plone++static/plone-logged-in.less
 
-These entry points will then cause Patterns themselves to be loaded, through in-browser XHR requests to URLs like:
+These entry points will then cause Patterns themselves to be loaded through in-browser XHR requests to URLs like:
 
 - http://localhost:8080/Plone/++resource++mockup/livesearch/pattern.js
 - http://localhost:8080/Plone/++resource++mockup/livesearch/pattern.livesearch.less
 
+If you do enable Development Mode, and yet do not select any bundles, Plone serves static resources in URLs similar to:
 
-Development mode
+- http://localhost:8080/++plone++static/++unique++TIMESTAMP/plone-compiled.min.js
+- http://localhost:8080/++plone++static/++unique++TIMESTAMP/plone-compiled.css
+- http://localhost:8080/++plone++static/++unique++TIMESTAMP/plone-logged-in-compiled.min.js
+- http://localhost:8080/++plone++static/++unique++TIMESTAMP/plone-logged-in-compiled.css
+
+
+Development tips
 ^^^^^^^^^^^^^^^^
 
 When fixing Plone bugs or improving functionality:
@@ -126,15 +164,15 @@ When fixing Plone bugs or improving functionality:
   desired bundle (that contains the modified files) must be set to either "Develop JavaScript", "Develop CSS" or both.
   This causes each of the bundle resources to be served individually, easing development. In this case, bundle
   resources are served from the source package (e.g. ``mockup``) instead of ``plone.staticresources``.
-- To identify which bundle contains the modified resource, see section
-  "Entry Points" below. Keep in mind the more bundles selected for development mode the slower are page reloads, so
-  it's recommended to select only what's being developed.
-- Alternatively you may run ``./bin/plone-compile-resources`` between changes
-  and avoid Development Mode's in-browser compilation (fastest browser loading time).
+- To identify which bundle contains the modified resource, see section "Entry Points" below. Keep in mind the more
+  bundles selected for development mode the slower are page reloads, so it's recommended to select only what's being
+  developed.
+- Alternatively you may run ``./bin/plone-compile-resources`` between changes and avoid Development Mode's in-browser
+  compilation (fastest browser loading time).
 
 
 Entry Points
-------------
+^^^^^^^^^^^^
 
 The current list of registered patterns for each entry point is available in:
 
@@ -150,7 +188,7 @@ The current list of registered patterns for each entry point is available in:
 Here's a snapshot:
 
 For anonymous users
-^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~
 
 +---------------------------------------+------------------------------------+
 | JS                                    | LESS                               |
@@ -177,7 +215,7 @@ For anonymous users
 +---------------------------------------+------------------------------------+
 
 For logged-in users
-^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~
 
 +--------------------------------------------+--------------------------------+
 | JS                                         | LESS                           |
@@ -206,23 +244,8 @@ For Mockup, the original repository is: https://github.com/plone/mockup/
 For Patternslib, visit: http://github.com/patternslib/Patterns
 
 
-How to upgrade the resources in this package
---------------------------------------------
-
-1. Increase ``npm`` package versions in ``package.json``, in sections ``dependencies`` or ``devDependencies``.
-
-2. Run ``yarn upgrade`` (cannot be ``npm``)
-
-3. Run ``./bin/plone-compile-resources -b plone`` or
-``./bin/plone-compile-resources -b plone-logged-in`` (whichever bundle you need to re-build).
-
-4. Increase the ``last_compilation`` date in ``src/plone/staticresources/profiles/default/registry/bundles.xml``.
-
-5. Submit a PR and run the tests on Jenkins.
-
-
-How to generate the ``plone-compile-resources`` script
-------------------------------------------------------
+Generating the ``plone-compile-resources`` script
+-------------------------------------------------
 
 The ``plone-compile-resources`` script can be used to compile bundles from the command line. In short, the script starts
 up a Plone instance, reads the resources and bundles configured in the registry and compiles a JS/CSS bundle based on
@@ -251,23 +274,8 @@ might need to add something similar to:
       plone-compile-resources
 
 
-What has changed since Plone 5.1
---------------------------------
-
-- The ``toolbar`` pattern from ``Products.CMFPlone.static.toolbar`` has been moved to ``mockup`` package.
-- ``mockup`` package now uses npm registry and yarn instead of bower.
-
-Besides the following has been moved in here:
-
-- All static resources from ``Products.CMFPlone.static``: bundle resources, compiled bundles, external packages
-- Bundle and resource registrations from ``Products.CMFPlone``'s ``dependencies`` profile
-- ``plone-compile-resources`` script
-- ``thememapper`` bundle from ``plone.app.theming``
-- ``plone.resourceeditor`` bundle from ``plone.resourceeditor``
-
-
 More on the Resource Registry and its modes
--------------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Have a look on how ``plone.staticresources`` and ``mockup`` register their resources:
 
