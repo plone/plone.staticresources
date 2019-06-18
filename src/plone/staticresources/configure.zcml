@@ -13,6 +13,11 @@
     />
 
   <browser:resource
+    name="plone-base.js"
+    file="static/plone-base.js"
+    />
+
+  <browser:resource
     name="plone.js"
     file="static/plone.js"
     />
