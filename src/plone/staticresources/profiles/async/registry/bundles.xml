@@ -5,20 +5,13 @@
   <records prefix="plone.bundles/plone-base"
             interface='Products.CMFPlone.interfaces.IBundleRegistry'>
     <value key="merge_with">default</value>
-    <value key="resources">
-      <element>plone-base</element>
-    </value>
     <value key="load_async">False</value>
     <value key="load_defer">False</value>
   </records>
 
   <records prefix="plone.bundles/plone"
             interface='Products.CMFPlone.interfaces.IBundleRegistry'>
-    <value key="depends">plone-base</value>
     <value key="merge_with"></value>
-    <value key="resources">
-      <element>plone</element>
-    </value>
     <value key="load_async">True</value>
     <value key="load_defer">False</value>
   </records>
