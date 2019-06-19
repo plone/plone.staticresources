@@ -16,6 +16,7 @@ class HiddenProfiles(object):
     def getNonInstallableProfiles(self):
         """Hide all profiles from site-creation and quickinstaller."""
         return [
-            'plone.staticresources:default',
-            'plone.staticresources:uninstall',
+            "plone.staticresources:default",
+            "plone.staticresources:async",
+            "plone.staticresources:uninstall",
         ]

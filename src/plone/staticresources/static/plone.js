@@ -14,18 +14,7 @@
 // Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 //
 
-if (window.jQuery) {
-  define( 'jquery', [], function () {
-    'use strict';
-    return window.jQuery;
-  } );
-}
-
 require([
-  'jquery',
-  'pat-registry',
-  'mockup-patterns-base',
-
   'mockup-patterns-autotoc',
   'mockup-patterns-contentloader',
   'mockup-patterns-cookietrigger',
@@ -43,59 +32,7 @@ require([
   'bootstrap-collapse',
   'bootstrap-dropdown',
   'bootstrap-tooltip',
-], function($, registry, Base) {
+], function () {
   'use strict';
-
-  // initialize only if we are in top frame
-  if ((window.parent === window) ||
-      (window.frameElement.nodeName === 'IFRAME')) {
-    $(document).ready(function() {
-      $('body').addClass('pat-plone');
-      if (!registry.initialized) {
-        registry.init();
-      }
-    });
-  }
-
-  // TODO: Needs to be moved to controlpanel js
-  $(document).ready(function() {
-    var cookieNegotiation = (
-      $("#form-widgets-use_cookie_negotiation > input").value === 'selected');
-    if (cookieNegotiation !== true) {
-      $("#formfield-form-widgets-authenticated_users_only").hide();
-    }else{
-      $("#formfield-form-widgets-authenticated_users_only").show();
-    }
-  });
-
-  // TODO: Needs to be moved to controlpanel js as well
-  $(document).ready(function() {
-      function autohide_quality_fields(animate) {
-        var highpixeldensity = $('#form-widgets-highpixeldensity_scales option:selected').attr('value');
-        var quality_2x = $('div[data-fieldname="form.widgets.quality_2x"]');
-        var quality_3x = $('div[data-fieldname="form.widgets.quality_3x"]');
-
-        if (highpixeldensity == 'disabled') {
-            quality_2x.fadeOut();
-            quality_3x.fadeOut();
-        }
-        else if (highpixeldensity == '2x') {
-            quality_2x.fadeIn();
-            quality_3x.fadeOut();
-        }
-        else if (highpixeldensity == '3x') {
-            quality_2x.fadeIn();
-            quality_3x.fadeIn();
-        }
-    }
-
-    if ($('#ImagingSettings')) {
-        $('div[data-fieldname="form.widgets.quality_2x"]').hide();
-        $('div[data-fieldname="form.widgets.quality_3x"]').hide();
-        autohide_quality_fields();
-        var select = $('#form-widgets-highpixeldensity_scales');
-        select.change(autohide_quality_fields);
-    }
-});
 
 });

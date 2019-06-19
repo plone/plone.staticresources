@@ -2,6 +2,10 @@
 <registry>
 
   <!-- Plone bundle resources -->
+  <records prefix="plone.resources/plone-base"
+            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
+      <value key="js">++resource++plone-base.js</value>
+  </records>
   <records prefix="plone.resources/plone"
             interface='Products.CMFPlone.interfaces.IResourceRegistry'>
       <value key="js">++resource++plone.js</value>
@@ -39,8 +43,25 @@
   </records>
 
   <!-- Bundles -->
+  <records prefix="plone.bundles/plone-base"
+            interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+    <value key="merge_with">default</value>
+    <value key="resources">
+      <element>plone-base</element>
+    </value>
+    <value key="enabled">True</value>
+    <value key="jscompilation">++plone++static/plone-base-compiled.min.js</value>
+    <value key="last_compilation">2019-06-18 22:30:00</value>
+    <value key="load_async">False</value>
+    <value key="load_defer">False</value>
+    <value key="stub_js_modules">
+      <element>jquery</element>
+    </value>
+  </records>
+
   <records prefix="plone.bundles/plone"
             interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+    <value key="depends">plone-base</value>
     <value key="merge_with">default</value>
     <value key="resources">
       <element>plone</element>
@@ -48,11 +69,13 @@
     <value key="enabled">True</value>
     <value key="jscompilation">++plone++static/plone-compiled.min.js</value>
     <value key="csscompilation">++plone++static/plone-compiled.css</value>
-    <value key="last_compilation">2019-06-30 09:30:00</value>
+    <value key="last_compilation">2019-06-18 22:30:00</value>
     <value key="load_async">False</value>
     <value key="load_defer">False</value>
     <value key="stub_js_modules">
       <element>jquery</element>
+      <element>pat-registry</element>
+      <element>mockup-patterns-base</element>
     </value>
   </records>
 
@@ -66,7 +89,7 @@
     <value key="expression">python: member is not None</value>
     <value key="jscompilation">++plone++static/plone-logged-in-compiled.min.js</value>
     <value key="csscompilation">++plone++static/plone-logged-in-compiled.css</value>
-    <value key="last_compilation">2018-10-01 23:00:00</value>
+    <value key="last_compilation">2019-06-18 22:30:00</value>
     <value key="depends">plone</value>
     <value key="load_async">False</value>
     <value key="load_defer">False</value>
