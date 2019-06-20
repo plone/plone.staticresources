@@ -108,7 +108,7 @@ When editing a pattern (e.g. in ``mockup`` package), it is important to know for
 The bundle name will be useful as parameter for ``plone-compile-resources`` script.
 
 .. note::
-  Patterns are also available as independent resources in :guilabel:`&Resource Registries` control panel but they are not registered to default Plone bundles, which instead use the entry point approach.
+  Patterns are also available as independent resources in `Resource Registries` control panel but they are not registered to default Plone bundles, which instead use the entry point approach.
   Pattern's resources may be useful if needed to be injected in specific views.
 
 In production mode (``./bin/instance start``), since version 5.1, Plone is configured to serve Aggregate Bundles, single files to minimize network requests (`aggregate bundles <https://docs.plone.org/adapt-and-extend/theming/resourceregistry.html#resource-bundle-aggregation>`_).
@@ -117,7 +117,7 @@ In that case final production resource URLs will be similar to:
 - http://localhost:8080//++plone++production/++unique++TIMESTAMP/default.js
 - http://localhost:8080//++plone++production/++unique++TIMESTAMP/default.css
 
-If you enable :guilabel:`&Development Mode` for JavaScript and CSS in :guilabel:`&Resource Registries` control panel, Plone will omit timestamp from path and serve fresh copies of the resources of the selected bundle(s).
+If you enable `Development Mode` for JavaScript and CSS in `Resource Registries` control panel, Plone will omit timestamp from path and serve fresh copies of the resources of the selected bundle(s).
 Those are compiled in-browser, on the fly for each page load and requested by XHR requests to URLs like:
 
 - http://localhost:8080/++resource++plone.js
@@ -145,13 +145,13 @@ When fixing Plone bugs or improving functionality:
 
 - Dependencies upgrades (e.g. ``moment.js``) should be done in ``mockup`` and after the PR is merged, propagated here (i.e. static resources needs to be recompiled)
 - Likewise, CSS and JS should be developed not in ``plone.staticresources`` but in their own package's source (for instance, in ``mockup``)
-- To see the new changes in the browser, enable :guilabel:`&Development Mode` in :guilabel:`&Resource Registries` control panel.
+- To see the new changes in the browser, enable `Development Mode` in `Resource Registries` control panel.
   Next the desired bundle (that contains the modified files) must be set to either "Develop JavaScript", "Develop CSS" or both.
   This causes each of the bundle resources to be served individually, easing development.
   In this case, bundle resources are served from the source package (e.g. ``mockup``) instead of ``plone.staticresources``.
 - To identify which bundle contains the modified resource, see section "Entry Points" below.
   Keep in mind the more bundles selected for development mode the slower are page reloads, so it is recommended to select only what is being developed.
-- Alternatively you may run ``./bin/plone-compile-resources`` between changes and avoid :guilabel:`&Development Mode`'s in-browser compilation (fastest browser loading time).
+- Alternatively you may run ``./bin/plone-compile-resources`` between changes and avoid `Development Mode`'s in-browser compilation (fastest browser loading time).
 
 
 Entry Points
