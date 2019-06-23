@@ -8,6 +8,27 @@ Changelog
 
 .. towncrier release notes start
 
+1.1.0 (2019-06-22)
+------------------
+
+New features:
+
+
+- Add support for asynchronous loading of javascript resources.
+  A new plone-base bundle is added with the minimum required scripts from plone bundle.
+  Import the extra profile to enable experimental async loading.
+  [agitator] (#27)
+
+
+Bug fixes:
+
+
+- Fixes plone/mockup#895 again. (#24)
+- Fixed plone/Products.CMFPlone#2490 conflict in z-index between main toolbar and structure pattern toolbar (#25)
+- - Integrate https://github.com/plone/mockup/pull/906 which fixes wrong in-path marking for similar pathnames. #26
+    [agitator] (#26)
+
+
 1.0.2 (2019-03-21)
 ------------------
 

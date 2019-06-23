@@ -1,2 +1,0 @@
-- Integrate https://github.com/plone/mockup/pull/906 which fixes wrong in-path marking for similar pathnames. #26
-  [agitator]
