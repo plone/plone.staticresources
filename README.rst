@@ -33,7 +33,9 @@ How to upgrade the resources in this package
 
 4. Increase the ``last_compilation`` date in ``src/plone/staticresources/profiles/default/registry/bundles.xml``.
 
-5. Submit a Pull Request and run the tests on Jenkins.
+5. Create an upgrade step for ``plone.app.upgrade``.
+
+6. Submit a Pull Request and run the tests on Jenkins.
 
 
 What has changed
