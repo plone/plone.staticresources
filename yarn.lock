@@ -553,6 +553,10 @@ jquery@, jquery@>=1.5, jquery@>=1.7, jquery@>=1.9:
   version "1.11.3"
   resolved "https://github.com/jquery/jquery-dist.git#1472290917f17af05e98007136096784f9051fab"
 
+"jquery@https://github.com/jquery/jquery-dist.git#1.12.4":
+  version "1.12.4"
+  resolved "https://github.com/jquery/jquery-dist.git#5e89585e0121e72ff47de177c5ef604f3089a53d"
+
 jsbn@~0.1.0:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/jsbn/-/jsbn-0.1.1.tgz#a5e654c2e5a2deb5f201d96cefbca80c0ef2f513"
