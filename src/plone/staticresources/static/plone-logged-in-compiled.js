@@ -24026,12 +24026,11 @@ define('mockup-patterns-datatables',[
  *
  */
 
-
 define('mockup-patterns-sortable',[
   'jquery',
   'pat-base',
   'jquery.event.drop',
-  'jquery.event.drag'
+  'jquery.event.drag',
 ], function($, Base, drop) {
   'use strict';
 
@@ -24043,77 +24042,85 @@ define('mockup-patterns-sortable',[
       selector: 'li',
       dragClass: 'item-dragging',
       cloneClass: 'dragging',
-      createDragItem: function(pattern, $el){
-        return $el.clone().
-          addClass(pattern.options.cloneClass).
-          css({opacity: 0.75, position: 'absolute'}).appendTo(document.body);
+      createDragItem: function(pattern, $el) {
+        return $el
+          .clone()
+          .addClass(pattern.options.cloneClass)
+          .css({ opacity: 0.75, position: 'absolute' })
+          .appendTo(document.body);
       },
-      drop: undefined  // callback function or name of global function
+      drop: undefined, // callback function or name of global function
+      dragOptions: {
+        distance: 2,
+      },
     },
     init: function() {
       var self = this;
       var start = 0;
 
-      self.$el.find(self.options.selector).drag('start', function(e, dd) {
-        var dragged = this;
-        var $el = $(this);
-        $(dragged).addClass(self.options.dragClass);
-        drop({
-          tolerance: function(event, proxy, target) {
-            if ($(target.elem).closest(self.$el).length === 0) {
-              /* prevent dragging conflict over another drag area */
-              return;
-            }
-            var test = event.pageY > (target.top + target.height / 2);
-            $.data(target.elem, 'drop+reorder', test ? 'insertAfter' : 'insertBefore' );
-            return this.contains(target, [event.pageX, event.pageY]);
-          }
-        });
-        start = $el.index();
-        return self.options.createDragItem(self, $el);
-      })
-      .drag(function(e, dd) {
-        /*jshint eqeqeq:false */
-        $( dd.proxy ).css({
-          top: dd.offsetY,
-          left: dd.offsetX
-        });
-        var drop = dd.drop[0],
+      self.$el
+        .find(self.options.selector)
+        .drag('start', function(e, dd) {
+          var dragged = this;
+          var $el = $(this);
+          $(dragged).addClass(self.options.dragClass);
+          drop({
+            tolerance: function(event, proxy, target) {
+              if ($(target.elem).closest(self.$el).length === 0) {
+                /* prevent dragging conflict over another drag area */
+                return;
+              }
+              var test = event.pageY > target.top + target.height / 2;
+              $.data(
+                target.elem,
+                'drop+reorder',
+                test ? 'insertAfter' : 'insertBefore'
+              );
+              return this.contains(target, [event.pageX, event.pageY]);
+            },
+          });
+
+          start = $el.index();
+          return self.options.createDragItem(self, $el);
+        })
+        .drag(function(e, dd) {
+          /*jshint eqeqeq:false */
+          $(dd.proxy).css({
+            top: dd.offsetY,
+            left: dd.offsetX,
+          });
+          var drop = dd.drop[0],
             method = $.data(drop || {}, 'drop+reorder');
-        /* XXX Cannot use triple equals here */
-        if (method && drop && (drop != dd.current || method != dd.method)) {
-          $(this)[method](drop);
-          dd.current = drop;
-          dd.method = method;
-          dd.update();
-        }
-      })
-      .drag('end', function(e, dd) {
-        var $el = $(this);
-        $el.removeClass(self.options.dragClass);
-        $(dd.proxy).remove();
+          /* XXX Cannot use triple equals here */
+          if (method && drop && (drop != dd.current || method != dd.method)) {
+            $(this)[method](drop);
+            dd.current = drop;
+            dd.method = method;
+            dd.update();
+          }
+        }, self.options.dragOptions)
+        .drag('end', function(e, dd) {
+          var $el = $(this);
+          $el.removeClass(self.options.dragClass);
+          $(dd.proxy).remove();
           if (self.options.drop) {
             if (typeof self.options.drop === 'string') {
               window[self.options.drop]($el, $el.index() - start);
             } else {
               self.options.drop($el, $el.index() - start);
             }
-        }
-      })
-      .drop('init', function(e, dd ) {
-        /*jshint eqeqeq:false */
-        /* XXX Cannot use triple equals here */
-        return (this == dd.drag) ? false: true;
-      });
-
-    }
+          }
+        })
+        .drop('init', function(e, dd) {
+          /*jshint eqeqeq:false */
+          /* XXX Cannot use triple equals here */
+          return this == dd.drag ? false : true;
+        });
+    },
   });
 
   return SortablePattern;
-
 });
-
-
 
 (function(root) {
 define("bootstrap-alert", ["jquery"], function() {
@@ -56610,10 +56617,10 @@ return (function () { this.tinyMCE.DOM.events.domLoaded = true; return this.tiny
 }(this));
 
 
-define('text!mockup-patterns-tinymce-url/templates/link.xml',[],function () { return '<div>\n  <div class="linkModal">\n    <h1><%- insertHeading %></h1>\n    <% if(upload){ %>\n    <p class="info">Specify the object to link to. It can be on this site already ("Internal"), an object you upload ("Upload"), from an external site ("External"), an email address ("Email"), or an anchor on this page ("Anchor").</p>\n    <% } %>\n\n    <div class="linkTypes pat-autotoc autotabs"\n         data-pat-autotoc="section:fieldset;levels:legend;IDPrefix:tinymce-autotoc-">\n\n      <fieldset class="linkType internal" data-linkType="internal">\n        <legend id="tinylink-internal">Internal</legend>\n        <div>\n          <div class="form-group main">\n            <!-- this gives the name to the "linkType" -->\n            <input type="text" name="internal" />\n          </div>\n        </div>\n      </fieldset>\n\n      <% if(upload){ %>\n      <fieldset class="linkType upload" data-linkType="upload">\n        <legend id="tinylink-upload">Upload</legend>\n        <div class="uploadify-me"></div>\n      </fieldset>\n      <% } %>\n\n      <fieldset class="linkType external" data-linkType="external">\n        <legend id="tinylink-external">External</legend>\n        <div class="form-group main">\n          <label for="external"><%- externalText %></label>\n          <input type="text" name="external" />\n        </div>\n      </fieldset>\n\n      <fieldset class="linkType email" data-linkType="email">\n        <legend id="tinylink-email">Email</legend>\n        <div class="form-inline">\n          <div class="form-group main">\n            <label><%- emailText %></label>\n            <input type="text" name="email" />\n          </div>\n          <div class="form-group">\n            <label><%- subjectText %></label>\n            <input type="text" name="subject" />\n          </div>\n        </div>\n      </fieldset>\n\n      <fieldset class="linkType anchor" data-linkType="anchor">\n        <legend id="tinylink-anchor">Anchor</legend>\n        <div>\n          <div class="form-group main">\n            <label>Select an anchor</label>\n            <div class="input-wrapper">\n              <select name="anchor" class="pat-select2" data-pat-select2="width:500px" />\n            </div>\n          </div>\n        </div>\n      </fieldset>\n\n    </div><!-- / tabs -->\n\n    <div class="common-controls">\n      <div class="form-group">\n        <label>Target</label>\n        <select name="target">\n          <% _.each(targetList, function(target){ %>\n            <option value="<%- target.value %>"><%- target.text %></option>\n          <% }); %>\n        </select>\n      </div>\n      <div class="form-group">\n        <label><%- titleText %></label>\n        <input type="text" name="title" />\n      </div>\n    </div>\n\n    <input type="submit" class="plone-btn" name="cancel" value="<%- cancelBtn %>" />\n    <input type="submit" class="plone-btn plone-btn-primary context" name="insert" value="<%- insertBtn %>" />\n  </div>\n</div>\n';});
+define('text!mockup-patterns-tinymce-url/templates/link.xml',[],function () { return '<div>\n  <div class="linkModal">\n    <h1><%- insertHeading %></h1>\n    <% if(upload){ %>\n    <p class="info"><%- insertLinkHelp %></p>\n    <% } %>\n\n    <div class="linkTypes pat-autotoc autotabs"\n         data-pat-autotoc="section:fieldset;levels:legend;IDPrefix:tinymce-autotoc-">\n\n      <fieldset class="linkType internal" data-linkType="internal">\n        <legend id="tinylink-internal"><%- internal %></legend>\n        <div>\n          <div class="form-group main">\n            <!-- this gives the name to the "linkType" -->\n            <input type="text" name="internal" />\n          </div>\n        </div>\n      </fieldset>\n\n      <% if(upload){ %>\n      <fieldset class="linkType upload" data-linkType="upload">\n        <legend id="tinylink-upload"><%- upload %></legend>\n        <div class="uploadify-me"></div>\n      </fieldset>\n      <% } %>\n\n      <fieldset class="linkType external" data-linkType="external">\n        <legend id="tinylink-external"><%- external %></legend>\n        <div class="form-group main">\n          <label for="external"><%- externalText %></label>\n          <input type="text" name="external" />\n        </div>\n      </fieldset>\n\n      <fieldset class="linkType email" data-linkType="email">\n        <legend id="tinylink-email">Email</legend>\n        <div class="form-inline">\n          <div class="form-group main">\n            <label><%- emailText %></label>\n            <input type="text" name="email" />\n          </div>\n          <div class="form-group">\n            <label><%- subjectText %></label>\n            <input type="text" name="subject" />\n          </div>\n        </div>\n      </fieldset>\n\n      <fieldset class="linkType anchor" data-linkType="anchor">\n        <legend id="tinylink-anchor"><%- anchor %></legend>\n        <div>\n          <div class="form-group main">\n            <label>Select an anchor</label>\n            <div class="input-wrapper">\n              <select name="anchor" class="pat-select2" data-pat-select2="width:500px" />\n            </div>\n          </div>\n        </div>\n      </fieldset>\n\n    </div><!-- / tabs -->\n\n    <div class="common-controls">\n      <div class="form-group">\n        <label>Target</label>\n        <select name="target">\n          <% _.each(targetList, function(target){ %>\n            <option value="<%- target.value %>"><%- target.text %></option>\n          <% }); %>\n        </select>\n      </div>\n      <div class="form-group">\n        <label><%- titleText %></label>\n        <input type="text" name="title" />\n      </div>\n    </div>\n\n    <input type="submit" class="plone-btn" name="cancel" value="<%- cancelBtn %>" />\n    <input type="submit" class="plone-btn plone-btn-primary context" name="insert" value="<%- insertBtn %>" />\n  </div>\n</div>\n';});
 
 
-define('text!mockup-patterns-tinymce-url/templates/image.xml',[],function () { return '<div>\n  <div class="linkModal">\n    <h1><%- insertHeading %></h1>\n    <% if(_.contains(linkTypes, \'uploadImage\')){ %>\n    <p class="info">Specify an image. It can be on this site already ("Internal Image"), an image you upload ("Upload"), or from an external site ("External Image").</p>\n    <% } %>\n\n    <div class="linkTypes pat-autotoc autotabs"\n         data-pat-autotoc="section:fieldset;levels:legend;IDPrefix:tinymce-autotoc-">\n\n        <% if(_.contains(linkTypes, \'image\')){ %>\n      <fieldset class="linkType image" data-linkType="image">\n        <legend id="tinylink-image">Internal Image</legend>\n        <div class="form-inline">\n          <div class="form-group main">\n            <input type="text" name="image" />\n          </div>\n          <div class="form-group scale">\n            <label><%- scaleText %></label>\n            <select name="scale">\n              <option value="">Original</option>\n                <% _.each(imageScales, function(scale){ %>\n                  <option value="<%- scale.value %>" <% if(scale.value === options.defaultScale){ %>selected<% } %> >\n                    <%- scale.title %>\n                  </option>\n                <% }); %>\n            </select>\n          </div>\n        </div>\n      </fieldset>\n        <% } %>\n\n      <% if(_.contains(linkTypes, \'uploadImage\')){ %>\n      <fieldset class="linkType uploadImage" data-linkType="uploadImage">\n        <legend id="tinylink-uploadImage">Upload</legend>\n        <div class="uploadify-me"></div>\n      </fieldset>\n      <% } %>\n\n      <% if(_.contains(linkTypes, \'externalImage\')){ %>\n      <fieldset class="linkType externalImage" data-linkType="externalImage">\n        <legend id="tinylink-externalImage">External Image</legend>\n        <div>\n          <div class="form-group main">\n            <label><%- externalImageText %></label>\n            <input type="text" name="externalImage" />\n          </div>\n        </div>\n      </fieldset>\n      <% } %>\n\n    </div><!-- / tabs -->\n\n    <div class="common-controls">\n      <div class="form-group title">\n        <label><%- titleText %></label>\n        <input type="text" name="title" />\n      </div>\n      <div class="form-group text">\n        <label><%- altText %></label>\n        <input type="text" name="alt" />\n      </div>\n      <div class="form-group align">\n        <label><%- imageAlignText %></label>\n        <select name="align">\n          <% _.each(Object.keys(options.imageClasses), function(align){ %>\n              <option value="<%- align %>">\n              <%- options.imageClasses[align] %>\n              </option>\n          <% }); %>\n        <select>\n      </div>\n    </div>\n\n    <input type="submit" class="plone-btn" name="cancel" value="<%- cancelBtn %>" />\n    <input type="submit" class="plone-btn plone-btn-primary context" name="insert" value="<%- insertBtn %>" />\n\n  </div>\n</div>\n';});
+define('text!mockup-patterns-tinymce-url/templates/image.xml',[],function () { return '<div>\n  <div class="linkModal">\n    <h1><%- insertHeading %></h1>\n    <% if(_.contains(linkTypes, \'uploadImage\')){ %>\n    <p class="info"><%- insertImageHelp %></p>\n    <% } %>\n\n    <div class="linkTypes pat-autotoc autotabs"\n         data-pat-autotoc="section:fieldset;levels:legend;IDPrefix:tinymce-autotoc-">\n\n        <% if(_.contains(linkTypes, \'image\')){ %>\n      <fieldset class="linkType image" data-linkType="image">\n        <legend id="tinylink-image"><%- internalImageText %></legend>\n        <div class="form-inline">\n          <div class="form-group main">\n            <input type="text" name="image" />\n          </div>\n          <div class="form-group scale">\n            <label><%- scaleText %></label>\n            <select name="scale">\n              <option value="">Original</option>\n                <% _.each(imageScales, function(scale) { %>\n                  <option value="<%- scale.value %>" <% if (scale.value === options.defaultScale) { %>selected<% } %> >\n                    <%- scale.title %>\n                  </option>\n                <% }); %>\n            </select>\n          </div>\n        </div>\n      </fieldset>\n        <% } %>\n\n      <% if(_.contains(linkTypes, \'uploadImage\')){ %>\n      <fieldset class="linkType uploadImage" data-linkType="uploadImage">\n        <legend id="tinylink-uploadImage"><%- upload %></legend>\n        <div class="uploadify-me"></div>\n      </fieldset>\n      <% } %>\n\n      <% if(_.contains(linkTypes, \'externalImage\')){ %>\n      <fieldset class="linkType externalImage" data-linkType="externalImage">\n        <legend id="tinylink-externalImage"><%- externalImageText %></legend>\n        <div>\n          <div class="form-group main">\n            <label><%- externalImageText %></label>\n            <input type="text" name="externalImage" />\n          </div>\n        </div>\n      </fieldset>\n      <% } %>\n\n    </div><!-- / tabs -->\n\n    <div class="common-controls">\n      <div class="form-group title">\n        <label><%- titleText %></label>\n        <input type="text" name="title" />\n      </div>\n      <div class="form-group text">\n        <label><%- altText %></label>\n        <input type="text" name="alt" />\n      </div>\n      <div class="form-group align">\n        <label><%- imageAlignText %></label>\n        <select name="align">\n          <% _.each(Object.keys(options.imageClasses), function(align){ %>\n              <option value="<%- align %>">\n              <%- options.imageClasses[align] %>\n              </option>\n          <% }); %>\n        <select>\n      </div>\n    </div>\n\n    <input type="submit" class="plone-btn" name="cancel" value="<%- cancelBtn %>" />\n    <input type="submit" class="plone-btn plone-btn-primary context" name="insert" value="<%- insertBtn %>" />\n\n  </div>\n</div>\n';});
 
 define('mockup-patterns-tinymce-url/js/links',[
   'jquery',
@@ -57083,12 +57090,19 @@ define('mockup-patterns-tinymce-url/js/links',[
         upload: this.options.upload,
         text: this.options.text,
         insertHeading: this.options.text.insertHeading,
+        insertImageHelp: this.options.text.insertImageHelp,
+        Upload: this.options.text.Upload,
+        insertLinkHelp: this.options.text.insertLinkHelp,
+        internal: this.options.text.internal,
+        external: this.options.text.external,
+        anchor: this.options.text.anchor,
         linkTypes: this.options.linkTypes,
         externalText: this.options.text.external,
         emailText: this.options.text.email,
         subjectText: this.options.text.subject,
         targetList: this.options.targetList,
         titleText: this.options.text.title,
+        internalImageText: this.options.text.internalImage,
         externalImageText: this.options.text.externalImage,
         altText: this.options.text.alt,
         imageAlignText: this.options.text.imageAlign,
@@ -93764,7 +93778,11 @@ define('mockup-patterns-tinymce',[
         imageAlign: _t('Align'),
         scale: _t('Size'),
         alt: _t('Alternative Text'),
-        externalImage: _t('External Image URL (can be relative within this site or absolute if it starts with http:// or https://)')
+        insertImageHelp: _t('Specify an image. It can be on this site already (Internal Image), an image you upload (Upload), or from an external site (External Image).'),
+        internalImage: _t('Internal Image'),
+        externalImage: _t('External Image URL (can be relative within this site or absolute if it starts with http:// or https://)'),
+        upload: _t('Upload'),
+        insertLinkHelp: _t('Specify the object to link to. It can be on this site already (Internal), an object you upload (Upload), from an external site (External), an email address (Email), or an anchor on this page (Anchor).'),
       },
       // URL generation options
       loadingBaseUrl: '../../../node_modules/tinymce-builded/js/tinymce/',
@@ -93785,9 +93803,10 @@ define('mockup-patterns-tinymce',[
         {title: 'Large', value: 'large'}
       ],
       imageClasses: {
-        'image-inline': 'Inline',
-        'image-right': 'Right',
-        'image-left': 'Left'
+        'image-inline': _t('Inline'),
+        'image-right': _t('Right'),
+        'image-left': _t('Left'),
+        'image-responsive': _t('Responsive')
       },
       targetList: [
         {text: _t('Open in this window / frame'), value: ''},
@@ -94996,5 +95015,5 @@ require([
   'use strict';
 });
 
-define("/Users/peter/workspace/buildout.coredev52py37/src/plone.staticresources/src/plone/staticresources/static/plone-logged-in.js", function(){});
+define("/Users/giuliaghisini/progetti/buildout.coredev/src/plone.staticresources/src/plone/staticresources/static/plone-logged-in.js", function(){});
 

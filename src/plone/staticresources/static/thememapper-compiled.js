@@ -41498,5 +41498,5 @@ require([
   'use strict';
 });
 
-define("/Users/esteele/projects/plone_5.2/src/plone.staticresources/src/plone/staticresources/static/thememapper.js", function(){});
+define("/Users/giuliaghisini/progetti/buildout.coredev/src/plone.staticresources/src/plone/staticresources/static/thememapper.js", function(){});
 
