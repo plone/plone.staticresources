@@ -17641,5 +17641,5 @@ require([
 
 });
 
-define("/home/mauro/Work/unibo/plone.staticresources/devsrc/plone.staticresources/src/plone/staticresources/static/plone.js", function(){});
+define("/Users/davi/work/plone/buildout.coredev/src/plone.staticresources/src/plone/staticresources/static/plone.js", function(){});
 
