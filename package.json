@@ -5,7 +5,7 @@
   "repository": "git@github.com:plone/plone.staticresources.git",
   "license": "BSD-3-Clause",
   "dependencies": {
-    "jquery": "https://github.com/jquery/jquery-dist.git#1.11.3",
+    "jquery": "https://github.com/jquery/jquery-dist.git#1.12.4",
     "less": "https://github.com/less/less.git#v2.7.3",
     "mockup": "https://github.com/plone/mockup.git",
     "requirejs": "~2.2.0"
