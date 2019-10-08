@@ -242,7 +242,7 @@ for requirejs, script in resources.items():
                 local_file = temp_resource_folder + '/' + file_name + '.js'
                 if isinstance(js_body, six.text_type):
                     js_body = js_body.encode('utf-8')
-                with open(local_file, 'w') as temp_file:
+                with open(local_file, 'wb') as temp_file:
                     temp_file.write(js_body)
 
         if local_file:
@@ -337,7 +337,7 @@ for name, value in resources.items():
                 except OSError:
                     pass
                 local_file = temp_resource_folder + '/' + file_name + '.js'
-                temp_file = open(local_file, 'w')
+                temp_file = open(local_file, 'wb')
                 if isinstance(css_body, six.text_type):
                     css_body = css_body.encode('utf-8')
                 temp_file.write(css_body)
