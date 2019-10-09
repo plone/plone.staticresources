@@ -17,6 +17,7 @@ setup(
     description="Static resources for Plone",
     long_description=long_description,
     classifiers=[
+        "Development Status :: 5 - Production/Stable",
         "Environment :: Web Environment",
         "Framework :: Plone",
         "Framework :: Plone :: 5.2",
