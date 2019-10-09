@@ -31,7 +31,7 @@ setup(
     keywords='Python Plone',
     author='Plone Foundation',
     author_email='plone-developers@lists.sourceforge.net',
-    url='https://pypi.python.org/pypi/plone.staticresources',
+    url='https://github.com/plone/plone.staticresources',
     license='GPL version 2',
     packages=find_packages('src', exclude=['ez_setup']),
     namespace_packages=['plone'],
