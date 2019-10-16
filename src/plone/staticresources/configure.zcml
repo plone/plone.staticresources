@@ -23,6 +23,11 @@
     />
 
   <browser:resource
+    name="plone-moment.js"
+    file="static/plone-moment.js"
+    />
+
+  <browser:resource
     name="plone-logged-in.js"
     file="static/plone-logged-in.js"
     />

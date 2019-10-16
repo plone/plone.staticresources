@@ -1,3 +1,4 @@
+/* globals requirejs */
 // Copyright (C) 2010 Plone Foundation
 //
 // This program is free software; you can redistribute it and/or modify it
@@ -14,24 +15,15 @@
 // Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 //
 
+if (window.jQuery) {
+  define( 'jquery', [], function () {
+    'use strict';
+    return window.jQuery;
+  } );
+}
+
 require([
-  'mockup-patterns-autotoc',
-  'mockup-patterns-contentloader',
-  'mockup-patterns-cookietrigger',
-  'mockup-patterns-formautofocus',
-  'mockup-patterns-formunloadalert',
-  'mockup-patterns-livesearch',
-  'mockup-patterns-markspeciallinks',
-  'mockup-patterns-modal',
-  'mockup-patterns-pickadate',
-  'mockup-patterns-navigationmarker',
-  'mockup-patterns-preventdoublesubmit',
-  'mockup-patterns-select2',
-
-  'bootstrap-collapse',
-  'bootstrap-dropdown',
-  'bootstrap-tooltip',
-], function () {
+  'mockup-patterns-moment',
+], function() {
   'use strict';
-
 });
