@@ -20,6 +20,10 @@
         <element>++plone++static/plone-logged-in.less</element>
       </value>
   </records>
+  <records prefix="plone.resources/plone-moment"
+            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
+      <value key="js">++resource++plone-moment.js</value>
+  </records>
   <records prefix="plone.resources/resourceregistry"
             interface='Products.CMFPlone.interfaces.IResourceRegistry'>
       <value key="js">++plone++static/resourceregistry.js</value>
@@ -79,6 +83,25 @@
     </value>
   </records>
 
+  <records prefix="plone.bundles/plone-moment"
+            interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+    <value key="depends">plone-base</value>
+    <value key="merge_with">default</value>
+    <value key="resources">
+      <element>plone-moment</element>
+    </value>
+    <value key="enabled">True</value>
+    <value key="jscompilation">++plone++static/plone-moment-compiled.min.js</value>
+    <value key="last_compilation">2019-10-16 08:30:00</value>
+    <value key="load_async">False</value>
+    <value key="load_defer">False</value>
+    <value key="stub_js_modules">
+      <element>jquery</element>
+      <element>pat-registry</element>
+      <element>mockup-patterns-base</element>
+    </value>
+  </records>
+
   <records prefix="plone.bundles/plone-logged-in"
             interface='Products.CMFPlone.interfaces.IBundleRegistry'>
     <value key="merge_with">logged-in</value>
@@ -121,6 +144,7 @@
       <element>translate</element>
       <element>underscore</element>
       <element>moment</element>
+      <element>plone-moment</element>
     </value>
   </records>
 
