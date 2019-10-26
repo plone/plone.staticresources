@@ -32,6 +32,7 @@ require([
   'mockup-patterns-tinymce',
   'plone-patterns-portletmanager',
   'plone-patterns-toolbar',
+  'mockup-patterns-select2',
 ], function() {
   'use strict';
 });
