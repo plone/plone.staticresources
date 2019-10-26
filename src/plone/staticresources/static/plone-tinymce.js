@@ -22,10 +22,8 @@ if (window.jQuery) {
 }
 
 require([
-  'mockup-patterns-inlinevalidation',
-  'mockup-patterns-recurrence',
-  'mockup-patterns-relateditems',
-  'mockup-patterns-select2',
+  'mockup-patterns-textareamimetypeselector',
+  'mockup-patterns-tinymce',
 ], function() {
   'use strict';
 });
