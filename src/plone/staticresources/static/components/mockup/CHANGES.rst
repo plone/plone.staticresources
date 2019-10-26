@@ -8,6 +8,131 @@ Changelog
 
 .. towncrier release notes start
 
+3.1.0 (2019-10-12)
+------------------
+
+New features:
+
+
+- Upgrade testing dependencies: Karma (from ~3.0.0 to ~4.1.0) and Mocha (from ~3.5.3 to ~6.1.4) (#913)
+- Upgrade jQuery from version 1.11.3 to 1.12.4
+  [davilima6] (#915)
+- Upgrade jQuery-related dependencies:
+    - jqtree: from version 1.4.1 to 1.4.10
+    - jquery-form: from 3.5.1 to 4.2.2
+    - bootstrap: from 3.3.6 to 3.4.1
+    - pickadate: from 3.5.6 to 3.6.4 (#916)
+
+
+Bug fixes:
+
+
+- pat-inlinevalidation: Avoid submitting files 
+  [frapell] (#903)
+- Fix marking of navigation parents as inPath
+  [agitator] (#906)
+- Absolute positioning of default page objects in the structure pattern (take 2 on issue #895) (#908)
+- Move toolbar to be above structure pattern, by increasing its z-index from 3 to 20 (fixes Products.CMFPlone#2490)
+  [fulv] (#909)
+- tinymce pattern: Add some lost i18n translations.
+  [adam139] (#910)
+- Fix SyntaxError caused by duplicate translation keys
+  [davilima6] (#918)
+- Fixed drag problem on click on sortable items in folder contents.
+  [giuliaghisini] (#919)
+- Fix Tinymce pattern: Link popup looses tab selection on active linktype
+  [mamico]
+  Fix autotoc pattern: activate the element link with active class during initialization
+  [mamico] (#922)
+
+
+3.0.2 (2019-06-20)
+------------------
+
+Bug fixes:
+
+- pat-inlinevalidation: Avoid submitting files
+  [frapell] (#903)
+- Fix marking of navigation parents as inPath
+  [agitator] (#906)
+- Absolute positioning of default page objects in the structure pattern
+  (take 2 on issue #895)
+  [fulv] (#908)
+- Move toolbar to be above structure pattern, by increasing its z-index from 3
+  to 20 (fixes Products.CMFPlone#2490)
+  [fulv] (#909)
+
+
+3.0.1 (2019-03-21)
+------------------
+
+New features:
+
+- Add ``plone-patterns-toolbar`` pattern from CMFPlone.
+  [thet] (#874)
+
+Bug fixes:
+
+- Improve fallback mechanism for Moment.js locale selection
+  [davilima6] (#890)
+- Fix bugs in Moment.js lazy locales, affecting: language variant fallbacks,
+  variable leak to global namespace, IE11 widget support
+  [davilima6] (#894)
+- Fix alignment of the default page objects in the structure pattern
+  (#895)
+- Fix the scrollbar always present in the toolbar
+  (#897)
+- Fix misalignment in regular Select2-based widgets (e.g. tags) after Related
+  Items improvements (#889)
+  [davilima6] (#902)
+
+
+3.0.0 (2019-03-04)
+------------------
+
+Breaking changes:
+
+- Now uses ``yarn`` instead of ``bower``. ``bower.json`` is dropped,
+  ``package.json`` is extended and all packages go into
+  ``mockup/node_modules``. Note: you have to use ``yarn`` for that to work, as
+  with npm there is no way to customize the modules directory. All references
+  in LESS files to ``bowerPath`` are kept for a frictionless upgrade.
+  [thet]
+- Remove obsolete dependencies:
+    - console-polyfill
+    - es5-shim
+    - selectivizr
+    - js-shortcuts
+    - marked
+    - react
+    - JSXTransformer
+
+  [thet]
+
+- Remove support for IE < 9.
+  [thet] (#874)
+
+  TODO:
+    - Refactor docs like in Patterns to get rid of react.
+    - Refactor jquery.recurrenceinput.js dependencies
+
+New features:
+
+- Added navigationmarker pattern
+  [agitator] (#885)
+- Lazy load Moment.js locale based on user's current portal language.
+  [davilima6]
+- Upgrade moment.js from version 2.10.6 to 2.24.0
+  [davilima6] (#887)
+
+Bug fixes:
+
+- Removed condition for mobile devices, solved via css and not needed anymore.
+  [agitator] (#885)
+- Improve relateditems pattern UX
+  [MrTango] (#889)
+
+
 2.7.7 (2018-12-10)
 ------------------
 
@@ -87,7 +212,7 @@ Bug fixes:
 - Fix WARN [watcher]: Pattern "..../patterns/foo.js" does not match any file,
   by excluding all requirements ending with '-url',
   since they point to a folder and not to a .js file.
-  The folder contents are already included by 'patterns/**/*'.
+  The folder contents are already included by ``patterns/**/*``.
   [sunew]
 
 - Move installation and config of sinon from bower+requirejs to karma-sinon.
@@ -245,17 +370,14 @@ New features:
 - Avoid double initialization of Select2.
   [thet]
 
-  - Added options to change sorting.
+- Added options to change sorting.
   [Gagaro]
 
 - TinyMCE pattern:
 
-  - Make anchor handling more flexible
-  [tomgross]
-
-  - Mark special links
-  - Do not mark anchors as special links
-  [frapell]
+  - Make anchor handling more flexible  [tomgross]
+  - Mark special links  [frapell]
+  - Do not mark anchors as special links  [frapell]
 
 Bug fixes:
 
@@ -340,7 +462,8 @@ Bug fixes:
 
 New features:
 
- - Improve the user experience for the theme editor
+ - Improve the user experience for the theme editor:
+
   - Search for files and text within files and opening the file upon click.
   - Add Bootstrap Dropdown menu to the UI views.
   - Enable Drag and Drop inside of the theme editor file tree.
@@ -350,6 +473,7 @@ New features:
   - Upgrade JQTree to 1.4.1
   - Enable Drag and Drop inside of the theme editor file tree.
   - Add contextual menu to theme files in the file tree.
+
   [b4oshany]
 
  - Make thumb scale in folder contents listing adjustable/supressable.
@@ -369,14 +493,17 @@ New features:
   [thet]
 
 - Structure widget:
+
   - Show ineffective label in folder contents for not yet effective and published content, likewise it's done with expires.
     Show effective and ineffective label styled as bootstrap badges.
   - Show "Description" below title, if it's set in ``availableColumns`` and ``activeColumns`` to save some screen space.
   - Do not break whitespace within actionmenu links and don't underline them when hovering.
   - Trigger ``context-info-loaded`` on body to be able to listen to the event outside the pattern.
+
   [thet]
 
 - Related Items widget:
+
     - Add new mode "auto", which automatically sets ``search`` mode when a searchterm is present, otherwise ``browse`` mode.
     - Use searchterm as substring, which matches also within words by wrapping searchterm with the "*" wildcard.
     - Show a "One level up" button in the result set in browse mode.
@@ -385,6 +512,7 @@ New features:
     - Add option to scan the selected list of items for other patterns.
     - Add option for contextPath - objects with this path will not be selectable. This prevents the object where the relation is set on to from being selected and self-referenced.
     - Make favorites container positon relative, so that the absolute positioned dropdown appears correctly.
+
   [thet]
 
 - Include TinyMCE 4.5.6
@@ -532,6 +660,7 @@ New:
     - Calculate all paths relative to the ``rootPath``, so that breadcrumbs navigation and favorites do not show paths outside the rootPath.
 
     - For results and selected items with images, add a line break after the image.
+
   [thet]
 
 
@@ -635,7 +764,7 @@ New:
 - Related items pattern: Result button style allow for more room for scrollbar, and have subltle color change on hover to deliniate user-expected behavior of browsing vs. selecting item.
   [seanupton]
 
- - Related items pattern: Related Items pattern: content icon cross-compatibility with Plone 5.x and 4.x (via plone.app.widgets 1.x); in Plone 5 getIcon returned from brain is a boolean, in Plone 4, it is a string -- use this to show content icons in Plone 5 as previous, but also show image scale in Plone 4, but only for images.  This is the most reasonable solution to avoid requesting many broken image scales (404) in Plone 4.
+- Related items pattern: Related Items pattern: content icon cross-compatibility with Plone 5.x and 4.x (via plone.app.widgets 1.x); in Plone 5 getIcon returned from brain is a boolean, in Plone 4, it is a string -- use this to show content icons in Plone 5 as previous, but also show image scale in Plone 4, but only for images.  This is the most reasonable solution to avoid requesting many broken image scales (404) in Plone 4.
   [seanupton]
 
 - Structure pattern refactorings:
@@ -772,6 +901,9 @@ New:
   be inline with the usage of ``{path}`` token in URL templates.
   [metatoaster]
 
+- Upgrade TinyMCE to 4.3.4
+  [vangheem]
+
 Fixes:
 
 - Fix fakeserver ``relateditems-test.json`` response to return ISO dates for ``CreationDate``, ``ModificationDate`` and ``EffectiveDate``, as they really do in Plone.
@@ -806,18 +938,8 @@ Fixes:
   the generated CSS in the editor.
   [ebrehault]
 
+
 2.1.3 (2016-02-27)
-New:
-
-- Upgrade TinyMCE to 4.3.4
-  [vangheem]
-
-
-Fixes:
-
-
-
-2.1.3 (2016-03-10)
 ------------------
 
 New:
@@ -918,6 +1040,7 @@ Fixes:
 ------------------
 
 New:
+
 - Fixed issue causing the querystring pattern to query multiple times per change
   [obct537]
 
@@ -1128,9 +1251,11 @@ Fixes:
   [vangheem]
 
 - Accessibility fixes for structure:
+
     - label "cog"/actions
     - provide title attribute on buttons
     - add aria-hidden true/false attrs and role=tooltip for popovers
+
   [vangheem]
 
 - remove accessibility pattern. see

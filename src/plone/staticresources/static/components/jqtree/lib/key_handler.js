@@ -1,17 +1,38 @@
 "use strict";
 exports.__esModule = true;
-var KeyHandler = (function () {
-    function KeyHandler(tree_widget) {
-        this.tree_widget = tree_widget;
-        if (tree_widget.options.keyboardSupport) {
-            $(document).on("keydown.jqtree", $.proxy(this.handleKeyDown, this));
+var KeyHandler = /** @class */ (function () {
+    function KeyHandler(treeWidget) {
+        var _this = this;
+        this.handleKeyDown = function (e) {
+            if (!_this.canHandleKeyboard()) {
+                return true;
+            }
+            else {
+                var key = e.which;
+                switch (key) {
+                    case KeyHandler.DOWN:
+                        return _this.moveDown();
+                    case KeyHandler.UP:
+                        return _this.moveUp();
+                    case KeyHandler.RIGHT:
+                        return _this.moveRight();
+                    case KeyHandler.LEFT:
+                        return _this.moveLeft();
+                    default:
+                        return true;
+                }
+            }
+        };
+        this.treeWidget = treeWidget;
+        if (treeWidget.options.keyboardSupport) {
+            jQuery(document).on("keydown.jqtree", this.handleKeyDown);
         }
     }
     KeyHandler.prototype.deinit = function () {
-        $(document).off("keydown.jqtree");
+        jQuery(document).off("keydown.jqtree");
     };
     KeyHandler.prototype.moveDown = function () {
-        var node = this.tree_widget.getSelectedNode();
+        var node = this.treeWidget.getSelectedNode();
         if (node) {
             return this.selectNode(node.getNextNode());
         }
@@ -20,7 +41,7 @@ var KeyHandler = (function () {
         }
     };
     KeyHandler.prototype.moveUp = function () {
-        var node = this.tree_widget.getSelectedNode();
+        var node = this.treeWidget.getSelectedNode();
         if (node) {
             return this.selectNode(node.getPreviousNode());
         }
@@ -29,7 +50,7 @@ var KeyHandler = (function () {
         }
     };
     KeyHandler.prototype.moveRight = function () {
-        var node = this.tree_widget.getSelectedNode();
+        var node = this.treeWidget.getSelectedNode();
         if (!node) {
             return true;
         }
@@ -44,19 +65,19 @@ var KeyHandler = (function () {
             }
             else {
                 // Right expands a closed node
-                this.tree_widget.openNode(node);
+                this.treeWidget.openNode(node);
                 return false;
             }
         }
     };
     KeyHandler.prototype.moveLeft = function () {
-        var node = this.tree_widget.getSelectedNode();
+        var node = this.treeWidget.getSelectedNode();
         if (!node) {
             return true;
         }
         else if (node.isFolder() && node.is_open) {
             // Left on an open node closes the node
-            this.tree_widget.closeNode(node);
+            this.treeWidget.closeNode(node);
             return false;
         }
         else {
@@ -64,54 +85,34 @@ var KeyHandler = (function () {
             return this.selectNode(node.getParent());
         }
     };
-    KeyHandler.prototype.handleKeyDown = function (e) {
-        if (!this.canHandleKeyboard()) {
-            return true;
-        }
-        else {
-            var key = e.which;
-            switch (key) {
-                case KeyHandler.DOWN:
-                    return this.moveDown();
-                case KeyHandler.UP:
-                    return this.moveUp();
-                case KeyHandler.RIGHT:
-                    return this.moveRight();
-                case KeyHandler.LEFT:
-                    return this.moveLeft();
-                default:
-                    return true;
-            }
-        }
-    };
     KeyHandler.prototype.selectNode = function (node) {
         if (!node) {
             return true;
         }
         else {
-            this.tree_widget.selectNode(node);
-            if (this.tree_widget.scroll_handler &&
-                (!this.tree_widget.scroll_handler.isScrolledIntoView($(node.element).find(".jqtree-element")))) {
-                this.tree_widget.scrollToNode(node);
+            this.treeWidget.selectNode(node);
+            if (this.treeWidget.scrollHandler &&
+                !this.treeWidget.scrollHandler.isScrolledIntoView(jQuery(node.element).find(".jqtree-element"))) {
+                this.treeWidget.scrollToNode(node);
             }
             return false;
         }
     };
     KeyHandler.prototype.canHandleKeyboard = function () {
-        return (this.tree_widget.options.keyboardSupport &&
+        return (this.treeWidget.options.keyboardSupport &&
             this.isFocusOnTree() &&
-            this.tree_widget.getSelectedNode() != null);
+            this.treeWidget.getSelectedNode() != null);
     };
     KeyHandler.prototype.isFocusOnTree = function () {
-        var active_element = document.activeElement;
-        return (active_element &&
-            active_element.tagName === "SPAN" &&
-            this.tree_widget._containsElement(active_element));
+        var activeElement = document.activeElement;
+        return Boolean(activeElement &&
+            activeElement.tagName === "SPAN" &&
+            this.treeWidget._containsElement(activeElement));
     };
+    KeyHandler.LEFT = 37;
+    KeyHandler.UP = 38;
+    KeyHandler.RIGHT = 39;
+    KeyHandler.DOWN = 40;
     return KeyHandler;
 }());
-KeyHandler.LEFT = 37;
-KeyHandler.UP = 38;
-KeyHandler.RIGHT = 39;
-KeyHandler.DOWN = 40;
 exports["default"] = KeyHandler;
