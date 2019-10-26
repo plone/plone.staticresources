@@ -188,7 +188,7 @@
 
   <records prefix="plone.resources/jquery.form"
             interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-      <value key="js">++plone++static/components/jquery-form/jquery.form.js</value>
+      <value key="js">++plone++static/components/jquery-form/src/jquery.form.js</value>
   </records>
 
   <records prefix="plone.resources/moment"

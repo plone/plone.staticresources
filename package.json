@@ -8,6 +8,6 @@
     "jquery": "https://github.com/jquery/jquery-dist.git#1.12.4",
     "less": "https://github.com/less/less.git#v2.7.3",
     "mockup": "https://github.com/plone/mockup.git",
-    "requirejs": "~2.2.0"
+    "requirejs": "^2.3.6"
   }
 }
