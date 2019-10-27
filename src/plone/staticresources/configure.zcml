@@ -34,6 +34,16 @@
     />
 
   <browser:resource
+    name="plone-editor-tools.js"
+    file="static/plone-editor-tools.js"
+    />
+
+  <browser:resource
+    name="plone-tinymce.js"
+    file="static/plone-tinymce.js"
+    />
+
+  <browser:resource
     name="plone.less"
     file="static/plone.less"
     />
