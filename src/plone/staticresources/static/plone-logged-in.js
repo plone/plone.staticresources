@@ -25,6 +25,7 @@ require([
   'mockup-patterns-inlinevalidation',
   'mockup-patterns-recurrence',
   'mockup-patterns-relateditems',
+  'mockup-patterns-pickadate',
   'mockup-patterns-select2',
 ], function() {
   'use strict';

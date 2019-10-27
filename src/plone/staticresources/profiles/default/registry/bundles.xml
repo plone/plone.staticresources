@@ -143,7 +143,6 @@
       <element>mockup-patterns-modal</element>
       <element>mockup-patterns-moment</element>
       <element>mockup-patterns-pickadate</element>
-      <element>mockup-patterns-select2</element>
       <element>mockup-router</element>
       <element>mockup-utils</element>
       <element>pat-base</element>
@@ -152,7 +151,6 @@
       <element>pat-mockup-parser</element>
       <element>pat-registry</element>
       <element>pat-utils</element>
-      <element>select2</element>
       <element>translate</element>
       <element>underscore</element>
       <element>moment</element>

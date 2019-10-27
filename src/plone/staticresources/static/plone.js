@@ -23,7 +23,6 @@ require([
   'mockup-patterns-livesearch',
   'mockup-patterns-markspeciallinks',
   'mockup-patterns-modal',
-  'mockup-patterns-pickadate',
   'mockup-patterns-navigationmarker',
   'mockup-patterns-preventdoublesubmit',
   'bootstrap-collapse',
