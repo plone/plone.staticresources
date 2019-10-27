@@ -19,4 +19,5 @@ class HiddenProfiles(object):
             "plone.staticresources:default",
             "plone.staticresources:async",
             "plone.staticresources:uninstall",
+            "plone.staticresources.upgrades:2",
         ]
