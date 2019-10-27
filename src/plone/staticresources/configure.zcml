@@ -44,6 +44,11 @@
     />
 
   <browser:resource
+    name="plone-datatables.js"
+    file="static/plone-datatables.js"
+    />
+
+  <browser:resource
     name="plone.less"
     file="static/plone.less"
     />
