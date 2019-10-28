@@ -1,0 +1,229 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<registry>
+  <records prefix="plone.resources/plone-moment" interface='Products.CMFPlone.interfaces.IResourceRegistry'>
+    <value key="js">++resource++plone-moment.js</value>
+  </records>
+  <records prefix="plone.resources/plone-editor-tools" interface='Products.CMFPlone.interfaces.IResourceRegistry'>
+    <value key="js">++resource++plone-editor-tools.js</value>
+    <value key="css">
+      <element>++plone++static/plone-editor-tools.less</element>
+    </value>
+  </records>
+  <records prefix="plone.resources/plone-tinymce" interface='Products.CMFPlone.interfaces.IResourceRegistry'>
+    <value key="js">++resource++plone-tinymce.js</value>
+    <value key="css">
+      <element>++plone++static/plone-tinymce.less</element>
+    </value>
+  </records>
+  <records prefix="plone.resources/plone-datatables" interface='Products.CMFPlone.interfaces.IResourceRegistry'>
+    <value key="js">++resource++plone-datatables.js</value>
+  </records>
+
+  <records prefix="plone.bundles/plone-base" interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+    <value key="last_compilation">2019-10-28 12:36:00</value>
+  </records>
+
+  <records prefix="plone.bundles/plone" interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+    <value key="last_compilation">2019-10-28 12:36:00</value>
+    <value key="stub_js_modules" purge="False">
+      <element>jquery.browser</element>
+      <element>logging</element>
+      <element>mockup-patterns-base</element>
+      <element>pat-base</element>
+      <element>pat-compat</element>
+      <element>pat-jquery-ext</element>
+      <element>pat-logger</element>
+      <element>pat-mockup-parser</element>
+      <element>pat-utils</element>
+      <element>underscore</element>
+    </value>
+  </records>
+
+  <records prefix="plone.bundles/plone-logged-in" interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+    <value key="last_compilation">2019-10-28 12:36:00</value>
+    <value key="stub_js_modules">
+      <element>backbone</element>
+      <element>bootstrap-dropdown</element>
+      <element>bootstrap-tooltip</element>
+      <element>jquery.browser</element>
+      <element>jquery.event.drag</element>
+      <element>jquery.event.drop</element>
+      <element>jquery.form</element>
+      <element>jquery</element>
+      <element>logging</element>
+      <element>mockup-i18n</element>
+      <element>mockup-patterns-autotoc</element>
+      <element>mockup-patterns-backdrop</element>
+      <element>mockup-patterns-base</element>
+      <element>mockup-patterns-modal</element>
+      <element>mockup-patterns-moment</element>
+      <element>mockup-router</element>
+      <element>mockup-utils</element>
+      <element>moment</element>
+      <element>pat-base</element>
+      <element>pat-compat</element>
+      <element>pat-jquery-ext</element>
+      <element>pat-logger</element>
+      <element>pat-mockup-parser</element>
+      <element>pat-registry</element>
+      <element>pat-utils</element>
+      <element>translate</element>
+      <element>underscore</element>
+    </value>
+  </records>
+
+  <records prefix="plone.bundles/plone-moment"
+            interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+    <value key="depends">plone-base</value>
+    <value key="merge_with">default</value>
+    <value key="resources">
+      <element>plone-moment</element>
+    </value>
+    <value key="enabled">True</value>
+    <value key="jscompilation">++plone++static/plone-moment-compiled.min.js</value>
+    <value key="last_compilation">2019-10-28 12:36:00</value>
+    <value key="load_async">False</value>
+    <value key="load_defer">False</value>
+    <value key="stub_js_modules">
+      <element>jquery</element>
+      <element>jquery.browser</element>
+      <element>logging</element>
+      <element>mockup-patterns-base</element>
+      <element>pat-base</element>
+      <element>pat-compat</element>
+      <element>pat-jquery-ext</element>
+      <element>pat-logger</element>
+      <element>pat-mockup-parser</element>
+      <element>pat-registry</element>
+      <element>pat-utils</element>
+      <element>underscore</element>
+    </value>
+  </records>
+
+  <records prefix="plone.bundles/plone-editor-tools"
+            interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+    <value key="depends">plone</value>
+    <value key="merge_with">logged-in</value>
+    <value key="resources">
+      <element>plone-editor-tools</element>
+    </value>
+    <value key="enabled">True</value>
+    <value key="expression">python: member is not None</value>
+    <value key="jscompilation">++plone++static/plone-editor-tools-compiled.min.js</value>
+    <value key="csscompilation">++plone++static/plone-editor-tools-compiled.css</value>
+    <value key="last_compilation">2019-10-28 12:36:00</value>
+    <value key="load_async">False</value>
+    <value key="load_defer">False</value>
+    <value key="stub_js_modules">
+      <element>backbone</element>
+      <element>bootstrap-dropdown</element>
+      <element>bootstrap-tooltip</element>
+      <element>jquery.browser</element>
+      <element>jquery.event.drag</element>
+      <element>jquery.event.drop</element>
+      <element>jquery.form</element>
+      <element>jquery</element>
+      <element>logging</element>
+      <element>mockup-i18n</element>
+      <element>mockup-patterns-autotoc</element>
+      <element>mockup-patterns-backdrop</element>
+      <element>mockup-patterns-base</element>
+      <element>mockup-patterns-modal</element>
+      <element>mockup-patterns-moment</element>
+      <element>mockup-patterns-pickadate</element>
+      <element>mockup-router</element>
+      <element>mockup-utils</element>
+      <element>moment</element>
+      <element>pat-base</element>
+      <element>pat-compat</element>
+      <element>pat-jquery-ext</element>
+      <element>pat-logger</element>
+      <element>pat-mockup-parser</element>
+      <element>pat-registry</element>
+      <element>pat-utils</element>
+      <element>translate</element>
+      <element>underscore</element>
+    </value>
+  </records>
+
+  <records prefix="plone.bundles/plone-tinymce"
+            interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+    <value key="depends">plone</value>
+    <value key="merge_with">logged-in</value>
+    <value key="resources">
+      <element>plone-tinymce</element>
+    </value>
+    <value key="enabled">True</value>
+    <value key="expression">python: member is not None</value>
+    <value key="jscompilation">++plone++static/plone-tinymce-compiled.min.js</value>
+    <value key="csscompilation">++plone++static/plone-tinymce-compiled.css</value>
+    <value key="last_compilation">2019-10-28 12:36:00</value>
+    <value key="load_async">False</value>
+    <value key="load_defer">False</value>
+    <value key="stub_js_modules">
+      <element>backbone</element>
+      <element>bootstrap-dropdown</element>
+      <element>bootstrap-tooltip</element>
+      <element>jquery.browser</element>
+      <element>jquery.event.drag</element>
+      <element>jquery.event.drop</element>
+      <element>jquery.form</element>
+      <element>jquery</element>
+      <element>logging</element>
+      <element>mockup-i18n</element>
+      <element>mockup-patterns-autotoc</element>
+      <element>mockup-patterns-backdrop</element>
+      <element>mockup-patterns-base</element>
+      <element>mockup-patterns-modal</element>
+      <element>mockup-patterns-moment</element>
+      <element>mockup-patterns-pickadate</element>
+      <element>mockup-router</element>
+      <element>mockup-utils</element>
+      <element>moment</element>
+      <element>pat-base</element>
+      <element>pat-compat</element>
+      <element>pat-jquery-ext</element>
+      <element>pat-logger</element>
+      <element>pat-mockup-parser</element>
+      <element>pat-registry</element>
+      <element>pat-utils</element>
+      <element>translate</element>
+      <element>underscore</element>
+    </value>
+  </records>
+
+  <records prefix="plone.bundles/plone-datatables"
+            interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+    <value key="depends">plone-base</value>
+    <value key="merge_with">default</value>
+    <value key="resources">
+      <element>plone-datatables</element>
+    </value>
+    <value key="enabled">False</value>
+    <value key="expression"></value>
+    <value key="jscompilation">++plone++static/plone-datatables-compiled.min.js</value>
+    <value key="csscompilation">++plone++static/plone-datatables-compiled.css</value>
+    <value key="last_compilation">2019-10-28 12:36:00</value>
+    <value key="load_async">False</value>
+    <value key="load_defer">False</value>
+    <value key="stub_js_modules">
+      <element>jquery</element>
+      <element>jquery.browser</element>
+      <element>logging</element>
+      <element>mockup-patterns-base</element>
+      <element>pat-base</element>
+      <element>pat-compat</element>
+      <element>pat-jquery-ext</element>
+      <element>pat-logger</element>
+      <element>pat-mockup-parser</element>
+      <element>pat-registry</element>
+      <element>pat-utils</element>
+      <element>underscore</element>
+    </value>
+  </records>
+
+  <records prefix="plone.bundles/filemanager" interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+    <value key="last_compilation">2019-10-28 12:36:00</value>
+  </records>
+
+</registry>

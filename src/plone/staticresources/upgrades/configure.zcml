@@ -3,5 +3,6 @@
     i18n_domain="plone.staticresources">
 
   <include file="2.zcml" />
+  <include file="3.zcml" />
 
 </configure>
