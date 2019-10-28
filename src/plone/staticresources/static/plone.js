@@ -30,5 +30,4 @@ require([
   'bootstrap-tooltip',
 ], function () {
   'use strict';
-
 });

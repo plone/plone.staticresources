@@ -24,8 +24,11 @@ if (window.jQuery) {
 require([
   'jquery',
   'pat-registry',
-  'mockup-patterns-base',
-], function ($, registry, Base) {
+  // Load common base dependencies of other bundles in here
+  'pat-base',
+  'pat-logger',
+  'pat-mockup-parser'
+], function ($, registry) {
   'use strict';
 
   // initialize only if we are in top frame
