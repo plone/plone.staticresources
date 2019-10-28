@@ -157,8 +157,6 @@
       <element>bootstrap-dropdown</element>
       <element>bootstrap-tooltip</element>
       <element>jquery.browser</element>
-      <element>jquery.event.drag</element>
-      <element>jquery.event.drop</element>
       <element>jquery.form</element>
       <element>jquery</element>
       <element>logging</element>
