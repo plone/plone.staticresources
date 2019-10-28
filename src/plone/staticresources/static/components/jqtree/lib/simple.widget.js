@@ -1,16 +1,16 @@
 "use strict";
 exports.__esModule = true;
-var SimpleWidget = (function () {
+var SimpleWidget = /** @class */ (function () {
     function SimpleWidget(el, options) {
-        this.$el = $(el);
+        this.$el = jQuery(el);
         var defaults = this.constructor.defaults;
-        this.options = $.extend({}, defaults, options);
+        this.options = jQuery.extend({}, defaults, options);
     }
-    SimpleWidget.register = function (widget_class, widget_name) {
-        var getDataKey = function () { return "simple_widget_" + widget_name; };
-        function getWidgetData(el, data_key) {
-            var widget = $.data(el, data_key);
-            if (widget && (widget instanceof SimpleWidget)) {
+    SimpleWidget.register = function (widgetClass, widgetName) {
+        var getDataKey = function () { return "simple_widget_" + widgetName; };
+        function getWidgetData(el, dataKey) {
+            var widget = jQuery.data(el, dataKey);
+            if (widget && widget instanceof SimpleWidget) {
                 return widget;
             }
             else {
@@ -18,14 +18,14 @@ var SimpleWidget = (function () {
             }
         }
         function createWidget($el, options) {
-            var data_key = getDataKey();
+            var dataKey = getDataKey();
             for (var _i = 0, _a = $el.get(); _i < _a.length; _i++) {
                 var el = _a[_i];
-                var existing_widget = getWidgetData(el, data_key);
-                if (!existing_widget) {
-                    var widget = new widget_class(el, options);
-                    if (!$.data(el, data_key)) {
-                        $.data(el, data_key, widget);
+                var existingWidget = getWidgetData(el, dataKey);
+                if (!existingWidget) {
+                    var widget = new widgetClass(el, options);
+                    if (!jQuery.data(el, dataKey)) {
+                        jQuery.data(el, dataKey, widget);
                     }
                     // Call init after setting data, so we can call methods
                     widget._init();
@@ -34,32 +34,33 @@ var SimpleWidget = (function () {
             return $el;
         }
         function destroyWidget($el) {
-            var data_key = getDataKey();
+            var dataKey = getDataKey();
             for (var _i = 0, _a = $el.get(); _i < _a.length; _i++) {
                 var el = _a[_i];
-                var widget = getWidgetData(el, data_key);
+                var widget = getWidgetData(el, dataKey);
                 if (widget) {
                     widget.destroy();
                 }
-                $.removeData(el, data_key);
+                jQuery.removeData(el, dataKey);
             }
         }
-        function callFunction($el, function_name, args) {
+        function callFunction($el, functionName, args) {
             var result = null;
             for (var _i = 0, _a = $el.get(); _i < _a.length; _i++) {
                 var el = _a[_i];
-                var widget = $.data(el, getDataKey());
-                if (widget && (widget instanceof SimpleWidget)) {
-                    var widget_function = widget[function_name];
-                    if (widget_function && (typeof widget_function === "function")) {
-                        result = widget_function.apply(widget, args);
+                var widget = jQuery.data(el, getDataKey());
+                if (widget && widget instanceof SimpleWidget) {
+                    var widgetFunction = widget[functionName];
+                    if (widgetFunction &&
+                        typeof widgetFunction === "function") {
+                        result = widgetFunction.apply(widget, args);
                     }
                 }
             }
             return result;
         }
         // tslint:disable-next-line: only-arrow-functions
-        $.fn[widget_name] = function (argument1) {
+        jQuery.fn[widgetName] = function (argument1) {
             var args = [];
             for (var _i = 1; _i < arguments.length; _i++) {
                 args[_i - 1] = arguments[_i];
@@ -70,15 +71,15 @@ var SimpleWidget = (function () {
                 return createWidget($el, options);
             }
             else if (typeof argument1 === "string" && argument1[0] !== "_") {
-                var function_name = argument1;
-                if (function_name === "destroy") {
+                var functionName = argument1;
+                if (functionName === "destroy") {
                     return destroyWidget($el);
                 }
-                else if (function_name === "get_widget_class") {
-                    return widget_class;
+                else if (functionName === "get_widget_class") {
+                    return widgetClass;
                 }
                 else {
-                    return callFunction($el, function_name, args);
+                    return callFunction($el, functionName, args);
                 }
             }
         };
@@ -92,7 +93,7 @@ var SimpleWidget = (function () {
     SimpleWidget.prototype._deinit = function () {
         //
     };
+    SimpleWidget.defaults = {};
     return SimpleWidget;
 }());
-SimpleWidget.defaults = {};
 exports["default"] = SimpleWidget;

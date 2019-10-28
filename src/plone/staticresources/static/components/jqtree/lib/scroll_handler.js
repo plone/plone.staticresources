@@ -1,76 +1,81 @@
 "use strict";
 exports.__esModule = true;
-var ScrollHandler = (function () {
+var ScrollHandler = /** @class */ (function () {
     function ScrollHandler(tree_widget) {
-        this.tree_widget = tree_widget;
-        this.previous_top = -1;
-        this.is_initialized = false;
+        this.treeWidget = tree_widget;
+        this.previousTop = -1;
+        this.isInitialized = false;
     }
     ScrollHandler.prototype.checkScrolling = function () {
-        this._ensureInit();
-        if (this.tree_widget.dnd_handler) {
-            var hovered_area = this.tree_widget.dnd_handler.hovered_area;
-            if (hovered_area && hovered_area.top !== this.previous_top) {
-                this.previous_top = hovered_area.top;
-                if (this.$scroll_parent) {
-                    this._handleScrollingWithScrollParent(hovered_area);
-                }
-                else {
-                    this._handleScrollingWithDocument(hovered_area);
-                }
-            }
-        }
+        this.ensureInit();
+        this.checkVerticalScrolling();
+        this.checkHorizontalScrolling();
     };
-    ScrollHandler.prototype.scrollTo = function (top) {
-        this._ensureInit();
-        if (this.$scroll_parent) {
-            this.$scroll_parent[0].scrollTop = top;
+    ScrollHandler.prototype.scrollToY = function (top) {
+        this.ensureInit();
+        if (this.$scrollParent) {
+            this.$scrollParent[0].scrollTop = top;
         }
         else {
-            var tree_top = this.tree_widget.$el.offset().top;
-            $(document).scrollTop(top + tree_top);
+            var offset = this.treeWidget.$el.offset();
+            var treeTop = offset ? offset.top : 0;
+            jQuery(document).scrollTop(top + treeTop);
         }
     };
     ScrollHandler.prototype.isScrolledIntoView = function ($element) {
-        this._ensureInit();
-        var element_bottom;
-        var view_bottom;
-        var element_top;
-        var view_top;
-        if (this.$scroll_parent) {
-            view_top = 0;
-            view_bottom = this.$scroll_parent.height();
-            element_top = $element.offset().top - this.scroll_parent_top;
-            element_bottom = element_top + $element.height();
+        this.ensureInit();
+        var elementBottom;
+        var viewBottom;
+        var elementTop;
+        var viewTop;
+        var elHeight = $element.height() || 0;
+        if (this.$scrollParent) {
+            viewTop = 0;
+            viewBottom = this.$scrollParent.height() || 0;
+            var offset = $element.offset();
+            var originalTop = offset ? offset.top : 0;
+            elementTop = originalTop - this.scrollParentTop;
+            elementBottom = elementTop + elHeight;
         }
         else {
-            view_top = $(window).scrollTop();
-            view_bottom = view_top + $(window).height();
-            element_top = $element.offset().top;
-            element_bottom = element_top + $element.height();
+            viewTop = jQuery(window).scrollTop() || 0;
+            var windowHeight = jQuery(window).height() || 0;
+            viewBottom = viewTop + windowHeight;
+            var offset = $element.offset();
+            elementTop = offset ? offset.top : 0;
+            elementBottom = elementTop + elHeight;
         }
-        return ((element_bottom <= view_bottom) && (element_top >= view_top));
+        return elementBottom <= viewBottom && elementTop >= viewTop;
     };
-    ScrollHandler.prototype._initScrollParent = function () {
+    ScrollHandler.prototype.getScrollLeft = function () {
+        if (!this.$scrollParent) {
+            return 0;
+        }
+        else {
+            return this.$scrollParent.scrollLeft() || 0;
+        }
+    };
+    ScrollHandler.prototype.initScrollParent = function () {
         var _this = this;
         var getParentWithOverflow = function () {
-            var css_attributes = ["overflow", "overflow-y"];
+            var cssAttributes = ["overflow", "overflow-y"];
             var hasOverFlow = function ($el) {
-                for (var _i = 0, css_attributes_1 = css_attributes; _i < css_attributes_1.length; _i++) {
-                    var attr = css_attributes_1[_i];
-                    var overflow_value = $el.css(attr);
-                    if (overflow_value === "auto" || overflow_value === "scroll") {
+                for (var _i = 0, cssAttributes_1 = cssAttributes; _i < cssAttributes_1.length; _i++) {
+                    var attr = cssAttributes_1[_i];
+                    var overflowValue = $el.css(attr);
+                    if (overflowValue === "auto" ||
+                        overflowValue === "scroll") {
                         return true;
                     }
                 }
                 return false;
             };
-            if (hasOverFlow(_this.tree_widget.$el)) {
-                return _this.tree_widget.$el;
+            if (hasOverFlow(_this.treeWidget.$el)) {
+                return _this.treeWidget.$el;
             }
-            for (var _i = 0, _a = _this.tree_widget.$el.parents().get(); _i < _a.length; _i++) {
+            for (var _i = 0, _a = _this.treeWidget.$el.parents().get(); _i < _a.length; _i++) {
                 var el = _a[_i];
-                var $el = $(el);
+                var $el = jQuery(el);
                 if (hasOverFlow($el)) {
                     return $el;
                 }
@@ -78,52 +83,127 @@ var ScrollHandler = (function () {
             return null;
         };
         var setDocumentAsScrollParent = function () {
-            _this.scroll_parent_top = 0;
-            _this.$scroll_parent = null;
+            _this.scrollParentTop = 0;
+            _this.$scrollParent = null;
         };
-        if (this.tree_widget.$el.css("position") === "fixed") {
+        if (this.treeWidget.$el.css("position") === "fixed") {
             setDocumentAsScrollParent();
         }
-        var $scroll_parent = getParentWithOverflow();
-        if ($scroll_parent && $scroll_parent.length && $scroll_parent[0].tagName !== "HTML") {
-            this.$scroll_parent = $scroll_parent;
-            this.scroll_parent_top = this.$scroll_parent.offset().top;
+        var $scrollParent = getParentWithOverflow();
+        if ($scrollParent &&
+            $scrollParent.length &&
+            $scrollParent[0].tagName !== "HTML") {
+            this.$scrollParent = $scrollParent;
+            var offset = this.$scrollParent.offset();
+            this.scrollParentTop = offset ? offset.top : 0;
         }
         else {
             setDocumentAsScrollParent();
         }
-        this.is_initialized = true;
+        this.isInitialized = true;
     };
-    ScrollHandler.prototype._ensureInit = function () {
-        if (!this.is_initialized) {
-            this._initScrollParent();
+    ScrollHandler.prototype.ensureInit = function () {
+        if (!this.isInitialized) {
+            this.initScrollParent();
         }
     };
-    ScrollHandler.prototype._handleScrollingWithScrollParent = function (area) {
-        if (!this.$scroll_parent) {
+    ScrollHandler.prototype.handleVerticalScrollingWithScrollParent = function (area) {
+        var scrollParent = this.$scrollParent && this.$scrollParent[0];
+        if (!scrollParent) {
             return;
         }
+        var distanceBottom = this.scrollParentTop + scrollParent.offsetHeight - area.bottom;
+        if (distanceBottom < 20) {
+            scrollParent.scrollTop += 20;
+            this.treeWidget.refreshHitAreas();
+            this.previousTop = -1;
+        }
+        else if (area.top - this.scrollParentTop < 20) {
+            scrollParent.scrollTop -= 20;
+            this.treeWidget.refreshHitAreas();
+            this.previousTop = -1;
+        }
+    };
+    ScrollHandler.prototype.handleVerticalScrollingWithDocument = function (area) {
+        var scrollTop = jQuery(document).scrollTop() || 0;
+        var distanceTop = area.top - scrollTop;
+        if (distanceTop < 20) {
+            jQuery(document).scrollTop(scrollTop - 20);
+        }
         else {
-            var distance_bottom = this.scroll_parent_top + this.$scroll_parent[0].offsetHeight - area.bottom;
-            if (distance_bottom < 20) {
-                this.$scroll_parent[0].scrollTop += 20;
-                this.tree_widget.refreshHitAreas();
-                this.previous_top = -1;
-            }
-            else if ((area.top - this.scroll_parent_top) < 20) {
-                this.$scroll_parent[0].scrollTop -= 20;
-                this.tree_widget.refreshHitAreas();
-                this.previous_top = -1;
+            var windowHeight = jQuery(window).height() || 0;
+            if (windowHeight - (area.bottom - scrollTop) < 20) {
+                jQuery(document).scrollTop(scrollTop + 20);
             }
         }
     };
-    ScrollHandler.prototype._handleScrollingWithDocument = function (area) {
-        var distance_top = area.top - $(document).scrollTop();
-        if (distance_top < 20) {
-            $(document).scrollTop($(document).scrollTop() - 20);
+    ScrollHandler.prototype.checkVerticalScrolling = function () {
+        var hoveredArea = this.treeWidget.dndHandler &&
+            this.treeWidget.dndHandler.hoveredArea;
+        if (hoveredArea && hoveredArea.top !== this.previousTop) {
+            this.previousTop = hoveredArea.top;
+            if (this.$scrollParent) {
+                this.handleVerticalScrollingWithScrollParent(hoveredArea);
+            }
+            else {
+                this.handleVerticalScrollingWithDocument(hoveredArea);
+            }
         }
-        else if ($(window).height() - (area.bottom - $(document).scrollTop()) < 20) {
-            $(document).scrollTop($(document).scrollTop() + 20);
+    };
+    ScrollHandler.prototype.checkHorizontalScrolling = function () {
+        var positionInfo = this.treeWidget.dndHandler &&
+            this.treeWidget.dndHandler.positionInfo;
+        if (!positionInfo) {
+            return;
+        }
+        if (this.$scrollParent) {
+            this.handleHorizontalScrollingWithParent(positionInfo);
+        }
+        else {
+            this.handleHorizontalScrollingWithDocument(positionInfo);
+        }
+    };
+    ScrollHandler.prototype.handleHorizontalScrollingWithParent = function (positionInfo) {
+        if (positionInfo.pageX === undefined ||
+            positionInfo.pageY === undefined) {
+            return;
+        }
+        var $scrollParent = this.$scrollParent;
+        var scrollParentOffset = $scrollParent && $scrollParent.offset();
+        if (!($scrollParent && scrollParentOffset)) {
+            return;
+        }
+        var scrollParent = $scrollParent[0];
+        var canScrollRight = scrollParent.scrollLeft + scrollParent.clientWidth <
+            scrollParent.scrollWidth;
+        var canScrollLeft = scrollParent.scrollLeft > 0;
+        var rightEdge = scrollParentOffset.left + scrollParent.clientWidth;
+        var leftEdge = scrollParentOffset.left;
+        var isNearRightEdge = positionInfo.pageX > rightEdge - 20;
+        var isNearLeftEdge = positionInfo.pageX < leftEdge + 20;
+        if (isNearRightEdge && canScrollRight) {
+            scrollParent.scrollLeft = Math.min(scrollParent.scrollLeft + 20, scrollParent.scrollWidth);
+        }
+        else if (isNearLeftEdge && canScrollLeft) {
+            scrollParent.scrollLeft = Math.max(scrollParent.scrollLeft - 20, 0);
+        }
+    };
+    ScrollHandler.prototype.handleHorizontalScrollingWithDocument = function (positionInfo) {
+        if (positionInfo.pageX === undefined ||
+            positionInfo.pageY === undefined) {
+            return;
+        }
+        var $document = jQuery(document);
+        var scrollLeft = $document.scrollLeft() || 0;
+        var windowWidth = jQuery(window).width() || 0;
+        var canScrollLeft = scrollLeft > 0;
+        var isNearRightEdge = positionInfo.pageX > windowWidth - 20;
+        var isNearLeftEdge = positionInfo.pageX - scrollLeft < 20;
+        if (isNearRightEdge) {
+            $document.scrollLeft(scrollLeft + 20);
+        }
+        else if (isNearLeftEdge && canScrollLeft) {
+            $document.scrollLeft(Math.max(scrollLeft - 20, 0));
         }
     };
     return ScrollHandler;

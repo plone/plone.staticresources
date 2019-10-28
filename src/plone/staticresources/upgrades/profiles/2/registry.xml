@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<registry>
+  <record name="plone.resources.rjs">
+    <field type="plone.registry.field.ASCII">
+      <title>URL of r.js</title>
+    </field>
+    <value>++plone++static/components/requirejs/bin/r.js</value>
+  </record>
+  <records prefix="plone.resources/jquery.form" interface='Products.CMFPlone.interfaces.IResourceRegistry'>
+    <value key="js">++plone++static/components/jquery-form/src/jquery.form.js</value>
+  </records>
+  <records prefix="plone.bundles/filemanager" interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+    <value key="last_compilation">2019-10-27 10:00:00</value>
+  </records>
+  <records prefix="plone.bundles/plone" interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+    <value key="last_compilation">2019-10-27 10:00:00</value>
+  </records>
+  <records prefix="plone.bundles/plone-base" interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+    <value key="last_compilation">2019-10-27 10:00:00</value>
+  </records>
+  <records prefix="plone.bundles/plone-legacy" interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+    <value key="last_compilation">2019-10-27 10:00:00</value>
+  </records>
+  <records prefix="plone.bundles/plone-logged-in" interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+    <value key="last_compilation">2019-10-27 10:00:00</value>
+  </records>
+  <records prefix="plone.bundles/resourceregistry" interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+    <value key="last_compilation">2019-10-27 10:00:00</value>
+  </records>
+  <records prefix="plone.bundles/thememapper" interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+    <value key="last_compilation">2019-10-27 10:00:00</value>
+  </records>
+</registry>

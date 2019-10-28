@@ -1,34 +1,23 @@
 {
-  "name": "malsup/form",
-  "description": "A simple way to AJAX-ify any form on your page; with file upload and progress support.",
-  "type": "component",
-  "homepage": "http://jquery.malsup.com/form/",
-  "keywords": [
-    "form",
-    "upload",
-    "ajax"
+  "name": "jquery-form/form",
+  "description": "The jQuery Form Plugin allows you to easily and unobtrusively upgrade HTML forms to use AJAX.",
+  "keywords": [ "jquery", "ajax", "jquery-plugin", "json", "json-form", "html-form", "form", "jquery-form" ],
+  "homepage": "https://github.com/jquery-form/form",
+  "license": "(LGPL-2.1+ OR MIT)",
+  "authors": [
+    { "name": "Kevin Morris" },
+    { "name": "Mike Alsup" }
   ],
   "support": {
-    "issues": "https://github.com/malsup/form/issues",
-    "wiki": "http://jquery.malsup.com/form/"
+    "issues": "https://github.com/jquery-form/form/issues"
   },
-  "authors": [
-    {
-      "name": "M. Alsup",
-      "homepage": "http://jquery.malsup.com"
-    }
-  ],
-  "license": [
-    "MIT",
-    "GPL-2.0"
-  ],
   "require": {
-    "components/jquery": ">=1.5"
+    "components/jquery": ">=1.7.2"
   },
   "extra": {
     "component": {
       "scripts": [
-        "jquery.form.js"
+        "src/jquery.form.js"
       ],
       "shim": {
         "deps": [

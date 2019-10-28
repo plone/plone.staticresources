@@ -7,6 +7,12 @@
     </field>
     <value>++plone++static/components/requirejs/require.js</value>
   </record>
+  <record name="plone.resources.rjs">
+    <field type="plone.registry.field.ASCII">
+      <title>URL of r.js</title>
+    </field>
+    <value>++plone++static/components/requirejs/bin/r.js</value>
+  </record>
   <record name="plone.resources.lessc">
     <field type="plone.registry.field.ASCII">
       <title>URL of less.js</title>
@@ -188,7 +194,7 @@
 
   <records prefix="plone.resources/jquery.form"
             interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-      <value key="js">++plone++static/components/jquery-form/jquery.form.js</value>
+      <value key="js">++plone++static/components/jquery-form/src/jquery.form.js</value>
   </records>
 
   <records prefix="plone.resources/moment"

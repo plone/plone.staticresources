@@ -34,6 +34,3 @@ node_modules
 !.travis.yml
 !.yarnrc
 !src/plone
-**/bin/
-**/news/
-!/news/

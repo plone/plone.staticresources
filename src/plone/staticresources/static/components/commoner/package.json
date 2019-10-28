@@ -1,0 +1,48 @@
+{
+  "author": {
+    "name": "Ben Newman",
+    "email": "bn@cs.stanford.edu"
+  },
+  "name": "commoner",
+  "description": "Flexible tool for translating any dialect of JavaScript into Node-readable CommonJS modules",
+  "keywords": [
+    "modules",
+    "require",
+    "commonjs",
+    "exports",
+    "commoner",
+    "browserify",
+    "stitch"
+  ],
+  "version": "0.9.8",
+  "license": "MIT",
+  "homepage": "http://github.com/reactjs/commoner",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/reactjs/commoner.git"
+  },
+  "main": "main.js",
+  "bin": {
+    "commonize": "./bin/commonize"
+  },
+  "scripts": {
+    "test": "node ./node_modules/mocha/bin/mocha --reporter spec test/run.js"
+  },
+  "dependencies": {
+    "q": "~1.0.1",
+    "recast": "~0.7.0",
+    "commander": "~2.2.0",
+    "graceful-fs": "~2.0.3",
+    "glob": "~3.2.9",
+    "mkdirp": "~0.3.5",
+    "private": "~0.1.2",
+    "install": "~0.1.7",
+    "iconv-lite": "~0.2.11"
+  },
+  "devDependencies": {
+    "mocha": "~1.20.1"
+  },
+  "engines": {
+    "node": ">= 0.8"
+  }
+}
