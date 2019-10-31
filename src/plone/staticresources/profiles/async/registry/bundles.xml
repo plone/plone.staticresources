@@ -16,7 +16,35 @@
     <value key="load_defer">False</value>
   </records>
 
+  <records prefix="plone.bundles/plone-moment"
+            interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+    <value key="merge_with"></value>
+    <value key="load_async">True</value>
+    <value key="load_defer">False</value>
+  </records>
+
   <records prefix="plone.bundles/plone-logged-in"
+            interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+    <value key="merge_with"></value>
+    <value key="load_async">True</value>
+    <value key="load_defer">False</value>
+  </records>
+
+  <records prefix="plone.bundles/plone-editor-tools"
+            interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+    <value key="merge_with"></value>
+    <value key="load_async">True</value>
+    <value key="load_defer">False</value>
+  </records>
+
+  <records prefix="plone.bundles/plone-tinymce"
+            interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+    <value key="merge_with"></value>
+    <value key="load_async">True</value>
+    <value key="load_defer">False</value>
+  </records>
+
+  <records prefix="plone.bundles/plone-datatables"
             interface='Products.CMFPlone.interfaces.IBundleRegistry'>
     <value key="merge_with"></value>
     <value key="load_async">True</value>

@@ -1,0 +1,22 @@
+<configure xmlns="http://namespaces.zope.org/zope"
+  xmlns:gs="http://namespaces.zope.org/genericsetup">
+
+  <gs:registerProfile name="3"
+    title="Update bundles (split bundles)"
+    description='Configuration for version 3'
+    directory="profiles/3"
+    for="Products.CMFPlone.interfaces.IMigratingPloneSiteRoot"
+    provides="Products.GenericSetup.interfaces.EXTENSION" />
+
+  <gs:upgradeSteps source="2"
+    destination="3"
+    profile="plone.staticresources:default">
+
+    <gs:upgradeDepends
+      title="Update bundles (split bundles)"
+      description="Change bundle configuration for split bundles."
+      import_profile="plone.staticresources.upgrades:3" />
+
+  </gs:upgradeSteps>
+
+</configure>

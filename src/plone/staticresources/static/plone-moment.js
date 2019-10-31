@@ -1,3 +1,4 @@
+/* globals requirejs */
 // Copyright (C) 2010 Plone Foundation
 //
 // This program is free software; you can redistribute it and/or modify it
@@ -15,11 +16,7 @@
 //
 
 require([
-  'mockup-patterns-inlinevalidation',
-  'mockup-patterns-recurrence',
-  'mockup-patterns-relateditems',
-  'mockup-patterns-pickadate',
-  'mockup-patterns-select2',
+  'mockup-patterns-moment',
 ], function() {
   'use strict';
 });

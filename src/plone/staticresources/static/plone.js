@@ -23,16 +23,11 @@ require([
   'mockup-patterns-livesearch',
   'mockup-patterns-markspeciallinks',
   'mockup-patterns-modal',
-  'mockup-patterns-moment',
-  'mockup-patterns-pickadate',
   'mockup-patterns-navigationmarker',
   'mockup-patterns-preventdoublesubmit',
-  'mockup-patterns-select2',
-
   'bootstrap-collapse',
   'bootstrap-dropdown',
   'bootstrap-tooltip',
 ], function () {
   'use strict';
-
 });

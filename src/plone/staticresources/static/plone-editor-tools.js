@@ -15,11 +15,11 @@
 //
 
 require([
-  'mockup-patterns-inlinevalidation',
-  'mockup-patterns-recurrence',
-  'mockup-patterns-relateditems',
-  'mockup-patterns-pickadate',
-  'mockup-patterns-select2',
+  'plone-patterns-toolbar',
+  'plone-patterns-portletmanager',
+  'mockup-patterns-querystring',
+  'mockup-patterns-structure',
+  'mockup-patterns-structureupdater',
 ], function() {
   'use strict';
 });
