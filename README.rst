@@ -25,7 +25,12 @@ This documentation aims at:
 How to upgrade the resources in this package
 --------------------------------------------
 
-1. Increase Npm package versions in ``package.json``, in sections ``dependencies`` or ``devDependencies``.
+.. note::
+  Changes to JavaScript functionality must be done outside this package.
+  If you want to fix something or add functionality in Mockup you have to do it there.
+  This package is only to deliver the generated bundles as well as the npm dependencies so that building bundles is possible.
+
+1. Increase npm package versions in ``package.json``, in sections ``dependencies`` or ``devDependencies``.
 
 2. Run ``yarn upgrade`` (important: cannot be ``npm``)
 
@@ -33,7 +38,7 @@ How to upgrade the resources in this package
 
 4. Increase the ``last_compilation`` date in ``src/plone/staticresources/profiles/default/registry/bundles.xml``.
 
-5. Create an upgrade step for ``plone.app.upgrade``.
+5. Create an upgrade step in ``plone.staticresources`` (most probably increasing ``last_compilation`` date).
 
 6. Submit a Pull Request and run the tests on Jenkins.
 
