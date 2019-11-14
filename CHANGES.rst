@@ -8,6 +8,44 @@ Changelog
 
 .. towncrier release notes start
 
+1.2.0 (2019-11-14)
+------------------
+
+New features:
+
+
+- Update jQuery from version 1.11.3 to 1.12.4
+  [davilima6] (#34)
+- Recompile 'plone' bundle after updating jQuery-related packages (#40)
+- Update all components and recompile bundles. (#44)
+- Split up bundles for more flexibility and optimized resource loading.
+  Move select2 and datepicker to logged-in bundle.
+  Move toolbar, portletmanager, querystring and structure pattern to editor bundle.
+  Move tinymce to it's own bundle.
+  Single out moment.js to reduce plone bundle size and allow async loading.
+  Add optional datatables bundle.
+  [agitator] (#46)
+
+
+Bug fixes:
+
+
+- Fix autotoc pattern: activate the element link with active class during initialization
+  [mamico] (#37)
+- Fix Tinymce pattern: Link popup looses tab selection on active linktype
+  [mamico] (#37)
+- build js/css for mockup changes plone/mockup#922
+  [mamico] (#37)
+- When compiling a bundle and including a resource from a request, open the
+  temporary file in binary mode.
+  [frapell] (#38)
+- Bring fix for https://github.com/plone/mockup/issues/923
+  [frapell] (#41)
+- Fix "TTW Bundle compilation broken".
+  Refs: https://github.com/plone/Products.CMFPlone/issues/2969
+  [thet] (#43)
+
+
 1.1.0 (2019-06-22)
 ------------------
 

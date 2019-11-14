@@ -1,3 +1,0 @@
-When compiling a bundle and including a resource from a request, open the
-temporary file in binary mode.
-[frapell]
