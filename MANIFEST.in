@@ -1,6 +1,8 @@
 graft src/plone
 graft docs
 include *.rst
+include .yarnrc
+include package.json
 global-exclude *.pyc
 include pyproject.toml
 recursive-exclude news *
