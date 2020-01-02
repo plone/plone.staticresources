@@ -26052,7 +26052,7 @@ define('mockup-patterns-structure-url/js/views/textfilter',[
         clearTimeout(self.timeoutId);
       }
       self.timeoutId = setTimeout(function() {
-        self.term = $(event.currentTarget).val();
+        self.term = encodeURIComponent($(event.currentTarget).val());
         self.app.collection.currentPage = 1;
         self.app.collection.pager();
 
@@ -30471,5 +30471,5 @@ require([
   'use strict';
 });
 
-define("/home/_thet/data/dev/plone/buildout.coredev/src/plone.staticresources/src/plone/staticresources/static/plone-editor-tools.js", function(){});
+define("/vagrant/src/plone.staticresources/src/plone/staticresources/static/plone-editor-tools.js", function(){});
 
