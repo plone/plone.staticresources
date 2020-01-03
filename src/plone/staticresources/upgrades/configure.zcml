@@ -7,5 +7,6 @@
   <include file="4.zcml" />
   <include file="5.zcml" />
   <include file="6.zcml" />
+  <include file="7.zcml" />
 
 </configure>
