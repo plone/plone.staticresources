@@ -21,4 +21,5 @@ class HiddenProfiles(object):
             "plone.staticresources:uninstall",
             "plone.staticresources.upgrades:2",
             "plone.staticresources.upgrades:3",
+            "plone.staticresources.upgrades:4",
         ]

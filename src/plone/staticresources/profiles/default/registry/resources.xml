@@ -11,13 +11,13 @@
     <field type="plone.registry.field.ASCII">
       <title>URL of r.js</title>
     </field>
-    <value>++plone++static/components/requirejs/bin/r.js</value>
+    <value>++plone++static/webcompiler/r.js</value>
   </record>
   <record name="plone.resources.lessc">
     <field type="plone.registry.field.ASCII">
       <title>URL of less.js</title>
     </field>
-    <value>++plone++static/components/less/dist/less.js</value>
+    <value>++plone++static/webcompiler/less.js</value>
   </record>
   <records prefix="plone.resources/less"
             interface='Products.CMFPlone.interfaces.IResourceRegistry'>

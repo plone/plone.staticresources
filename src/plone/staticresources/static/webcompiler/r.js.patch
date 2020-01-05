@@ -1,0 +1,36 @@
+From c950dbe7c16533e5040cceb22db62db8f244bdd7 Mon Sep 17 00:00:00 2001
+From: Johannes Raggam <thetetet@gmail.com>
+Date: Sun, 5 Jan 2020 13:04:32 +0100
+Subject: [PATCH] r.js for uncached resource downloads Original commit
+ by @vangheem:
+ https://github.com/plone/Products.CMFPlone/commit/2d3865805efc6b72dce236eb68e502d8c57717b6
+
+---
+ src/plone/staticresources/static/webcompiler/r.js | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/src/plone/staticresources/static/webcompiler/r.js b/src/plone/staticresources/static/webcompiler/r.js
+index ed177d8..d5e2573 100644
+--- a/src/plone/staticresources/static/webcompiler/r.js
++++ b/src/plone/staticresources/static/webcompiler/r.js
+@@ -25821,7 +25821,16 @@ define('build', function (require) {
+             d.resolve(require._cachedRawText[path]);
+             return d.promise;
+         } else {
+-            return file.readFileAsync(path, encoding).then(function (text) {
++
++            /* XXX Plone hack to always re-download resource TTW */
++            var url = path;
++            if(url.indexOf('?') === -1){
++                url += '?';
++            }else{
++                url += '&';
++            }
++            url = url + "bust=" +  (new Date()).getTime();
++            return file.readFileAsync(url, encoding).then(function (text) {
+                 require._cachedRawText[path] = text;
+                 return text;
+             });
+--
+2.20.1
+

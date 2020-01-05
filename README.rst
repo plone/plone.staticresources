@@ -284,16 +284,6 @@ For more information on the Plone resource registry see the documentation at:
 - https://docs.plone.org/adapt-and-extend/theming/resourceregistry.html
 
 
-Warning
--------
-
-If you update ``r.js`` or ``less``, you will need to manually re-apply a patch that gives us cache busting resource downloads so we can build through the web.
-See:
-
-- https://github.com/plone/Products.CMFPlone/commit/2d3865805efc6b72dce236eb68e502d8c57717b6
-- https://github.com/plone/Products.CMFPlone/commit/bd1f9ba99d1ad40bb7fe1c00eaa32b8884aae5e2
-
-
 License
 -------
 
