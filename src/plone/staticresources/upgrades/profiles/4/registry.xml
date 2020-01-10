@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<registry>
+  <record name="plone.resources.rjs">
+    <value>++plone++static/webcompiler/r.js</value>
+  </record>
+  <record name="plone.resources.lessc">
+    <value>++plone++static/webcompiler/less.js</value>
+  </record>
+</registry>

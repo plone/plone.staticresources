@@ -1,0 +1,21 @@
+<configure xmlns="http://namespaces.zope.org/zope"
+  xmlns:gs="http://namespaces.zope.org/genericsetup">
+
+  <gs:registerProfile name="4"
+    title="Change r.js and less.js paths for TTW compilation"
+    description='Configuration for version 4'
+    directory="profiles/4"
+    for="Products.CMFPlone.interfaces.IMigratingPloneSiteRoot"
+    provides="Products.GenericSetup.interfaces.EXTENSION" />
+
+  <gs:upgradeSteps source="3"
+    destination="4"
+    profile="plone.staticresources:default">
+
+    <gs:upgradeDepends
+      title="Change r.js and less.js paths for TTW compilation"
+      import_profile="plone.staticresources.upgrades:4" />
+
+  </gs:upgradeSteps>
+
+</configure>
