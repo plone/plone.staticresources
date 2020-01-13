@@ -8,6 +8,16 @@ Changelog
 
 .. towncrier release notes start
 
+1.2.1 (2020-01-12)
+------------------
+
+Bug fixes:
+
+
+- Fixed drag problem on click on sortable items in folder contents. (#56)
+- Fix problem with TTW compilation of bundles. (#58)
+
+
 1.2.0 (2019-11-14)
 ------------------
 
