@@ -41,6 +41,9 @@
   <records prefix="plone.resources/plone-datatables"
             interface='Products.CMFPlone.interfaces.IResourceRegistry'>
       <value key="js">++resource++plone-datatables.js</value>
+      <value key="css">
+        <element>++plone++static/plone-datatables.less</element>
+      </value>
   </records>
   <records prefix="plone.resources/resourceregistry"
             interface='Products.CMFPlone.interfaces.IResourceRegistry'>
@@ -284,7 +287,7 @@
     <value key="expression"></value>
     <value key="jscompilation">++plone++static/plone-datatables-compiled.min.js</value>
     <value key="csscompilation">++plone++static/plone-datatables-compiled.css</value>
-    <value key="last_compilation">2019-10-28 12:36:00</value>
+    <value key="last_compilation">2020-01-29 15:30:00</value>
     <value key="load_async">False</value>
     <value key="load_defer">False</value>
     <value key="stub_js_modules">
