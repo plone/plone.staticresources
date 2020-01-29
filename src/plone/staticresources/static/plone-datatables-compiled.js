@@ -16287,5 +16287,5 @@ require([
   'use strict';
 });
 
-define("/home/_thet/data/dev/plone/buildout.coredev/src/plone.staticresources/src/plone/staticresources/static/plone-datatables.js", function(){});
+define("/Users/peter/workspace/zhref-plone52/srccore/plone.staticresources/src/plone/staticresources/static/plone-datatables.js", function(){});
 
