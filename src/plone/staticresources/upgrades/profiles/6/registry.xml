@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<registry>
+  <records prefix="plone.bundles/filemanager" interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+    <value key="last_compilation">2020-02-11 15:54:00</value>
+  </records>
+  <records prefix="plone.bundles/plone" interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+    <value key="last_compilation">2020-02-11 15:54:00</value>
+  </records>
+  <records prefix="plone.bundles/plone-editor-tools" interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+    <value key="last_compilation">2020-02-11 15:54:00</value>
+  </records>
+  <records prefix="plone.bundles/plone-logged-in" interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+    <value key="last_compilation">2020-02-11 15:54:00</value>
+  </records>
+  <records prefix="plone.bundles/plone-tinymce" interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+    <value key="last_compilation">2020-02-11 15:54:00</value>
+  </records>
+  <records prefix="plone.bundles/resourceregistry" interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+    <value key="last_compilation">2020-02-11 15:54:00</value>
+  </records>
+  <records prefix="plone.bundles/thememapper" interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+    <value key="last_compilation">2020-02-11 15:54:00</value>
+  </records>
+</registry>
