@@ -550,6 +550,13 @@ define('mockup-utils',[
     }
   };
 
+  var createElementFromHTML = function(htmlString) {
+    // From: https://stackoverflow.com/a/494348/1337474
+    var div = document.createElement('div');
+    div.innerHTML = htmlString.trim();
+    return div.firstChild;
+  };
+
   return {
     bool: bool,
     escapeHTML: escapeHTML,
@@ -563,7 +570,8 @@ define('mockup-utils',[
     parseBodyTag: parseBodyTag,
     QueryHelper: QueryHelper,
     setId: setId,
-    storage: storage
+    storage: storage,
+    createElementFromHTML: createElementFromHTML
   };
 });
 
@@ -4856,6 +4864,9 @@ define('mockup-router',[
  *    automaticallyAddButtonActions(boolean): Automatically create actions for elements matched with the buttons selector. They will use the options provided in actionOptions. (true)
  *    loadLinksWithinModal(boolean): Automatically load links inside of the modal using AJAX. (true)
  *    actionOptions(object): A hash of selector to options. Where options can include any of the defaults from actionOptions. Allows for the binding of events to elements in the content and provides options for handling ajax requests and displaying them in the modal. ({})
+ *        onSuccess(Function|string): function which is called with parameters (modal, response, state, xhr, form) when form has been successfully submitted. if value is a string, this is the name of a function at window level
+ *        onFormError(Function|string): function which is called with parameters (modal, response, state, xhr, form) when backend has sent an error after form submission. if value is a string, this is the name of a function at window level
+ *        onError(Function|string): function which is called with parameters (xhr, textStatus, errorStatus) when form submission has failed. if value is a string, this is the name of a function at window level
  *
  *
  * Documentation:
@@ -4948,6 +4959,7 @@ define('mockup-patterns-modal',[
       automaticallyAddButtonActions: true,
       loadLinksWithinModal: true,
       prependContent: '.portalMessage',
+      onRender: null,
       templateOptions: {
         className: 'plone-modal fade',
         classDialog: 'plone-modal-dialog',
@@ -5111,10 +5123,14 @@ define('mockup-patterns-modal',[
               options.onTimeout.apply(self, xhr, errorStatus);
             // on "error", "abort", and "parsererror"
             } else if (options.onError) {
-              options.onError(xhr, textStatus, errorStatus);
+              if (typeof options.onError === 'string') {
+                window[options.onError](xhr, textStatus, errorStatus);
+              } else {
+                  options.onError(xhr, textStatus, errorStatus);
+              }
             } else {
               // window.alert(_t('There was an error submitting the form.'));
-              console.log('error happened do something');
+              console.log('error happened', textStatus, ' do something');
             }
             self.emit('formActionError', [xhr, textStatus, errorStatus]);
           },
@@ -5125,7 +5141,11 @@ define('mockup-patterns-modal',[
             if ($(options.error, response).size() !== 0 ||
                 $(options.formFieldError, response).size() !== 0) {
               if (options.onFormError) {
-                options.onFormError(self, response, state, xhr, form);
+                if (typeof options.onFormError === 'string') {
+                  window[options.onFormError](self, response, state, xhr, form);
+                } else {
+                  options.onFormError(self, response, state, xhr, form);
+                }
               } else {
                 self.redraw(response, patternOptions);
               }
@@ -5142,7 +5162,11 @@ define('mockup-patterns-modal',[
             }
 
             if (options.onSuccess) {
-              options.onSuccess(self, response, state, xhr, form);
+              if (typeof options.onSuccess === 'string') {
+                window[options.onSuccess](self, response, state, xhr, form);
+              } else {
+                  options.onSuccess(self, response, state, xhr, form);
+              }
             }
 
             if (options.displayInModal === true) {
@@ -5161,6 +5185,10 @@ define('mockup-patterns-modal',[
       handleLinkAction: function($action, options, patternOptions) {
         var self = this;
         var url;
+        if ($action.hasClass('pat-plone-modal')) {
+          // if link is a modal pattern, do not reload the page
+          return ;
+        }
 
         // Figure out URL
         if (options.ajaxUrl) {
@@ -5201,8 +5229,13 @@ define('mockup-patterns-modal',[
         }).done(function(response, state, xhr) {
           self.redraw(response, patternOptions);
           if (options.onSuccess) {
-            options.onSuccess(self, response, state, xhr);
+            if (typeof options.onSuccess === 'string') {
+              window[options.onSuccess](self, response, state, xhr);
+            } else {
+                options.onSuccess(self, response, state, xhr);
+            }
           }
+
           self.emit('linkActionSuccess', [response, state, xhr]);
         }).always(function(){
           self.loading.hide();
@@ -5333,6 +5366,14 @@ define('mockup-patterns-modal',[
         }
         self.$modal.data('pattern-' + self.name, self);
         self.emit('after-render');
+        if (options.onRender) {
+          if (typeof options.onRender === 'string') {
+            window[options.onRender](self);
+          } else {
+              options.onRender(self);
+          }
+        }
+
       }
     },
     reloadWindow: function() {

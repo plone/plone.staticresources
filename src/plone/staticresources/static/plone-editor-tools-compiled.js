@@ -4613,6 +4613,10 @@ the specific language governing permissions and limitations under the Apache Lic
  *    initialValues(string): This can be a json encoded string, or a list of id:text values. Ex: Red:The Color Red,Orange:The Color Orange  This is used inside the initSelection method, if AJAX options are NOT set. (null)
  *    vocabularyUrl(string): This is a URL to a JSON-formatted file used to populate the list (null)
  *    allowNewItems(string): All new items to be entered into the widget(true)
+ *    onSelecting(string|function): Name of global function or function to call when value is selecting (null)
+ *    onSelected(string|function): Name of global function or function to call when value has been selected (null)
+ *    onDeselecting(string|function): Name of global function or function to call when value is deselecting (null)
+ *    onDeselected(string|function): Name of global function or function to call when value has been deselected (null)
  *    OTHER OPTIONS(): For more options on select2 go to http://ivaynberg.github.io/select2/#documentation ()
  *
  * Documentation:
@@ -4813,7 +4817,34 @@ define('mockup-patterns-select2',[
           return 'select2-option-' + ob.id.toLowerCase().replace(/[ \:\)\(\[\]\{\}\_\+\=\&\*\%\#]/g, '-');
         }
       };
+
+      function callback(action, e) {
+        if (!!action) {
+          if (self.options.debug) {
+            console.debug('callback', action, e)
+          }
+          if (typeof action === 'string') {
+            action = window[action];
+          }
+          return action(e);
+        } else {
+          return action;
+        }
+      }
+
       self.$el.select2(self.options);
+      self.$el.on('select2-selected', function(e) {
+          callback(self.options.onSelected, e);
+      });
+      self.$el.on('select2-selecting', function(e) {
+          callback(self.options.onSelecting, e);
+      });
+      self.$el.on('select2-deselecting', function(e) {
+          callback(self.options.onDeselecting, e);
+      });
+      self.$el.on('select2-deselected', function(e) {
+          callback(self.options.onDeselected, e);
+      });
       self.$select2 = self.$el.parent().find('.select2-container');
       self.$el.parent().off('close.plone-modal.patterns');
       if (self.options.orderable) {
@@ -4989,6 +5020,13 @@ define('mockup-ui-url/views/base',[
  *    enterEvent(string): Event used to trigger tooltip. ('mouseenter')
  *    exitEvent(string): Event used to dismiss tooltip. ('mouseleave')
  *
+ * data-pat-tooltip Configuration
+ *    ajaxUrl(string): the ajax source of tooltip content (null). if null, tooltip displays content of title
+ *    contentSelector(string): selects a subset of content (null)
+ *    class(string): add one or several (white space separated) class to tooltip, at the .tooltip.mockup-tooltip level
+ *    style(object): add css styles to tooltip, at the .tooltip.mockup-tooltip level
+ *    innerStyle(object): add css styles to tooltip, at the .tooltip-inner level
+ *
  * Documentation:
  *    # Directions
  *
@@ -5122,6 +5160,8 @@ define('mockup-patterns-tooltip',[
       $(obj.currentTarget).data('bs.' + this.type, self)
     }
 
+    self.leaving = false;
+
     clearTimeout(self.timeout)
 
     self.hoverState = 'in'
@@ -5136,6 +5176,7 @@ define('mockup-patterns-tooltip',[
   bootstrapTooltip.prototype.leave = function (obj) {
     var self = obj instanceof this.constructor ?
       obj : $(obj.currentTarget).data('bs.' + this.type)
+    self.leaving = true;
 
     if (!self) {
       self = new this.constructor(obj.currentTarget, this.getDelegateOptions())
@@ -5158,24 +5199,22 @@ define('mockup-patterns-tooltip',[
 
     if (this.hasContent() && this.enabled) {
       this.$element.trigger(e)
-
       var inDom = $.contains(document.documentElement, this.$element[0])
       if (e.isDefaultPrevented() || !inDom) return
-      var that = this
 
       var $tip = this.tip()
 
       var tipId = this.getUID(this.type)
-
-      this.setContent()
+      var self = this;
+      this.setContent().then(function() {
       $tip.attr('id', tipId)
-      this.$element.attr('aria-describedby', tipId)
+      self.$element.attr('aria-describedby', tipId)
 
-      if (this.options.animation) $tip.addClass('fade')
+      if (self.options.animation) $tip.addClass('fade')
 
-      var placement = typeof this.options.placement == 'function' ?
-        this.options.placement.call(this, $tip[0], this.$element[0]) :
-        this.options.placement
+      var placement = typeof self.options.placement == 'function' ?
+        self.options.placement.call(self, $tip[0], self.$element[0]) :
+        self.options.placement
 
       var autoToken = /\s?auto?\s?/i
       var autoPlace = autoToken.test(placement)
@@ -5185,18 +5224,18 @@ define('mockup-patterns-tooltip',[
         .detach()
         .css({ top: 0, left: 0, display: 'block' })
         .addClass(placement)
-        .data('bs.' + this.type, this)
+        .data('bs.' + self.type, self)
 
-      this.options.container ? $tip.appendTo(this.options.container) : $tip.insertAfter(this.$element)
+      self.options.container ? $tip.appendTo(self.options.container) : $tip.insertAfter(self.$element)
 
-      var pos          = this.getPosition()
+      var pos          = self.getPosition()
       var actualWidth  = $tip[0].offsetWidth
       var actualHeight = $tip[0].offsetHeight
 
       if (autoPlace) {
         var orgPlacement = placement
-        var $parent      = this.$element.parent()
-        var parentDim    = this.getPosition($parent)
+        var $parent      = self.$element.parent()
+        var parentDim    = self.getPosition($parent)
 
         placement = placement == 'bottom' && pos.top   + pos.height       + actualHeight - parentDim.scroll > parentDim.height ? 'top'    :
                     placement == 'top'    && pos.top   - parentDim.scroll - actualHeight < 0                                   ? 'bottom' :
@@ -5209,22 +5248,26 @@ define('mockup-patterns-tooltip',[
           .addClass(placement)
       }
 
-      var calculatedOffset = this.getCalculatedOffset(placement, pos, actualWidth, actualHeight)
+      var calculatedOffset = self.getCalculatedOffset(placement, pos, actualWidth, actualHeight)
 
-      this.applyPlacement(calculatedOffset, placement)
+      self.applyPlacement(calculatedOffset, placement)
 
       var complete = function () {
-        that.$element.trigger('shown.bs.' + that.type)
-        that.hoverState = null
+        self.$element.trigger('shown.bs.' + self.type);
+        self.hoverState = null;
+        if (self.leaving) {  // prevent a race condition bug when user has leaved before complete
+          self.leave(self);
+        }
       }
 
-      $.support.transition && this.$tip.hasClass('fade') ?
+      $.support.transition && self.$tip.hasClass('fade') ?
         $tip
           .one('bsTransitionEnd', complete)
           .emulateTransitionEnd(150) :
         complete()
+      })
     }
-  }
+  };
 
   bootstrapTooltip.prototype.applyPlacement = function (offset, placement) {
     var $tip   = this.tip()
@@ -5281,12 +5324,39 @@ define('mockup-patterns-tooltip',[
   }
 
   bootstrapTooltip.prototype.setContent = function () {
-    var $tip  = this.tip()
-    var title = this.getTitle()
+    var $tip  = this.tip();
+    var type = this.options.html ? 'html' : 'text';
+    var selector = this.options.patTooltip ? this.options.patTooltip.contentSelector : null;
 
-    $tip.find('.tooltip-inner')[this.options.html ? 'html' : 'text'](title)
-    $tip.removeClass('fade in top bottom left right')
-  }
+    function setContent(content) {
+      if (type === 'html' && !!selector) {
+        content = $(content).find(selector).html();
+      }
+      $tip.find('.tooltip-inner')[type](content);
+    }
+    function removeClasses() {
+      $tip.removeClass('fade in top bottom left right')
+    }
+    var title = this.getTitle();
+    var url = this.getUrl();
+      if (!!url) {
+        removeClasses();
+        return $.get(url).then(function(content) {
+          setContent(content);
+        });
+      } else {
+        removeClasses();
+        setContent(title);
+        return new Promise(function(resolve, reject) {
+          resolve(title)
+        });
+      }
+
+  };
+
+  bootstrapTooltip.prototype.getUrl = function () {
+    return this.options.patTooltip ? this.options.patTooltip.ajaxUrl : null;
+  };
 
   bootstrapTooltip.prototype.hide = function () {
     var that = this
@@ -5325,8 +5395,8 @@ define('mockup-patterns-tooltip',[
   }
 
   bootstrapTooltip.prototype.hasContent = function () {
-    return this.getTitle()
-  }
+    return this.getTitle() || this.getUrl();
+  };
 
   bootstrapTooltip.prototype.getPosition = function ($element) {
     $element   = $element || this.$element
@@ -5379,7 +5449,6 @@ define('mockup-patterns-tooltip',[
     var title
     var $e = this.$element
     var o  = this.options
-
     title = $e.attr('data-original-title')
       || (typeof o.title == 'function' ? o.title.call($e[0]) :  o.title)
 
@@ -5393,7 +5462,24 @@ define('mockup-patterns-tooltip',[
   }
 
   bootstrapTooltip.prototype.tip = function () {
-    return (this.$tip = this.$tip || $(this.options.template))
+    if (!!this.$tip) {
+      return this.$tip;
+    }
+    var $tip = this.$tip || $(this.options.template);
+    if (this.options.patTooltip) {
+
+    if (this.options.patTooltip.style) {
+      $tip.css(this.options.patTooltip.style)
+    }
+    if (this.options.patTooltip['class']) {
+      $tip.addClass(this.options.patTooltip['class'])
+    }
+    if (this.options.patTooltip.innerStyle) {
+      $tip.find('.tooltip-inner').css(this.options.patTooltip.innerStyle)
+    }
+    }
+    this.$tip = $tip;
+    return $tip;
   }
 
   bootstrapTooltip.prototype.arrow = function () {
@@ -5447,7 +5533,7 @@ define('mockup-patterns-tooltip',[
       placement: 'top'
     },
     init: function() {
-        if (this.options.html === 'true') {
+        if (this.options.html === 'true' || this.options.html === true) {
           // TODO: fix the parser!
           this.options.html = true;
         } else {
@@ -5498,7 +5584,7 @@ define('mockup-ui-url/views/button',[
         }
         _.each(this.extraClasses, function(klass){
           this.$el.addClass(klass);
-        });
+        }.bind(this));
 
         if (this.tooltip !== null) {
 
@@ -6994,7 +7080,7 @@ define('mockup-patterns-querystring',[
       self.createPathOperators();
 
       // We must test if we have a "simple" path or an "advanced" one and change the widgets accordingly
-      if (index === 'path' && value && value !== '.::1' && value !== '..::1' && !value.match(/^[0-9a-f]{32}::-?[0-9]+$/)) {
+      if (index === 'path' && value && value !== '.::1' && value !== '..::1' && !value.match(/^[0-9a-f\-]{32,36}::-?[0-9]+$/)) {
         self.advanced = true;
         self.resetPathOperators();
       }
@@ -7964,7 +8050,8 @@ define('mockup-patterns-structure-url/js/actions',[
         } else {
           msg = _t('Error ' + failMsg + ' "' + self.model.attributes.Title + '"');
         }
-        self.app.setStatus({text: msg, type: data.status || 'warning'});
+        self.app.clearStatus();
+        self.app.setStatus({ text: msg, type: data.status || 'warning' });
       });
     },
 
@@ -8157,6 +8244,7 @@ define('mockup-patterns-structure-url/js/views/actionmenu',[
   'text!mockup-patterns-structure-url/templates/actionmenu.xml',
   'pat-registry',
   'translate',
+  'mockup-patterns-modal',
   'mockup-patterns-tooltip',
   'bootstrap-dropdown'
 ], function($, _, BaseView, utils, Result, Actions, ActionMenu, ActionMenuTemplate, registry, _t) {
@@ -8455,7 +8543,7 @@ define('mockup-patterns-structure-url/js/views/tablerow',[
 });
 
 
-define('text!mockup-patterns-structure-url/templates/table.xml',[],function () { return '<div class="alert alert-<%- status.type %> status">\n  <strong><%- status.label %></strong>\n  <span><%- status.text %></span>&nbsp;<% // &nbsp; to get correct height for empty alerts %>\n</div>\n\n<div class="fc-breadcrumbs-container">\n  <div class="fc-breadcrumbs" colspan="<%- activeColumns.length + 3 %>">\n    <a href="#" data-path="/">\n      <span class="glyphicon glyphicon-home"></span> /\n    </a>\n    <% _.each(pathParts, function(part, idx, list){\n      if(part){\n        if(idx > 0){ %>\n          /\n        <% } %>\n        <a href="#" class="crumb" data-path="<%- part %>"><%- part %></a>\n      <% }\n    }); %>\n  </div>\n</div>\n\n<table class="pat-datatables table table-striped table-bordered"\n       data-pat-datatables="<%- datatables_options %>">\n  <thead>\n    <tr>\n      <th class="selection"><input type="checkbox" class="select-all" /></th>\n      <th class="title"><%- _t(\'Title\') %></th>\n      <% _.each(activeColumns, function(column){ %>\n        <% if(column !== \'Description\' && _.has(availableColumns, column)) { %>\n          <th><%- availableColumns[column] %></th>\n        <% } %>\n      <% }); %>\n      <th class="actions"><%- _t("Actions") %></th>\n    </tr>\n  </thead>\n  <tbody>\n  </tbody>\n</table>\n';});
+define('text!mockup-patterns-structure-url/templates/table.xml',[],function () { return '<div class="fc-breadcrumbs-container">\n  <div class="fc-breadcrumbs" colspan="<%- activeColumns.length + 3 %>">\n    <a href="#" data-path="/">\n      <span class="glyphicon glyphicon-home"></span> /\n    </a>\n    <% _.each(pathParts, function(part, idx, list){\n      if(part){\n        if(idx > 0){ %>\n          /\n        <% } %>\n        <a href="#" class="crumb" data-path="<%- part %>"><%- part %></a>\n      <% }\n    }); %>\n  </div>\n</div>\n\n<table class="pat-datatables table table-striped table-bordered"\n       data-pat-datatables="<%- datatables_options %>">\n  <thead>\n    <tr>\n      <th class="selection"><input type="checkbox" class="select-all" /></th>\n      <th class="title"><%- _t(\'Title\') %></th>\n      <% _.each(activeColumns, function(column){ %>\n        <% if(column !== \'Description\' && _.has(availableColumns, column)) { %>\n          <th><%- availableColumns[column] %></th>\n        <% } %>\n      <% }); %>\n      <th class="actions"><%- _t("Actions") %></th>\n    </tr>\n  </thead>\n  <tbody>\n  </tbody>\n</table>\n';});
 
 /*! DataTables 1.10.19
  * ©2008-2018 SpryMedia Ltd - datatables.net/license
@@ -25066,7 +25154,6 @@ define('mockup-patterns-structure-url/js/views/table',[
             return val.length > 0;
           }
         ),
-        status: self.app.status,
         activeColumns: self.app.activeColumns,
         availableColumns: self.app.availableColumns,
         datatables_options: JSON.stringify(datatables_options)
@@ -25115,12 +25202,15 @@ define('mockup-patterns-structure-url/js/views/table',[
                     // Restore reordering by drag and drop
                     self.addReordering();
                     // Clear the status message
-                    self.app.setStatus();
+                    self.app.clearStatus();
                   });
-        self.app.setStatus(_t('Notice: Drag and drop reordering is disabled when viewing the contents sorted by a column.'), 'warning', btn = btn);
-        $(".pat-datatables tbody").find('tr').off("drag")
+        self.app.setStatus({
+          text: _t('Notice: Drag and drop reordering is disabled when viewing the contents sorted by a column.'),
+          type: 'warning'
+        }, btn, false, 'sorting_dndreordering_disabled');
+        $(".pat-datatables tbody").find('tr').off("drag");
         self.$el.removeClass('order-support');
-      } );
+      });
 
       return this;
     },
@@ -25163,7 +25253,6 @@ define('mockup-patterns-structure-url/js/views/table',[
       var self = this;
       // if we have a custom query going on, we do not allow sorting.
       if (self.app.inQueryMode()) {
-        self.app.setStatus({text: _t('Cannot order items while querying'), type: 'warning'});
         self.$el.removeClass('order-support');
         return;
       }
@@ -25833,33 +25922,33 @@ define('mockup-patterns-structure-url/js/views/paging',[
     },
     nextResultPage: function(e) {
       e.preventDefault();
-      this.app.setStatus();
+      this.app.clearStatus();
       this.collection.requestNextPage();
     },
     previousResultPage: function(e) {
       e.preventDefault();
-      this.app.setStatus();
+      this.app.clearStatus();
       this.collection.requestPreviousPage();
     },
     gotoFirst: function(e) {
       e.preventDefault();
-      this.app.setStatus();
+      this.app.clearStatus();
       this.collection.goTo(this.collection.information.firstPage);
     },
     gotoLast: function(e) {
       e.preventDefault();
-      this.app.setStatus();
+      this.app.clearStatus();
       this.collection.goTo(this.collection.information.totalPages);
     },
     gotoPage: function(e) {
       e.preventDefault();
-      this.app.setStatus();
+      this.app.clearStatus();
       var page = $(e.target).text();
       this.collection.goTo(page);
     },
     changeCount: function(e) {
       e.preventDefault();
-      this.app.setStatus();
+      this.app.clearStatus();
       var per = $(e.target).text();
       this.collection.howManyPer(per);
       this.app.setCookieSetting('perPage', per);
@@ -25973,7 +26062,7 @@ define('mockup-patterns-structure-url/js/views/textfilter',[
     className: 'navbar-search form-search ui-offset-parent',
     template: _.template(
       '<div class="input-group">' +
-      '<input type="text" class="form-control search-query" placeholder="<%- _t("Filter") %>">' +
+      '<input type="text" class="form-control search-query" placeholder="<%- _t("Search") %>">' +
       '<span class="input-group-btn">' +
       '</span>' +
       '</div>'
@@ -25987,22 +26076,123 @@ define('mockup-patterns-structure-url/js/views/textfilter',[
     term: null,
     timeoutId: null,
     keyupDelay: 300,
+    statusKeyFilter: 'textfilter_status_message_filter',
+    statusKeySorting: 'textfilter_status_message_sorting',
 
     initialize: function(options) {
       BaseView.prototype.initialize.apply(this, [options]);
       this.app = this.options.app;
     },
 
+    setFilterStatusMessage: function() {
+      var clear_btn = $('<button type="button" class="btn btn-primary btn-xs"></button>')
+        .text(_t('Clear'))
+        .on('click', function() {
+          this.clearFilter();
+        }.bind(this));
+
+      var statusTextFilter = _t('This listing has filters applied. Not all items are shown.');
+      this.app.setStatus({
+        text: statusTextFilter,
+        type: 'success',
+      }, clear_btn, true, this.statusKeyFilter);
+
+      var statusTextSorting = _t('Drag and drop reordering is disabled while filters are applied.');
+      this.app.setStatus({
+        text: statusTextSorting,
+        type: 'warning'
+      }, null, true, this.statusKeySorting);
+
+    },
+
+    clearFilterStatusMessage: function() {
+      if (!this.term && !this.app.additionalCriterias.length) {
+        this.app.clearStatus(this.statusKeyFilter);
+        this.app.clearStatus(this.statusKeySorting);
+      }
+    },
+
+    setTerm: function(term, set_input) {
+      var term_el = this.$el[0].querySelector('.search-query');
+      this.term = encodeURIComponent(term);
+      if (set_input) {
+        term_el.value = term;
+      }
+      this.app.collection.currentPage = 1;
+      this.app.collection.pager();
+
+      if (term) {
+        term_el.classList.add('has-filter');
+        this.setFilterStatusMessage();
+      } else {
+        var hasquery = false;
+        try {
+          var qu =this.$queryString.val();
+          if (qu && JSON.parse(qu).length > 0) {
+            hasquery = true;
+          }
+        } finally {
+          if (! hasquery) {
+            term_el.classList.remove('has-filter');
+            this.clearFilterStatusMessage();
+          }
+        }
+      }
+    },
+
+    setQuery: function(query, set_input) {
+      var query_string = null;
+      var query_obj = null;
+      try {
+        if (typeof query === 'string') {
+          query_obj = JSON.parse(query);
+          query_string = query;
+        } else {
+          query_string = JSON.stringify(query);
+          query_obj = query;
+        }
+      } catch (e) {
+        query_obj = [];
+        query_string = '[]';
+      }
+
+      if (set_input) {
+        this.$queryString.val(query_string);
+        // TODO clear query string form
+        // this.queryString._init();
+      }
+      this.app.additionalCriterias = query_obj;
+      this.app.collection.currentPage = 1;
+      this.app.collection.pager();
+      if (query_obj.length) {
+        this.button.$el[0].classList.add('has-filter');
+        this.setFilterStatusMessage();
+      } else if (! this.term) {
+        this.button.$el[0].classList.remove('has-filter');
+        this.clearFilterStatusMessage();
+      }
+    },
+
+    clearTerm: function() {
+      this.setTerm('', true);
+    },
+
+    clearFilter: function() {
+      this.setTerm('', true);
+      this.setQuery([], true);
+    },
+
     render: function() {
       this.$el.html(this.template({_t: _t}));
       this.button = new ButtonView({
-        tooltip: _t('Query'),
-        icon: 'search'
+        title: _t('Filter'),
+        icon: 'filter',
+        extraClasses: ['btn-queryfilter', ],
       });
       this.popover = new PopoverView({
         triggerView: this.button,
         id: 'structure-query',
-        title: _.template(_t('Query')),
+        title: _.template(_t('Filter')),
         content: this.popoverContent,
         placement: 'left'
       });
@@ -26021,10 +26211,7 @@ define('mockup-patterns-structure-url/js/views/textfilter',[
           clearTimeout(self.timeoutId);
         }
         self.timeoutId = setTimeout(function() {
-          var criterias = $.parseJSON(self.$queryString.val());
-          self.app.additionalCriterias = criterias;
-          self.app.collection.currentPage = 1;
-          self.app.collection.pager();
+          self.setQuery(self.$queryString.val(), false);
         }, this.keyupDelay);
       });
       self.queryString.$el.on('initialized', function() {
@@ -26052,14 +26239,8 @@ define('mockup-patterns-structure-url/js/views/textfilter',[
         clearTimeout(self.timeoutId);
       }
       self.timeoutId = setTimeout(function() {
-        self.term = $(event.currentTarget).val();
-        self.app.collection.currentPage = 1;
-        self.app.collection.pager();
-
-        if (!self.term){
-            self.app.setStatus();
-        }
-
+        var term_el = $(event.currentTarget);
+        self.setTerm(term_el.val(), false);
       }, this.keyupDelay);
     }
   });
@@ -29620,6 +29801,9 @@ define('mockup-patterns-structure-url/js/collections/selected',[
   return SelectedCollection;
 });
 
+
+define('text!mockup-patterns-structure-url/templates/status.xml',[],function () { return '<div class="alert alert-<%- type %> status fc-status">\n  <strong class="fc-status-label"><%- label %></strong>\n  <span class="fc-status-text"><%- text %></span>&nbsp;<% // &nbsp; to get correct height for empty alerts %>\n</div>\n';});
+
 define('mockup-patterns-structure-url/js/views/app',[
   'jquery',
   'underscore',
@@ -29638,6 +29822,7 @@ define('mockup-patterns-structure-url/js/views/app',[
   'mockup-patterns-structure-url/js/views/upload',
   'mockup-patterns-structure-url/js/collections/result',
   'mockup-patterns-structure-url/js/collections/selected',
+  'text!mockup-patterns-structure-url/templates/status.xml',
   'mockup-utils',
   'translate',
   'pat-logger',
@@ -29646,22 +29831,22 @@ define('mockup-patterns-structure-url/js/views/app',[
   TableView, SelectionWellView,
   GenericPopover, RearrangeView, SelectionButtonView,
   PagingView, ColumnsView, TextFilterView, UploadView,
-  _ResultCollection, SelectedCollection, utils, _t, logger) {
+  _ResultCollection, SelectedCollection, StatusTemplate, utils, _t, logger) {
   'use strict';
 
   var log = logger.getLogger('pat-structure');
 
   var AppView = BaseView.extend({
     tagName: 'div',
-    status: {
-      type: 'none',
-      text: '',
-      label: ''
-    },
+    statusTemplate: _.template(StatusTemplate),
+    statusMessages: [],
     sort_on: 'getObjPositionInParent',
     sort_order: 'ascending',
     additionalCriterias: [],
     cookieSettingPrefix: '_fc_',
+
+    buttons: null,
+    textfilter: null,
 
     pasteAllowed: function () {
         return !!$.cookie('__cp');
@@ -29897,6 +30082,8 @@ define('mockup-patterns-structure-url/js/views/app',[
     },
     setCurrentPath: function(path) {
       this.collection.setCurrentPath(path);
+      this.textfilter.clearTerm();
+      this.clearStatus();
     },
     getAjaxUrl: function(url) {
       return url.replace('{path}', this.getCurrentPath());
@@ -29951,19 +30138,19 @@ define('mockup-patterns-structure-url/js/views/app',[
       }
     },
     ajaxSuccessResponse: function(data, callback) {
-      var self = this;
-      self.selectedCollection.reset();
+      this.clearStatus();
+      this.selectedCollection.reset();
       if (data.status === 'success') {
-        self.collection.reset();
+        this.collection.reset();
       }
       if (data.msg) {
         // give status message somewhere...
-        self.setStatus(data.msg, data.status || 'warning');
+        this.setStatus({text: data.msg, type: data.status || 'warning'});
       }
       if (callback !== null && callback !== undefined) {
         callback(data);
       }
-      self.collection.pager();
+      this.collection.pager();
     },
     ajaxErrorResponse: function(response, url) {
       if (response.status === 404) {
@@ -30050,10 +30237,12 @@ define('mockup-patterns-structure-url/js/views/app',[
       });
       items.push(self.buttons);
 
-      items.push(new TextFilterView({
+      self.textfilter = new TextFilterView({
         id: 'filter',
         app: this
-      }));
+      });
+      items.push(self.textfilter);
+
       this.toolbar = new Toolbar({
         items: items
       });
@@ -30071,8 +30260,9 @@ define('mockup-patterns-structure-url/js/views/app',[
         },
         dataType: 'json',
         success: function(data) {
+          self.clearStatus();
           if (data.msg) {
-            self.setStatus(data.msg);
+            self.setStatus({text: data.msg});
           } else if (data.status !== 'success') {
             // XXX handle error here with something?
             self.setStatus({text: 'error moving item', type: 'error'});
@@ -30080,43 +30270,85 @@ define('mockup-patterns-structure-url/js/views/app',[
           self.collection.pager(); // reload it all
         },
         error: function() {
+          self.clearStatus();
           self.setStatus({text: 'error moving item', type: 'error'});
         }
       });
     },
-    setStatus: function(msg, type, btn) {
-      if (!msg) {
-        // clear it
-        this.status.text = '';
-        this.status.label = '';
-        this.status.type = 'none';
-      } else if (typeof(msg) === 'string') {
-        this.status.text = msg;
-        this.status.label = '';
-        this.status.type = type || 'warning';
+
+    clearStatus: function(key) {
+      var statusContainer = this.$el[0].querySelector('.fc-status-container');
+      var statusItem;
+      var toBeRemoved = [];
+      if (key) {
+        // remove specific status, even if marked with ``fixed``.
+        toBeRemoved = this.statusMessages.filter(function (item) { return item.key === key; });
+        toBeRemoved.forEach(function (statusItem) {
+          try {
+            statusContainer.removeChild(statusItem.el);
+          } catch(e) {
+            // just ignore.
+          }
+        });
+        this.statusMessages = this.statusMessages.filter(function (item) { return item.key !== key; });
       } else {
-        // support setting portal status messages here
-        this.status.label = msg.label || '';
-        this.status.text = msg.text;
-        this.status.type = msg.type || 'warning';
-      }
-      // still need to manually set in case rendering isn't done(especially true for tests)
-      var $status = this.$('.status');
-      if ($status.length > 0){
-          $status[0].className = 'alert alert-' + this.status.type + ' status';
-          var $text = $('<span></span>');
-          $text.text(this.status.text);
-          var $label = $('<strong></strong>');
-          $label.text(this.status.label);
-          $status.empty().append($label).append($text);
-          if (btn) { $status.append(btn) }
+        // remove all status messages except those marked with ``fixed``.
+        this.statusMessages.forEach(function (statusItem) {
+          if (!statusItem.fixed) {
+            try {
+              statusContainer.removeChild(statusItem.el);
+              toBeRemoved.push(statusItem);
+            } catch(e) {
+              // just ignore.
+            }
+          }
+        }.bind(this));
+        this.statusMessages = this.statusMessages.filter(function (item) { return toBeRemoved.indexOf(item) === -1; });
       }
     },
+
+    setStatus: function(status, btn, fixed, key) {
+
+      if (
+        key &&
+        this.statusMessages.filter(function (item) { return item.key === key; }).length > 0
+      ) {
+        // Prevent two same status messages
+        return;
+      }
+
+      var el = this.statusTemplate({
+        label: status.label || '',
+        text: status.text,
+        type: status.type || 'warning'
+      });
+
+      el = utils.createElementFromHTML(el);
+
+      if (btn) {
+        btn = $(btn)[0];  // support jquert + bare dom elements
+        el.appendChild(btn);
+      }
+
+      var status = {
+        el: el,
+        fixed: fixed,
+        key: key // to be used for filtering to prevent double status messages.
+      };
+
+      var statusContainer = this.$el[0].querySelector('.fc-status-container');
+      statusContainer.appendChild(status.el);
+      this.statusMessages.push(status);
+
+      return status;
+    },
+
     render: function() {
       var self = this;
 
       self.$el.append(self.toolbar.render().el);
       self.$el.append(self.wellView.render().el);
+      self.$el.append(utils.createElementFromHTML('<div class="fc-status-container"></div>'));
       self.$el.append(self.columnsView.render().el);
       if (self.rearrangeView) {
         self.$el.append(self.rearrangeView.render().el);
