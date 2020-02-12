@@ -16,6 +16,7 @@ define([
   'mockup-patterns-structure-url/js/views/upload',
   'mockup-patterns-structure-url/js/collections/result',
   'mockup-patterns-structure-url/js/collections/selected',
+  'text!mockup-patterns-structure-url/templates/status.xml',
   'mockup-utils',
   'translate',
   'pat-logger',
@@ -24,22 +25,22 @@ define([
   TableView, SelectionWellView,
   GenericPopover, RearrangeView, SelectionButtonView,
   PagingView, ColumnsView, TextFilterView, UploadView,
-  _ResultCollection, SelectedCollection, utils, _t, logger) {
+  _ResultCollection, SelectedCollection, StatusTemplate, utils, _t, logger) {
   'use strict';
 
   var log = logger.getLogger('pat-structure');
 
   var AppView = BaseView.extend({
     tagName: 'div',
-    status: {
-      type: 'none',
-      text: '',
-      label: ''
-    },
+    statusTemplate: _.template(StatusTemplate),
+    statusMessages: [],
     sort_on: 'getObjPositionInParent',
     sort_order: 'ascending',
     additionalCriterias: [],
     cookieSettingPrefix: '_fc_',
+
+    buttons: null,
+    textfilter: null,
 
     pasteAllowed: function () {
         return !!$.cookie('__cp');
@@ -275,6 +276,8 @@ define([
     },
     setCurrentPath: function(path) {
       this.collection.setCurrentPath(path);
+      this.textfilter.clearTerm();
+      this.clearStatus();
     },
     getAjaxUrl: function(url) {
       return url.replace('{path}', this.getCurrentPath());
@@ -329,19 +332,19 @@ define([
       }
     },
     ajaxSuccessResponse: function(data, callback) {
-      var self = this;
-      self.selectedCollection.reset();
+      this.clearStatus();
+      this.selectedCollection.reset();
       if (data.status === 'success') {
-        self.collection.reset();
+        this.collection.reset();
       }
       if (data.msg) {
         // give status message somewhere...
-        self.setStatus(data.msg, data.status || 'warning');
+        this.setStatus({text: data.msg, type: data.status || 'warning'});
       }
       if (callback !== null && callback !== undefined) {
         callback(data);
       }
-      self.collection.pager();
+      this.collection.pager();
     },
     ajaxErrorResponse: function(response, url) {
       if (response.status === 404) {
@@ -428,10 +431,12 @@ define([
       });
       items.push(self.buttons);
 
-      items.push(new TextFilterView({
+      self.textfilter = new TextFilterView({
         id: 'filter',
         app: this
-      }));
+      });
+      items.push(self.textfilter);
+
       this.toolbar = new Toolbar({
         items: items
       });
@@ -449,8 +454,9 @@ define([
         },
         dataType: 'json',
         success: function(data) {
+          self.clearStatus();
           if (data.msg) {
-            self.setStatus(data.msg);
+            self.setStatus({text: data.msg});
           } else if (data.status !== 'success') {
             // XXX handle error here with something?
             self.setStatus({text: 'error moving item', type: 'error'});
@@ -458,43 +464,85 @@ define([
           self.collection.pager(); // reload it all
         },
         error: function() {
+          self.clearStatus();
           self.setStatus({text: 'error moving item', type: 'error'});
         }
       });
     },
-    setStatus: function(msg, type, btn) {
-      if (!msg) {
-        // clear it
-        this.status.text = '';
-        this.status.label = '';
-        this.status.type = 'none';
-      } else if (typeof(msg) === 'string') {
-        this.status.text = msg;
-        this.status.label = '';
-        this.status.type = type || 'warning';
+
+    clearStatus: function(key) {
+      var statusContainer = this.$el[0].querySelector('.fc-status-container');
+      var statusItem;
+      var toBeRemoved = [];
+      if (key) {
+        // remove specific status, even if marked with ``fixed``.
+        toBeRemoved = this.statusMessages.filter(function (item) { return item.key === key; });
+        toBeRemoved.forEach(function (statusItem) {
+          try {
+            statusContainer.removeChild(statusItem.el);
+          } catch(e) {
+            // just ignore.
+          }
+        });
+        this.statusMessages = this.statusMessages.filter(function (item) { return item.key !== key; });
       } else {
-        // support setting portal status messages here
-        this.status.label = msg.label || '';
-        this.status.text = msg.text;
-        this.status.type = msg.type || 'warning';
-      }
-      // still need to manually set in case rendering isn't done(especially true for tests)
-      var $status = this.$('.status');
-      if ($status.length > 0){
-          $status[0].className = 'alert alert-' + this.status.type + ' status';
-          var $text = $('<span></span>');
-          $text.text(this.status.text);
-          var $label = $('<strong></strong>');
-          $label.text(this.status.label);
-          $status.empty().append($label).append($text);
-          if (btn) { $status.append(btn) }
+        // remove all status messages except those marked with ``fixed``.
+        this.statusMessages.forEach(function (statusItem) {
+          if (!statusItem.fixed) {
+            try {
+              statusContainer.removeChild(statusItem.el);
+              toBeRemoved.push(statusItem);
+            } catch(e) {
+              // just ignore.
+            }
+          }
+        }.bind(this));
+        this.statusMessages = this.statusMessages.filter(function (item) { return toBeRemoved.indexOf(item) === -1; });
       }
     },
+
+    setStatus: function(status, btn, fixed, key) {
+
+      if (
+        key &&
+        this.statusMessages.filter(function (item) { return item.key === key; }).length > 0
+      ) {
+        // Prevent two same status messages
+        return;
+      }
+
+      var el = this.statusTemplate({
+        label: status.label || '',
+        text: status.text,
+        type: status.type || 'warning'
+      });
+
+      el = utils.createElementFromHTML(el);
+
+      if (btn) {
+        btn = $(btn)[0];  // support jquert + bare dom elements
+        el.appendChild(btn);
+      }
+
+      var status = {
+        el: el,
+        fixed: fixed,
+        key: key // to be used for filtering to prevent double status messages.
+      };
+
+      var statusContainer = this.$el[0].querySelector('.fc-status-container');
+      statusContainer.appendChild(status.el);
+      this.statusMessages.push(status);
+
+      return status;
+    },
+
     render: function() {
       var self = this;
 
       self.$el.append(self.toolbar.render().el);
       self.$el.append(self.wellView.render().el);
+      self.$el.append(utils.createElementFromHTML('<div class="fc-status-container"></div>'));
       self.$el.append(self.columnsView.render().el);
       if (self.rearrangeView) {
         self.$el.append(self.rearrangeView.render().el);

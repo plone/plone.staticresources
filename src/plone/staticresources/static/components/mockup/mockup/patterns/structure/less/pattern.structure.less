@@ -67,21 +67,35 @@
         .btn-sm();
     }
 
+    .btn.has-filter {
+        .btn-info();
+    }
+    input.has-filter {
+        border: 1px solid @btn-info-border;
+    }
+
     .navbar {
         position: sticky;
         top: 0;
         z-index: 10;
         background-color: #fafafa;
-        border-bottom: 1px solid #ccc;
-        border-radius: 0;
+
+        border: none;
+        min-height: auto;
+        margin: 0;
+
 
         &>a.btn:last-of-type,
         .btn-group {
             margin-right: 1em;
         }
         #filter {
-            width: 200px;
+            width: 20em;
             float: right;
+
+            .btn-queryfilter {
+                margin-left: 1em;
+            }
         }
         &>a.btn, .btn-group, #filter {
             margin-bottom: 0.5em;
@@ -148,13 +162,17 @@
             height: 31px;
         }
     }
-    .alert.status{
-        margin-bottom: 5px;
-        padding: 5px;
+    .fc-status {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1em;
+        padding: 0.5em;
         color: @plone-link-color;
-
+        .fc-status-text {
+            flex-grow: 1;
+        }
         .btn {
-            margin-left: 10px;
+            margin-left: 1em;
         }
 
     }

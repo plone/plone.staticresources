@@ -96,7 +96,6 @@ define([
             return val.length > 0;
           }
         ),
-        status: self.app.status,
         activeColumns: self.app.activeColumns,
         availableColumns: self.app.availableColumns,
         datatables_options: JSON.stringify(datatables_options)
@@ -145,12 +144,15 @@ define([
                     // Restore reordering by drag and drop
                     self.addReordering();
                     // Clear the status message
-                    self.app.setStatus();
+                    self.app.clearStatus();
                   });
-        self.app.setStatus(_t('Notice: Drag and drop reordering is disabled when viewing the contents sorted by a column.'), 'warning', btn = btn);
-        $(".pat-datatables tbody").find('tr').off("drag")
+        self.app.setStatus({
+          text: _t('Notice: Drag and drop reordering is disabled when viewing the contents sorted by a column.'),
+          type: 'warning'
+        }, btn, false, 'sorting_dndreordering_disabled');
+        $(".pat-datatables tbody").find('tr').off("drag");
         self.$el.removeClass('order-support');
-      } );
+      });
 
       return this;
     },
@@ -193,7 +195,6 @@ define([
       var self = this;
       // if we have a custom query going on, we do not allow sorting.
       if (self.app.inQueryMode()) {
-        self.app.setStatus({text: _t('Cannot order items while querying'), type: 'warning'});
         self.$el.removeClass('order-support');
         return;
       }

@@ -12,4 +12,5 @@ tinymce-builded/tests
 **/node_modules
 **/bower_components
 **/test*
+**/__tests__
 *.map
