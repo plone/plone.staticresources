@@ -15,7 +15,7 @@ class PloneStaticresourcesLayer(PloneSandboxLayer):
         self.loadZCML(package=plone.staticresources)
 
     def setUpPloneSite(self, portal):
-        applyProfile(portal, 'plone.staticresources:default')
+        applyProfile(portal, "plone.staticresources:default")
 
 
 PLONE_STATICRESOURCES_FIXTURE = PloneStaticresourcesLayer()
@@ -23,5 +23,5 @@ PLONE_STATICRESOURCES_FIXTURE = PloneStaticresourcesLayer()
 
 PLONE_STATICRESOURCES_INTEGRATION_TESTING = IntegrationTesting(
     bases=(PLONE_STATICRESOURCES_FIXTURE,),
-    name='PloneStaticresourcesLayer:IntegrationTesting',
+    name="PloneStaticresourcesLayer:IntegrationTesting",
 )

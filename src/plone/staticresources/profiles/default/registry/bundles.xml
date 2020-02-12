@@ -94,7 +94,7 @@
     <value key="enabled">True</value>
     <value key="jscompilation">++plone++static/plone-compiled.min.js</value>
     <value key="csscompilation">++plone++static/plone-compiled.css</value>
-    <value key="last_compilation">2019-10-28 12:36:00</value>
+    <value key="last_compilation">2020-02-11 15:54:00</value>
     <value key="load_async">False</value>
     <value key="load_defer">False</value>
     <value key="stub_js_modules">
@@ -152,7 +152,7 @@
     <value key="expression">python: member is not None</value>
     <value key="jscompilation">++plone++static/plone-logged-in-compiled.min.js</value>
     <value key="csscompilation">++plone++static/plone-logged-in-compiled.css</value>
-    <value key="last_compilation">2019-10-28 12:36:00</value>
+    <value key="last_compilation">2020-02-11 15:54:00</value>
     <value key="load_async">False</value>
     <value key="load_defer">False</value>
     <value key="stub_js_modules">
@@ -195,7 +195,7 @@
     <value key="expression">python: member is not None</value>
     <value key="jscompilation">++plone++static/plone-editor-tools-compiled.min.js</value>
     <value key="csscompilation">++plone++static/plone-editor-tools-compiled.css</value>
-    <value key="last_compilation">2019-10-28 12:36:00</value>
+    <value key="last_compilation">2020-02-11 15:54:00</value>
     <value key="load_async">False</value>
     <value key="load_defer">False</value>
     <value key="stub_js_modules">
@@ -241,7 +241,7 @@
     <value key="expression">python: member is not None</value>
     <value key="jscompilation">++plone++static/plone-tinymce-compiled.min.js</value>
     <value key="csscompilation">++plone++static/plone-tinymce-compiled.css</value>
-    <value key="last_compilation">2019-10-28 12:36:00</value>
+    <value key="last_compilation">2020-02-11 15:54:00</value>
     <value key="load_async">False</value>
     <value key="load_defer">False</value>
     <value key="stub_js_modules">
@@ -329,7 +329,7 @@
     <value key="enabled">False</value>
     <value key="jscompilation">++plone++static/resourceregistry-compiled.min.js</value>
     <value key="csscompilation">++plone++static/resourceregistry-compiled.css</value>
-    <value key="last_compilation">2019-10-27 10:00:00</value>
+    <value key="last_compilation">2020-02-11 15:54:00</value>
     <value key="load_async">False</value>
     <value key="load_defer">False</value>
     <value key="stub_js_modules">
@@ -345,7 +345,7 @@
     <value key="enabled">False</value>
     <value key="jscompilation">++plone++static/thememapper-compiled.min.js</value>
     <value key="csscompilation">++plone++static/thememapper-compiled.css</value>
-    <value key="last_compilation">2019-10-27 10:00:00</value>
+    <value key="last_compilation">2020-02-11 15:54:00</value>
     <value key="load_async">False</value>
     <value key="load_defer">False</value>
   </records>
@@ -358,7 +358,7 @@
     <value key="enabled">False</value>
     <value key="jscompilation">++plone++static/filemanager-compiled.min.js</value>
     <value key="csscompilation">++plone++static/filemanager-compiled.css</value>
-    <value key="last_compilation">2019-10-28 12:36:00</value>
+    <value key="last_compilation">2020-02-11 15:54:00</value>
     <value key="load_async">False</value>
     <value key="load_defer">False</value>
   </records>
