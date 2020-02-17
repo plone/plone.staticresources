@@ -27207,7 +27207,7 @@ define('text',['module'], function (module) {
 define('text!mockup-patterns-tinymce-url/templates/link.xml',[],function () { return '<div>\n  <div class="linkModal">\n    <h1><%- insertHeading %></h1>\n    <% if(upload){ %>\n    <p class="info"><%- insertLinkHelp %></p>\n    <% } %>\n\n    <div class="linkTypes pat-autotoc autotabs"\n         data-pat-autotoc="section:fieldset;levels:legend;IDPrefix:tinymce-autotoc-">\n\n      <fieldset class="linkType internal" data-linkType="internal">\n        <legend id="tinylink-internal"><%- internal %></legend>\n        <div>\n          <div class="form-group main">\n            <!-- this gives the name to the "linkType" -->\n            <input type="text" name="internal" />\n          </div>\n        </div>\n      </fieldset>\n\n      <% if(upload){ %>\n      <fieldset class="linkType upload" data-linkType="upload">\n        <legend id="tinylink-upload"><%- uploadText %></legend>\n        <div class="uploadify-me"></div>\n      </fieldset>\n      <% } %>\n\n      <fieldset class="linkType external" data-linkType="external">\n        <legend id="tinylink-external"><%- external %></legend>\n        <div class="form-group main">\n          <label for="external"><%- externalText %></label>\n          <input type="text" name="external" />\n        </div>\n      </fieldset>\n\n      <fieldset class="linkType email" data-linkType="email">\n        <legend id="tinylink-email">Email</legend>\n        <div class="form-inline">\n          <div class="form-group main">\n            <label><%- emailText %></label>\n            <input type="text" name="email" />\n          </div>\n          <div class="form-group">\n            <label><%- subjectText %></label>\n            <input type="text" name="subject" />\n          </div>\n        </div>\n      </fieldset>\n\n      <fieldset class="linkType anchor" data-linkType="anchor">\n        <legend id="tinylink-anchor"><%- anchor %></legend>\n        <div>\n          <div class="form-group main">\n            <label>Select an anchor</label>\n            <div class="input-wrapper">\n              <select name="anchor" class="pat-select2" data-pat-select2="width:500px" />\n            </div>\n          </div>\n        </div>\n      </fieldset>\n\n    </div><!-- / tabs -->\n\n    <div class="common-controls">\n      <div class="form-group">\n        <label>Target</label>\n        <select name="target">\n          <% _.each(targetList, function(target){ %>\n            <option value="<%- target.value %>"><%- target.text %></option>\n          <% }); %>\n        </select>\n      </div>\n      <div class="form-group">\n        <label><%- titleText %></label>\n        <input type="text" name="title" />\n      </div>\n    </div>\n\n    <input type="submit" class="plone-btn" name="cancel" value="<%- cancelBtn %>" />\n    <input type="submit" class="plone-btn plone-btn-primary context" name="insert" value="<%- insertBtn %>" />\n  </div>\n</div>\n';});
 
 
-define('text!mockup-patterns-tinymce-url/templates/image.xml',[],function () { return '<div>\n  <div class="linkModal">\n    <h1><%- insertHeading %></h1>\n    <% if(_.contains(linkTypes, \'uploadImage\')){ %>\n    <p class="info"><%- insertImageHelp %></p>\n    <% } %>\n\n    <div class="linkTypes pat-autotoc autotabs"\n         data-pat-autotoc="section:fieldset;levels:legend;IDPrefix:tinymce-autotoc-">\n\n        <% if(_.contains(linkTypes, \'image\')){ %>\n      <fieldset class="linkType image" data-linkType="image">\n        <legend id="tinylink-image"><%- internalImageText %></legend>\n        <div class="form-inline">\n          <div class="form-group main">\n            <input type="text" name="image" />\n          </div>\n          <div class="form-group scale">\n            <label><%- scaleText %></label>\n            <select name="scale">\n              <option value="">Original</option>\n                <% _.each(imageScales, function(scale) { %>\n                  <option value="<%- scale.value %>" <% if (scale.value === options.defaultScale) { %>selected<% } %> >\n                    <%- scale.title %>\n                  </option>\n                <% }); %>\n            </select>\n          </div>\n        </div>\n      </fieldset>\n        <% } %>\n\n      <% if(_.contains(linkTypes, \'uploadImage\')){ %>\n      <fieldset class="linkType uploadImage" data-linkType="uploadImage">\n        <legend id="tinylink-uploadImage"><%- upload %></legend>\n        <div class="uploadify-me"></div>\n      </fieldset>\n      <% } %>\n\n      <% if(_.contains(linkTypes, \'externalImage\')){ %>\n      <fieldset class="linkType externalImage" data-linkType="externalImage">\n        <legend id="tinylink-externalImage"><%- externalImage %></legend>\n        <div>\n          <div class="form-group main">\n            <label><%- externalImageText %></label>\n            <input type="text" name="externalImage" />\n          </div>\n        </div>\n      </fieldset>\n      <% } %>\n\n    </div><!-- / tabs -->\n\n    <div class="common-controls">\n      <div class="form-group title">\n        <label><%- titleText %></label>\n        <input type="text" name="title" />\n      </div>\n      <div class="form-group text">\n        <label><%- altText %></label>\n        <input type="text" name="alt" />\n      </div>\n      <div class="form-group align">\n        <label><%- imageAlignText %></label>\n        <select name="align">\n          <% _.each(Object.keys(options.imageClasses), function(align){ %>\n              <option value="<%- align %>">\n              <%- options.imageClasses[align] %>\n              </option>\n          <% }); %>\n        <select>\n      </div>\n    </div>\n\n    <input type="submit" class="plone-btn" name="cancel" value="<%- cancelBtn %>" />\n    <input type="submit" class="plone-btn plone-btn-primary context" name="insert" value="<%- insertBtn %>" />\n\n  </div>\n</div>\n';});
+define('text!mockup-patterns-tinymce-url/templates/image.xml',[],function () { return '<div>\n  <div class="linkModal">\n    <h1><%- insertHeading %></h1>\n    <% if(_.contains(linkTypes, \'uploadImage\')){ %>\n    <p class="info"><%- insertImageHelp %></p>\n    <% } %>\n\n    <div class="linkTypes pat-autotoc autotabs"\n         data-pat-autotoc="section:fieldset;levels:legend;IDPrefix:tinymce-autotoc-">\n\n        <% if(_.contains(linkTypes, \'image\')){ %>\n      <fieldset class="linkType image" data-linkType="image">\n        <legend id="tinylink-image"><%- internalImageText %></legend>\n        <div class="form-inline">\n          <div class="form-group main">\n            <input type="text" name="image" />\n          </div>\n          <div class="form-group scale">\n            <label><%- scaleText %></label>\n            <select name="scale">\n              <option value="">Original</option>\n                <% _.each(imageScales, function(scale) { %>\n                  <option value="<%- scale.value %>" <% if (scale.value === options.defaultScale) { %>selected<% } %> >\n                    <%- scale.title %>\n                  </option>\n                <% }); %>\n            </select>\n          </div>\n        </div>\n      </fieldset>\n        <% } %>\n\n      <% if(_.contains(linkTypes, \'uploadImage\')){ %>\n      <fieldset class="linkType uploadImage" data-linkType="uploadImage">\n        <legend id="tinylink-uploadImage"><%- upload %></legend>\n        <div class="uploadify-me"></div>\n      </fieldset>\n      <% } %>\n\n      <% if(_.contains(linkTypes, \'externalImage\')){ %>\n      <fieldset class="linkType externalImage" data-linkType="externalImage">\n        <legend id="tinylink-externalImage"><%- externalImage %></legend>\n        <div>\n          <div class="form-group main">\n            <label><%- externalImageText %></label>\n            <input type="text" name="externalImage" />\n          </div>\n        </div>\n      </fieldset>\n      <% } %>\n\n    </div><!-- / tabs -->\n\n    <div class="common-controls">\n      <div class="form-group title">\n        <label><%- titleText %></label>\n        <input type="text" name="title" />\n      </div>\n      <div class="form-group text">\n        <label><%- altText %></label>\n        <input type="text" name="alt" />\n      </div>\n      <div class="form-group captionFromDescription">\n        <label>\n          <input type="checkbox" name="captionFromDescription" />\n          <%- captionFromDescriptionText %>\n        </label>\n      </div>\n      <div class="form-group caption">\n        <label><%- captionText %></label>\n        <textarea name="caption" />\n      </div>\n      <div class="form-group align">\n        <label><%- imageAlignText %></label>\n        <select name="align">\n          <% _.each(Object.keys(options.imageClasses), function(align){ %>\n              <option value="<%- align %>">\n              <%- options.imageClasses[align] %>\n              </option>\n          <% }); %>\n        <select>\n      </div>\n    </div>\n\n    <input type="submit" class="plone-btn" name="cancel" value="<%- cancelBtn %>" />\n    <input type="submit" class="plone-btn plone-btn-primary context" name="insert" value="<%- insertBtn %>" />\n\n  </div>\n</div>\n';});
 
 (function(root) {
 define("select2", [], function() {
@@ -35538,6 +35538,8 @@ define('mockup-patterns-tinymce-url/js/links',[
         externalImageText: this.options.text.externalImageText,
         altText: this.options.text.alt,
         imageAlignText: this.options.text.imageAlign,
+        captionFromDescriptionText: this.options.text.captionFromDescription,
+        captionText: this.options.text.caption,
         scaleText: this.options.text.scale,
         imageScales: this.options.imageScales,
         cancelBtn: this.options.text.cancelBtn,
@@ -35559,6 +35561,8 @@ define('mockup-patterns-tinymce-url/js/links',[
       self.$alt = $('input[name="alt"]', self.modal.$modal);
       self.$align = $('select[name="align"]', self.modal.$modal);
       self.$scale = $('select[name="scale"]', self.modal.$modal);
+      self.$captionFromDescription = $('input[name="captionFromDescription"]', self.modal.$modal);
+      self.$caption = $('textarea[name="caption"]', self.modal.$modal);
 
       /* load up all the link types */
       _.each(self.options.linkTypes, function(type) {
@@ -35578,6 +35582,15 @@ define('mockup-patterns-tinymce-url/js/links',[
           }
         });
       });
+
+      self.$captionFromDescription.change(function () {
+        if (this.checked) {
+          self.$caption.prop('disabled', true);
+        } else {
+          self.$caption.prop('disabled', false);
+        }
+      });
+
     },
 
     getLinkUrl: function() {
@@ -35637,17 +35650,23 @@ define('mockup-patterns-tinymce-url/js/links',[
     updateImage: function(src) {
       var self = this;
       var title = self.$title.val();
+      var captionFromDescription = self.$captionFromDescription.prop('checked')
 
       self.tiny.focus();
       self.tiny.selection.setRng(self.rng);
+
+      var cssclasses = ['image-richtext', self.$align.val()];
+      if (captionFromDescription) {
+        cssclasses.push('captioned');
+      }
 
       var data = $.extend(true, {}, {
         src: src,
         title: title ? title : null,
         alt: self.$alt.val(),
-        'class': self.$align.val(),
+        'class': cssclasses.join(' '),
         'data-linkType': self.linkType,
-        'data-scale': self.$scale.val()
+        'data-scale': self.$scale.val(),
       }, self.linkTypes[self.linkType].attributes());
       if (self.imgElm && !self.imgElm.getAttribute('data-mce-object')) {
         data.width = self.dom.getAttrib(self.imgElm, 'width');
@@ -35663,14 +35682,30 @@ define('mockup-patterns-tinymce-url/js/links',[
         };
       }
 
-      if (!self.imgElm) {
-        data.id = '__mcenew';
-        self.tiny.insertContent(self.dom.createHTML('img', data));
-        self.imgElm = self.dom.get('__mcenew');
-        self.dom.setAttrib(self.imgElm, 'id', null);
-      } else {
-        self.dom.setAttribs(self.imgElm, data);
+      if (self.imgElm) {
+        self.dom.remove(self.imgElm);
       }
+      if (self.captionElm) {
+        self.dom.remove(self.captionElm);
+      }
+      if (self.figureElm) {
+        self.dom.remove(self.figureElm);
+      }
+
+      data.id = '__mcenew';
+      var html_inner = self.dom.createHTML('img', data);
+      var caption = self.$caption.val();
+      var html_string;
+      if (caption && ! captionFromDescription) {
+        html_inner += '\n' + self.dom.createHTML('figcaption', {}, caption);
+        //html_inner += '\n' + self.dom.createHTML('figcaption', { class: 'mceNonEditable' }, caption);
+        html_string = self.dom.createHTML('figure', {}, html_inner);
+      } else {
+        html_string = html_inner;
+      }
+      self.tiny.insertContent(html_string);
+      self.imgElm = self.dom.get('__mcenew');
+      self.dom.setAttrib(self.imgElm, 'id', null);
 
       waitLoad(self.imgElm);
       if (self.imgElm.complete) {
@@ -35790,31 +35825,48 @@ define('mockup-patterns-tinymce-url/js/links',[
         self.data.title = value;
       }
 
-      self.selection = self.tiny.selection;
       self.tiny.focus();
-      var selectedElm = self.imgElm = self.selection.getNode();
-      self.anchorElm = self.dom.getParent(selectedElm, 'a[href]');
+      self.anchorElm = self.dom.getParent(self.selectedElm, 'a[href]');
 
-      var linkType;
+      var linkType
       if (self.isImageMode()) {
-        if (self.imgElm.nodeName !== 'IMG') {
-          // try finding elsewhere
-          if (self.anchorElm) {
-            var imgs = self.anchorElm.getElementsByTagName('img');
-            if (imgs.length > 0) {
-              self.imgElm = imgs[0];
-              self.focusElement(self.imgElm);
-            }
-          }
+
+        var figure;
+        var img;
+        var caption;
+        if (self.selectedElm.nodeName === 'FIGURE') {
+          figure = self.selectedElm;
+          img = figure.querySelector('img');
+          caption = figure.querySelector('figcaption');
+        } else if (self.selectedElm.nodeName === 'IMG') {
+          figure = $(self.selectedElm).closest('figure');
+          figure = figure.length ? figure[0] : undefined;
+          img = self.selectedElm;
+          caption = figure ? figure.querySelector('figcaption') : undefined;
+        } else if (self.selectedElm.nodeName === 'FIGCAPTION') {
+          figure = $(self.selectedElm).closest('figure');
+          figure = figure.length ? figure[0] : undefined;
+          img = figure ? figure.querySelector('img') : undefined;
+          caption = self.selectedElm;
         }
-        if (self.imgElm.nodeName !== 'IMG') {
-          // okay, still no image, unset
-          self.imgElm = null;
-        }
+
+        self.imgElm = img;
+        self.figureElm = figure;
+        self.captionElm = caption;
+
         if (self.imgElm) {
           var src = self.dom.getAttrib(self.imgElm, 'src');
           self.$title.val(self.dom.getAttrib(self.imgElm, 'title'));
           self.$alt.val(self.dom.getAttrib(self.imgElm, 'alt'));
+
+          if ($(self.imgElm).hasClass('captioned')) {
+            self.$captionFromDescription.prop('checked', true);
+            self.$caption.prop('disabled', true);
+          }
+          if (self.captionElm) {
+            self.$caption.val(self.captionElm.innerHTML);
+          }
+
           linkType = self.dom.getAttrib(self.imgElm, 'data-linktype');
           if (linkType) {
             self.linkType = linkType;
@@ -35822,7 +35874,7 @@ define('mockup-patterns-tinymce-url/js/links',[
             var scale = self.dom.getAttrib(self.imgElm, 'data-scale');
             self.$scale.val(scale);
             $('#tinylink-' + self.linkType, self.modal.$modal).trigger('click');
-          }else if (src) {
+          } else if (src) {
             self.guessImageLink(src);
           }
           var className = self.dom.getAttrib(self.imgElm, 'class');
@@ -35836,7 +35888,8 @@ define('mockup-patterns-tinymce-url/js/links',[
             }
           }
         }
-      }else if (self.anchorElm) {
+
+      } else if (self.anchorElm) {
         self.focusElement(self.anchorElm);
         var href = '';
         href = self.dom.getAttrib(self.anchorElm, 'href');
@@ -72073,7 +72126,7 @@ define("tinymce-compat3x", ["tinymce"], function() {
  * Options:
  *    relatedItems(object): Related items pattern options. ({ attributes: ["UID", "Title", "Description", "getURL", "portal_type", "path", "ModificationDate"], batchSize: 20, basePath: "/", vocabularyUrl: null, width: 500, maximumSelectionSize: 1, placeholder: "Search for item on site..." })
  *    upload(object): Upload pattern options. ({ attributes: look at upload pattern for getting the options list })
- *    text(object): Translation strings ({ insertBtn: "Insert", cancelBtn: "Cancel", insertHeading: "Insert link", title: "Title", internal: "Internal", external: "External", email: "Email", anchor: "Anchor", subject: "Subject" image: "Image", imageAlign: "Align", scale: "Size", alt: "Alternative Text", externalImage: "External Image URI"})
+ *    text(object): Translation strings ({ insertBtn: "Insert", cancelBtn: "Cancel", insertHeading: "Insert link", title: "Title", internal: "Internal", external: "External", email: "Email", anchor: "Anchor", subject: "Subject" image: "Image", imageAlign: "Align", scale: "Size", alt: "Alternative Text", captionFromDescription: "Show Image Caption from Image Description", caption: "Image Caption", externalImage: "External Image URI"})
  *    imageScales(string): Image scale name/value object-array or JSON string for use in the image dialog.
  *    targetList(array): TODO ([ {text: "Open in this window / frame", value: ""}, {text: "Open in new window", value: "_blank"}, {text: "Open in parent window / frame", value: "_parent"}, {text: "Open in top frame (replaces all frames)", value: "_top"}])
  *    imageTypes(string): TODO ('Image')
@@ -72221,6 +72274,8 @@ define('mockup-patterns-tinymce',[
         externalImageText: _t('External Image URL (can be relative within this site or absolute if it starts with http:// or https://)'),
         upload: _t('Upload'),
         insertLinkHelp: _t('Specify the object to link to. It can be on this site already (Internal), an object you upload (Upload), from an external site (External), an email address (Email), or an anchor on this page (Anchor).'),
+        captionFromDescription: _t('Show Image Caption from Image Description'),
+        caption: _t('Image Caption'),
       },
       // URL generation options
       loadingBaseUrl: '../../../node_modules/tinymce-builded/js/tinymce/',
