@@ -597,6 +597,35 @@
       </value>
   </records>
 
+  <records prefix="plone.resources/pat-parser"
+            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
+  <value key="js">++plone++static/components/patternslib/src/core/parser.js</value>
+  </records>
+
+  <records prefix="plone.resources/pat-date-picker"
+            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
+  <value key="js">++plone++static/components/patternslib/src/pat/date-picker/date-picker.js</value>
+      <value key="css">
+        <element>++plone++static/components/patternslib/src/pat/date-picker/date-picker.css</element>
+      </value>
+  </records>
+
+  <records prefix="plone.resources/pat-datetime-picker"
+            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
+  <value key="js">++plone++static/components/patternslib/src/pat/datetime-picker/datetime-picker.js</value>
+      <value key="css">
+        <element>++plone++static/components/patternslib/src/pat/datetime-picker/datetime-picker.css</element>
+      </value>
+  </records>
+
+  <records prefix="plone.resources/pikaday"
+            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
+  <value key="js">++plone++static/components/pikaday/pikaday.js</value>
+      <value key="css">
+          <element>++plone++static/components/pikaday/css/pikaday.css</element>
+      </value>
+  </records>
+
   <records prefix="plone.resources/mockup-patterns-preventdoublesubmit"
             interface='Products.CMFPlone.interfaces.IResourceRegistry'>
       <value key="js">++resource++mockup/preventdoublesubmit/pattern.js</value>

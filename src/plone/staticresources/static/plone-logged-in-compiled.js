@@ -14931,5 +14931,5 @@ require([
   'use strict';
 });
 
-define("/home/_thet/data/dev/plone/buildout.coredev/src/plone.staticresources/src/plone/staticresources/static/plone-logged-in.js", function(){});
+define("/srv/pleasance/coredev_common/src/plone.staticresources/src/plone/staticresources/static/plone-logged-in.js", function(){});
 

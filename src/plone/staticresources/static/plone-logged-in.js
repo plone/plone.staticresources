@@ -18,7 +18,7 @@ require([
   'mockup-patterns-inlinevalidation',
   'mockup-patterns-recurrence',
   'mockup-patterns-relateditems',
-  'mockup-patterns-pickadate',
+  'pat-datetime-picker',
   'mockup-patterns-select2',
 ], function() {
   'use strict';

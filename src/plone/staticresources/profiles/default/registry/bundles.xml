@@ -214,7 +214,8 @@
       <element>mockup-patterns-base</element>
       <element>mockup-patterns-modal</element>
       <element>mockup-patterns-moment</element>
-      <element>mockup-patterns-pickadate</element>
+      <element>pat-date-picker</element>
+      <element>pat-datetime-picker</element>
       <element>mockup-router</element>
       <element>mockup-utils</element>
       <element>moment</element>
@@ -260,7 +261,7 @@
       <element>mockup-patterns-base</element>
       <element>mockup-patterns-modal</element>
       <element>mockup-patterns-moment</element>
-      <element>mockup-patterns-pickadate</element>
+      <element>pat-datetime-picker</element>
       <element>mockup-router</element>
       <element>mockup-utils</element>
       <element>moment</element>
