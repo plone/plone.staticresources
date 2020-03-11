@@ -3689,6 +3689,15 @@ define('pat-base',[
 if (window.jQuery) {
   define('jquery', [], function () {
     'use strict';
+
+    // Prevent auto-execution of scripts when no explicit dataType was provided 
+    // (See https://github.com/jquery/jquery/issues/2432 )
+    window.jQuery.ajaxPrefilter( function( s ) {
+        if ( s.crossDomain ) {
+            s.contents.script = false;
+        }
+    } );
+
     return window.jQuery;
   });
 }
@@ -3755,5 +3764,5 @@ require([
 
 });
 
-define("/home/_thet/data/dev/plone/buildout.coredev/src/plone.staticresources/src/plone/staticresources/static/plone-base.js", function(){});
+define("/trabajo/plone/buildout.coredev/src/plone.staticresources/src/plone/staticresources/static/plone-base.js", function(){});
 

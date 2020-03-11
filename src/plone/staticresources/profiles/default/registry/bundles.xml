@@ -76,7 +76,7 @@
     </value>
     <value key="enabled">True</value>
     <value key="jscompilation">++plone++static/plone-base-compiled.min.js</value>
-    <value key="last_compilation">2019-10-28 12:36:00</value>
+    <value key="last_compilation">2020-03-11 18:20:00</value>
     <value key="load_async">False</value>
     <value key="load_defer">False</value>
     <value key="stub_js_modules">
