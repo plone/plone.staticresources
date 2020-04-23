@@ -4954,7 +4954,7 @@ define('mockup-patterns-modal',[
       },
       title: null,
       titleSelector: 'h1:first',
-      buttons: '.formControls > input[type="submit"]',
+      buttons: '.formControls > input[type="submit"], .formControls > button',
       content: '#content',
       automaticallyAddButtonActions: true,
       loadLinksWithinModal: true,
@@ -7028,5 +7028,5 @@ require([
   'use strict';
 });
 
-define("/home/_thet/data/dev/plone/buildout.coredev/src/plone.staticresources/src/plone/staticresources/static/plone.js", function(){});
+define("/Volumes/WORKSPACE2/buildout.coredev.barceloneta-lts/src/plone.staticresources/src/plone/staticresources/static/plone.js", function(){});
 

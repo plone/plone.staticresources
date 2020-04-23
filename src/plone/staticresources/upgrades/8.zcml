@@ -1,0 +1,21 @@
+<configure xmlns="http://namespaces.zope.org/zope"
+  xmlns:gs="http://namespaces.zope.org/genericsetup">
+
+  <gs:registerProfile name="8"
+    title="Update bundles"
+    description='Configuration for version 8'
+    directory="profiles/8"
+    for="Products.CMFPlone.interfaces.IMigratingPloneSiteRoot"
+    provides="Products.GenericSetup.interfaces.EXTENSION" />
+
+  <gs:upgradeSteps source="7"
+    destination="8"
+    profile="plone.staticresources:default">
+
+    <gs:upgradeDepends
+      title="Update bundles"
+      import_profile="plone.staticresources.upgrades:8" />
+
+  </gs:upgradeSteps>
+
+</configure>
