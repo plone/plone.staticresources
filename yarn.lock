@@ -102,6 +102,11 @@ boom@2.x.x:
   dependencies:
     hoek "2.x.x"
 
+bootstrap-icons@:
+  version "1.0.0-alpha3"
+  resolved "https://registry.yarnpkg.com/bootstrap-icons/-/bootstrap-icons-1.0.0-alpha3.tgz#413171e88b79315e712e6ab65601f64b1735d566"
+  integrity sha512-UO++43jb/qlWVsC31WkHOjFsTihJkSz0wngnUS+P1ImcCMTqDJqDHySld+hpkzxi+q6fL8iom7nfT3ApAxZ6cQ==
+
 "bootstrap@https://github.com/twbs/bootstrap.git#v3.4.1":
   version "3.4.1"
   resolved "https://github.com/twbs/bootstrap.git#68b0d231a13201eb14acd3dc84e51543d16e5f7e"
