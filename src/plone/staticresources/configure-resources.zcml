@@ -1,0 +1,19 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:browser="http://namespaces.zope.org/browser"
+    xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
+    xmlns:plone="http://namespaces.plone.org/plone">
+
+  <plone:static
+    directory="static/icons"
+    type="plone"
+    name="icons"
+    />
+
+  <plone:static
+    directory="static/components/bootstrap-icons/icons"
+    type="plone"
+    name="bootstrap-icons"
+    />
+
+</configure>
