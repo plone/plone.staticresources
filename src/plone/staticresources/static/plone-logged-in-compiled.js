@@ -40,6 +40,23 @@ define('mockup-patterns-inlinevalidation',[
        }
     },
 
+    render_error_bootstrap: function ($field, errmsg) {
+        var $input = $('input', $field), $errbox = $('.invalid-feedback', $field);
+        if (errmsg !== '') {
+            $input.addClass('is-invalid');
+            if($errbox.length) {
+                $errbox.html(errmsg);
+            } else {
+                $('<div class="invalid-feedback">' + errmsg + '</div>').insertAfter($input);
+            }
+        } else {
+            $input.removeClass('is-invalid');
+            if($errbox.length) {
+                $errbox.remove();
+            }
+        }
+    },
+
     append_url_path: function (url, extra) {
         // Add '/extra' on to the end of the URL, respecting querystring
         var i, ret, urlParts = url.split(/\?/);
@@ -135,7 +152,11 @@ define('mockup-patterns-inlinevalidation',[
                   data: {fname: fname, fset: fset},
                   iframe: false,
                   success: $.proxy(function (data) {
-                      this.render_error($field, data.errmsg);
+                      if($field.hasClass('form-group')) {
+                          this.render_error_bootstrap($field, data.errmsg);
+                      } else {
+                          this.render_error($field, data.errmsg);
+                      }
                       next();
                   }, this),
                   error: function () { next(); },
@@ -14931,5 +14952,5 @@ require([
   'use strict';
 });
 
-define("/home/_thet/data/dev/plone/buildout.coredev/src/plone.staticresources/src/plone/staticresources/static/plone-logged-in.js", function(){});
+define("/Volumes/WORKSPACE2/buildout.coredev.barceloneta-lts/src/plone.staticresources/src/plone/staticresources/static/plone-logged-in.js", function(){});
 
