@@ -424,18 +424,35 @@ define('plone-patterns-toolbar',[
       if (height < natualHeight) {
         /* add scroll buttons */
         var $scrollUp = $(
-          '<li class="scroll-btn up"><a href="#"><span class="icon-up"></span><span>&nbsp;</span></a></li>'
+          '<li class="scroll-btn up" aria-hidden="true"><a title="' + _t('scroll up') + '" href="#"><span class="icon-up"></span><span>&nbsp;</span></a></li>'
         );
         var $scrollDown = $(
-          '<li class="scroll-btn down"><a href="#"><span class="icon-down"></span><span>&nbsp;</span></a></li>'
+          '<li class="scroll-btn down" aria-hidden="true"><a title="' + _t('scroll down') + '" href="#"><span class="icon-down"></span><span>&nbsp;</span></a></li>'
         );
         $items.prepend($scrollUp);
         $items.append($scrollDown);
-        height = height - $scrollDown.height();
         $items.height(height);
-        $items.css({
-          'padding-top': $scrollUp.height(),
-        });
+        //set an scroll event listerner to know where we are inside the container
+        $items.scroll(function(){
+          if($items.scrollTop()==0){
+            //if we are in the top we hide the arrow to go up
+            $scrollUp.css('display', 'none')
+          }else{
+            //else we display it
+            $scrollUp.css('display', 'list-item')
+          }
+          if($items.scrollTop()+$items.height()==natualHeight){
+            //if we are in the bottom we hide the arrow to go down
+            $scrollDown.css('display', 'none')
+          }else{
+            //else we display it
+            $scrollDown.css('display', 'list-item')
+          }
+        })
+        //at the beginning we check if we are in the top to hide the arrow to go up
+        if($items.scrollTop()==0){
+          $scrollUp.css('display', 'none')
+        }
         $scrollUp.click(function(e) {
           e.preventDefault();
           $items.scrollTop($items.scrollTop() - 50);
@@ -7190,6 +7207,7 @@ define('mockup-patterns-querystring',[
         self.$value = $('<input type="text"/>')
                 .after($('<span/>').html(_t('days')))
                 .addClass(self.options.classValueName + '-' + widget)
+                .val(value)
                 .appendTo($wrapper)
                 .change(function() {
                   self.trigger('value-changed');
@@ -8231,7 +8249,7 @@ define('mockup-patterns-structure-url/js/actionmenu',['underscore'], function(_)
 });
 
 
-define('text!mockup-patterns-structure-url/templates/actionmenu.xml',[],function () { return '<% _.each(menuOptions.button, function(menuOption){ %>\n<a class="action <%- menuOption.name %> <%- menuOption.idx %> pat-tooltip <%- menuOption.css %>"\n    href="<%- menuOption.url %>"\n    title="<%- _t(menuOption.title) %>">\n  <% if (menuOption.iconCSS) { %>\n  <span class="<%- menuOption.iconCSS %>"></span>\n  <% } else { %>\n  <%- _t(menuOption.title) %> \n  <% } %>\n</a>&nbsp;\n<% }); %>\n\n\n<% if (menuOptions.dropdown) { %>\n<a class="dropdown-toggle"\n    data-toggle="dropdown"\n    href="#"\n    aria-haspopup="true"\n    aria-expanded="true"\n    id="<%- id %>"\n    title="Actions">\n  <span class="glyphicon glyphicon-cog"></span><span class="caret"></span>\n</a>\n<ul class="dropdown-menu pull-right" aria-labelledby="<%- id %>">\n  <% if (header) { %>\n    <li class="dropdown-header"><%- header %></li>\n    <li class="divider"></li>\n  <% } %>\n\n  <% _.each(menuOptions.dropdown, function(menuOption){ %>\n  <li>\n    <a class="action <%- menuOption.name %> <%- menuOption.idx %> <%- menuOption.css %>"\n        href="<%- menuOption.url %>">\n      <% if (menuOption.iconCSS) { %>\n      <span class="<%- menuOption.iconCSS %>"></span>\n      <% } %>\n      <%- _t(menuOption.title) %>\n    </a>\n  </li>\n  <% }); %>\n</ul>\n<% } %>\n';});
+define('text!mockup-patterns-structure-url/templates/actionmenu.xml',[],function () { return '<% _.each(menuOptions.button, function(menuOption){ %>\n<a class="action <%- menuOption.name %> <%- menuOption.idx %> pat-tooltip <%- menuOption.css %>"\n    href="<%- menuOption.url %>"\n    title="<%- _t(menuOption.title) %>"\n    aria-label="<%- _t(menuOption.title) %>">\n  <% if (menuOption.iconCSS) { %>\n  <span class="<%- menuOption.iconCSS %>"></span>\n  <% } else { %>\n  <%- _t(menuOption.title) %>\n  <% } %>\n</a>&nbsp;\n<% }); %>\n\n\n<% if (menuOptions.dropdown) { %>\n<a class="dropdown-toggle"\n    data-toggle="dropdown"\n    href="#"\n    aria-haspopup="true"\n    aria-expanded="true"\n    id="<%- id %>"\n    title="Actions">\n  <span class="glyphicon glyphicon-cog"></span><span class="caret"></span>\n</a>\n<ul class="dropdown-menu pull-right" aria-labelledby="<%- id %>">\n  <% if (header) { %>\n    <li class="dropdown-header"><%- header %></li>\n    <li class="divider"></li>\n  <% } %>\n\n  <% _.each(menuOptions.dropdown, function(menuOption){ %>\n  <li>\n    <a class="action <%- menuOption.name %> <%- menuOption.idx %> <%- menuOption.css %>"\n        href="<%- menuOption.url %>">\n      <% if (menuOption.iconCSS) { %>\n      <span class="<%- menuOption.iconCSS %>"></span>\n      <% } %>\n      <%- _t(menuOption.title) %>\n    </a>\n  </li>\n  <% }); %>\n</ul>\n<% } %>\n';});
 
 define('mockup-patterns-structure-url/js/views/actionmenu',[
   'jquery',
@@ -8364,7 +8382,7 @@ define('mockup-patterns-structure-url/js/views/actionmenu',[
 });
 
 
-define('text!mockup-patterns-structure-url/templates/tablerow.xml',[],function () { return '<td class="selection" data-order="<%- attributes[\'_sort\'] %>"><input type="checkbox" <% if(selected){ %> checked="checked" <% } %>/></td>\n\n<td class="title">\n  <div class="pull-left">\n    <a href="<%- viewURL %>"\n        class="manage state-<%- review_state %> contenttype-<%- contenttype %>"\n        title="<%- portal_type %>">\n        <% if(attributes["getMimeIcon"] && contenttype == \'file\'){ %>\n           <img class="mime-icon" src="<%- getMimeIcon %>"> <% } %>\n      <% if(Title){ %>\n        <%- Title %>\n      <% } else { %>\n        <em><%- id %></em>\n      <% } %>\n    </a>\n    <% if(expired){ %>\n      <span class="plone-item-expired"><%- _t(\'Expired\') %></span>\n    <% } %>\n    <% if(ineffective){ %>\n      <span class="plone-item-ineffective"><%- _t(\'Before publishing date\') %></span>\n    <% } %>\n    <% if(activeColumns.indexOf(\'Description\') !== -1 && _.has(availableColumns, \'Description\') && Description) { %>\n    <p class="Description">\n      <small>\n        <%- Description %>\n      </small>\n    </p>\n    <% } %>\n  </div>\n  <% if(attributes["getIcon"] && thumb_scale) { %>\n    <img class="thumb-<%- thumb_scale %> pull-right" src="<%- getURL %>/@@images/image/<%- thumb_scale %>">\n  <% } %>\n</td>\n\n<% _.each(activeColumns, function(column) { %>\n  <% if(column !== \'Description\' && _.has(availableColumns, column)) { %>\n    <td class="<%- column %>" data-order="<%- attributes[column] %>"><%- attributes[column] %></td>\n  <% } %>\n<% }); %>\n\n<td class="actionmenu-container"></td>\n';});
+define('text!mockup-patterns-structure-url/templates/tablerow.xml',[],function () { return '<td class="selection" data-order="<%- attributes[\'_sort\'] %>"><label for="select<%- attributes[\'_sort\'] %>InputCheckbox" class="hiddenStructure" aria-label="<%- _t(\'Select\') %>"><%- _t(\'Select\') %></label><input id="select<%- attributes[\'_sort\'] %>InputCheckbox" <% if(selected){ %> checked="checked" <% } %> type="checkbox"/></td>\n\n<td class="title">\n  <div class="pull-left">\n    <a href="<%- viewURL %>"\n        class="manage state-<%- review_state %> contenttype-<%- contenttype %>"\n        title="<%- portal_type %>">\n        <% if(attributes["getMimeIcon"] && contenttype == \'file\'){ %>\n           <img class="mime-icon" src="<%- getMimeIcon %>"> <% } %>\n      <% if(Title){ %>\n        <%- Title %>\n      <% } else { %>\n        <em><%- id %></em>\n      <% } %>\n    </a>\n    <% if(expired){ %>\n      <span class="plone-item-expired"><%- _t(\'Expired\') %></span>\n    <% } %>\n    <% if(ineffective){ %>\n      <span class="plone-item-ineffective"><%- _t(\'Before publishing date\') %></span>\n    <% } %>\n    <% if(activeColumns.indexOf(\'Description\') !== -1 && _.has(availableColumns, \'Description\') && Description) { %>\n    <p class="Description">\n      <small>\n        <%- Description %>\n      </small>\n    </p>\n    <% } %>\n  </div>\n  <% if(attributes["getIcon"] && thumb_scale) { %>\n    <img class="thumb-<%- thumb_scale %> pull-right" src="<%- getURL %>/@@images/image/<%- thumb_scale %>">\n  <% } %>\n</td>\n\n<% _.each(activeColumns, function(column) { %>\n  <% if(column !== \'Description\' && _.has(availableColumns, column)) { %>\n    <td class="<%- column %>" data-order="<%- attributes[column] %>"><%- attributes[column] %></td>\n  <% } %>\n<% }); %>\n\n<td class="actionmenu-container"></td>\n';});
 
 define('mockup-patterns-structure-url/js/views/tablerow',[
   'jquery',
@@ -8543,7 +8561,7 @@ define('mockup-patterns-structure-url/js/views/tablerow',[
 });
 
 
-define('text!mockup-patterns-structure-url/templates/table.xml',[],function () { return '<div class="fc-breadcrumbs-container">\n  <div class="fc-breadcrumbs" colspan="<%- activeColumns.length + 3 %>">\n    <a href="#" data-path="/">\n      <span class="glyphicon glyphicon-home"></span> /\n    </a>\n    <% _.each(pathParts, function(part, idx, list){\n      if(part){\n        if(idx > 0){ %>\n          /\n        <% } %>\n        <a href="#" class="crumb" data-path="<%- part %>"><%- part %></a>\n      <% }\n    }); %>\n  </div>\n</div>\n\n<table class="pat-datatables table table-striped table-bordered"\n       data-pat-datatables="<%- datatables_options %>">\n  <thead>\n    <tr>\n      <th class="selection"><input type="checkbox" class="select-all" /></th>\n      <th class="title"><%- _t(\'Title\') %></th>\n      <% _.each(activeColumns, function(column){ %>\n        <% if(column !== \'Description\' && _.has(availableColumns, column)) { %>\n          <th><%- availableColumns[column] %></th>\n        <% } %>\n      <% }); %>\n      <th class="actions"><%- _t("Actions") %></th>\n    </tr>\n  </thead>\n  <tbody>\n  </tbody>\n</table>\n';});
+define('text!mockup-patterns-structure-url/templates/table.xml',[],function () { return '<div class="fc-breadcrumbs-container">\n  <div class="fc-breadcrumbs" colspan="<%- activeColumns.length + 3 %>">\n    <a href="#" title="<%- _t(\'Root\') %>" aria-label="<%- _t(\'Root\') %>" data-path="/">\n      <span class="glyphicon glyphicon-home" aria-hidden="true"></span> /\n    </a>\n    <% _.each(pathParts, function(part, idx, list){\n      if(part){\n        if(idx > 0){ %>\n          /\n        <% } %>\n        <a href="#" class="crumb" data-path="<%- part %>"><%- part %></a>\n      <% }\n    }); %>\n  </div>\n</div>\n\n<table class="pat-datatables table table-striped table-bordered"\n       data-pat-datatables="<%- datatables_options %>">\n  <thead>\n    <tr>\n      <th class="selection"><label for="selectAllInputCheckbox" class="hiddenStructure" aria-label="<%- _t(\'Select all\') %>"><%- _t(\'Select all\') %></label><input id="selectAllInputCheckbox" type="checkbox" class="select-all" /></th>\n      <th class="title"><%- _t(\'Title\') %></th>\n      <% _.each(activeColumns, function(column){ %>\n        <% if(column !== \'Description\' && _.has(availableColumns, column)) { %>\n          <th><%- availableColumns[column] %></th>\n        <% } %>\n      <% }); %>\n      <th class="actions"><%- _t("Actions") %></th>\n    </tr>\n  </thead>\n  <tbody>\n  </tbody>\n</table>\n';});
 
 /*! DataTables 1.10.19
  * ©2008-2018 SpryMedia Ltd - datatables.net/license
@@ -25333,6 +25351,7 @@ define('mockup-ui-url/views/popover',[
       closeOnClick: true
     },
     initialize: function(options) {
+      var self = this;
       ContainerView.prototype.initialize.apply(this, [options]);
       this.bindTriggerEvents();
 
@@ -25341,6 +25360,12 @@ define('mockup-ui-url/views/popover',[
         this.renderTitle();
         this.renderContent();
       }, this);
+
+      this.$el.on('keyup', function(e){
+        if (e.keyCode === 27) {
+          self.hide();
+        }
+      });
     },
     afterRender: function () {
     },
@@ -25840,7 +25865,7 @@ define('mockup-patterns-structure-url/js/views/selectionbutton',[
 });
 
 
-define('text!mockup-patterns-structure-url/templates/paging.xml',[],function () { return '  <ul class="pagination pagination-sm pagination-centered">\n    <li class="<% if (currentPage === 1) { %>disabled<% } %>">\n      <a href="#" class="serverfirst">\n        &laquo;\n      </a>\n    </li>\n    <li class="<% if (currentPage === 1) { %>disabled<% } %>">\n      <a href="#" class="serverprevious">\n        &lt;\n      </a>\n    </li>\n    <% _.each(pages, function(p){ %>\n    <li class="<% if (currentPage == p) { %>active<% } else if ( p == \'...\' ) { %>disabled<% }%>">\n      <a href="#" class="page"><%- p %></a>\n    </li>\n    <% }); %>\n    <li class="<% if (currentPage === totalPages) { %>disabled<% } %>">\n      <a href="#" class="servernext">\n        &gt;\n      </a>\n    </li>\n    <li class="<% if (currentPage === totalPages) { %>disabled<% } %>">\n      <a href="#" class="serverlast">\n        &raquo;\n      </a>\n    </li>\n  </ul>\n\n  <ul class="pagination pagination-sm">\n    <li class="disabled"><a href="#"><%- _t("Show:") %></a></li>\n    <li class="serverhowmany serverhowmany15 <% if(perPage == 15){ %>disabled<% } %>">\n      <a href="#" class="">15</a>\n    </li>\n    <li class="serverhowmany serverhowmany30 <% if(perPage == 30){ %>disabled<% } %>">\n      <a href="#" class="">30</a>\n    </li>\n    <li class="serverhowmany serverhowmany50 <% if(perPage == 50){ %>disabled<% } %>">\n      <a href="#" class="">50</a>\n    </li>\n    <li class="serverhowmany serverhowmany250 <% if(perPage == 250){ %>disabled<% } %>">\n      <a href="#" class="">250</a>\n    </li>\n  </ul>\n\n  <ul class="pagination pagination-sm">\n    <li class="disabled">\n      <a href="#">\n        <%- _t("Page:") %> <span class="current"><%- currentPage %></span>\n        <%- _t("of") %>\n        <span class="total"><%- totalPages %></span>\n              <%- _t("shown") %>\n      </a>\n    </li>\n  </ul>\n';});
+define('text!mockup-patterns-structure-url/templates/paging.xml',[],function () { return '  <ul class="pagination pagination-sm pagination-centered">\n    <li class="<% if (currentPage === 1) { %>disabled<% } %>">\n      <a href="#" class="serverfirst">\n        &laquo;\n      </a>\n    </li>\n    <li class="<% if (currentPage === 1) { %>disabled<% } %>">\n      <a href="#" class="serverprevious">\n        &lt;\n      </a>\n    </li>\n    <% _.each(pages, function(p){ %>\n    <li class="<% if (currentPage == p) { %>active<% } else if ( p == \'...\' ) { %>disabled<% }%>">\n      <a href="#" class="page"><%- p %></a>\n    </li>\n    <% }); %>\n    <li class="<% if (currentPage === totalPages) { %>disabled<% } %>">\n      <a href="#" class="servernext">\n        &gt;\n      </a>\n    </li>\n    <li class="<% if (currentPage === totalPages) { %>disabled<% } %>">\n      <a href="#" class="serverlast">\n        &raquo;\n      </a>\n    </li>\n  </ul>\n\n  <div class="pagination pagination-sm"><%- _t("Show:") %></div>\n  <ul class="pagination pagination-sm">\n    <li class="serverhowmany serverhowmany15 <% if(perPage == 15){ %>disabled<% } %>">\n      <a href="#" class="">15</a>\n    </li>\n    <li class="serverhowmany serverhowmany30 <% if(perPage == 30){ %>disabled<% } %>">\n      <a href="#" class="">30</a>\n    </li>\n    <li class="serverhowmany serverhowmany50 <% if(perPage == 50){ %>disabled<% } %>">\n      <a href="#" class="">50</a>\n    </li>\n    <li class="serverhowmany serverhowmany250 <% if(perPage == 250){ %>disabled<% } %>">\n      <a href="#" class="">250</a>\n    </li>\n  </ul>\n\n  <div class="pagination pagination-sm">\n    <%- _t("Page:") %> <span class="current"><%- currentPage %></span>\n    <%- _t("of") %>\n    <span class="total"><%- totalPages %></span>\n          <%- _t("shown") %>\n  </div>\n';});
 
 define('mockup-patterns-structure-url/js/views/paging',[
   'jquery',
@@ -26062,7 +26087,9 @@ define('mockup-patterns-structure-url/js/views/textfilter',[
     className: 'navbar-search form-search ui-offset-parent',
     template: _.template(
       '<div class="input-group">' +
-      '<input type="text" class="form-control search-query" placeholder="<%- _t("Search") %>">' +
+      '<label class="hiddenStructure" for="textFilterInput" aria-label="<%- _t("Search") %>"><%- _t("Search") %>"</label>' +
+      '<input id="textFilterInput" type="text" class="form-control search-query" placeholder="<%- _t("Search") %>">' +
+
       '<span class="input-group-btn">' +
       '</span>' +
       '</div>'
@@ -29847,6 +29874,7 @@ define('mockup-patterns-structure-url/js/views/app',[
 
     buttons: null,
     textfilter: null,
+    forms: [],
 
     pasteAllowed: function () {
         return !!$.cookie('__cp');
@@ -29899,7 +29927,7 @@ define('mockup-patterns-structure-url/js/views/app',[
         collection: self.selectedCollection,
         triggerView: self.toolbar.get('selected-items'),
         app: self,
-        id: 'structure-well'
+        id: 'selected-items'
       });
 
       self.toolbar.get('selected-items').disable();
@@ -30164,7 +30192,7 @@ define('mockup-patterns-structure-url/js/views/app',[
       var items = [];
 
       var columnsBtn = new ButtonView({
-        id: 'attribute-columns',
+        id: 'structure-columns',
         tooltip: _t('Configure displayed columns'),
         icon: 'th'
       });
@@ -30185,7 +30213,7 @@ define('mockup-patterns-structure-url/js/views/app',[
 
       if (self.options.rearrange) {
         var rearrangeButton = new ButtonView({
-          id: 'rearrange',
+          id: 'structure-rearrange',
           title: _t('Rearrange'),
           icon: 'sort-by-attributes',
           tooltip: _t('Rearrange folder contents'),
@@ -30207,7 +30235,8 @@ define('mockup-patterns-structure-url/js/views/app',[
         });
         self.uploadView = new UploadView({
           triggerView: uploadButton,
-          app: self
+          app: self,
+          id: 'upload'
         });
         items.push(uploadButton);
       }
@@ -30222,7 +30251,7 @@ define('mockup-patterns-structure-url/js/views/app',[
             buttonOptions.triggerView = button;
             buttonOptions.app = self;
             var view = new GenericPopover(buttonOptions);
-            self.$el.append(view.el);
+            self.forms.push(view.el);
           } else {
             button.on('button:click', self.buttonClickEvent, self);
           }
@@ -30347,14 +30376,23 @@ define('mockup-patterns-structure-url/js/views/app',[
       var self = this;
 
       self.$el.append(self.toolbar.render().el);
-      self.$el.append(self.wellView.render().el);
+      if (self.wellView) {
+        self.$el.find('#btn-' + self.wellView.id).after(self.wellView.render().el)
+      }
+      self.forms.forEach(function(element) {
+        var id = $(element).attr('id')
+        self.$el.find('#btn-'+id).after(element)
+      });
+
       self.$el.append(utils.createElementFromHTML('<div class="fc-status-container"></div>'));
-      self.$el.append(self.columnsView.render().el);
+      if (self.columnsView) {
+        self.$el.find('#btn-' + self.columnsView.id).after(self.columnsView.render().el)
+      }
       if (self.rearrangeView) {
-        self.$el.append(self.rearrangeView.render().el);
+        self.$el.find('#btn-' + self.rearrangeView.id).after(self.rearrangeView.render().el)
       }
       if (self.uploadView) {
-        self.$el.append(self.uploadView.render().el);
+        self.$el.find('#btn-' + self.uploadView.id).after(self.uploadView.render().el)
       }
 
       self.$el.append(self.tableView.render().el);
@@ -30703,5 +30741,5 @@ require([
   'use strict';
 });
 
-define("/home/_thet/data/dev/plone/buildout.coredev/src/plone.staticresources/src/plone/staticresources/static/plone-editor-tools.js", function(){});
+define("/Volumes/WORKSPACE2/erinnern/src/plone.staticresources/src/plone/staticresources/static/plone-editor-tools.js", function(){});
 

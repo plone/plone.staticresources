@@ -6,4 +6,7 @@
   <records prefix="plone.bundles/plone-logged-in" interface='Products.CMFPlone.interfaces.IBundleRegistry'>
     <value key="last_compilation">2020-04-23 14:00:00</value>
   </records>
+  <records prefix="plone.bundles/plone-editor-tools" interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+    <value key="last_compilation">2020-06-03 14:40:00</value>
+  </records>
 </registry>
