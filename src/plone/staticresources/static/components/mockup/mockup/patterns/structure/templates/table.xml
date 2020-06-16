@@ -1,12 +1,7 @@
-<div class="alert alert-<%- status.type %> status">
-  <strong><%- status.label %></strong>
-  <span><%- status.text %></span>&nbsp;<% // &nbsp; to get correct height for empty alerts %>
-</div>
-
 <div class="fc-breadcrumbs-container">
   <div class="fc-breadcrumbs" colspan="<%- activeColumns.length + 3 %>">
-    <a href="#" data-path="/">
-      <span class="glyphicon glyphicon-home"></span> /
+    <a href="#" title="<%- _t('Root') %>" aria-label="<%- _t('Root') %>" data-path="/">
+      <span class="glyphicon glyphicon-home" aria-hidden="true"></span> /
     </a>
     <% _.each(pathParts, function(part, idx, list){
       if(part){
@@ -23,7 +18,7 @@
        data-pat-datatables="<%- datatables_options %>">
   <thead>
     <tr>
-      <th class="selection"><input type="checkbox" class="select-all" /></th>
+      <th class="selection"><label for="selectAllInputCheckbox" class="hiddenStructure" aria-label="<%- _t('Select all') %>"><%- _t('Select all') %></label><input id="selectAllInputCheckbox" type="checkbox" class="select-all" /></th>
       <th class="title"><%- _t('Title') %></th>
       <% _.each(activeColumns, function(column){ %>
         <% if(column !== 'Description' && _.has(availableColumns, column)) { %>
