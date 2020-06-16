@@ -7028,5 +7028,5 @@ require([
   'use strict';
 });
 
-define("/Volumes/WORKSPACE2/buildout.coredev.barceloneta-lts/src/plone.staticresources/src/plone/staticresources/static/plone.js", function(){});
+define("/home/_thet/data/dev/plone/buildout.coredev/src/plone.staticresources/src/plone/staticresources/static/plone.js", function(){});
 
