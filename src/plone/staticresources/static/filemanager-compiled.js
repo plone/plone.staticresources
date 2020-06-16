@@ -26771,6 +26771,7 @@ define('mockup-ui-url/views/popover',[
       closeOnClick: true
     },
     initialize: function(options) {
+      var self = this;
       ContainerView.prototype.initialize.apply(this, [options]);
       this.bindTriggerEvents();
 
@@ -26779,6 +26780,12 @@ define('mockup-ui-url/views/popover',[
         this.renderTitle();
         this.renderContent();
       }, this);
+
+      this.$el.on('keyup', function(e){
+        if (e.keyCode === 27) {
+          self.hide();
+        }
+      });
     },
     afterRender: function () {
     },

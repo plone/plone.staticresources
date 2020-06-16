@@ -53,7 +53,7 @@ Run:
 - npm login
 - npm version <update_type> 
   where update_type is patch, minor or major. See https://docs.npmjs.com/getting-started/publishing-npm-packages.
-- npm publish --access=public
+- npm publish
 
 
 ## Now contact support@syslab.com and request an update of the patternslib.com site as well.
@@ -67,6 +67,6 @@ This is done as follows:
     cd patternslib
     git pull
     make clean && make bundle
-    bundle exec jekyll serve
+    cd .. && bundle exec jekyll serve
 
 

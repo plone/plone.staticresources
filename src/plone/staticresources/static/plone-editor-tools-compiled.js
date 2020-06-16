@@ -30741,5 +30741,5 @@ require([
   'use strict';
 });
 
-define("/Volumes/WORKSPACE2/erinnern/src/plone.staticresources/src/plone/staticresources/static/plone-editor-tools.js", function(){});
+define("/home/_thet/data/dev/plone/buildout.coredev/src/plone.staticresources/src/plone/staticresources/static/plone-editor-tools.js", function(){});
 

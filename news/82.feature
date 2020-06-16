@@ -1,0 +1,2 @@
+Update static resources.
+[thet]

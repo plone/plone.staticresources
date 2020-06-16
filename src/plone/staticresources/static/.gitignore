@@ -9,6 +9,7 @@ components/jqtree/static
 components/backbone/docs
 components/backbone/test
 tinymce-builded/tests
+**/__tests__
 **/node_modules
 **/bower_components
 **/test*

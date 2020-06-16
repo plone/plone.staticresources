@@ -3,7 +3,7 @@
  * Options:
  *    relatedItems(object): Related items pattern options. ({ attributes: ["UID", "Title", "Description", "getURL", "portal_type", "path", "ModificationDate"], batchSize: 20, basePath: "/", vocabularyUrl: null, width: 500, maximumSelectionSize: 1, placeholder: "Search for item on site..." })
  *    upload(object): Upload pattern options. ({ attributes: look at upload pattern for getting the options list })
- *    text(object): Translation strings ({ insertBtn: "Insert", cancelBtn: "Cancel", insertHeading: "Insert link", title: "Title", internal: "Internal", external: "External", email: "Email", anchor: "Anchor", subject: "Subject" image: "Image", imageAlign: "Align", scale: "Size", alt: "Alternative Text", externalImage: "External Image URI"})
+ *    text(object): Translation strings ({ insertBtn: "Insert", cancelBtn: "Cancel", insertHeading: "Insert link", title: "Title", internal: "Internal", external: "External", email: "Email", anchor: "Anchor", subject: "Subject" image: "Image", imageAlign: "Align", scale: "Size", alt: "Alternative Text", captionFromDescription: "Show Image Caption from Image Description", caption: "Image Caption", externalImage: "External Image URI"})
  *    imageScales(string): Image scale name/value object-array or JSON string for use in the image dialog.
  *    targetList(array): TODO ([ {text: "Open in this window / frame", value: ""}, {text: "Open in new window", value: "_blank"}, {text: "Open in parent window / frame", value: "_parent"}, {text: "Open in top frame (replaces all frames)", value: "_top"}])
  *    imageTypes(string): TODO ('Image')
@@ -151,6 +151,8 @@ define([
         externalImageText: _t('External Image URL (can be relative within this site or absolute if it starts with http:// or https://)'),
         upload: _t('Upload'),
         insertLinkHelp: _t('Specify the object to link to. It can be on this site already (Internal), an object you upload (Upload), from an external site (External), an email address (Email), or an anchor on this page (Anchor).'),
+        captionFromDescription: _t('Show Image Caption from Image Description'),
+        caption: _t('Image Caption'),
       },
       // URL generation options
       loadingBaseUrl: '../../../node_modules/tinymce-builded/js/tinymce/',
@@ -416,6 +418,21 @@ define([
           }
         }
 
+        /* If TinyMCE is rendered inside of a modal, set an ID on
+         * .plone-modal-dialog and use that as the ui_container
+         * setting for TinyMCE to anchor it there. This ensures that
+         * sub-menus are displayed relative to the modal rather than
+         * the document body. 
+         * Generate a random id and append it, because there might be
+         * more than one TinyMCE in the DOM.
+         */
+        var modal_container = self.$el.parents(".plone-modal-dialog")
+
+        if (modal_container.length > 0) {
+            var random_id = Math.random().toString(36).substring(2, 15) ;
+            modal_container.attr("id", "tiny-ui-container-" + random_id);
+            tinyOptions['ui_container'] = "#tiny-ui-container-" + random_id;
+        }
         tinymce.init(tinyOptions);
         self.tiny = tinymce.get(self.tinyId);
 
