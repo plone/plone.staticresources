@@ -1,0 +1,2 @@
+Fix ``pat-querystring`` to set value of RelativeDateWidget correctly when editing
+[petschki]
