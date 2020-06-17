@@ -23,6 +23,7 @@
   </records>
   <records prefix="plone.bundles/resourceregistry" interface='Products.CMFPlone.interfaces.IBundleRegistry'>
     <value key="last_compilation">2020-06-16 10:10:00</value>
+  </records>
   <records prefix="plone.bundles/thememapper" interface='Products.CMFPlone.interfaces.IBundleRegistry'>
     <value key="last_compilation">2020-06-16 10:10:00</value>
   </records>
