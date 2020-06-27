@@ -1,10 +1,10 @@
 {
     "name": "datatables.net-bs",
-    "version": "1.10.19",
+    "version": "1.10.16",
     "description": "DataTables for jQuery with styling for [Bootstrap 3](http://getbootstrap.com/)",
     "files": [
-        "css/**/*.css",
-        "js/**/*.js"
+        "js/dataTables.bootstrap.js",
+        "css/dataTables.bootstrap.css"
     ],
     "main": "js/dataTables.bootstrap.js",
     "style": "css/dataTables.bootstrap.css",
@@ -25,7 +25,7 @@
     },
     "dependencies": {
         "jquery": ">=1.7",
-        "datatables.net": "1.10.19"
+        "datatables.net": "1.10.16"
     },
     "repository": {
         "type": "git",
