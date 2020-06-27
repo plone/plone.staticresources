@@ -31,6 +31,12 @@ How to upgrade the resources in this package
   This package is only to deliver the generated bundles as well as the npm dependencies so that building bundles is possible.
 
 1. Increase npm package versions in ``package.json``, in sections ``dependencies`` or ``devDependencies``.
+   If you increase the mockup version, please verify the resolutions section in
+   package.json matches the one from mockup package.json.
+   Verify that the jquery version used is the same version that in mockup too.
+   Then copy the yarn.lock from mockup ``cp ../src/mockup/yarn.lock .`` and run ``yarn``.
+   This is to be sure we create the bundles with the same versions that mockup
+   was tested with.
 
 2. Run ``yarn upgrade`` (important: cannot be ``npm``)
 
