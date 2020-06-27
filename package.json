@@ -8,13 +8,13 @@
     "backbone": "https://github.com/jashkenas/backbone.git#1.1.2",
     "underscore": "1.9.1",
     "jqtree": "1.4.10",
-    "jquery": "1.12.4",
+    "jquery": "3.5.0",
     "datatables.net": "https://github.com/DataTables/Dist-DataTables.git#1.10.16",
     "datatables.net-bs": "https://github.com/DataTables/Dist-DataTables-Bootstrap.git#1.10.16"
   },
   "dependencies": {
     "bootstrap-icons": "1.0.0-alpha3",
-    "jquery": "1.12.4",
+    "jquery": "3.5.0",
     "less": "https://github.com/less/less.git#v2.7.3",
     "mockup": "https://github.com/plone/mockup.git#2a91e0438b9eff49d3f2ff974c00988651ef0368",
     "requirejs": "^2.3.6"
