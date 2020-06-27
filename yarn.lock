@@ -673,9 +673,9 @@ mkdirp@~0.3.5:
   resolved "https://registry.yarnpkg.com/mkdirp/-/mkdirp-0.3.5.tgz#de3e5f8961c88c787ee1368df849ac4413eca8d7"
   integrity sha1-3j5fiWHIjHh+4TaN+EmsRBPsqNc=
 
-"mockup@https://github.com/plone/mockup.git#e6bd1977871c7dbeb75b0eccc395687320e681b8":
+"mockup@https://github.com/plone/mockup.git#af672aede8cb09f1983e6949df96bf7b855227d9":
   version "3.1.2"
-  resolved "https://github.com/plone/mockup.git#e6bd1977871c7dbeb75b0eccc395687320e681b8"
+  resolved "https://github.com/plone/mockup.git#af672aede8cb09f1983e6949df96bf7b855227d9"
   dependencies:
     ace-builds "https://github.com/ajaxorg/ace-builds.git#v1.2.6"
     backbone "https://github.com/jashkenas/backbone.git#1.1.2"

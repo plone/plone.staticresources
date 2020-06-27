@@ -83,10 +83,13 @@
 define([
   'jquery',
   'pat-base',
+  'pat-registry',
   'mockup-i18n',
   'moment'
-], function($, Base, i18n, moment) {
+], function($, Base, Registry, i18n, moment) {
   var currentLanguage = (new i18n()).currentLanguage;
+  var localeLoaded = false;
+  var patMomentInstances = [];
 
   // From https://github.com/moment/moment/blob/3147fbc/src/test/moment/format.js#L463-L468
   var MOMENT_LOCALES =
@@ -106,6 +109,7 @@ define([
     if (currentLanguage === LANG_FALLBACK) {
       // English locale is built-in, no need to load, so let's exit early
       // to avoid computing fallback, which happens at every loaded page
+      localeLoaded = true;
       return;
     }
 
@@ -116,10 +120,18 @@ define([
     lang = isLangSupported(lang) ? lang : lang.split('-')[0];
     lang = isLangSupported(lang) ? lang : LANG_FALLBACK;
     if (lang === LANG_FALLBACK) {
+      localeLoaded = true;
       return;
     }
 
-    require(['moment-url/' + lang]);
+    require(['moment-url/' + lang], function() {
+      localeLoaded = true;
+      for (var i = 0; i < patMomentInstances.length; i++) {
+        var patMoment = patMomentInstances[i];
+        patMoment.init();
+      }
+      patMomentInstances = [];
+    });
   }
 
   lazyLoadMomentLocale();
@@ -141,6 +153,9 @@ define([
       var date = $el.attr('data-date');
       if (!date) {
         date = $.trim($el.html());
+        if (date && date !== 'None') {
+          $el.attr('data-date', date);
+        }
       }
       if (!date || date === 'None') {
         return;
@@ -170,6 +185,12 @@ define([
     },
     init: function() {
       var self = this;
+      if (!localeLoaded) {
+        // The locale has not finished to load yet, we will execute the init
+        // again once the locale is loaded.
+        patMomentInstances.push(self);
+        return;
+      }
       if (self.options.selector) {
         self.$el.find(self.options.selector).each(function() {
           self.convert($(this));
