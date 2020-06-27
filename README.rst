@@ -30,15 +30,17 @@ How to upgrade the resources in this package
   If you want to fix something or add functionality in Mockup you have to do it there.
   This package is only to deliver the generated bundles as well as the npm dependencies so that building bundles is possible.
 
-1. Increase npm package versions in ``package.json``, in sections ``dependencies`` or ``devDependencies``.
+1. Don't run ``yarn upgrade`` in this package. If you want to upgrade all
+   packages, do it in ``../src/mockup`` with ``rm yarn.lock && yarn`` (important: cannot be ``npm``) and execute the tests
+   with ``make test`` there, commit the changes if all looks good.
+
+2. In this package, increase npm package versions in ``package.json``, in sections ``dependencies`` or ``devDependencies``.
    If you increase the mockup version, please verify the resolutions section in
    package.json matches the one from mockup package.json.
    Verify that the jquery version used is the same version that in mockup too.
    Then copy the yarn.lock from mockup ``cp ../src/mockup/yarn.lock .`` and run ``yarn``.
    This is to be sure we create the bundles with the same versions that mockup
    was tested with.
-
-2. Run ``yarn upgrade`` (important: cannot be ``npm``)
 
 3. Run ``./bin/plone-compile-resources -b plone`` or ``./bin/plone-compile-resources -b plone-logged-in`` (whichever bundle you need to re-build).
 
