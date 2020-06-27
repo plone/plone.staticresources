@@ -8,6 +8,43 @@ Changelog
 
 .. towncrier release notes start
 
+1.3.0 (2020-06-28)
+------------------
+
+New features:
+
+
+- Add figcaption support - https://github.com/plone/mockup/pull/911
+  [thet] (#30)
+- Register icon resources & add bootstrap-icons
+  [agitator] (#75)
+- Adapt ``pat-plone-modal`` and ``pat-inlinevalidation`` to work with barceloneta LTS.
+  Add missing ``plone.svg`` icon.
+  [petschki, agitator] (#76)
+- Update static resources.
+  [thet] (#82)
+
+
+Bug fixes:
+
+
+- Fix buildout and use latest Plone 5.2.
+  [thet] (#51)
+- Fix missing styles in plone-datatables bundle.
+  [agitator] (#62)
+- Upgrade resources with latest mockup.
+  [thet] (#64)
+- Move ``metadata.xml`` from async/registry profile directory to correct location. (#65)
+- Add jQuery workaround for XSS vulnerability - https://github.com/plone/plone.staticresources/issues/69
+  [frapell] (#69)
+- Fix ``pat-querystring`` to set value of RelativeDateWidget correctly when editing
+  [petschki] (#78)
+- Hide upgrade profile
+  [petschki] (#83)
+- fix syntax in `upgrades/profiles/8/registry.xml`
+  [petschki] (#85)
+
+
 1.2.1 (2020-01-12)
 ------------------
 
