@@ -47,6 +47,7 @@ How to upgrade the resources in this package
 4. Increase the ``last_compilation`` date in ``src/plone/staticresources/profiles/default/registry/bundles.xml``.
 
 5. Create an upgrade step in ``plone.staticresources`` (most probably increasing ``last_compilation`` date).
+   Add the upgrade step to the hidden profiles in ``getNonInstallableProfiles`` in ``setuphandlers.py``.
 
 6. Submit a Pull Request and run the tests on Jenkins.
 
