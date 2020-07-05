@@ -26475,7 +26475,7 @@ define('mockup-ui-url/views/button',[
     },
     handleClick: function(e) {
       e.preventDefault();
-      if (!this.$el.prop('disabled')) {
+      if (!this.$el.is('.disabled')) {
         this.uiEventTrigger('click', this, e);
       }
     },
@@ -26483,10 +26483,10 @@ define('mockup-ui-url/views/button',[
       return _.extend({'icon': '', 'title': ''}, this.options);
     },
     disable: function() {
-      this.$el.prop('disabled', true);
+      this.$el.addClass('disabled');
     },
     enable: function() {
-      this.$el.prop('disabled', false);
+      this.$el.removeClass('disabled');
     }
   });
 
@@ -26553,12 +26553,12 @@ define('mockup-ui-url/views/anchor',[
         this.$el.attr('aria-label', this.options.title || this.options.tooltip || '');
         _.each(this.extraClasses, function(klass) {
           this.$el.addClass(klass);
-        });
+        }.bind(this));
       }, this);
     },
     handleClick: function(e) {
       e.preventDefault();
-      if (!this.$el.prop('disabled')) {
+      if (!this.$el.is('.disabled')) {
         this.uiEventTrigger('click', this, e);
       }
     },
@@ -26566,10 +26566,10 @@ define('mockup-ui-url/views/anchor',[
       return _.extend({'icon': '', 'title': '', 'shortcut': ''}, this.options);
     },
     disable: function() {
-      this.$el.prop('disabled', true);
+      this.$el.addClass('disabled');
     },
     enable: function() {
-      this.$el.prop('disabled', false);
+      this.$el.removeClass('disabled');
     }
   });
 
@@ -26871,6 +26871,9 @@ define('mockup-ui-url/views/popover',[
       actualHeight = $tip[0].offsetHeight;
 
       switch (placement) {
+        case 'bottom-right':
+          tp = {top: pos.top + pos.height, left: pos.left + pos.width - 40};
+          break;
         case 'bottom':
           tp = {top: pos.top + pos.height, left: pos.left + pos.width / 2 - actualWidth / 2};
           break;
@@ -26926,7 +26929,8 @@ define('mockup-ui-url/views/popover',[
 
         this.positionArrow(delta - width + actualWidth, actualWidth, 'left');
 
-      } else {
+      } else if (placement !== 'bottom-right') {
+        // If placement is bottom-right, don't override left position for the arrow that is defined in css to 20px.
         this.positionArrow(actualHeight - height, actualHeight, 'top');
       }
 
@@ -35154,7 +35158,7 @@ define('mockup-patterns-relateditems',[
 define('text!mockup-patterns-upload-url/templates/upload.xml',[],function () { return '<div class="upload-container upload-multiple">\n    <h2 class="title"><%- _t("Upload here") %></h2>\n    <p class="help">\n        <%- _t(\'Drag and drop files from your computer onto the area below or click the Browse button.\') %>\n    </p>\n    <div class="upload-area">\n        <div class="fallback">\n            <input name="file" type="file" multiple />\n        </div>\n        <div class="dz-message"><p><%-_t("Drop files here...")%></p></div>\n        <div class="row browse-select">\n            <div class="col-md-9">\n                <input\n                    id="fakeUploadFile"\n                    placeholder="<%- _t("Choose File") %>"\n                    disabled\n                    />\n            </div>\n            <div class="col-md-3">\n                <button\n                    type="button"\n                    class="btn btn-primary browse">\n                    <%- _t("Browse") %>\n                </button>\n            </div>\n        </div>\n        <div class="upload-queue">\n            <div class="previews">\n            </div>\n            <div class="controls">\n                <% if (allowPathSelection) { %>\n                <div class="path">\n                    <label><%- _t("Upload to...") %></label>\n                    <p class="form-help">\n                        <%- _t("Select another destination folder or leave blank to add files to the current location.") %>\n                    </p>\n                    <input\n                        type="text"\n                        name="location"\n                        />\n                </div>\n                <% } %>\n                <div class="actions row">\n                    <div class="col-md-9">\n                        <div class="progress progress-striped active">\n                            <div class="progress-bar progress-bar-success"\n                                 role="progressbar"\n                                 aria-valuenow="0"\n                                 aria-valuemin="0"\n                                 aria-valuemax="100"\n                                 style="width: 0%">\n                                <span class="sr-only">40% Complete (success)</span>\n                            </div>\n                        </div>\n                    </div>\n                    <div class="col-md-3 align-right">\n                        <button\n                            type="button"\n                            class="btn btn-primary upload-all">\n                            <%- _t("Upload") %>\n                        </button>\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n</div>\n';});
 
 
-define('text!mockup-patterns-upload-url/templates/preview.xml',[],function () { return '<div class="row item form-inline">\n    <div class="col-md-1 action">\n        <button\n            type="button"\n            class="btn btn-danger btn-xs remove-item"\n            data-dz-remove=""\n            href="javascript:undefined;">\n            <span class="glyphicon glyphicon-remove"></span>\n        </button>\n    </div>\n    <div class="col-md-8 title">\n        <div class="dz-preview">\n          <div class="dz-details">\n            <div class="dz-filename"><span data-dz-name></span></div>\n          </div>\n          <div class="dz-error-message"><span data-dz-errormessage></span></div>\n        </div>\n        <div class="dz-progress">\n            <span class="dz-upload" data-dz-uploadprogress></span>\n        </div>\n    </div>\n    <div class="col-md-3 info">\n        <div class="dz-size" data-dz-size></div>\n        <img data-dz-thumbnail />\n    </div>\n</div>\n';});
+define('text!mockup-patterns-upload-url/templates/preview.xml',[],function () { return '<div class="row item form-inline">\n    <div class="col-xs-2 action">\n        <button\n            type="button"\n            class="btn btn-danger btn-xs remove-item"\n            data-dz-remove=""\n            href="javascript:undefined;">\n            <span class="glyphicon glyphicon-remove"></span>\n        </button>\n    </div>\n    <div class="col-xs-7 title">\n        <div class="dz-preview">\n          <div class="dz-details">\n            <div class="dz-filename"><span data-dz-name></span></div>\n          </div>\n          <div class="dz-error-message"><span data-dz-errormessage></span></div>\n        </div>\n        <div class="dz-progress">\n            <span class="dz-upload" data-dz-uploadprogress></span>\n        </div>\n    </div>\n    <div class="col-xs-3 info">\n        <div class="dz-size" data-dz-size></div>\n        <img data-dz-thumbnail />\n    </div>\n</div>\n';});
 
 /* Upload pattern.
  *
