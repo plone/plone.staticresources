@@ -30,26 +30,33 @@ How to upgrade the resources in this package
   If you want to fix something or add functionality in Mockup you have to do it there.
   This package is only to deliver the generated bundles as well as the npm dependencies so that building bundles is possible.
 
-1. Don't run ``yarn upgrade`` in this package. If you want to upgrade all
+1. Add ``plone.staticresources`` (and maybe also ``mockup``) to ``checkouts.cfg`` in ``buildout.coredev``
+   and do the buildout. This is important because otherwise ``./bin/plone-compile-resources`` will put the
+   generated bundles in the released egg!
+
+2. Don't run ``yarn upgrade`` in this package. If you want to upgrade all
    packages, do it in ``../src/mockup`` with ``rm yarn.lock && yarn`` (important: cannot be ``npm``) and execute the tests
    with ``make test`` there, commit the changes if all looks good.
 
-2. In this package, increase npm package versions in ``package.json``, in sections ``dependencies`` or ``devDependencies``.
+3. In this package, increase npm package versions in ``package.json``, in sections ``dependencies`` or ``devDependencies``.
    If you increase the mockup version, please verify the resolutions section in
-   package.json matches the one from mockup package.json.
+   ``package.json`` matches the one from mockup ``package.json``.
    Verify that the jquery version used is the same version that in mockup too.
    Then copy the yarn.lock from mockup ``cp ../src/mockup/yarn.lock .`` and run ``yarn``.
    This is to be sure we create the bundles with the same versions that mockup
-   was tested with.
+   was tested with. Commit the changes made to ``package.json`` and
+   ``yarn.lock``. Do a separate commit with the changes made in the ``components`` folder.
 
-3. Run ``./bin/plone-compile-resources -b plone`` or ``./bin/plone-compile-resources -b plone-logged-in`` (whichever bundle you need to re-build).
+4. Run ``./bin/plone-compile-resources -b plone`` or ``./bin/plone-compile-resources -b plone-logged-in`` (whichever bundle you need to re-build). If you are unsure, build them all: ``./bin/plone-compile-resources``
 
-4. Increase the ``last_compilation`` date in ``src/plone/staticresources/profiles/default/registry/bundles.xml``.
+5. Increase the ``last_compilation`` date in ``src/plone/staticresources/profiles/default/registry/bundles.xml``.
 
-5. Create an upgrade step in ``plone.staticresources`` (most probably increasing ``last_compilation`` date).
-   Add the upgrade step to the hidden profiles in ``getNonInstallableProfiles`` in ``setuphandlers.py``.
+6. Create an upgrade step in ``plone.staticresources`` (most probably increasing ``last_compilation`` date).
+   Add the upgrade step to the hidden profiles in ``getNonInstallableProfiles`` in ``setuphandlers.py`` and
+   increment the version in ``src/plone/staticresources/profiles/default/metadata.xml``.
+   See `PR 91 <https://github.com/plone/plone.staticresources/pull/91>`_ for a full example.
 
-6. Submit a Pull Request and run the tests on Jenkins.
+7. Submit a Pull Request and run the tests on Jenkins.
 
 
 What has changed
