@@ -8,6 +8,16 @@ Changelog
 
 .. towncrier release notes start
 
+1.3.1 (2020-07-17)
+------------------
+
+Bug fixes:
+
+
+- Update static resources.  Now in line with mockup 3.2.1.
+  [vincentfretin] (#91)
+
+
 1.3.0 (2020-06-28)
 ------------------
 
