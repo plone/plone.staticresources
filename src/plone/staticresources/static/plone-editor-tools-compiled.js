@@ -587,7 +587,7 @@ define('plone-patterns-toolbar',[
       }
       // check if the personal toolbar is not offseted if there isn't enough space
       // and we already have the plone-toolbar-more-options added to the page.
-      if ($pers_bar_container[0].offsetTop !== 0) {
+      if ($pers_bar_container[0] && $pers_bar_container[0].offsetTop !== 0) {
         that.cloneViewsIntoSubset(
           $pers_bar_container,
           $content_views,
@@ -5619,7 +5619,7 @@ define('mockup-ui-url/views/button',[
     },
     handleClick: function(e) {
       e.preventDefault();
-      if (!this.$el.prop('disabled')) {
+      if (!this.$el.is('.disabled')) {
         this.uiEventTrigger('click', this, e);
       }
     },
@@ -5627,10 +5627,10 @@ define('mockup-ui-url/views/button',[
       return _.extend({'icon': '', 'title': ''}, this.options);
     },
     disable: function() {
-      this.$el.prop('disabled', true);
+      this.$el.addClass('disabled');
     },
     enable: function() {
-      this.$el.prop('disabled', false);
+      this.$el.removeClass('disabled');
     }
   });
 
@@ -7667,7 +7667,7 @@ define('mockup-patterns-querystring',[
           $('[id$="sort_on"]', existingSortOn).val($(this).val());
         });
 
-      self.$sortOn.append($('<option value="">No sorting</option>')); // default no sorting
+      self.$sortOn.append($('<option value="">' + _t('No sorting') + '</option>')); // default no sorting
       for (var key in self.options['sortable_indexes']) { // jshint ignore:line
         self.$sortOn.append(
           $('<option/>')
@@ -8119,13 +8119,13 @@ define('mockup-patterns-structure-url/js/actions',[
   return Actions;
 });
 
-define('mockup-patterns-structure-url/js/actionmenu',['underscore'], function(_) {
+define('mockup-patterns-structure-url/js/actionmenu',['underscore', 'translate'], function(_, _t) {
   'use strict';
 
   var menuOptions = {
     'openItem': {
       'url':      '#',
-      'title':    'Open',
+      'title':    _t('Open'),
       'category': 'button',
       'iconCSS':  'glyphicon glyphicon-eye-open',
       'css': '',
@@ -8133,7 +8133,7 @@ define('mockup-patterns-structure-url/js/actionmenu',['underscore'], function(_)
     },
     'editItem': {
       'url':      '#',
-      'title':    'Edit',
+      'title':    _t('Edit'),
       'category': 'button',
       'iconCSS':  'glyphicon glyphicon-pencil',
       'css': '',
@@ -8143,7 +8143,7 @@ define('mockup-patterns-structure-url/js/actionmenu',['underscore'], function(_)
       'library':  'mockup-patterns-structure-url/js/actions',
       'method':   'cutClicked',
       'url':      '#',
-      'title':    'Cut',
+      'title':    _t('Cut'),
       'category': 'dropdown',
       'iconCSS':  'glyphicon glyphicon-scissors',
       'css': '',
@@ -8153,7 +8153,7 @@ define('mockup-patterns-structure-url/js/actionmenu',['underscore'], function(_)
       'library':  'mockup-patterns-structure-url/js/actions',
       'method':   'copyClicked',
       'url':      '#',
-      'title':    'Copy',
+      'title':    _t('Copy'),
       'category': 'dropdown',
       'iconCSS':  'glyphicon glyphicon-duplicate',
       'css': '',
@@ -8163,7 +8163,7 @@ define('mockup-patterns-structure-url/js/actionmenu',['underscore'], function(_)
       'library':  'mockup-patterns-structure-url/js/actions',
       'method':   'pasteClicked',
       'url':      '#',
-      'title':    'Paste',
+      'title':    _t('Paste'),
       'category': 'dropdown',
       'iconCSS':  'glyphicon glyphicon-open-file',
       'css': '',
@@ -8173,7 +8173,7 @@ define('mockup-patterns-structure-url/js/actionmenu',['underscore'], function(_)
       'library':  'mockup-patterns-structure-url/js/actions',
       'method':   'moveTopClicked',
       'url':      '#',
-      'title':    'Move to top of folder',
+      'title':    _t('Move to top of folder'),
       'category': 'dropdown',
       'iconCSS':  'glyphicon glyphicon-step-backward rright',
       'css': '',
@@ -8183,7 +8183,7 @@ define('mockup-patterns-structure-url/js/actionmenu',['underscore'], function(_)
       'library':  'mockup-patterns-structure-url/js/actions',
       'method':   'moveBottomClicked',
       'url':      '#',
-      'title':    'Move to bottom of folder',
+      'title':    _t('Move to bottom of folder'),
       'category': 'dropdown',
       'iconCSS':  'glyphicon glyphicon-step-backward rleft',
       'css': '',
@@ -8193,7 +8193,7 @@ define('mockup-patterns-structure-url/js/actionmenu',['underscore'], function(_)
       'library':  'mockup-patterns-structure-url/js/actions',
       'method':   'setDefaultPageClicked',
       'url':      '#',
-      'title':    'Set as default page',
+      'title':    _t('Set as default page'),
       'category': 'dropdown',
       'iconCSS':  'glyphicon glyphicon-ok-circle',
       'css': '',
@@ -8203,7 +8203,7 @@ define('mockup-patterns-structure-url/js/actionmenu',['underscore'], function(_)
       'library':  'mockup-patterns-structure-url/js/actions',
       'method':   'selectAll',
       'url':      '#',
-      'title':    'Select all contained items',
+      'title':    _t('Select all contained items'),
       'category': 'dropdown',
       'iconCSS':  'glyphicon glyphicon-check',
       'css': '',
@@ -8249,7 +8249,7 @@ define('mockup-patterns-structure-url/js/actionmenu',['underscore'], function(_)
 });
 
 
-define('text!mockup-patterns-structure-url/templates/actionmenu.xml',[],function () { return '<% _.each(menuOptions.button, function(menuOption){ %>\n<a class="action <%- menuOption.name %> <%- menuOption.idx %> pat-tooltip <%- menuOption.css %>"\n    href="<%- menuOption.url %>"\n    title="<%- _t(menuOption.title) %>"\n    aria-label="<%- _t(menuOption.title) %>">\n  <% if (menuOption.iconCSS) { %>\n  <span class="<%- menuOption.iconCSS %>"></span>\n  <% } else { %>\n  <%- _t(menuOption.title) %>\n  <% } %>\n</a>&nbsp;\n<% }); %>\n\n\n<% if (menuOptions.dropdown) { %>\n<a class="dropdown-toggle"\n    data-toggle="dropdown"\n    href="#"\n    aria-haspopup="true"\n    aria-expanded="true"\n    id="<%- id %>"\n    title="Actions">\n  <span class="glyphicon glyphicon-cog"></span><span class="caret"></span>\n</a>\n<ul class="dropdown-menu pull-right" aria-labelledby="<%- id %>">\n  <% if (header) { %>\n    <li class="dropdown-header"><%- header %></li>\n    <li class="divider"></li>\n  <% } %>\n\n  <% _.each(menuOptions.dropdown, function(menuOption){ %>\n  <li>\n    <a class="action <%- menuOption.name %> <%- menuOption.idx %> <%- menuOption.css %>"\n        href="<%- menuOption.url %>">\n      <% if (menuOption.iconCSS) { %>\n      <span class="<%- menuOption.iconCSS %>"></span>\n      <% } %>\n      <%- _t(menuOption.title) %>\n    </a>\n  </li>\n  <% }); %>\n</ul>\n<% } %>\n';});
+define('text!mockup-patterns-structure-url/templates/actionmenu.xml',[],function () { return '<% _.each(menuOptions.button, function(menuOption){ %>\n<a class="action <%- menuOption.name %> <%- menuOption.idx %> pat-tooltip <%- menuOption.css %>"\n    href="<%- menuOption.url %>"\n    title="<%- _t(menuOption.title) %>"\n    aria-label="<%- _t(menuOption.title) %>">\n  <% if (menuOption.iconCSS) { %>\n  <span class="<%- menuOption.iconCSS %>"></span>\n  <% } else { %>\n  <%- _t(menuOption.title) %>\n  <% } %>\n</a>&nbsp;\n<% }); %>\n\n\n<% if (menuOptions.dropdown) { %>\n<a class="dropdown-toggle"\n    data-toggle="dropdown"\n    href="#"\n    aria-haspopup="true"\n    aria-expanded="true"\n    id="<%- id %>"\n    title=\'<%- _t("Actions") %>\'>\n  <span class="glyphicon glyphicon-cog"></span><span class="caret"></span>\n</a>\n<ul class="dropdown-menu pull-right" aria-labelledby="<%- id %>">\n  <% if (header) { %>\n    <li class="dropdown-header"><%- header %></li>\n    <li class="divider"></li>\n  <% } %>\n\n  <% _.each(menuOptions.dropdown, function(menuOption){ %>\n  <li>\n    <a class="action <%- menuOption.name %> <%- menuOption.idx %> <%- menuOption.css %>"\n        href="<%- menuOption.url %>">\n      <% if (menuOption.iconCSS) { %>\n      <span class="<%- menuOption.iconCSS %>"></span>\n      <% } %>\n      <%- _t(menuOption.title) %>\n    </a>\n  </li>\n  <% }); %>\n</ul>\n<% } %>\n';});
 
 define('mockup-patterns-structure-url/js/views/actionmenu',[
   'jquery',
@@ -25397,6 +25397,9 @@ define('mockup-ui-url/views/popover',[
       actualHeight = $tip[0].offsetHeight;
 
       switch (placement) {
+        case 'bottom-right':
+          tp = {top: pos.top + pos.height, left: pos.left + pos.width - 40};
+          break;
         case 'bottom':
           tp = {top: pos.top + pos.height, left: pos.left + pos.width / 2 - actualWidth / 2};
           break;
@@ -25452,7 +25455,8 @@ define('mockup-ui-url/views/popover',[
 
         this.positionArrow(delta - width + actualWidth, actualWidth, 'left');
 
-      } else {
+      } else if (placement !== 'bottom-right') {
+        // If placement is bottom-right, don't override left position for the arrow that is defined in css to 20px.
         this.positionArrow(actualHeight - height, actualHeight, 'top');
       }
 
@@ -25523,7 +25527,7 @@ define('mockup-patterns-structure-url/js/views/selectionwell',[
   var WellView = PopoverView.extend({
     className: 'popover selected-items',
     title: _.template(
-      '<input type="text" class="filter" placeholder="Filter" />' +
+      '<input type="text" class="filter" placeholder="<%- _t("Filter") %>" />' +
       '<a href="#" class=" remove-all">' +
       '<span class="glyphicon glyphicon-remove-circle"></span> <%- _t("remove all") %></a>'
     ),
@@ -28007,7 +28011,7 @@ define('mockup-patterns-structure-url/js/views/textfilter',[
 define('text!mockup-patterns-upload-url/templates/upload.xml',[],function () { return '<div class="upload-container upload-multiple">\n    <h2 class="title"><%- _t("Upload here") %></h2>\n    <p class="help">\n        <%- _t(\'Drag and drop files from your computer onto the area below or click the Browse button.\') %>\n    </p>\n    <div class="upload-area">\n        <div class="fallback">\n            <input name="file" type="file" multiple />\n        </div>\n        <div class="dz-message"><p><%-_t("Drop files here...")%></p></div>\n        <div class="row browse-select">\n            <div class="col-md-9">\n                <input\n                    id="fakeUploadFile"\n                    placeholder="<%- _t("Choose File") %>"\n                    disabled\n                    />\n            </div>\n            <div class="col-md-3">\n                <button\n                    type="button"\n                    class="btn btn-primary browse">\n                    <%- _t("Browse") %>\n                </button>\n            </div>\n        </div>\n        <div class="upload-queue">\n            <div class="previews">\n            </div>\n            <div class="controls">\n                <% if (allowPathSelection) { %>\n                <div class="path">\n                    <label><%- _t("Upload to...") %></label>\n                    <p class="form-help">\n                        <%- _t("Select another destination folder or leave blank to add files to the current location.") %>\n                    </p>\n                    <input\n                        type="text"\n                        name="location"\n                        />\n                </div>\n                <% } %>\n                <div class="actions row">\n                    <div class="col-md-9">\n                        <div class="progress progress-striped active">\n                            <div class="progress-bar progress-bar-success"\n                                 role="progressbar"\n                                 aria-valuenow="0"\n                                 aria-valuemin="0"\n                                 aria-valuemax="100"\n                                 style="width: 0%">\n                                <span class="sr-only">40% Complete (success)</span>\n                            </div>\n                        </div>\n                    </div>\n                    <div class="col-md-3 align-right">\n                        <button\n                            type="button"\n                            class="btn btn-primary upload-all">\n                            <%- _t("Upload") %>\n                        </button>\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n</div>\n';});
 
 
-define('text!mockup-patterns-upload-url/templates/preview.xml',[],function () { return '<div class="row item form-inline">\n    <div class="col-md-1 action">\n        <button\n            type="button"\n            class="btn btn-danger btn-xs remove-item"\n            data-dz-remove=""\n            href="javascript:undefined;">\n            <span class="glyphicon glyphicon-remove"></span>\n        </button>\n    </div>\n    <div class="col-md-8 title">\n        <div class="dz-preview">\n          <div class="dz-details">\n            <div class="dz-filename"><span data-dz-name></span></div>\n          </div>\n          <div class="dz-error-message"><span data-dz-errormessage></span></div>\n        </div>\n        <div class="dz-progress">\n            <span class="dz-upload" data-dz-uploadprogress></span>\n        </div>\n    </div>\n    <div class="col-md-3 info">\n        <div class="dz-size" data-dz-size></div>\n        <img data-dz-thumbnail />\n    </div>\n</div>\n';});
+define('text!mockup-patterns-upload-url/templates/preview.xml',[],function () { return '<div class="row item form-inline">\n    <div class="col-xs-2 action">\n        <button\n            type="button"\n            class="btn btn-danger btn-xs remove-item"\n            data-dz-remove=""\n            href="javascript:undefined;">\n            <span class="glyphicon glyphicon-remove"></span>\n        </button>\n    </div>\n    <div class="col-xs-7 title">\n        <div class="dz-preview">\n          <div class="dz-details">\n            <div class="dz-filename"><span data-dz-name></span></div>\n          </div>\n          <div class="dz-error-message"><span data-dz-errormessage></span></div>\n        </div>\n        <div class="dz-progress">\n            <span class="dz-upload" data-dz-uploadprogress></span>\n        </div>\n    </div>\n    <div class="col-xs-3 info">\n        <div class="dz-size" data-dz-size></div>\n        <img data-dz-thumbnail />\n    </div>\n</div>\n';});
 
 /* Upload pattern.
  *
@@ -30146,7 +30150,8 @@ define('mockup-patterns-structure-url/js/views/app',[
       self.columnsView = new ColumnsView({
         app: self,
         triggerView: columnsBtn,
-        id: 'structure-columns'
+        id: 'structure-columns',
+        placement: 'bottom-right'
       });
       items.push(columnsBtn);
 
