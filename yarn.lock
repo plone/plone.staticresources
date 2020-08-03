@@ -523,7 +523,8 @@ jqtree@1.4.10, jqtree@>=0.16:
 
 jquery@, jquery@1.12.4, jquery@>=1.7, jquery@>=1.7.2, jquery@>=1.9:
   version "1.12.4"
-  resolved "https://github.com/jquery/jquery-dist.git#5e89585e0121e72ff47de177c5ef604f3089a53d"
+  resolved "https://registry.yarnpkg.com/jquery/-/jquery-1.12.4.tgz#01e1dfba290fe73deba77ceeacb0f9ba2fec9e0c"
+  integrity sha1-AeHfuikP5z3rp3zurLD5ui/sngw=
 
 jsbn@~0.1.0:
   version "0.1.1"
@@ -635,9 +636,9 @@ mkdirp@~0.3.5:
   resolved "https://registry.yarnpkg.com/mkdirp/-/mkdirp-0.3.5.tgz#de3e5f8961c88c787ee1368df849ac4413eca8d7"
   integrity sha1-3j5fiWHIjHh+4TaN+EmsRBPsqNc=
 
-"mockup@https://github.com/plone/mockup.git#2767f8d3d68c50e265bce434468ef2c7a4632a67":
-  version "3.2.1"
-  resolved "https://github.com/plone/mockup.git#2767f8d3d68c50e265bce434468ef2c7a4632a67"
+"mockup@https://github.com/plone/mockup.git#c875ad19ecafcfad6bc8e99be9e049b6c67b7d69":
+  version "3.2.2"
+  resolved "https://github.com/plone/mockup.git#c875ad19ecafcfad6bc8e99be9e049b6c67b7d69"
   dependencies:
     ace-builds "https://github.com/ajaxorg/ace-builds.git#v1.2.6"
     backbone "https://github.com/jashkenas/backbone.git#1.1.2"
