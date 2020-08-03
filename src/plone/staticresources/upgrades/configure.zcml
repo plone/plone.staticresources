@@ -10,5 +10,6 @@
   <include file="7.zcml" />
   <include file="8.zcml" />
   <include file="9.zcml" />
+  <include file="10.zcml" />
 
 </configure>
