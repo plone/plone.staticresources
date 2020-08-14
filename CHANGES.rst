@@ -8,6 +8,19 @@ Changelog
 
 .. towncrier release notes start
 
+1.3.2 (2020-08-14)
+------------------
+
+Bug fixes:
+
+
+- Update static resources.
+  [pbauer] (#94)
+- Fix content type icons not showing in the toolbar Add menu on Safari.
+  This fixes https://github.com/plone/Products.CMFPlone/issues/3163
+  [vincentfretin] (#95)
+
+
 1.3.1 (2020-07-17)
 ------------------
 
