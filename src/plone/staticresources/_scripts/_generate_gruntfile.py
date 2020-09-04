@@ -13,7 +13,7 @@ from Products.Five.browser.resource import FileResource
 from zope.component import getSiteManager
 from zope.component import getUtility
 from zope.interface import alsoProvides
-from zope.site.hooks import setSite
+from zope.component.hooks import setSite
 
 import json
 import os
