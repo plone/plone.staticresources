@@ -13,7 +13,7 @@
     "datatables.net-bs": "https://github.com/DataTables/Dist-DataTables-Bootstrap.git#1.10.16"
   },
   "dependencies": {
-    "bootstrap-icons": "1.0.0-alpha3",
+    "bootstrap-icons": "1.0.0",
     "jquery": "1.12.4",
     "less": "https://github.com/less/less.git#v2.7.3",
     "mockup": "https://github.com/plone/mockup.git#e69dad0c4bd9c8df1e9f558474a9661578608cf2",
