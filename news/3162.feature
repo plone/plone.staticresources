@@ -1,2 +1,2 @@
-Updated Bootstrap Icons to 1.0.0 final.
+Update Bootstrap icons and add registration.
 [santonelli]

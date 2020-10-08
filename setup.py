@@ -5,12 +5,17 @@ from setuptools import find_packages
 from setuptools import setup
 
 
-long_description = "\n\n".join([open("README.rst").read(), open("CHANGES.rst").read(),])
+long_description = "\n\n".join(
+    [
+        open("README.rst").read(),
+        open("CHANGES.rst").read(),
+    ]
+)
 
 
 setup(
     name="plone.staticresources",
-    version="1.3.3.dev0",
+    version="1.4.0.dev0",
     description="Static resources for Plone",
     long_description=long_description,
     classifiers=[
@@ -37,11 +42,21 @@ setup(
     package_dir={"": "src"},
     include_package_data=True,
     zip_safe=False,
-    install_requires=["Products.GenericSetup", "setuptools", "plone.resource",],
-    extras_require={"test": ["plone.app.testing", "plone.testing",],},
+    install_requires=[
+        "Products.GenericSetup",
+        "setuptools",
+        "plone.resource",
+    ],
+    extras_require={
+        "test": [
+            "plone.app.testing",
+            "plone.testing",
+        ],
+    },
     entry_points="""
     [console_scripts]
     plone-compile-resources = plone.staticresources._scripts.compile_resources:main
+    plone-register-icons = plone.staticresources._scripts.register_icons:main
     [z3c.autoinclude.plugin]
     target = plone
     """,  # noqa
