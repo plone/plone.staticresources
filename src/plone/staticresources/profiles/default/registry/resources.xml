@@ -237,22 +237,14 @@
       </value>
   </records>
 
+  <records prefix="plone.resources/sortable"
+            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
+      <value key="js">++plone++static/components/sortablejs/dist/sortable.umd.js</value>
+  </records>
+
   <records prefix="plone.resources/text"
             interface='Products.CMFPlone.interfaces.IResourceRegistry'>
       <value key="js">++plone++static/components/requirejs-text/text.js</value>
-  </records>
-
-  <records prefix="plone.resources/jquery.event.drag"
-            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-      <value key="js">++resource++mockuplib/jquery.event.drag.js</value>
-      <value key="deps">jquery</value>
-  </records>
-
-  <records prefix="plone.resources/jquery.event.drop"
-            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-      <value key="js">++resource++mockuplib/jquery.event.drop.js</value>
-      <value key="deps">jquery</value>
-      <value key="export">$.drop</value>
   </records>
 
   <records prefix="plone.resources/tinymce-advlist"
