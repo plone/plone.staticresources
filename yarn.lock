@@ -95,10 +95,10 @@ boom@2.x.x:
   dependencies:
     hoek "2.x.x"
 
-bootstrap-icons@1.0.0-alpha3:
-  version "1.0.0-alpha3"
-  resolved "https://registry.yarnpkg.com/bootstrap-icons/-/bootstrap-icons-1.0.0-alpha3.tgz#413171e88b79315e712e6ab65601f64b1735d566"
-  integrity sha512-UO++43jb/qlWVsC31WkHOjFsTihJkSz0wngnUS+P1ImcCMTqDJqDHySld+hpkzxi+q6fL8iom7nfT3ApAxZ6cQ==
+bootstrap-icons@1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/bootstrap-icons/-/bootstrap-icons-1.0.0.tgz#90ed08c9503cef95184972420fbea7b09780bd83"
+  integrity sha512-PaQm3VtSqbUnWuyqGmFJG5iF9UMieDuk8raPOmKOtKeyWyiVshgLoKa+9EWGolGU/nvyBLEBWhZoQqhu9ccNBg==
 
 "bootstrap@https://github.com/twbs/bootstrap.git#v3.4.1":
   version "3.4.1"
