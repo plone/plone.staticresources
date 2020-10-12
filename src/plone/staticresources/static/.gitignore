@@ -1,3 +1,4 @@
+components/.bin
 components/ace-builds/src-noconflict
 components/ace-builds/src-min-noconflict
 components/ace-builds/src-min
@@ -13,4 +14,9 @@ tinymce-builded/tests
 **/node_modules
 **/bower_components
 **/test*
+**/.github
 *.map
+.npmignore
+.eslint*
+.jscs*
+.yarn*
