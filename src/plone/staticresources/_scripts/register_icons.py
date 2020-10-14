@@ -15,7 +15,7 @@ registry_template = """<?xml version="1.0"?>
 """
 
 entry = """
-  <record name="plone.staticresources.icon.{icon}">
+  <record name="plone.icon.{icon}">
     <field type="plone.registry.field.TextLine">
       <title>Bootstrap Icon {icon}</title>
     </field>
