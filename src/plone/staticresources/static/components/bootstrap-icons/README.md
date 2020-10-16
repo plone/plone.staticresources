@@ -1,6 +1,6 @@
 <p align="center">
-  <a href="https://getbootstrap.com/">
-    <img src="https://getbootstrap.com/docs/4.3/assets/brand/bootstrap-solid.svg" alt="Bootstrap logo" width="72" height="72">
+  <a href="https://v5.getbootstrap.com/">
+    <img src="https://v5.getbootstrap.com/docs/5.0/assets/brand/bootstrap-logo-shadow.png" alt="Bootstrap logo" width="200" height="165">
   </a>
 </p>
 
@@ -12,28 +12,39 @@
   <a href="https://icons.getbootstrap.com/"><strong>Explore Bootstrap Icons »</strong></a>
   <br>
   <br>
-  <a href="https://getbootstrap.com/docs/4.3/">Bootstrap</a>
+  <a href="https://getbootstrap.com/docs/4.5/">Bootstrap</a>
   ·
   <a href="https://themes.getbootstrap.com/">Themes</a>
   ·
   <a href="https://blog.getbootstrap.com/">Blog</a>
 </p>
 
-# 500+ icons
+## 1,100+ icons
 
-![Bootstrap Icons full set](https://user-images.githubusercontent.com/98681/77025215-bea36900-694d-11ea-9f2d-68485c4a2543.png)
+[![Bootstrap Icons full set](https://user-images.githubusercontent.com/98681/91365119-402cdc00-e7b5-11ea-9a2c-e1a03aed21c3.png)](https://icons.getbootstrap.com)
 
-[Also available in Figma.](https://www.figma.com/file/NKZWcfR2T3FU0I7fNLqFvI/Bootstrap-Icons-v1.0.0-alpha3)
+[Also available in Figma.](https://www.figma.com/file/9YmlUAwhMv99G4yP4yN7Jy/Bootstrap-Icons-v1.0.0?node-id=0%3A1)
 
-# Install
+## Install
 
-Bootstrap Icons are packaged up and published to npm. We only include the processed SVGs in this package—it's up to you and your team to implement. [Read our docs](https://icons.getbootstrap.com/) at for usage instructions.
+Bootstrap Icons are packaged up and published to npm. We only include the processed SVGs in this package—it's up to you and your team to implement. [Read our docs](https://icons.getbootstrap.com/) for usage instructions.
 
 ```shell
 npm i bootstrap-icons --save
 ```
 
-# Development
+## Usage
+
+Depending on your setup, you can include Bootstrap Icons in a handful of ways.
+
+- Copy-paste SVGs as embedded HTML
+- Reference via `<img>` element
+- Use the SVG sprite
+- Include via CSS
+
+[See the docs for more information.](https://icons.getbootstrap.com/#usage)
+
+## Development
 
 [![Build Status](https://github.com/twbs/icons/workflows/Tests/badge.svg)](https://github.com/twbs/icons/actions?workflow=Tests)
 
@@ -48,27 +59,34 @@ npm start
 
 Then open `http://localhost:4000` in your browser.
 
-# Adding SVGs
+### npm scripts
+
+Here are some key scripts you'll use during development. Be sure to look to our `package.json` for a complete list of scripts.
+
+| Script | Description |
+| --- | --- |
+| `start` | Alias for running `docs-serve` |
+| `docs-serve` | Starts a local Hugo server |
+| `pages` | Generates permalink pages for each icon with template Markdown |
+| `icons` | Processes and optimizes SVGs in `icons` directory |
+
+## Adding SVGs
 
 Once a new SVG icon has been added to the `icons` directory, you'll need to optimize them. An npm script is used to:
 
 1. Optimize our SVGs with SVGO.
 2. Modify the SVGs source HTML, removing all attributes before setting new attributes and values in our preferred order.
 
-Use `npm run icons` to run the script, then commit the results in a new branch for updating.
+Use `npm run icons` to run the script, run `npm run pages` to build permalink pages, complete those pages, and, finally, commit the results in a new branch for updating.
 
-# Publishing
+## Publishing
 
-Docs are published via an npm script that builds the Hugo site, creates a temporary Git repo, and force pushes that to our `gh-pages` branch. This circumvents issues with GitHub Pages not working with Hugo.
+Documentation is published automatically when a new Git tag is published. See our GitHub Actions and `package.json` for more information.
 
-```shell
-npm run publish
-```
-
-# License
+## License
 
 MIT
 
-# Author
+## Author
 
-@mdo
+[@mdo](https://github.com/mdo)
