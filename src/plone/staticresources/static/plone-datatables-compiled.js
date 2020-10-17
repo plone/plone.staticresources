@@ -16168,46 +16168,44 @@ c){"dt"===a.namespace&&g.select.init(new g.Api(c))});return g.select});
  */
 
 define('mockup-patterns-datatables',[
-  'jquery',
-  'pat-base',
-  'datatables.net',
-  'datatables.net-bs',
-  'datatables.net-buttons',
-  "datatables.net-buttons-colvis",
-  "datatables.net-buttons-flash",
-  "datatables.net-buttons-html5",
-  "datatables.net-buttons-print",
-  'datatables.net-buttons-bs',
-  'datatables.net-colreorder',
-  'datatables.net-rowreorder',
-  'datatables.net-fixedcolumns',
-  'datatables.net-fixedheader',
-  'datatables.net-select'
-], function($, Base, Dt) {
-  'use strict';
+    "jquery",
+    "pat-base",
+    "datatables.net",
+    "datatables.net-bs",
+    "datatables.net-buttons",
+    "datatables.net-buttons-colvis",
+    "datatables.net-buttons-flash",
+    "datatables.net-buttons-html5",
+    "datatables.net-buttons-print",
+    "datatables.net-buttons-bs",
+    "datatables.net-colreorder",
+    "datatables.net-rowreorder",
+    "datatables.net-fixedcolumns",
+    "datatables.net-fixedheader",
+    "datatables.net-select",
+], function ($, Base, Dt) {
+    "use strict";
 
-  var DataTables = Base.extend({
-    // The name for this pattern
-    name: 'datatables',
-    trigger: '.pat-datatables',
-    parser: 'mockup',
-    table: null,
+    var DataTables = Base.extend({
+        // The name for this pattern
+        name: "datatables",
+        trigger: ".pat-datatables",
+        parser: "mockup",
+        table: null,
 
-    defaults: {
-      // Default values for attributes
-    },
+        defaults: {
+            // Default values for attributes
+        },
 
-    init: function() {
-      // The init code for your pattern goes here
-      var self = this;
-      // self.$el contains the html element
-      self.table = self.$el.DataTable(self.options);
+        init: function () {
+            // The init code for your pattern goes here
+            var self = this;
+            // self.$el contains the html element
+            self.table = self.$el.DataTable(self.options);
+        },
+    });
 
-    }
-  });
-
-  return DataTables;
-
+    return DataTables;
 });
 
 /* globals requirejs */
@@ -16233,5 +16231,5 @@ require([
   'use strict';
 });
 
-define("/home/vincentfretin/workspace/buildout.coredev-5.2/src/plone.staticresources/src/plone/staticresources/static/plone-datatables.js", function(){});
+define("/home/_thet/data/dev/plone/buildout.coredev/src/plone.staticresources/src/plone/staticresources/static/plone-datatables.js", function(){});
 

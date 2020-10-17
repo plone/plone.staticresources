@@ -2142,14 +2142,14 @@ define('pat-logger',[
 define('pat-utils',[
     "jquery",
     "underscore",
-    "jquery.browser"  // adds itself to the jquery object, no need to pass to the define callback.
-], function($, _) {
+    "jquery.browser"
+], function($, _, browser) {
 
     $.fn.safeClone = function () {
         var $clone = this.clone();
         // IE BUG : Placeholder text becomes actual value after deep clone on textarea
         // https://connect.microsoft.com/IE/feedback/details/781612/placeholder-text-becomes-actual-value-after-deep-clone-on-textarea
-        if ($.browser.msie !== undefined && true) {
+        if (browser.msie !== undefined && true) {
             $clone.findInclusive(':input[placeholder]').each(function(i, item) {
                 var $item = $(item);
                 if ($item.attr('placeholder') === $item.val()) {
@@ -2323,8 +2323,10 @@ define('pat-utils',[
     // END: Taken from Underscore.js until here.
 
     function rebaseURL(base, url) {
-        if (url.indexOf("://")!==-1 || url[0]==="/")
+        base = new URL(base, window.location).href; // If base is relative make it absolute.
+        if (url.indexOf("://") !== -1 || url[0] === "/" || url.indexOf("data:") === 0) {
             return url;
+        }
         return base.slice(0, base.lastIndexOf("/")+1) + url;
     }
 
@@ -2386,6 +2388,22 @@ define('pat-utils',[
             });
         }
     }
+
+    function hasValue(el) {
+       if (el.tagName === "INPUT") {
+           if (el.type === "checkbox" || el.type === "radio") {
+               return el.checked;
+           }
+           return el.value !== "";
+       }
+       if (el.tagName === "SELECT") {
+           return el.selectedIndex !== -1;
+       }
+       if (el.tagName === "TEXTAREA") {
+           return el.value !== "";
+       }
+       return false;
+    };
 
     var transitions = {
         none: {hide: "hide", show: "show"},
@@ -2498,14 +2516,14 @@ define('pat-utils',[
         return results;
     }
 
-    isElementInViewport = function (el, partial, offset) { 
-        /* returns true if element is visible to the user ie. is in the viewport. 
+    isElementInViewport = function (el, partial, offset) {
+        /* returns true if element is visible to the user ie. is in the viewport.
          * Setting partial parameter to true, will only check if a part of the element is visible
-         * in the viewport, specifically that some part of that element is touching the top part 
+         * in the viewport, specifically that some part of that element is touching the top part
          * of the viewport. This only applies to the vertical direction, ie. doesnt check partial
          * visibility for horizontal scrolling
          * some code taken from:
-         * http://stackoverflow.com/questions/123999/how-to-tell-if-a-dom-element-is-visible-in-the-current-viewport/7557433#7557433         
+         * http://stackoverflow.com/questions/123999/how-to-tell-if-a-dom-element-is-visible-in-the-current-viewport/7557433#7557433
          */
         if (el === []) {
             return false;
@@ -2517,14 +2535,14 @@ define('pat-utils',[
             rec_values = [rec.top, rec.bottom, rec.left, rec.right];
         if ( _.every(rec_values, function zero(v) { if ( v === 0 ){ return true;}}) ) {
             // if every property of rec is 0, the element is invisible;
-            return false;            
+            return false;
         } else if (partial) {
             // when using getBoundingClientRect() (in the vertical case)
             // negative means above top of viewport, positive means below top of viewport
             // therefore for part of the element to be touching or crossing the top of the viewport
-            // rec.top must <= 0 and rec.bottom must >= 0 
-            // an optional tolerance offset can be added for when the desired element is not exactly 
-            // toucing the top of the viewport but needs to be considered as touching. 
+            // rec.top must <= 0 and rec.bottom must >= 0
+            // an optional tolerance offset can be added for when the desired element is not exactly
+            // toucing the top of the viewport but needs to be considered as touching.
             if (offset === undefined) {
                 offset = 0;
             }
@@ -2535,16 +2553,66 @@ define('pat-utils',[
                 // XXX do we want to include a check for the padding of an element?
                 // using window.getComputedStyle(target).paddingTop
             );
-        } else {           
-            // this will return true if the entire element is completely in the viewport 
-            return ( 
+        } else {
+            // this will return true if the entire element is completely in the viewport
+            return (
                 rec.top >= 0 &&
                 rec.left >= 0 &&
                 rec.bottom <= (window.innerHeight || document.documentElement.clientHeight) && /*or $(window).height() */
                 rec.right <= (window.innerWidth || document.documentElement.clientWidth) /*or $(window).width() */
-            );        
+            );
         }
     };
+
+    function parseTime(time) {
+        var m = /^(\d+(?:\.\d+)?)\s*(\w*)/.exec(time);
+        if (!m) {
+            throw new Error('Invalid time');
+        }
+        var amount = parseFloat(m[1])
+        switch (m[2]) {
+            case 's':
+                return Math.round(amount * 1000);
+            case 'm':
+                return Math.round(amount * 1000 * 60);
+            case 'ms':
+            default:
+                return Math.round(amount);
+        }
+    }
+
+    // Return a jQuery object with elements related to an input element.
+    function findRelatives(el) {
+        var $el = $(el),
+            $relatives = $(el),
+            $label = $();
+
+        $relatives=$relatives.add($el.closest("label"));
+        $relatives=$relatives.add($el.closest("fieldset"));
+
+        if (el.id)
+            $label=$("label[for='"+el.id+"']");
+        if (!$label.length) {
+            var $form = $el.closest("form");
+            if (!$form.length)
+                $form=$(document.body);
+            $label=$form.find("label[for='"+el.name+"']");
+        }
+        $relatives=$relatives.add($label);
+        return $relatives;
+    }
+
+    function getCSSValue(el, property, asPixels) {
+        /* Return a CSS property value for a given DOM node.
+         * For length-values, relative values are converted to pixels.
+         * Optionally parse as pixels, if applicable.
+        */
+        var value = window.getComputedStyle(el).getPropertyValue(property);
+        if (asPixels) {
+            value = parseFloat(value) || 0.0;
+        }
+        return value;
+    }
 
     var utils = {
         // pattern pimping - own module?
@@ -2561,7 +2629,11 @@ define('pat-utils',[
         addURLQueryParameter: addURLQueryParameter,
         removeDuplicateObjects: removeDuplicateObjects,
         mergeStack: mergeStack,
-        isElementInViewport: isElementInViewport
+        isElementInViewport: isElementInViewport,
+        hasValue: hasValue,
+        parseTime: parseTime,
+        findRelatives: findRelatives,
+        getCSSValue: getCSSValue
     };
     return utils;
 });
@@ -3042,8 +3114,8 @@ define('pat-jquery-ext',["jquery"], function($) {
                         "inExceptionArea": false
                     });
 
-                    $this.bind( "mouseover.timeout", methods.mouseMoved );
-                    $this.bind( "mouseenter.timeout", methods.mouseMoved );
+                    $this.on( "mouseover.timeout", methods.mouseMoved );
+                    $this.on( "mouseenter.timeout", methods.mouseMoved );
 
                     $(settings.exceptionAreas).each(function() {
                         $this.find(this)
@@ -3077,7 +3149,7 @@ define('pat-jquery-ext',["jquery"], function($) {
                 var $this = $(this),
                     data = $this.data("timeout");
 
-                $(window).unbind(".timeout");
+                $(window).off(".timeout");
                 data.timeout.remove();
                 $this.removeData("timeout");
             });
@@ -3190,6 +3262,25 @@ define('pat-jquery-ext',["jquery"], function($) {
         });
     };
 
+    //Work around warning for jQuery 3.x:
+    //JQMIGRATE: jQuery.fn.offset() requires an element connected to a document
+    $.fn.safeOffset = function() {
+        var docElem,
+            elem = this[ 0 ],
+            origin = { top: 0, left: 0 };
+
+	if ( !elem || !elem.nodeType ) {
+            return origin;
+	}
+
+        docElem = ( elem.ownerDocument || document).documentElement;
+        if ( !jQuery.contains(docElem, elem)) {
+            return origin;
+        }
+
+        return jQuery.fn.offset.apply( this, arguments );
+    };
+
     //Make absolute location
     $.fn.setPositionAbsolute = function(element,offsettop,offsetleft) {
         return this.each(function() {
@@ -3197,7 +3288,7 @@ define('pat-jquery-ext',["jquery"], function($) {
             // dynamically since every browser has different settings
             var $this = $(this);
             var thiswidth = $(this).width();
-            var    pos   = element.offset();
+            var    pos   = element.safeOffset();
             var    width = element.width();
             var    height = element.height();
             var setleft = (pos.left + width - thiswidth + offsetleft);
@@ -3216,10 +3307,10 @@ define('pat-jquery-ext',["jquery"], function($) {
             var $ancestor = $(this).closest(selector);
             if ($ancestor.length && $ancestor.css("position") !== "static") {
                 var $child = $(this);
-                var childMarginEdgeLeft = $child.offset().left - parseInt($child.css("marginLeft"), 10);
-                var childMarginEdgeTop = $child.offset().top - parseInt($child.css("marginTop"), 10);
-                var ancestorPaddingEdgeLeft = $ancestor.offset().left + parseInt($ancestor.css("borderLeftWidth"), 10);
-                var ancestorPaddingEdgeTop = $ancestor.offset().top + parseInt($ancestor.css("borderTopWidth"), 10);
+                var childMarginEdgeLeft = $child.safeOffset().left - parseInt($child.css("marginLeft"), 10);
+                var childMarginEdgeTop = $child.safeOffset().top - parseInt($child.css("marginTop"), 10);
+                var ancestorPaddingEdgeLeft = $ancestor.safeOffset().left + parseInt($ancestor.css("borderLeftWidth"), 10);
+                var ancestorPaddingEdgeTop = $ancestor.safeOffset().top + parseInt($ancestor.css("borderTopWidth"), 10);
                 left = childMarginEdgeLeft - ancestorPaddingEdgeLeft;
                 top = childMarginEdgeTop - ancestorPaddingEdgeTop;
                 // we have found the ancestor and computed the position
@@ -3237,9 +3328,16 @@ define('pat-jquery-ext',["jquery"], function($) {
     // XXX: In compat.js we include things for browser compatibility,
     // but these two seem to be only convenience. Do we really want to
     // include these as part of patterns?
-    String.prototype.startsWith = function(str) { return (this.match("^"+str) !== null); };
-    String.prototype.endsWith = function(str) { return (this.match(str+"$") !== null); };
-
+    if (!String.prototype.startsWith) {
+        String.prototype.startsWith = function (str) {
+            return (this.match("^" + str) !== null);
+        };
+    }
+    if (!String.prototype.endsWith) {
+        String.prototype.endsWith = function(str) {
+            return (this.match(str+"$") !== null);
+        };
+    }
 
     /******************************
 
@@ -3764,5 +3862,5 @@ require([
 
 });
 
-define("/home/vincentfretin/workspace/buildout.coredev-5.2/src/plone.staticresources/src/plone/staticresources/static/plone-base.js", function(){});
+define("/home/_thet/data/dev/plone/buildout.coredev/src/plone.staticresources/src/plone/staticresources/static/plone-base.js", function(){});
 
