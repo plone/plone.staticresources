@@ -9,12 +9,14 @@ define(
         'moment',
         'modernizr'
     ],
-    function(_, Parser, registry, Base, Pikaday, moment) {
+    function(_, Parser, registry, Base, Pikaday, moment, Modernizr) {
         var parser = new Parser('date-picker');
         parser.addArgument('behavior', 'styled', ['native', 'styled']);
         parser.addArgument('format', 'YYYY-MM-DD');
         parser.addArgument('week-numbers', [], ['show', 'hide']);
         parser.addArgument('i18n'); // URL pointing to JSON resource with i18n values
+        parser.addArgument('first-day', 0);
+
         /* JSON format for i18n
         * { "previousMonth": "Previous Month",
         *   "nextMonth"    : "Next Month",
@@ -40,6 +42,7 @@ define(
                 var config = {
                     field: this.$el[0],
                     format: this.options.format,
+                    firstDay: this.options.firstDay,
                     showWeekNumber: this.options.weekNumbers === 'show',
                     toString: function (date, format) {
                         var date = moment(date).format(format);
@@ -62,13 +65,20 @@ define(
                 }
 
                 if (this.options.i18n) {
-                    $.getJSON(this.options.i18n, function(data) {
+                    $.getJSON(
+                        this.options.i18n
+                    ).done(function(data) {
                         config.i18n = data;
+                    }).fail($.proxy(function() {
+                        console.error('date-picker could not load i18n: ' + this.options.i18n);
+                    }, this)).always(function() {
+                        new Pikaday(config);
                     });
+                } else {
+                    new Pikaday(config);
                 }
-
-                new Pikaday(config);
                 return this.$el;
+
             },
 
             isodate: function() {
@@ -78,4 +88,4 @@ define(
 
         });
     }
-);
+)

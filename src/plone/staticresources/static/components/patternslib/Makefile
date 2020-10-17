@@ -1,12 +1,10 @@
-BOWER 		?= node_modules/.bin/bower
 JSHINT 		?= node_modules/.bin/jshint
 PEGJS		?= node_modules/.bin/pegjs
-PHANTOMJS	?= node_modules/.bin/phantomjs
-HTTPSERVE   ?= node_modules/.bin/http-server
 BUNDLE      ?= ./.bundle/bin/bundle
 SASS        ?= ./.bundle/bin/sass
 
-SOURCES		= $(wildcard src/*.js) $(wildcard src/pat/*.js) $(wildcard src/pat/calendar/*.js) $(wildcard src/lib/*.js)
+# SOURCES		= $(wildcard src/*.js) $(wildcard src/pat/*.js) $(wildcard src/pat/*/*.js) $(wildcard src/pat/calendar/*.js) $(wildcard src/lib/*.js)
+SOURCES		= $(wildcard src/*.js) $(wildcard src/pat/*.js) $(wildcard src/lib/*.js)
 BUNDLES		= bundles/patterns.js bundles/patterns.min.js
 
 GENERATED	= src/lib/depends_parse.js
@@ -17,21 +15,17 @@ JSHINTEXCEPTIONS = $(GENERATED) \
 		   src/lib/dependshandler.js \
 		   src/lib/htmlparser.js \
 		   src/pat/skeleton.js \
+		   src/modernizr.js \
 		   $(TESTSOURCES)
 CHECKSOURCES	= $(filter-out $(JSHINTEXCEPTIONS),$(SOURCES))
 
-all:: bundle.js
+all:: bundle.js css
 
 ########################################################################
 ## Install dependencies
 
 stamp-npm: package.json
-	npm install
-	touch stamp-npm
-
-stamp-bower: stamp-npm bower.json
-	$(BOWER) install
-	touch stamp-bower
+	npm install --no-optional
 
 stamp-bundler:
 	mkdir -p .bundle
@@ -40,8 +34,8 @@ stamp-bundler:
 	touch stamp-bundler
 
 clean::
-	rm -f stamp-npm stamp-bower stamp-bundler
-	rm -rf node_modules src/bower_components
+	rm -f stamp-npm
+	rm -rf node_modules
 
 ########################################################################
 ## Tests
@@ -52,24 +46,24 @@ jshint: stamp-npm
 
 
 .PHONY: check
-check:: stamp-bower jshint
-	$(PHANTOMJS) node_modules/phantom-jasmine/lib/run_jasmine_test.coffee tests.html
+check:: stamp-npm jshint
+	npm run test
 
 
 ########################################################################
 ## Builds
 
-build:: bundle
+build:: bundle all_css
 
-bundle bundle.js: $(GENERATED) $(SOURCES) build.js stamp-bower
-	node_modules/.bin/r.js -o build.js
+bundle bundle.js: $(GENERATED) $(SOURCES) stamp-npm
+	npm run build
 
 src/lib/depends_parse.js: src/lib/depends_parse.pegjs stamp-npm
 	$(PEGJS) $<
 	sed -i~ -e '1s/.*/define(function() {/' -e '$$s/()//' $@ || rm -f $@
 
 clean::
-	rm -f bundle.js
+	rm -f bundle.js bundle.min.js
 
 all_css:: css
 	@echo "Hang tight!"
@@ -80,7 +74,7 @@ all_css:: css
 	@$(SASS) -I . -I _sass src/pat/bumper/_bumper.scss src/pat/bumper/bumper.css
 	@$(SASS) -I . -I _sass src/pat/calendar/_calendar.scss src/pat/calendar/calendar.css
 	@$(SASS) -I . -I _sass src/pat/carousel/_carousel.scss src/pat/carousel/carousel.css
-	@$(SASS) -I . -I _sass src/pat/checked-flag/_checked-flag.scss src/pat/checked-flag/checked-flag.css
+	@$(SASS) -I . -I _sass src/pat/carousel/_carousel-legacy.scss src/pat/carousel-legacy/carousel-legacy.css
 	@$(SASS) -I . -I _sass src/pat/checklist/_checklist.scss src/pat/checklist/checklist.css
 	@$(SASS) -I . -I _sass src/pat/clone/_clone.scss src/pat/clone/clone.css
 	@$(SASS) -I . -I _sass src/pat/collapsible/_collapsible.scss src/pat/collapsible/collapsible.css
@@ -93,6 +87,7 @@ all_css:: css
 	@$(SASS) -I . -I _sass src/pat/focus/_focus.scss src/pat/focus/focus.css
 	@echo "Almost there, don't give up!"
 	@$(SASS) -I . -I _sass src/pat/forward/_forward.scss src/pat/forward/forward.css
+	@$(SASS) -I . -I _sass src/pat/fullscreen/_fullscreen.scss src/pat/fullscreen/fullscreen.css
 	@$(SASS) -I . -I _sass src/pat/gallery/_gallery.scss src/pat/gallery/gallery.css
 	@$(SASS) -I . -I _sass src/pat/grid/_grid.scss src/pat/grid/grid.css
 	@$(SASS) -I . -I _sass src/pat/image-crop/_image-crop.scss src/pat/image-crop/image-crop.css
@@ -101,7 +96,6 @@ all_css:: css
 	@$(SASS) -I . -I _sass src/pat/markdown/_markdown.scss src/pat/markdown/markdown.css
 	@$(SASS) -I . -I _sass src/pat/masonry/_masonry.scss src/pat/masonry/masonry.css
 	@$(SASS) -I . -I _sass src/pat/modal/_modal.scss src/pat/modal/modal.css
-	@$(SASS) -I . -I _sass src/pat/navigation/_navigation.scss src/pat/navigation/navigation.css
 	@$(SASS) -I . -I _sass src/pat/notification/_notification.scss src/pat/notification/notification.css
 	@$(SASS) -I . -I _sass src/pat/slideshow-builder/_slideshow-builder.scss src/pat/slideshow-builder/slideshow-builder.css
 	@$(SASS) -I . -I _sass src/pat/sortable/_sortable.scss src/pat/sortable/sortable.css
@@ -124,8 +118,8 @@ watch::
 serve:: all _serve
 
 _serve:
-	@printf "\nDesigner, you can be happy now.\n Go to http://localhost:4001/ to see the demo \n\n"
-	@$(HTTPSERVE) -p 4001
+	npm run start
+	@printf "\nBundle built\n\n"
 
 designerhappy:: serve
 

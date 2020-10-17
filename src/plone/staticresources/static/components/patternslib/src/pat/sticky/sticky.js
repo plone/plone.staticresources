@@ -1,12 +1,13 @@
-/* pat-date-picker  - Polyfill for input type=date */
+/* pat-sticky - A pattern for a sticky polyfill */
 define([
     "underscore",
     "pat-parser",
     "pat-registry",
     "pat-base",
     "pat-logger",
-    "stickyfill",
-], function(_, Parser, registry, Base, logger, Stickyfill) {
+    "pat-utils",
+    "stickyfilljs"
+], function(_, Parser, registry, Base, logger, utils, Stickyfill) {
     "use strict";
     var parser = new Parser("sticky");
     var log = logger.getLogger("sticky")
@@ -18,24 +19,27 @@ define([
         init: function() {
             this.options = parser.parse(this.$el);
             this.makeSticky();
-            this.$el.on('pat-update', this.onPatternUpdate.bind(this));
+            $('body').on('pat-update', utils.debounce(this.onPatternUpdate.bind(this), 500));
+            
+            /* recalc if the DOM changes. Should fix positioning issues when parts of the page get injected */
+
             return this.$el;
         },
         onPatternUpdate: function (ev, data) {
             /* Handler which gets called when pat-update is triggered within
              * the .pat-sticky element.
              */
-            this.makeSticky();
+            Stickyfill.refreshAll()
             return true;
         },
         makeSticky: function() {
             if (this.options.selector === "") {
                 this.$stickies = this.$el;
             } else {
-                this.$stickies = this.$el.children().filter(this.options.selector);
+                this.$stickies = this.$el.find(this.options.selector);
             }
-            this.$stickies.each(function () {
-                $(this).Stickyfill();
+            this.$stickies.each(function (idx, elem) {
+                Stickyfill.add(elem);
             });
         }
     });

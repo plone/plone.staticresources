@@ -1,6 +1,6 @@
 # AutoFill for DataTables 
 
-This package contains distribution files for the [AutoFill extension](https://datatables.net/extensions/autofill) for [DataTables](https://datatables.net/). Only the core software for this library is contained in this package - to be correctly styled, a styling package for AutoFill must also be included. Styling options include DataTable's native styling, [Bootstrap](http://getbootstrap.com) and [Foundation](http://foundation.zurb.com/).
+This package contains distribution files for the [AutoFill extension](https://datatables.net/extensions/autofill) for [DataTables](https://datatables.net/). Only the core software for this library is contained in this package - to be correctly styled, a styling package for AutoFill must also be included. Styling options include DataTable's native styling, [Bootstrap](http://getboostrap.com) and [Foundation](http://foundation.zurb.com/).
 
 AutoFill adds an Excel like data fill option to DataTables, allowing click and drag over cells, filling in information and incrementing numbers as needed.
 
@@ -19,7 +19,7 @@ npm install datatables.net-autofill
 
 ```
 var $ = require( 'jquery' );
-require( 'datatables.net-autofill' )( window, $ );
+require( 'datatables.net-autofill' )( $ );
 ```
 
 ### bower

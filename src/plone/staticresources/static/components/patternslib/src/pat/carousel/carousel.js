@@ -1,28 +1,28 @@
 /**
  * Patterns carousel
  *
- * Copyright 2012-2013 Simplon B.V. - Wichert Akkerman
- * Copyright 2012-2013 Florian Friesdorf
+ * Copyright 2017 Syslab.com GmbH Alexander Pilz
  */
 define([
     "jquery",
     "pat-registry",
     "pat-logger",
     "pat-parser",
-    "jquery.anythingslider"
+    "slick-carousel"
 ], function($, patterns, logger, Parser) {
     var log = logger.getLogger("pat.carousel"),
         parser = new Parser("carousel");
 
     parser.addArgument("auto-play", false);
-    parser.addArgument("loop", true);
-    parser.addArgument("resize", false);
-    parser.addArgument("expand", false);
-    parser.addArgument("control-arrows", true);
-    parser.addArgument("control-navigation", false);
-    parser.addArgument("control-startstop", false);
-    parser.addArgument("time-delay", 3000);
-    parser.addArgument("time-animation", 600);
+    parser.addArgument("auto-play-speed", 1000);
+    parser.addArgument("speed", 500);
+    parser.addArgument("height", "fixed");
+    parser.addArgument("arrows", "show");
+    parser.addArgument("slides-to-show", 1);
+    parser.addArgument("slides-to-scroll", 1);
+    parser.addArgument("dots", "show");
+    parser.addArgument("append-dots", "");
+    parser.addArgument("infinite", false);
 
     var carousel = {
         name: "carousel",
@@ -32,24 +32,25 @@ define([
             return $el.each(function() {
                 var $carousel = $(this),
                     options = parser.parse($carousel, opts),
-                    settings = {hashTags: false};
+                    settings = {};
 
-                settings.autoPlay = options.autoPlay;
-                settings.stopAtEnd = !options.loop;
-                settings.resizeContents = options.resize;
-                settings.expand = options.expand;
-                settings.buildArrows = options.control.arrows;
-                settings.buildNavigation = options.control.navigation;
-                settings.buildStartStop = options.control.startstop;
-                settings.delay = options.time.delay;
-                settings.animationTime = options.time.animation;
-                settings.onInitialized = carousel.onInitialized;
-                settings.onSlideInit = carousel.onSlideInit;
+                settings.autoplay = options.auto.play;
+                settings.autoplaySpeed = options.auto['play-speed'];
+                settings.speed = options.speed;
+                settings.adaptiveHeight = options.height === "adaptive";
+                settings.arrows  = options.arrows === "show";
+                settings.slidesToShow = options.slides["to-show"];
+                settings.slidesToScroll = options.slides["to-scroll"];
+                settings.dots = options.dots === "show";
+                if (options.appendDots) {
+                    settings.appendDots = options.appendDots;
+                }
+                settings.infinite = options.infinite;
                 carousel.setup($carousel, settings);
             });
         },
 
-	setup: function($el, settings) {
+        setup: function($el, settings) {
             var loaded = true,
                 $images = $el.find("img"),
                 img, i;
@@ -65,9 +66,8 @@ define([
                 }, 50);
                 return;
             }
-
-            var $carousel = $el.anythingSlider(settings),
-                control = $carousel.data("AnythingSlider"),
+            var $carousel = $el.slick(settings),
+                // control = $carousel.data("AnythingSlider"),
                 $panel_links = $();
 
             $carousel
@@ -84,12 +84,12 @@ define([
                     $panel_links = $panel_links.add($links);
                 }).end()
                 .on("slide_complete.pat-carousel", null, $panel_links, carousel.onSlideComplete);
-	},
+	    },
 
         _loadPanelImages: function(slider, page) {
             var $img;
             log.info("Loading lazy images on panel " + page);
-            slider.$items.eq(page).find("img").andSelf().filter("[data-src]").each(function() {
+            slider.$items.eq(page).find("img").addBack().filter("[data-src]").each(function() {
                 $img=$(this);
                 this.src=$img.attr("data-src");
                 $img.removeAttr("data-src");

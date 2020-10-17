@@ -115,6 +115,8 @@ Backbone.Paginator = (function ( Backbone, _, $ ) {
                                    bbVer[1] === 9 &&
                                    bbVer[2] === 10);
 
+      var isBeforeBackbone_1_0 = bbVer[0] === 0;
+
       var success = queryOptions.success;
       queryOptions.success = function ( resp, status, xhr ) {
         if ( success ) {
@@ -125,7 +127,7 @@ Backbone.Paginator = (function ( Backbone, _, $ ) {
             success( model, resp, queryOptions );
           }
         }
-        if ( model && model.trigger ) {
+        if ( isBeforeBackbone_1_0 && model && model.trigger ) {
           model.trigger( 'sync', model, resp, queryOptions );
         }
       };
@@ -133,9 +135,9 @@ Backbone.Paginator = (function ( Backbone, _, $ ) {
       var error = queryOptions.error;
       queryOptions.error = function ( xhr ) {
         if ( error ) {
-          error( model, xhr, queryOptions );
+          error( xhr );
         }
-        if ( model && model.trigger ) {
+        if ( isBeforeBackbone_1_0 && model && model.trigger ) {
           model.trigger( 'error', model, xhr, queryOptions );
         }
       };
@@ -455,7 +457,7 @@ Backbone.Paginator = (function ( Backbone, _, $ ) {
               should_push = true;
             }
 
-            // The field's value is required to be greater tan N (numbers only)
+            // The field's value is required to be greater than N (numbers only)
           }else if(rule.type === "min"){
             if( !_.isNaN( Number( model.get(rule.field) ) ) &&
                !_.isNaN( Number( rule.value ) ) &&
@@ -463,7 +465,7 @@ Backbone.Paginator = (function ( Backbone, _, $ ) {
               should_push = true;
             }
 
-            // The field's value is required to be smaller tan N (numbers only)
+            // The field's value is required to be smaller than N (numbers only)
           }else if(rule.type === "max"){
             if( !_.isNaN( Number( model.get(rule.field) ) ) &&
                !_.isNaN( Number( rule.value ) ) &&
@@ -527,6 +529,17 @@ Backbone.Paginator = (function ( Backbone, _, $ ) {
               // The field's value is required to match the regular expression
           }else if(rule.type === "pattern"){
             if( model.get(rule.field).toString().match(rule.value) ) {
+              should_push = true;
+            }
+
+            // The field's value will be applied to the model, which should
+            // return true (if model should be included) or false (model should be ignored)
+          }else if(rule.type === "custom"){
+            var attr = model.toJSON();
+            var cf = _.wrap(rule.value, function(func){
+              return func( attr );
+            });
+            if( cf() ){
               should_push = true;
             }
 
@@ -811,7 +824,8 @@ Backbone.Paginator = (function ( Backbone, _, $ ) {
         timeout: 25000,
         cache: false,
         type: 'GET',
-        dataType: 'jsonp'
+        dataType: 'jsonp',
+        url: self.url
       });
 
       // Allows the passing in of {data: {foo: 'bar'}} at request time to overwrite server_api defaults
@@ -831,6 +845,8 @@ Backbone.Paginator = (function ( Backbone, _, $ ) {
                                    bbVer[1] === 9 &&
                                    bbVer[2] === 10);
 
+      var isBeforeBackbone_1_0 = bbVer[0] === 0;
+
       var success = queryOptions.success;
       queryOptions.success = function ( resp, status, xhr ) {
 
@@ -842,7 +858,7 @@ Backbone.Paginator = (function ( Backbone, _, $ ) {
             success( model, resp, queryOptions );
           }
         }
-        if (bbVer[0] < 1 && model && model.trigger ) {
+        if (isBeforeBackbone_1_0 && model && model.trigger ) {
           model.trigger( 'sync', model, resp, queryOptions );
         }
       };
@@ -852,7 +868,7 @@ Backbone.Paginator = (function ( Backbone, _, $ ) {
         if ( error ) {
           error( xhr );
         }
-        if ( model && model.trigger ) {
+        if ( isBeforeBackbone_1_0 && model && model.trigger ) {
           model.trigger( 'error', model, xhr, queryOptions );
         }
       };

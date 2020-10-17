@@ -12,7 +12,7 @@ define([
 ], function($, patterns) {
     var selectbox = {
         name: "selectbox",
-        trigger: "select",
+        trigger: ".pat-select",
 
         init: function($el) {
             var $forms = $();
@@ -26,7 +26,7 @@ define([
                 }
             });
 
-            $el.filter("select:not([multiple])")
+            $el.find("select:not([multiple])")
                 .each(function() {
                     var $el = $(this);
                     // create parent span if not direct child of a label

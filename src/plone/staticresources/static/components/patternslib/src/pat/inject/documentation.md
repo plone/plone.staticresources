@@ -247,7 +247,7 @@ After the injection:
     <div id="non-existing">
       Content of body of sources.html
     </div>
-	</body>
+    </body>
 
 Trigger
 -------
@@ -291,7 +291,7 @@ after:
     <a class="next-month" href="#2012-05" data-pat-inject="">Next month</a>
     …
     <div class="month" id="2012-04">
-	    …
+        …
     </div>
     <a class="next-month pat-inject" ref="calendar.html#2012-06"
        data-pat-inject="post: #2012-05; next-href: #2012-06">Next month</a>
@@ -337,7 +337,7 @@ You can customise the behaviour of injection through options in the `data-pat-in
 | ----- | --------| -------- | ------- | ----------- |
 | `confirm` | `class` | class, always, never, form-data | Should a confirmation prompt be shown to the user before injection happens? Setting this to `form-data` means a prompt will be shown if there are form fields with values that will be replaced with the injected content. A value of `class` means that the pattern will check for the `is-dirty` CSS class on the target element. If the class is there, a confirmation prompt will be shown. | One of the allowable values. |
 | `confirm-message` | `Are you sure you want to leave this page?` | | What message should be shown to the user in the confirmation prompt? | |
-| `selector` | `body` | | Selector identifying which section of the loaded document to inject. | Selector string|
+| `source` | `body` | | Selector identifying which section of the loaded document to inject. | Selector string|
 | `target` | `body` | | Selector identifying where to inject the loaded content. | Selector string |
 | `data-type` | `html` | `html` `markdown`| The type of content that is loaded. This is normally detected automatically. | One of the mutually exclusive string values. |
 | `next-href` | | | For anchors, you can specify an href to point to after injection was triggered. If that element exists already during initialisation, the injection is not initialised and the href changed to next-href. | |
@@ -345,5 +345,5 @@ You can customise the behaviour of injection through options in the `data-pat-in
 | `url` | | *href attribute* | URL to load content from. | URI string. |
 | `class` | | | A class which will be added to the injected content. Multiple classes can be specified (separated with spaces). | String |
 | `loading-class` | 'injecting' | | A class which will be added to the injection target while content is still being loaded. Multiple classes can be specified (separated with spaces), or leave empty if no class should be added. | String |
-| `history` | `none` | `none` `record` | If set to `record` injection will update the URL history. | One of the mutually exclusive string values. |
+| `history` | `record` | `none` `record` | If set to `record` (default) then injection will update the URL history and the title tag of the HTML page. | One of the mutually exclusive string values. |
 | `hooks` | `[]` | `["raptor"]` | Once injection has completed successfully, pat-inject will trigger an event for each hook: pat-inject-hook-$(hook). Useful for other patterns which need to know whether injection relevant to them has finished, for example `pat-raptor`. | String. |
