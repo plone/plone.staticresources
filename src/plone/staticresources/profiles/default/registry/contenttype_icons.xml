@@ -1,56 +1,56 @@
 <?xml version="1.0"?>
 
 <registry>
-  <record name="plone.staticresources.icon.plone-contenttype-image">
+  <record name="plone.icon.contenttype-image">
     <field type="plone.registry.field.TextLine">
       <title>Plone Image</title>
     </field>
     <value key="resource">++plone++static/components/bootstrap-icons/icons/file-image.svg</value>
   </record>
 
-  <record name="plone.staticresources.icon.plone-contenttype-file">
+  <record name="plone.icon.contenttype-file">
     <field type="plone.registry.field.TextLine">
       <title>Plone File</title>
     </field>
     <value key="resource">++plone++static/components/bootstrap-icons/icons/file-binary.svg</value>
   </record>
 
-  <record name="plone.staticresources.icon.plone-contenttype-collection">
+  <record name="plone.icon.contenttype-collection">
     <field type="plone.registry.field.TextLine">
       <title>Plone Collection</title>
     </field>
     <value key="resource">++plone++static/components/bootstrap-icons/icons/collection.svg</value>
   </record>
 
-  <record name="plone.staticresources.icon.plone-contenttype-link">
+  <record name="plone.icon.contenttype-link">
     <field type="plone.registry.field.TextLine">
       <title>Plone Link</title>
     </field>
     <value key="resource">++plone++static/components/bootstrap-icons/icons/link.svg</value>
   </record>
 
-  <record name="plone.staticresources.icon.plone-contenttype-newsitem">
+  <record name="plone.icon.contenttype-newsitem">
     <field type="plone.registry.field.TextLine">
       <title>Plone News Item</title>
     </field>
     <value key="resource">++plone++static/components/bootstrap-icons/icons/file-richtext.svg</value>
   </record>
 
-  <record name="plone.staticresources.icon.plone-contenttype-folder">
+  <record name="plone.icon.contenttype-folder">
     <field type="plone.registry.field.TextLine">
       <title>Plone Folder</title>
     </field>
     <value key="resource">++plone++static/components/bootstrap-icons/icons/folder.svg</value>
   </record>
 
-  <record name="plone.staticresources.icon.plone-contenttype-event">
+  <record name="plone.icon.contenttype-event">
     <field type="plone.registry.field.TextLine">
       <title>Plone Event</title>
     </field>
     <value key="resource">++plone++static/components/bootstrap-icons/icons/calendar-event.svg</value>
   </record>
 
-  <record name="plone.staticresources.icon.plone-contenttype-document">
+  <record name="plone.icon.contenttype-document">
     <field type="plone.registry.field.TextLine">
       <title>Plone Document</title>
     </field>
