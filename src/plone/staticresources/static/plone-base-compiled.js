@@ -3764,5 +3764,5 @@ require([
 
 });
 
-define("/home/vincentfretin/workspace/buildout.coredev-5.2/src/plone.staticresources/src/plone/staticresources/static/plone-base.js", function(){});
+define("/Users/maurits/community/plone-coredev/5.2/src/plone.staticresources/src/plone/staticresources/static/plone-base.js", function(){});
 
