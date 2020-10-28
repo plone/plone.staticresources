@@ -8229,7 +8229,7 @@ define('mockup-patterns-structure-url/js/actionmenu',['underscore', 'translate']
       delete result['move-top'];
       delete result['move-bottom'];
     }
-    if (model.is_folderish || !app.setDefaultPageUrl) {
+    if (app.defaultPageTypes.indexOf(model.portal_type) == -1 || !app.setDefaultPageUrl) {
       delete result['set-default-page'];
     }
 
@@ -30519,6 +30519,14 @@ define('mockup-patterns-structure',[
           'Blob': '/view'
       },
 
+      defaultPageTypes: null,
+      _default_defaultPageTypes: [
+          'Document',
+          'Event',
+          'News Item',
+          'Collection'
+      ],
+
       collectionConstructor:
         'mockup-patterns-structure-url/js/collections/result',
 
@@ -30587,7 +30595,7 @@ define('mockup-patterns-structure',[
         May want to consider moving the _default_* values out of the
         options object.
       */
-      var replaceDefaults = ['attributes', 'activeColumns', 'availableColumns', 'buttons', 'typeToViewAction'];
+      var replaceDefaults = ['attributes', 'activeColumns', 'availableColumns', 'buttons', 'typeToViewAction', 'defaultPageTypes'];
       _.each(replaceDefaults, function(idx) {
         if (self.options[idx] === null) {
           self.options[idx] = self.options['_default_' + idx];
@@ -30692,5 +30700,5 @@ require([
   'use strict';
 });
 
-define("/home/vincentfretin/workspace/buildout.coredev-5.2/src/plone.staticresources/src/plone/staticresources/static/plone-editor-tools.js", function(){});
+define("/Users/maurits/community/plone-coredev/py3/src/plone.staticresources/src/plone/staticresources/static/plone-editor-tools.js", function(){});
 
