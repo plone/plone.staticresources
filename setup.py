@@ -10,7 +10,7 @@ long_description = "\n\n".join([open("README.rst").read(), open("CHANGES.rst").r
 
 setup(
     name="plone.staticresources",
-    version="1.4.0",
+    version="1.4.1.dev0",
     description="Static resources for Plone",
     long_description=long_description,
     classifiers=[
