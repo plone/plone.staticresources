@@ -35530,7 +35530,7 @@ define('mockup-patterns-tinymce-url/js/links',[
         anchorLabel: this.options.text.anchorLabel,
         target: this.options.text.target,
         linkTypes: this.options.linkTypes,
-        externalText: this.options.text.external,
+        externalText: this.options.text.externalText,
         emailText: this.options.text.email,
         subjectText: this.options.text.subject,
         targetList: this.options.targetList,
@@ -72760,5 +72760,5 @@ require([
   'use strict';
 });
 
-define("/home/vincentfretin/workspace/buildout.coredev-5.2/src/plone.staticresources/src/plone/staticresources/static/plone-tinymce.js", function(){});
+define("/Users/fred/buildouts/coredev-plone5.2/src/plone.staticresources/src/plone/staticresources/static/plone-tinymce.js", function(){});
 

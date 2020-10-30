@@ -16,7 +16,7 @@
     "bootstrap-icons": "1.0.0",
     "jquery": "1.12.4",
     "less": "https://github.com/less/less.git#v2.7.3",
-    "mockup": "https://github.com/plone/mockup.git#e69dad0c4bd9c8df1e9f558474a9661578608cf2",
+    "mockup": "https://github.com/plone/mockup.git#97b4010cebc59a1556aff8f2d96f97d7705a53e7",
     "requirejs": "^2.3.6"
   }
 }

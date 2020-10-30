@@ -14958,5 +14958,5 @@ require([
   'use strict';
 });
 
-define("/Users/pbauer/workspace/coredev/src/plone.staticresources/src/plone/staticresources/static/plone-logged-in.js", function(){});
+define("/Users/fred/buildouts/coredev-plone5.2/src/plone.staticresources/src/plone/staticresources/static/plone-logged-in.js", function(){});
 

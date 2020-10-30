@@ -362,7 +362,7 @@ define('plone-patterns-toolbar',[
           }
         });
 
-      $('body').on('click', function(event) {
+      $('body').off('click.closetoolbarsubmenus').on('click.closetoolbarsubmenus', function(event) {
         var $el = that.$container.find(event.target);
         // we need to check if the target isn't the nav which can be
         // triggered if we click on the portal-header and plone-toolbar-more-subset
@@ -627,15 +627,17 @@ define('plone-patterns-toolbar',[
          This is for usability so the menu changes along with
          the folder contents context */
       $('body')
-        .off('structure-url-changed')
-        .on('structure-url-changed', function(e, path) {
+        .off('structure-url-changed.toolbar')
+        .on('structure-url-changed.toolbar', function(e, path) {
           $.ajax({
             url: $('body').attr('data-portal-url') + path + '/@@render-toolbar',
           }).done(function(data) {
-            var $el = $(utils.parseBodyTag(data));
-            $el = $el.find('#edit-zone').length ? $el.find('#edit-zone') : $el;
-            that.$el.replaceWith($el);
-            Registry.scan($el);
+            var $newel = $(utils.parseBodyTag(data));
+            var hasedit = $newel.find('#edit-zone').length;
+            $newel = hasedit ? $newel.find('#edit-zone') : $newel;
+            var $replacetoolbar = $('#edit-bar').find('#edit-zone');
+            $replacetoolbar.replaceWith($newel);
+            Registry.scan($newel);
           });
         });
 
@@ -8229,7 +8231,7 @@ define('mockup-patterns-structure-url/js/actionmenu',['underscore', 'translate']
       delete result['move-top'];
       delete result['move-bottom'];
     }
-    if (model.is_folderish || !app.setDefaultPageUrl) {
+    if (app.defaultPageTypes.indexOf(model.portal_type) == -1 || !app.setDefaultPageUrl) {
       delete result['set-default-page'];
     }
 
@@ -30519,6 +30521,14 @@ define('mockup-patterns-structure',[
           'Blob': '/view'
       },
 
+      defaultPageTypes: null,
+      _default_defaultPageTypes: [
+          'Document',
+          'Event',
+          'News Item',
+          'Collection'
+      ],
+
       collectionConstructor:
         'mockup-patterns-structure-url/js/collections/result',
 
@@ -30587,7 +30597,7 @@ define('mockup-patterns-structure',[
         May want to consider moving the _default_* values out of the
         options object.
       */
-      var replaceDefaults = ['attributes', 'activeColumns', 'availableColumns', 'buttons', 'typeToViewAction'];
+      var replaceDefaults = ['attributes', 'activeColumns', 'availableColumns', 'buttons', 'typeToViewAction', 'defaultPageTypes'];
       _.each(replaceDefaults, function(idx) {
         if (self.options[idx] === null) {
           self.options[idx] = self.options['_default_' + idx];
@@ -30692,5 +30702,5 @@ require([
   'use strict';
 });
 
-define("/home/vincentfretin/workspace/buildout.coredev-5.2/src/plone.staticresources/src/plone/staticresources/static/plone-editor-tools.js", function(){});
+define("/Users/fred/buildouts/coredev-plone5.2/src/plone.staticresources/src/plone/staticresources/static/plone-editor-tools.js", function(){});
 

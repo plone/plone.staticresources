@@ -347,5 +347,5 @@ require([
   'use strict';
 });
 
-define("/home/vincentfretin/workspace/buildout.coredev-5.2/src/plone.staticresources/src/plone/staticresources/static/plone-moment.js", function(){});
+define("/Users/fred/buildouts/coredev-plone5.2/src/plone.staticresources/src/plone/staticresources/static/plone-moment.js", function(){});
 
