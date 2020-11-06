@@ -323,7 +323,7 @@
 
   <records prefix="plone.bundles/bootstrap-js"
             interface='Products.CMFPlone.interfaces.IBundleRegistry'>
-    <value key="depends">plone-base</value>
+    <value key="depends"></value>
     <value key="merge_with"></value>
     <value key="resources" purge="false">
     </value>
