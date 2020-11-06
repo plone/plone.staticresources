@@ -1,0 +1,21 @@
+<configure xmlns="http://namespaces.zope.org/zope"
+  xmlns:gs="http://namespaces.zope.org/genericsetup">
+
+  <gs:registerProfile name="12"
+    title="Update bundles"
+    description='Configuration for version 12'
+    directory="profiles/12"
+    for="Products.CMFPlone.interfaces.IMigratingPloneSiteRoot"
+    provides="Products.GenericSetup.interfaces.EXTENSION" />
+
+  <gs:upgradeSteps source="11"
+    destination="12"
+    profile="plone.staticresources:default">
+
+    <gs:upgradeDepends
+      title="Update bundles"
+      import_profile="plone.staticresources.upgrades:12" />
+
+  </gs:upgradeSteps>
+
+</configure>

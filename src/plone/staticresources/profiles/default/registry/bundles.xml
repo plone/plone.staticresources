@@ -321,6 +321,20 @@
     <value key="load_defer">False</value>
   </records>
 
+  <records prefix="plone.bundles/bootstrap-js"
+            interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+    <value key="depends">plone-base</value>
+    <value key="merge_with"></value>
+    <value key="resources" purge="false">
+    </value>
+    <value key="jscompilation">++plone++static/components/bootstrap/dist/js/bootstrap.bundle.min.js</value>
+    <value key="last_compilation">2020-10-13 5:56:30</value>
+    <value key="compile">False</value>
+    <value key="enabled">True</value>
+    <value key="load_async">True</value>
+    <value key="load_defer">False</value>
+  </records>
+
   <records prefix="plone.bundles/resourceregistry"
             interface='Products.CMFPlone.interfaces.IBundleRegistry'>
     <value key="resources">
