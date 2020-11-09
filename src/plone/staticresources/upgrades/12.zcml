@@ -13,7 +13,7 @@
     profile="plone.staticresources:default">
 
     <gs:upgradeDepends
-      title="Update bundles"
+      title="Add Bootstrap JS bundle"
       import_profile="plone.staticresources.upgrades:12" />
 
   </gs:upgradeSteps>
