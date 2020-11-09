@@ -635,7 +635,7 @@ define('plone-patterns-toolbar',[
             var $newel = $(utils.parseBodyTag(data));
             var hasedit = $newel.find('#edit-zone').length;
             $newel = hasedit ? $newel.find('#edit-zone') : $newel;
-            var $replacetoolbar = $('#edit-bar').find('#edit-zone');
+            var $replacetoolbar = $('body').find('#edit-zone');
             $replacetoolbar.replaceWith($newel);
             Registry.scan($newel);
           });
@@ -25055,7 +25055,8 @@ define('mockup-patterns-structure-url/js/views/table',[
       self.subsetIds = [];
       self.contextInfo = null;
 
-      $('body').on('context-info-loaded', function(event, data) {
+      $('body').off('context-info-loaded').on('context-info-loaded', function(event, data) {
+
         self.contextInfo = data;
         /* set default page info */
         self.setContextInfo();
@@ -26066,7 +26067,7 @@ define('mockup-patterns-structure-url/js/views/textfilter',[
     setFilterStatusMessage: function() {
       var clear_btn = $('<button type="button" class="btn btn-primary btn-xs"></button>')
         .text(_t('Clear'))
-        .on('click', function() {
+        .off('click.textfilter').on('click.textfilter', function() {
           this.clearFilter();
         }.bind(this));
 
@@ -26091,15 +26092,16 @@ define('mockup-patterns-structure-url/js/views/textfilter',[
       }
     },
 
-    setTerm: function(term, set_input) {
+    setTerm: function(term, set_input, refresh) {
       var term_el = this.$el[0].querySelector('.search-query');
       this.term = encodeURIComponent(term);
       if (set_input) {
         term_el.value = term;
       }
-      this.app.collection.currentPage = 1;
-      this.app.collection.pager();
-
+      if (refresh === undefined || refresh == true) {
+        this.app.collection.currentPage = 1;
+        this.app.collection.pager();
+      }
       if (term) {
         term_el.classList.add('has-filter');
         this.setFilterStatusMessage();
@@ -26152,8 +26154,8 @@ define('mockup-patterns-structure-url/js/views/textfilter',[
       }
     },
 
-    clearTerm: function() {
-      this.setTerm('', true);
+    clearTerm: function(refresh) {
+      this.setTerm('', true, refresh);
     },
 
     clearFilter: function() {
@@ -30062,7 +30064,7 @@ define('mockup-patterns-structure-url/js/views/app',[
     },
     setCurrentPath: function(path) {
       this.collection.setCurrentPath(path);
-      this.textfilter.clearTerm();
+      this.textfilter.clearTerm(false);
       this.clearStatus();
     },
     getAjaxUrl: function(url) {
@@ -30659,7 +30661,8 @@ define('mockup-patterns-structureupdater',[
 
     init: function() {
 
-      $('body').on('context-info-loaded', function (e, data) {
+      $('body').off('context-info-loaded').on('context-info-loaded', function (e, data) {
+
         if (this.options.titleSelector) {
             $(this.options.titleSelector, this.$el).html(data.object && data.object.Title || '&nbsp;');
         }
@@ -30702,5 +30705,5 @@ require([
   'use strict';
 });
 
-define("/Users/fred/buildouts/coredev-plone5.2/src/plone.staticresources/src/plone/staticresources/static/plone-editor-tools.js", function(){});
+define("/Users/maurits/community/plone-coredev/5.2/src/plone.staticresources/src/plone/staticresources/static/plone-editor-tools.js", function(){});
 
