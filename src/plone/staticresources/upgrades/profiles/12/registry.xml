@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<registry>
+  <records prefix="plone.bundles/plone-logged-in" interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+    <value key="last_compilation">2020-11-09 13:00:00</value>
+  </records>
+  <records prefix="plone.bundles/plone-editor-tools" interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+    <value key="last_compilation">2020-11-09 13:00:00</value>
+  </records>
+</registry>
