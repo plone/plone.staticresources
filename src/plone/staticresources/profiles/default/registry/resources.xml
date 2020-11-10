@@ -62,6 +62,12 @@
       <value key="deps">backbone</value>
   </records>
 
+  <records prefix="plone.resources/bootstrap-js"
+            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
+      <value key="js">++plone++static/components/bootstrap/dist/js/bootstrap.bundle.min.js</value>
+  </records>
+
+
   <records prefix="plone.resources/bootstrap-variables"
             interface='Products.CMFPlone.interfaces.IResourceRegistry'>
       <value key="css">

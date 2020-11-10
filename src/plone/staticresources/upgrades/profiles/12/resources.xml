@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<registry>
+
+  <records prefix="plone.resources/bootstrap-js"
+            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
+      <value key="js">++plone++static/components/bootstrap/dist/js/bootstrap.bundle.min.js</value>
+  </records>
+
+</registry>
