@@ -8,6 +8,16 @@ Changelog
 
 .. towncrier release notes start
 
+1.4.1 (2020-11-11)
+------------------
+
+Bug fixes:
+
+
+- Update mockup to 3.2.4.
+  [maurits] (#1031)
+
+
 1.4.0 (2020-10-30)
 ------------------
 
