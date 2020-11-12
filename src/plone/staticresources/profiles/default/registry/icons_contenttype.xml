@@ -1,12 +1,6 @@
 <?xml version="1.0"?>
 
 <registry>
-  <record name="plone.icon.contenttype-text">
-    <field type="plone.registry.field.TextLine">
-      <title>Plone Text</title>
-    </field>
-    <value key="resource">++plone++static/components/bootstrap-icons/icons/file-earmark-text.svg</value>
-  </record>
 
   <record name="plone.icon.contenttype-event">
     <field type="plone.registry.field.TextLine">
@@ -29,27 +23,6 @@
     <value key="resource">++plone++static/components/bootstrap-icons/icons/file-earmark-text.svg</value>
   </record>
 
-  <record name="plone.icon.contenttype-pdf">
-    <field type="plone.registry.field.TextLine">
-      <title>Plone Image</title>
-    </field>
-    <value key="resource">++plone++static/components/bootstrap-icons/icons/file-earmark-richtext.svg</value>
-  </record>
-
-  <record name="plone.icon.contenttype-spreadsheet">
-    <field type="plone.registry.field.TextLine">
-      <title>Plone Image</title>
-    </field>
-    <value key="resource">++plone++static/components/bootstrap-icons/icons/file-earmark-spreadsheet.svg</value>
-  </record>
-
-  <record name="plone.icon.contenttype-presentation">
-    <field type="plone.registry.field.TextLine">
-      <title>Plone Image</title>
-    </field>
-    <value key="resource">++plone++static/components/bootstrap-icons/icons/file-earmark-easel.svg</value>
-  </record>
-
   <record name="plone.icon.contenttype-image">
     <field type="plone.registry.field.TextLine">
       <title>Plone Image</title>
@@ -62,27 +35,6 @@
       <title>Plone File</title>
     </field>
     <value key="resource">++plone++static/components/bootstrap-icons/icons/file-earmark.svg</value>
-  </record>
-
-  <record name="plone.icon.contenttype-archive">
-    <field type="plone.registry.field.TextLine">
-      <title>Plone Archive</title>
-    </field>
-    <value key="resource">++plone++static/components/bootstrap-icons/icons/file-earmark-zip.svg</value>
-  </record>
-
-  <record name="plone.icon.contenttype-audio">
-    <field type="plone.registry.field.TextLine">
-      <title>Plone Audio</title>
-    </field>
-    <value key="resource">++plone++static/components/bootstrap-icons/icons/file-earmark-music.svg</value>
-  </record>
-
-  <record name="plone.icon.contenttype-video">
-    <field type="plone.registry.field.TextLine">
-      <title>Plone Video</title>
-    </field>
-    <value key="resource">++plone++static/components/bootstrap-icons/icons/file-earmark-play.svg</value>
   </record>
 
   <record name="plone.icon.contenttype-link">
