@@ -122,13 +122,13 @@
 
   <records prefix="plone.resources/bootstrap-alert"
             interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-      <value key="js">++plone++static/components/bootstrap/js/alert.js</value>
+      <value key="js">++plone++static/components/bootstrap/js/dist/alert.js</value>
       <value key="deps">jquery</value>
   </records>
 
   <records prefix="plone.resources/bootstrap-dropdown"
             interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-      <value key="js">++plone++static/components/bootstrap/js/dropdown.js</value>
+      <value key="js">++plone++static/components/bootstrap/js/dist/dropdown.js</value>
       <value key="css">
         <element>++plone++static/components/bootstrap/less/dropdowns.less</element>
       </value>
@@ -137,14 +137,14 @@
 
   <records prefix="plone.resources/bootstrap-collapse"
             interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-      <value key="js">++plone++static/components/bootstrap/js/collapse.js</value>
+      <value key="js">++plone++static/components/bootstrap/js/dist/collapse.js</value>
       <value key="deps">jquery</value>
       <value key="export">window.jQuery.fn.collapse.Constructor</value>
   </records>
 
   <records prefix="plone.resources/bootstrap-tooltip"
             interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-      <value key="js">++plone++static/components/bootstrap/js/tooltip.js</value>
+      <value key="js">++plone++static/components/bootstrap/js/dist/tooltip.js</value>
       <value key="deps">jquery</value>
   </records>
 
