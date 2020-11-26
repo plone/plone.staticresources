@@ -31,12 +31,6 @@
     </value>
   </records>
 
-  <!-- mockup core reqs -->
-  <records prefix="plone.resources/mockup-patterns-base"
-            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-      <value key="js">++resource++mockup/base/pattern.js</value>
-  </records>
-
   <records prefix="plone.resources/jquery"
             interface='Products.CMFPlone.interfaces.IResourceRegistry'>
       <value key="js">++plone++static/components/jquery/dist/jquery.min.js</value>
@@ -481,253 +475,11 @@
       </value>
   </records>
 
-  <records prefix="plone.resources/mockup-popover"
-            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-      <value key="css">
-        <element>++resource++mockupless/popover.less</element>
-      </value>
-  </records>
-
-  <records prefix="plone.resources/mockup-router"
-            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-      <value key="js">++resource++mockupjs/router.js</value>
-  </records>
-
-  <records prefix="plone.resources/mockup-utils"
-            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-      <value key="js">++resource++mockupjs/utils.js</value>
-  </records>
-
-  <records prefix="plone.resources/mockup-i18n"
-            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-      <value key="js">++resource++mockupjs/i18n.js</value>
-  </records>
-
-  <records prefix="plone.resources/translate"
-            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-      <value key="js">++resource++mockupjs/i18n-wrapper.js</value>
-  </records>
-
  <!-- Patterns -->
 
-  <records prefix="plone.resources/plone-patterns-toolbar"
-            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-      <value key="js">++resource++mockup/toolbar/pattern.js</value>
-      <value key="css">
-        <element>++resource++mockup/toolbar/pattern.toolbar.less</element>
-      </value>
-  </records>
-
-  <records prefix="plone.resources/mockup-patterns-autotoc"
-            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-      <value key="js">++resource++mockup/autotoc/pattern.js</value>
-      <value key="css">
-        <element>++resource++mockup/autotoc/pattern.autotoc.less</element>
-      </value>
-  </records>
-
-  <records prefix="plone.resources/mockup-patterns-backdrop"
-            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-      <value key="js">++resource++mockup/backdrop/pattern.js</value>
-  </records>
-
-  <records prefix="plone.resources/mockup-patterns-contentloader"
-            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-      <value key="js">++resource++mockup/contentloader/pattern.js</value>
-  </records>
-
-  <records prefix="plone.resources/mockup-patterns-cookietrigger"
-            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-      <value key="js">++resource++mockup/cookietrigger/pattern.js</value>
-  </records>
-
-  <records prefix="plone.resources/mockup-patterns-sortable"
-            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-      <value key="js">++resource++mockup/sortable/pattern.js</value>
-  </records>
-
-  <records prefix="plone.resources/mockup-patterns-formautofocus"
-            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-      <value key="js">++resource++mockup/formautofocus/pattern.js</value>
-  </records>
-
-  <records prefix="plone.resources/mockup-patterns-formunloadalert"
-            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-      <value key="js">++resource++mockup/formunloadalert/pattern.js</value>
-  </records>
-
-  <records prefix="plone.resources/mockup-patterns-inlinevalidation"
-            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-      <value key="js">++resource++mockup/inlinevalidation/pattern.js</value>
-  </records>
-
-  <records prefix="plone.resources/mockup-patterns-markspeciallinks"
-            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-      <value key="js">++resource++mockup/markspeciallinks/pattern.js</value>
-      <value key="css">
-        <element>++resource++mockup/markspeciallinks/pattern.markspeciallinks.less</element>
-      </value>
-  </records>
-
-  <records prefix="plone.resources/mockup-patterns-modal"
-            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-      <value key="js">++resource++mockup/modal/pattern.js</value>
-      <value key="css">
-        <element>++resource++mockup/modal/pattern.modal.less</element>
-      </value>
-  </records>
-
-  <records prefix="plone.resources/mockup-patterns-moment"
-            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-      <value key="js">++resource++mockup/moment/pattern.js</value>
-  </records>
-
-  <records prefix="plone.resources/mockup-patterns-navigationmarker"
-           interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-      <value key="js">++resource++mockup/navigationmarker/pattern.js</value>
-  </records>
-
-  <records prefix="plone.resources/mockup-patterns-pickadate"
-            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-      <value key="js">++resource++mockup/pickadate/pattern.js</value>
-      <value key="css">
-        <element>++resource++mockup/pickadate/pattern.pickadate.less</element>
-      </value>
-  </records>
-
-  <records prefix="plone.resources/mockup-patterns-preventdoublesubmit"
-            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-      <value key="js">++resource++mockup/preventdoublesubmit/pattern.js</value>
-  </records>
-
-  <records prefix="plone.resources/mockup-patterns-querystring"
-            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-      <value key="js">++resource++mockup/querystring/pattern.js</value>
-      <value key="css">
-        <element>++resource++mockup/querystring/pattern.querystring.less</element>
-      </value>
-  </records>
-
-  <records prefix="plone.resources/mockup-patterns-recurrence"
-            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-      <value key="js">++resource++mockup/recurrence/pattern.js</value>
-      <value key="css">
-        <element>++resource++mockup/recurrence/pattern.recurrence.less</element>
-      </value>
-  </records>
-
-  <records prefix="plone.resources/mockup-patterns-relateditems"
-            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-      <value key="js">++resource++mockup/relateditems/pattern.js</value>
-      <value key="css">
-        <element>++resource++mockup/relateditems/pattern.relateditems.less</element>
-      </value>
-      <value key="url">++resource++mockup/relateditems</value>
-  </records>
-
-  <records prefix="plone.resources/mockup-patterns-relateditems-upload"
-            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-      <value key="js">++resource++mockup/relateditems/upload.js</value>
-  </records>
-
-  <records prefix="plone.resources/mockup-patterns-select2"
-            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-      <value key="js">++resource++mockup/select2/pattern.js</value>
-      <value key="css">
-        <element>++resource++mockup/select2/pattern.select2.less</element>
-      </value>
-  </records>
-
-  <records prefix="plone.resources/mockup-patterns-livesearch"
-            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-      <value key="js">++resource++mockup/livesearch/pattern.js</value>
-      <value key="css">
-        <element>++resource++mockup/livesearch/pattern.livesearch.less</element>
-      </value>
-  </records>
-
-  <records prefix="plone.resources/mockup-patterns-resourceregistry"
-            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-      <value key="url">++resource++mockup/resourceregistry</value>
-      <value key="js">++resource++mockup/resourceregistry/pattern.js</value>
-      <value key="css">
-        <element>++resource++mockup/resourceregistry/pattern.resourceregistry.less</element>
-      </value>
-  </records>
-
-  <records prefix="plone.resources/mockup-patterns-structure"
-            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-      <value key="js">++resource++mockup/structure/pattern.js</value>
-      <value key="url">++resource++mockup/structure</value>
-      <value key="css">
-        <element>++resource++mockup/structure/less/pattern.structure.less</element>
-      </value>
-  </records>
-
-  <records prefix="plone.resources/mockup-patterns-structureupdater"
-            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-      <value key="js">++resource++mockup/structure/pattern-structureupdater.js</value>
-  </records>
-
-  <records prefix="plone.resources/mockup-patterns-upload"
-            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-      <value key="js">++resource++mockup/upload/pattern.js</value>
-      <value key="url">++resource++mockup/upload</value>
-      <value key="css">
-        <element>++resource++mockup/upload/less/pattern.upload.less</element>
-      </value>
-  </records>
-
-  <records prefix="plone.resources/mockup-patterns-textareamimetypeselector"
-            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-      <value key="js">++resource++mockup/textareamimetypeselector/pattern.js</value>
-  </records>
-
-  <records prefix="plone.resources/mockup-patterns-tinymce"
-            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-      <value key="js">++resource++mockup/tinymce/pattern.js</value>
-      <value key="url">++resource++mockup/tinymce</value>
-      <value key="css">
-        <element>++resource++mockup/tinymce/less/pattern.tinymce.less</element>
-      </value>
-  </records>
-
-  <records prefix="plone.resources/mockup-patterns-toggle"
-            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-      <value key="js">++resource++mockup/toggle/pattern.js</value>
-  </records>
-
-  <records prefix="plone.resources/mockup-patterns-tooltip"
-            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-      <value key="js">++resource++mockup/tooltip/pattern.js</value>
-      <value key="css">
-        <element>++resource++mockup/tooltip/pattern.tooltip.less</element>
-      </value>
-  </records>
-
-  <records prefix="plone.resources/mockup-patterns-tree"
-            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-      <value key="js">++resource++mockup/tree/pattern.js</value>
-      <value key="css">
-        <element>++resource++mockup/tree/pattern.tree.less</element>
-      </value>
-  </records>
-
-  <records prefix="plone.resources/mockup-patterns-texteditor"
-            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-      <value key="js">++resource++mockup/texteditor/pattern.js</value>
-  </records>
   <records prefix="plone.resources/plone-patterns-portletmanager"
             interface='Products.CMFPlone.interfaces.IResourceRegistry'>
     <value key="js">++resource++manage-portlets.js</value>
-  </records>
-
-  <records prefix="plone.resources/mockup-patterns-datatables"
-            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-      <value key="js">++resource++mockup/datatables/pattern.js</value>
-      <value key="css">
-        <element>++resource++mockup/datatables/pattern.datatables.less</element>
-      </value>
   </records>
 
   <!-- DataTables resources -->
@@ -848,11 +600,6 @@
       <value key="js">++plone++static/components/ace-builds/src/mode-css.js</value>
   </records>
 
-  <records prefix="plone.resources/mockup-ui"
-            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-      <value key="url">++resource++mockupjs/ui</value>
-  </records>
-
   <!-- patternslib dependencies -->
   <records prefix="plone.resources/pat-base"
             interface='Products.CMFPlone.interfaces.IResourceRegistry'>
@@ -877,10 +624,6 @@
   <records prefix="plone.resources/pat-utils"
             interface='Products.CMFPlone.interfaces.IResourceRegistry'>
       <value key="js">++plone++static/components/patternslib/src/core/utils.js</value>
-  </records>
-  <records prefix="plone.resources/pat-mockup-parser"
-            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-      <value key="js">++plone++static/components/patternslib/src/core/mockup-parser.js</value>
   </records>
   <records prefix="plone.resources/logging"
             interface='Products.CMFPlone.interfaces.IResourceRegistry'>
@@ -924,25 +667,6 @@
       <value key="js">++plone++static/components/jquery.recurrenceinput.js/lib/jquery.tmpl.js</value>
       <value key="deps">jquery</value>
   </records>
-
-  <!-- thememappper registrations -->
-  <records prefix="plone.resources/mockup-patterns-filemanager"
-            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-      <value key="url">++resource++mockup/filemanager</value>
-      <value key="js">++resource++mockup/filemanager/pattern.js</value>
-      <value key="css">
-        <element>++resource++mockup/filemanager/pattern.filemanager.less</element>
-      </value>
-  </records>
-  <records prefix="plone.resources/mockup-patterns-thememapper"
-            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-      <value key="url">++resource++mockup/thememapper</value>
-      <value key="js">++resource++mockup/thememapper/pattern.js</value>
-      <value key="css">
-        <element>++resource++mockup/thememapper/pattern.thememapper.less</element>
-      </value>
-  </records>
-
 
   <!-- Plone generated resources -->
   <!-- These are also defined in CMFPlone since their browser views are in

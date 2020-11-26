@@ -14,20 +14,4 @@
 // Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 //
 
-require([
-  'mockup-patterns-autotoc',
-  'mockup-patterns-contentloader',
-  'mockup-patterns-cookietrigger',
-  'mockup-patterns-formautofocus',
-  'mockup-patterns-formunloadalert',
-  'mockup-patterns-livesearch',
-  'mockup-patterns-markspeciallinks',
-  'mockup-patterns-modal',
-  'mockup-patterns-navigationmarker',
-  'mockup-patterns-preventdoublesubmit',
-  'bootstrap-collapse',
-  'bootstrap-dropdown',
-  'bootstrap-tooltip',
-], function () {
-  'use strict';
-});
+// Todo Plone 6 - No requirejs
