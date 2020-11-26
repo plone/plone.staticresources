@@ -1,0 +1,215 @@
+<?xml version="1.0"?>
+
+<registry>
+
+  <record name="plone.icon.controlpanel">
+    <field type="plone.registry.field.TextLine">
+      <title>Controlpanel</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/gear.svg</value>
+  </record>
+
+  <record name="plone.icon.controlpanel/add-ons">
+    <field type="plone.registry.field.TextLine">
+      <title>Add-ons</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/puzzle.svg</value>
+  </record>
+
+  <record name="plone.icon.controlpanel/site">
+    <field type="plone.registry.field.TextLine">
+      <title>Site</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/house-door.svg</value>
+  </record>
+
+  <record name="plone.icon.controlpanel/date-time">
+    <field type="plone.registry.field.TextLine">
+      <title>Date and Time</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/clock.svg</value>
+  </record>
+
+  <record name="plone.icon.controlpanel/users-groups">
+    <field type="plone.registry.field.TextLine">
+      <title>Users and Groups</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/people.svg</value>
+  </record>
+
+  <record name="plone.icon.controlpanel/member">
+    <field type="plone.registry.field.TextLine">
+      <title>Personal Preferences</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/person.svg</value>
+  </record>
+
+  <record name="plone.icon.controlpanel/member-password">
+    <field type="plone.registry.field.TextLine">
+      <title>Change Password</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/lock.svg</value>
+  </record>
+
+  <record name="plone.icon.controlpanel/mail">
+    <field type="plone.registry.field.TextLine">
+      <title>Mail</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/envelope-open.svg</value>
+  </record>
+
+  <record name="plone.icon.controlpanel/themes">
+    <field type="plone.registry.field.TextLine">
+      <title>Themes</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/display.svg</value>
+  </record>
+
+  <record name="plone.icon.controlpanel/editing">
+    <field type="plone.registry.field.TextLine">
+      <title>Editing</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/pencil.svg</value>
+  </record>
+
+  <record name="plone.icon.controlpanel/errors">
+    <field type="plone.registry.field.TextLine">
+      <title>Errors</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/exclamation-square.svg</value>
+  </record>
+
+  <record name="plone.icon.controlpanel/content">
+    <field type="plone.registry.field.TextLine">
+      <title>Content</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/file-text.svg</value>
+  </record>
+
+  <record name="plone.icon.controlpanel/dexterity">
+    <field type="plone.registry.field.TextLine">
+      <title>Dexterity Content Types</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/gem.svg</value>
+  </record>
+
+  <record name="plone.icon.controlpanel/markup">
+    <field type="plone.registry.field.TextLine">
+      <title>Markup</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/code-slash.svg</value>
+  </record>
+
+  <record name="plone.icon.controlpanel/security">
+    <field type="plone.registry.field.TextLine">
+      <title>Security</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/shield-check.svg</value>
+  </record>
+
+  <record name="plone.icon.controlpanel/zmi">
+    <field type="plone.registry.field.TextLine">
+      <title>Management Interface</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/command.svg</value>
+  </record>
+
+  <record name="plone.icon.controlpanel/search">
+    <field type="plone.registry.field.TextLine">
+      <title>Search</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/search.svg</value>
+  </record>
+
+  <record name="plone.icon.controlpanel/navigation">
+    <field type="plone.registry.field.TextLine">
+      <title>Navigation</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/list-nested.svg</value>
+  </record>
+
+  <record name="plone.icon.controlpanel/language">
+    <field type="plone.registry.field.TextLine">
+      <title>Language</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/flag.svg</value>
+  </record>
+
+  <record name="plone.icon.controlpanel/html-filtering">
+    <field type="plone.registry.field.TextLine">
+      <title>HTML Filtering</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/funnel.svg</value>
+  </record>
+
+  <record name="plone.icon.controlpanel/maintenance">
+    <field type="plone.registry.field.TextLine">
+      <title>Maintenance</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/wrench.svg</value>
+  </record>
+
+  <record name="plone.icon.controlpanel/content-rules">
+    <field type="plone.registry.field.TextLine">
+      <title>Content Rules</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/card-checklist.svg</value>
+  </record>
+
+  <record name="plone.icon.controlpanel/syndication">
+    <field type="plone.registry.field.TextLine">
+      <title>Syndication</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/wifi.svg</value>
+  </record>
+
+  <record name="plone.icon.controlpanel/registry">
+    <field type="plone.registry.field.TextLine">
+      <title>Configuration Registry</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/gear.svg</value>
+  </record>
+
+  <record name="plone.icon.controlpanel/resource-registries">
+    <field type="plone.registry.field.TextLine">
+      <title>Resource Registries</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/bootstrap-reboot.svg</value>
+  </record>
+
+  <record name="plone.icon.controlpanel/tinymce">
+    <field type="plone.registry.field.TextLine">
+      <title>TinyMCE</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/textarea-t.svg</value>
+  </record>
+
+  <record name="plone.icon.controlpanel/social-media">
+    <field type="plone.registry.field.TextLine">
+      <title>Social Media</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/volume-up.svg</value>
+  </record>
+
+  <record name="plone.icon.controlpanel/image-handling">
+    <field type="plone.registry.field.TextLine">
+      <title>Image Handling</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/image.svg</value>
+  </record>
+
+  <record name="plone.icon.controlpanel/actions">
+    <field type="plone.registry.field.TextLine">
+      <title>Actions</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/lightning.svg</value>
+  </record>
+
+  <record name="plone.icon.controlpanel/url-management">
+    <field type="plone.registry.field.TextLine">
+      <title>URL Management</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/alt.svg</value>
+  </record>
+
+</registry>
