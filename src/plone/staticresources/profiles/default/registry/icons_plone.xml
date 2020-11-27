@@ -526,4 +526,11 @@
     <value key="resource">++plone++bootstrap-icons/wrench.svg</value>
   </record>
 
+  <record name="plone.icon.plone-controlpanel">
+    <field type="plone.registry.field.TextLine">
+      <title>Plone Icon wrench</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/gear.svg</value>
+  </record>
+
 </registry>
