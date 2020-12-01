@@ -34435,33 +34435,31 @@ define('mockup-patterns-resourceregistry',[
         activeTab: "registry",
         template: _.template(
             "" +
-                '<div class="autotabs">' +
-                '<ul class="main-tabs autotoc-nav" role="tablist">' +
-                '<li class="registry-btn"><a href="#"><%- _t("Registry") %></a></li>' +
-                '<li class="overrides-btn"><a href="#"><%- _t("Overrides") %></a></li>' +
-                '<li class="lessvariables-btn"><a href="#"><%- _t("Less Variables") %></a></li>' +
-                '<li class="patternoptions-btn"><a href="#"><%- _t("Pattern Options") %></a></li>' +
-                "</ul>" +
-                "</div>" +
-                '<div class="tab-content" />'
+                '<div class="pat-autotoc autotabs">' +
+                '<nav class="main-tabs autotoc-nav">' +
+                '<a class="registry-btn" href="#"><%- _t("Registry") %></a>' +
+                '<a class="overrides-btn" href="#"><%- _t("Overrides") %></a>' +
+                '<a class="lessvariables-btn" href="#"><%- _t("Less Variables") %></a>' +
+                '<a class="patternoptions-btn" href="#"><%- _t("Pattern Options") %></a>' +
+                "</nav>" +
+                '<div class="tab-content" />' +
+                "</div>"
         ),
         events: {
-            "click .registry-btn a": "hideShow",
-            "click .overrides-btn a": "hideShow",
-            "click .lessvariables-btn a": "hideShow",
-            "click .patternoptions-btn a": "hideShow",
+            "click a.registry-btn": "hideShow",
+            "click a.overrides-btn": "hideShow",
+            "click a.lessvariables-btn": "hideShow",
+            "click a.patternoptions-btn": "hideShow",
         },
         hideShow: function (e) {
             var self = this;
             if (e !== undefined) {
                 e.preventDefault();
-                self.activeTab = $(e.target)
-                    .parent()[0]
-                    .className.replace("-btn", "");
+                self.activeTab = e.target.className.replace("-btn", "");
             }
-            self.$(".main-tabs > li a").removeClass("active");
+            self.$(".main-tabs > a").removeClass("active");
             self.$content.find(".tab-pane").removeClass("active");
-            self.tabs[self.activeTab].btn.find("a").addClass("active");
+            self.tabs[self.activeTab].btn.addClass("active");
             self.tabs[self.activeTab].content.addClass("active");
         },
         initialize: function (options) {
@@ -34620,5 +34618,5 @@ require([
   'use strict';
 });
 
-define("/home/_thet/data/dev/plone/buildout.coredev/src/plone.staticresources/src/plone/staticresources/static/resourceregistry.js", function(){});
+define("/Users/peter/workspace/barcelonetaplone6/src/plone.staticresources/src/plone/staticresources/static/resourceregistry.js", function(){});
 

@@ -400,7 +400,9 @@ define('plone-patterns-toolbar',[
                     }
                 });
 
-            $("body").on("click", function (event) {
+            $("body")
+                .off("click.closetoolbarsubmenus")
+                .on("click.closetoolbarsubmenus", function (event) {
                 var $el = that.$container.find(event.target);
                 // we need to check if the target isn't the nav which can be
                 // triggered if we click on the portal-header and plone-toolbar-more-subset
@@ -688,20 +690,20 @@ define('plone-patterns-toolbar',[
          This is for usability so the menu changes along with
          the folder contents context */
             $("body")
-                .off("structure-url-changed")
-                .on("structure-url-changed", function (e, path) {
+                .off("structure-url-changed.toolbar")
+                .on("structure-url-changed.toolbar", function (e, path) {
                     $.ajax({
                         url:
                             $("body").attr("data-portal-url") +
                             path +
                             "/@@render-toolbar",
                     }).done(function (data) {
-                        var $el = $(utils.parseBodyTag(data));
-                        $el = $el.find("#edit-zone").length
-                            ? $el.find("#edit-zone")
-                            : $el;
-                        that.$el.replaceWith($el);
-                        Registry.scan($el);
+                        var $newel = $(utils.parseBodyTag(data));
+                        var hasedit = $newel.find('#edit-zone').length;
+                        $newel = hasedit ? $newel.find("#edit-zone") : $newel;
+                        var $replacetoolbar = $('body').find('#edit-zone');
+                        $replacetoolbar.replaceWith($newel);
+                        Registry.scan($newel);
                     });
                 });
 
@@ -747,7 +749,7 @@ define('plone-patterns-portletmanager',[
     init: function(){
       var that = this;
       var $modal = that.$el.parents('.plone-modal');
-      if($modal.size() === 1){
+      if($modal.length === 1){
         this.isModal = true;
         /* want to do something on exit from modal now */
         var modal = $modal.data('pattern-plone-modal');
@@ -815,15 +817,15 @@ define('plone-patterns-portletmanager',[
       var that = this;
 
       var $message = $('#portlet-message');
-      if($message.size() === 0){
-        $message = $('<div class="portalMessage info" id="portlet-message" style="opacity: 0"></div>');
+      if($message.length === 0){
+        $message = $('<div class="alert alert-info" role="alert" id="portlet-message" style="opacity: 0"></div>');
         if(that.isModal){
           $('.plone-modal-body:visible').prepend($message);
         }else{
           $('#content-core').prepend($message);
         }
       }
-      $message.html('<strong>' + _t("Info") + '</strong>' + msg);
+      $message.html('<strong class="mr-1">' + _t("Info") + '</strong>' + msg);
       clearTimeout(that.messageTimeout);
       $message.fadeTo(500, 1);
       that.messageTimeout = window.setTimeout(function(){
@@ -855,7 +857,7 @@ define('plone-patterns-portletmanager',[
            create the portlet without an actual form.
            If element is found here, we can short circuit and
            continue on. */
-        if($el.size() === 1){
+        if($el.length === 1){
           /* hacky, trying to prevent modal parts from flickering here */
           $el = $el.clone();
           pattern.on('shown', function(){
@@ -31451,5 +31453,5 @@ require([
   'use strict';
 });
 
-define("/home/_thet/data/dev/plone/buildout.coredev/src/plone.staticresources/src/plone/staticresources/static/plone-editor-tools.js", function(){});
+define("/Users/peter/workspace/barcelonetaplone6/src/plone.staticresources/src/plone/staticresources/static/plone-editor-tools.js", function(){});
 
