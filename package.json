@@ -5,6 +5,7 @@
   "repository": "git@github.com:plone/plone.staticresources.git",
   "license": "BSD-3-Clause",
   "dependencies": {
+    "bootstrap3": "https://github.com/twbs/bootstrap.git#68b0d231a13201eb14acd3dc84e51543d16e5f7e",
     "bootstrap": "^5.0.0-alpha3",
     "bootstrap-icons": "^1.1.0",
     "jquery": "^3.5.1",
