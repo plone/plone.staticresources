@@ -4,7 +4,7 @@
 
   <record name="plone.icon.contenttype">
     <field type="plone.registry.field.TextLine">
-      <title>Plone Event</title>
+      <title>Plone Contenttype</title>
     </field>
     <value key="resource">++plone++bootstrap-icons/file.svg</value>
   </record>
