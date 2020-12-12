@@ -1,6 +1,6 @@
 /**
  * --------------------------------------------------------------------------
- * Bootstrap (v5.0.0-alpha3): collapse.js
+ * Bootstrap (v5.0.0-beta1): collapse.js
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
  * --------------------------------------------------------------------------
  */
@@ -21,6 +21,7 @@ import Data from './dom/data'
 import EventHandler from './dom/event-handler'
 import Manipulator from './dom/manipulator'
 import SelectorEngine from './dom/selector-engine'
+import BaseComponent from './base-component'
 
 /**
  * ------------------------------------------------------------------------
@@ -29,7 +30,6 @@ import SelectorEngine from './dom/selector-engine'
  */
 
 const NAME = 'collapse'
-const VERSION = '5.0.0-alpha3'
 const DATA_KEY = 'bs.collapse'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
@@ -59,7 +59,7 @@ const WIDTH = 'width'
 const HEIGHT = 'height'
 
 const SELECTOR_ACTIVES = '.show, .collapsing'
-const SELECTOR_DATA_TOGGLE = '[data-toggle="collapse"]'
+const SELECTOR_DATA_TOGGLE = '[data-bs-toggle="collapse"]'
 
 /**
  * ------------------------------------------------------------------------
@@ -67,14 +67,15 @@ const SELECTOR_DATA_TOGGLE = '[data-toggle="collapse"]'
  * ------------------------------------------------------------------------
  */
 
-class Collapse {
+class Collapse extends BaseComponent {
   constructor(element, config) {
+    super(element)
+
     this._isTransitioning = false
-    this._element = element
     this._config = this._getConfig(config)
     this._triggerArray = SelectorEngine.find(
       `${SELECTOR_DATA_TOGGLE}[href="#${element.id}"],` +
-      `${SELECTOR_DATA_TOGGLE}[data-target="#${element.id}"]`
+      `${SELECTOR_DATA_TOGGLE}[data-bs-target="#${element.id}"]`
     )
 
     const toggleList = SelectorEngine.find(SELECTOR_DATA_TOGGLE)
@@ -100,18 +101,16 @@ class Collapse {
     if (this._config.toggle) {
       this.toggle()
     }
-
-    Data.setData(element, DATA_KEY, this)
   }
 
   // Getters
 
-  static get VERSION() {
-    return VERSION
-  }
-
   static get Default() {
     return Default
+  }
+
+  static get DATA_KEY() {
+    return DATA_KEY
   }
 
   // Public
@@ -125,8 +124,7 @@ class Collapse {
   }
 
   show() {
-    if (this._isTransitioning ||
-      this._element.classList.contains(CLASS_NAME_SHOW)) {
+    if (this._isTransitioning || this._element.classList.contains(CLASS_NAME_SHOW)) {
       return
     }
 
@@ -137,7 +135,7 @@ class Collapse {
       actives = SelectorEngine.find(SELECTOR_ACTIVES, this._parent)
         .filter(elem => {
           if (typeof this._config.parent === 'string') {
-            return elem.getAttribute('data-parent') === this._config.parent
+            return elem.getAttribute('data-bs-parent') === this._config.parent
           }
 
           return elem.classList.contains(CLASS_NAME_COLLAPSE)
@@ -150,8 +148,8 @@ class Collapse {
 
     const container = SelectorEngine.findOne(this._selector)
     if (actives) {
-      const tempActiveData = actives.filter(elem => container !== elem)
-      activesData = tempActiveData[0] ? Data.getData(tempActiveData[0], DATA_KEY) : null
+      const tempActiveData = actives.find(elem => container !== elem)
+      activesData = tempActiveData ? Data.getData(tempActiveData, DATA_KEY) : null
 
       if (activesData && activesData._isTransitioning) {
         return
@@ -213,8 +211,7 @@ class Collapse {
   }
 
   hide() {
-    if (this._isTransitioning ||
-      !this._element.classList.contains(CLASS_NAME_SHOW)) {
+    if (this._isTransitioning || !this._element.classList.contains(CLASS_NAME_SHOW)) {
       return
     }
 
@@ -266,11 +263,9 @@ class Collapse {
   }
 
   dispose() {
-    Data.removeData(this._element, DATA_KEY)
-
+    super.dispose()
     this._config = null
     this._parent = null
-    this._element = null
     this._triggerArray = null
     this._isTransitioning = null
   }
@@ -303,7 +298,7 @@ class Collapse {
       parent = SelectorEngine.findOne(parent)
     }
 
-    const selector = `${SELECTOR_DATA_TOGGLE}[data-parent="${parent}"]`
+    const selector = `${SELECTOR_DATA_TOGGLE}[data-bs-parent="${parent}"]`
 
     SelectorEngine.find(selector, parent)
       .forEach(element => {
@@ -367,10 +362,6 @@ class Collapse {
     return this.each(function () {
       Collapse.collapseInterface(this, config)
     })
-  }
-
-  static getInstance(element) {
-    return Data.getData(element, DATA_KEY)
   }
 }
 
