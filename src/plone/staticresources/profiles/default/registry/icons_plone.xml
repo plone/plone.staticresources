@@ -528,9 +528,37 @@
 
   <record name="plone.icon.plone-controlpanel">
     <field type="plone.registry.field.TextLine">
-      <title>Plone Icon wrench</title>
+      <title>Plone Icon gear</title>
     </field>
     <value key="resource">++plone++bootstrap-icons/gear.svg</value>
+  </record>
+
+  <record name="plone.icon.plone-statusmessage-info">
+    <field type="plone.registry.field.TextLine">
+      <title>Plone Icon Statusmessage Info</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/info-circle-fill.svg</value>
+  </record>
+
+  <record name="plone.icon.plone-statusmessage-warning">
+    <field type="plone.registry.field.TextLine">
+      <title>Plone Icon Statusmessage Warning</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/exclamation-circle-fill.svg</value>
+  </record>
+
+  <record name="plone.icon.plone-statusmessage-error">
+    <field type="plone.registry.field.TextLine">
+      <title>Plone Icon Statusmessage Error</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/exclamation-octagon-fill.svg</value>
+  </record>
+
+  <record name="plone.icon.plone-statusmessage-danger">
+    <field type="plone.registry.field.TextLine">
+      <title>Plone Icon Statusmessage Danger</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/exclamation-triangle-fill.svg</value>
   </record>
 
 </registry>
