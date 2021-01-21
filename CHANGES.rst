@@ -8,6 +8,26 @@ Changelog
 
 .. towncrier release notes start
 
+1.4.0 (2020-10-30)
+------------------
+
+New features:
+
+
+- Updated Bootstrap Icons to 1.0.0 final.
+  [santonelli] (#3162)
+
+
+Bug fixes:
+
+
+- Bumps bl from 4.0.2 to 4.0.3. [dependabot, jensens] (#97)
+- Build bundles with latest mockup 3.x.
+  [maurits] (#1026)
+- Fixed deprecation warning for zope.site.hooks.
+  [maurits] (#3130)
+
+
 1.3.2 (2020-08-14)
 ------------------
 

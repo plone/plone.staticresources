@@ -3862,5 +3862,5 @@ require([
 
 });
 
-define("/Users/peter/workspace/barcelonetaplone6/src/plone.staticresources/src/plone/staticresources/static/plone-base.js", function(){});
+define("/home/jensens/ws/cdev/p6/src/plone.staticresources/src/plone/staticresources/static/plone-base.js", function(){});
 

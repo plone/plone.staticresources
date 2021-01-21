@@ -1,0 +1,58 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<registry>
+
+  <records remove="True" prefix="plone.resources/jquery.event.drag" interface='Products.CMFPlone.interfaces.IResourceRegistry' />
+  <records remove="True" prefix="plone.resources/jquery.event.drop" interface='Products.CMFPlone.interfaces.IResourceRegistry' />
+
+  <records prefix="plone.resources/sortable"
+            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
+      <value key="js">++plone++static/components/sortablejs/dist/sortable.umd.js</value>
+  </records>
+
+  <!-- bundles -->
+
+  <records prefix="plone.bundles/plone-base" interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+    <value key="last_compilation">2021-01-21 11:40:00</value>
+  </records>
+
+  <records prefix="plone.bundles/plone" interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+    <value key="last_compilation">2021-01-21 11:40:00</value>
+  </records>
+
+  <records prefix="plone.bundles/plone-moment" interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+    <value key="last_compilation">2021-01-21 11:40:00</value>
+  </records>
+
+  <records prefix="plone.bundles/plone-logged-in" interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+     <value key="last_compilation">2021-01-21 11:40:00</value>
+  </records>
+
+  <records prefix="plone.bundles/plone-editor-tools" interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+    <value key="last_compilation">2021-01-21 11:40:00</value>
+  </records>
+
+  <records prefix="plone.bundles/plone-tinymce" interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+    <value key="last_compilation">2021-01-21 11:40:00</value>
+  </records>
+
+  <records prefix="plone.bundles/plone-datatables" interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+    <value key="last_compilation">2021-01-21 11:40:00</value>
+  </records>
+
+  <records prefix="plone.bundles/resourceregistry" interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+    <value key="last_compilation">2021-01-21 11:40:00</value>
+  </records>
+
+  <records prefix="plone.bundles/thememapper" interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+    <value key="last_compilation">2021-01-21 11:40:00</value>
+  </records>
+
+  <records prefix="plone.bundles/filemanager" interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+    <value key="last_compilation">2021-01-21 11:40:00</value>
+  </records>
+
+  <record name="plone.resources.last_legacy_import">
+    <value>2021-01-21 11:40:00</value>
+  </record>
+
+</registry>

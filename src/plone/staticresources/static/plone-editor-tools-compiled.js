@@ -31453,5 +31453,5 @@ require([
   'use strict';
 });
 
-define("/Users/peter/workspace/barcelonetaplone6/src/plone.staticresources/src/plone/staticresources/static/plone-editor-tools.js", function(){});
+define("/home/jensens/ws/cdev/p6/src/plone.staticresources/src/plone/staticresources/static/plone-editor-tools.js", function(){});
 

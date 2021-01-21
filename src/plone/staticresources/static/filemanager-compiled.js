@@ -36546,5 +36546,5 @@ require([
   'use strict';
 });
 
-define("/home/_thet/data/dev/plone/buildout.coredev/src/plone.staticresources/src/plone/staticresources/static/filemanager.js", function(){});
+define("/home/jensens/ws/cdev/p6/src/plone.staticresources/src/plone/staticresources/static/filemanager.js", function(){});
 
