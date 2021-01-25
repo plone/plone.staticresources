@@ -31453,5 +31453,5 @@ require([
   'use strict';
 });
 
-define("/home/jensens/ws/cdev/p6/src/plone.staticresources/src/plone/staticresources/static/plone-editor-tools.js", function(){});
+define("/Volumes/WORKSPACE2/kinderdorf_plone5/srccore/plone.staticresources/src/plone/staticresources/static/plone-editor-tools.js", function(){});
 
