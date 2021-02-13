@@ -5,8 +5,7 @@
     <title>pat-date-picker demo page</title>
     <link rel="stylesheet" href="/style/common.css" type="text/css">
     <link rel="stylesheet" href="date-picker.css" type="text/css">
-    <script src="/main.js" type="text/javascript" charset="utf-8"></script>
-    <script data-main="/src/pat/main" src="/src/bower_components/requirejs/require.js" type="text/javascript" charset="utf-8"></script>
+        <script src="/bundle.js" type="text/javascript" charset="utf-8"></script>
   </head>
   <body>
         <form action="">
@@ -19,6 +18,9 @@
                 </label><br/>
                 <label>Default value
                     <input class="pat-date-picker" type="date" value="2015-01-01">
+                </label><br/>
+                <label>First day on Monday
+                  <input class="pat-date-picker" type="date" value="2015-01-01" data-pat-date-picker="first-day: 1">
                 </label><br/>
                 <label>Specifying the "min" and "max" attributes.
                     <input class="pat-date-picker" min="2015-01-01" max="2015-12-31" type="date">

@@ -1,69 +1,98 @@
 define([
     "jquery",
+    "pat-base",
+    "pat-parser",
     "pat-logger",
-    "pat-registry"
-], function($, logger, registry) {
-    var log = logger.getLogger("pat.navigation");
+], function($, Base, Parser, logger) {
+    var log = logger.getLogger("navigation");
+    var parser = new Parser("navigation");
 
-    var _ = {
+    parser.addArgument("item-wrapper", "li");
+    parser.addArgument("in-path-class", "navigation-in-path");
+    parser.addArgument("current-class", "current");
+
+    return Base.extend({
         name: "navigation",
         trigger: "nav, .navigation, .pat-navigation",
-        init: function($el) {
-            return $el.each(function() {
-                var $el = $(this);
-                var curpath = window.location.pathname;
-                log.debug("current path:", curpath);
-
-                // check whether to load
-                if ($el.hasClass("navigation-load-current")) {
-                    $el.find("a.current, .current a").click();
-                    // check for current elements injected here
-                    $el.on("patterns-injected-scanned", function(ev) {
-                        var $target = $(ev.target);
-                        if ($target.is("a.current"))
-                            $target.click();
-                        if ($target.is(".current"))
-                            $target.find("a").click();
-                        _._updatenavpath($el);
-                    });
-                }
-
-                // An anchor within this navigation triggered injection
-                $el.on("patterns-inject-triggered", "a", function(ev) {
+        init: function($el, opts) {
+            this.options = parser.parse($el, opts);
+            var current = this.options.currentClass;
+            // check whether to load
+            if ($el.hasClass("navigation-load-current")) {
+                $el.find("a." + current, "."  + current + " a").click();
+                // check for current elements injected here
+                $el.on("patterns-injected-scanned", function(ev) {
                     var $target = $(ev.target);
-                    // remove all set current classes
-                    $el.find(".current").removeClass("current");
-                    // set .current on target
-                    $target.addClass("current");
-                    // If target's parent is an LI, also set current there
-                    $target.parent("li").addClass("current");
-                    _._updatenavpath($el);
-                });
+                    if ($target.is("a." + current))
+                        $target.click();
+                    if ($target.is("." + current))
+                        $target.find("a").click();
+                    this._updatenavpath($el);
+                }.bind(this));
+            }
 
-                // set current class if it is not set
-                if ($el.find(".current").length === 0) {
-                    $el.find("li a").each(function() {
-                        var $a = $(this),
-                            $li = $a.parents("li:first"),
-                            url = $a.attr("href"),
-                            path;
-                        if (typeof url === "undefined") {
-                            return;
-                        }
-                        path = _._pathfromurl(url);
-                        log.debug("checking url:", url, "extracted path:", path);
-                        if (_._match(curpath, path)) {
-                            log.debug("found match", $li);
-                            $li.addClass("current");
-                        }
-                    });
-                }
-                _._updatenavpath($el);
+            // An anchor within this navigation triggered injection
+            $el.on("patterns-inject-triggered", "a", function(ev) {
+                var $target = $(ev.target);
+                // remove all set current classes
+                $el.find("." + current).removeClass(current);
+                // set current class on target
+                $target.addClass(current);
+                // If target's parent is an LI, also set current class there
+                $target.parents(this.options.itemWrapper).first().addClass(current);
+                this._updatenavpath($el);
+            }.bind(this));
+
+            var observer = new MutationObserver(this._initialSet.bind(this));
+            observer.observe($el[0], {
+                childList: true,
+                subtree: true,
+                attributes: false,
+                characterData: false,
             });
+
+            this._initialSet();
+        },
+        _initialSet: function () {
+            var $el = this.$el;
+            var current = this.options.currentClass;
+            // Set current class if it is not set
+            if ($el[0].querySelectorAll('.' + current).length === 0) {
+                var ael = $el[0].querySelectorAll("a");
+                for (var cnt=0; cnt<ael.length; cnt++) {
+                    var $a = $(ael[cnt]),
+                        $li = $a.parents(this.options.itemWrapper).first(),
+                        url = $a.attr("href"),
+                        path;
+                    if (typeof url === "undefined") {
+                        return;
+                    }
+                    path = this._pathfromurl(url);
+                    log.debug("checking url:", url, "extracted path:", path);
+                    if (this._match(window.location.pathname, path)) {
+                        log.debug("found match", $li);
+                        $a.addClass(current);
+                        $li.addClass(current);
+                    }
+                }
+            }
+
+            // Set current class on item-wrapper, if not set.
+            if (
+                this.options.itemWrapper
+                && $el[0].querySelectorAll('.' + current).length > 0
+                && $el[0].querySelectorAll(this.options.itemWrapper + '.' + current).length === 0
+            ) {
+                $('.' + current, $el).parents(this.options.itemWrapper).first().addClass(current);
+            }
+
+            this._updatenavpath($el);
         },
         _updatenavpath: function($el) {
-            $el.find(".navigation-in-path").removeClass("navigation-in-path");
-            $el.find("li:has(.current)").addClass("navigation-in-path");
+            var in_path = this.options.inPathClass;
+            if (! in_path) { return; }
+            $el.find('.' + in_path).removeClass(in_path);
+            $el.find(this.options.itemWrapper + ":not(." + this.options.currentClass + "):has(." + this.options.currentClass + ")").addClass(in_path);
         },
         _match: function(curpath, path) {
             if (!path) {
@@ -87,10 +116,5 @@ define([
             if (path.length === 1) return path[0];
             return path[1].split("/").slice(1).join("/");
         }
-    };
-    registry.register(_);
-    return _;
+    });
 });
-
-// jshint indent: 4, browser: true, jquery: true, quotmark: double
-// vim: sw=4 expandtab

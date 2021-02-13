@@ -1,8 +1,14 @@
-# Backbone.Paginator (0.8.1)
+# Backbone.Paginator (1.0.0-dev)
 
-[![Continuous Integration status](https://secure.travis-ci.org/addyosmani/backbone.paginator.png)](http://travis-ci.org/addyosmani/backbone.paginator)
+[![Continuous Integration status](https://secure.travis-ci.org/backbone-paginator/backbone.paginator.png)](http://travis-ci.org/backbone-paginator/backbone.paginator)
 
-![](https://raw.github.com/addyosmani/backbone.paginator/master/media/logo.png)
+![](https://raw.github.com/backbone-paginator/backbone.paginator/master/media/logo.png)
+
+## Notice!
+
+This implementation is pending merge with [backbone-pageable](https://github.com/backbone-paginator/backbone-pageable). If you are starting new, it might be advisable to start there. Special thanks to Jimmy Yuen Ho Wong and @addyosmani for their contributions and agreement to provide a single optimized solution for the backbone community.
+
+---
 
 Backbone.Paginator is a set of opinionated components for paginating collections of data using Backbone.js.
 
@@ -14,13 +20,13 @@ You can either download the raw source code for the project, fork the repository
 
 * Production: [production version][min] 10.2K file size (2.79K gzipped)
 * Development: [development version][max] 30.1K file size (6.8K gzipped)
-* Examples: [tarball](https://github.com/addyosmani/backbone.paginator/zipball/)
+* Examples: [tarball](https://github.com/backbone-paginator/backbone.paginator/zipball/)
 
-[min]: https://raw.github.com/backbon-paginator/backbone.paginator/0.8.1/dist/backbone.paginator.min.js
-[max]: https://raw.github.com/backbon-paginator/backbone.paginator/0.8.1/dist/backbone.paginator.js
+[min]: https://raw.github.com/backbone-paginator/backbone.paginator/0.8.1/dist/backbone.paginator.min.js
+[max]: https://raw.github.com/backbone-paginator/backbone.paginator/0.8.1/dist/backbone.paginator.js
 
 ## Available on
-We are available via [Bower](http://twitter.github.com/bower/):
+We are available via [Bower](http://bower.io/):
 
 ```bash
 bower install backbone.paginator
@@ -42,13 +48,10 @@ Backbone.Paginator supports two main pagination components:
 
 Live previews of both pagination components using the Netflix API can be found below. Fork the repository to experiment with these examples further.
 
-* [Backbone.Paginator.requestPager()](http://addyosmani.github.com/backbone.paginator/examples/request-paging/index.html)
-* [Infinite Pagination (Backbone.Paginator.requestPager())](http://addyosmani.github.com/backbone.paginator/examples/infinite-paging/index.html)
-* [Diacritic Plugin](http://addyosmani.github.com/backbone.paginator/examples/google-diacritic/index.html)
-
-Netflix has shut down their OData API hence this example doesn't work:
-
-* [Backbone.Paginator.clientPager()](http://addyosmani.github.com/backbone.paginator/examples/netflix-client-paging/index.html)
+* [Backbone.Paginator.requestPager()](http://backbone-paginator.github.com/backbone.paginator/examples/request-paging/index.html)
+* [Backbone.Paginator.clientPager()](http://backbone-paginator.github.com/backbone.paginator/examples/client-paging/index.html)
+* [Infinite Pagination (Backbone.Paginator.requestPager())](http://backbone-paginator.github.com/backbone.paginator/examples/infinite-paging/index.html)
+* [Diacritic Plugin](http://backbone-paginator.github.com/backbone.paginator/examples/google-diacritic/index.html)
 
 ##Paginator.requestPager
 
@@ -326,7 +329,7 @@ As mentioned, your views can hook into a number of convenience methods to naviga
 * **Collection.prevPage(options)** - go to the previous page
 * **Collection.nextPage(options)** - go to the next page
 * **Collection.howManyPer(n)** - set how many items to display per page
-* **Collection.setSort(sortBy, sortDirection)** - update sort on the current view. Sorting will automatically detect if you're trying to sort numbers (even if they're strored as strings) and will do the right thing.
+* **Collection.setSort(sortBy, sortDirection)** - update sort on the current view. Sorting will automatically detect if you're trying to sort numbers (even if they're strored as strings) and will do the right thing. **Note** This works by calling .toString().toLower() so javascript Date objects don't sort properly. Also, setting a comparator on your collection will cause this to break.
 * **Collection.setFilter(filterFields, filterWords)** - filter the current view. Filtering supports multiple words without any specific order, so you'll basically get a full-text search ability. Also, you can pass it only one field from the model, or you can pass an array with fields and all of them will get filtered. Last option is to pass it an object containing a comparison method and rules. Currently, only ```levenshtein``` method is available.
 
 The `goTo()`, `prevPage()`, and `nextPage()` functions do not require the `options` param since they will be executed synchronously. However, when specified, the success callback will be invoked before the function returns. For example:

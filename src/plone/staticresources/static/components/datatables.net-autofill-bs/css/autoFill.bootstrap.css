@@ -1,11 +1,23 @@
+table.dataTable tbody td,
+table.dataTable tbody th {
+  position: relative;
+}
+
 div.dt-autofill-handle {
   position: absolute;
+  bottom: 0;
+  right: 0;
   height: 8px;
   width: 8px;
-  z-index: 102;
+  z-index: 1;
   box-sizing: border-box;
   border: 1px solid #337ab7;
   background: #337ab7;
+}
+
+td.focus div.dt-autofill-handle {
+  bottom: -4px;
+  right: -5px;
 }
 
 div.dt-autofill-select {

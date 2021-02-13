@@ -2142,14 +2142,14 @@ define('pat-logger',[
 define('pat-utils',[
     "jquery",
     "underscore",
-    "jquery.browser"  // adds itself to the jquery object, no need to pass to the define callback.
-], function($, _) {
+    "jquery.browser"
+], function($, _, browser) {
 
     $.fn.safeClone = function () {
         var $clone = this.clone();
         // IE BUG : Placeholder text becomes actual value after deep clone on textarea
         // https://connect.microsoft.com/IE/feedback/details/781612/placeholder-text-becomes-actual-value-after-deep-clone-on-textarea
-        if ($.browser.msie !== undefined && true) {
+        if (browser.msie !== undefined && true) {
             $clone.findInclusive(':input[placeholder]').each(function(i, item) {
                 var $item = $(item);
                 if ($item.attr('placeholder') === $item.val()) {
@@ -2323,8 +2323,10 @@ define('pat-utils',[
     // END: Taken from Underscore.js until here.
 
     function rebaseURL(base, url) {
-        if (url.indexOf("://")!==-1 || url[0]==="/")
+        base = new URL(base, window.location).href; // If base is relative make it absolute.
+        if (url.indexOf("://") !== -1 || url[0] === "/" || url.indexOf("data:") === 0) {
             return url;
+        }
         return base.slice(0, base.lastIndexOf("/")+1) + url;
     }
 
@@ -2386,6 +2388,22 @@ define('pat-utils',[
             });
         }
     }
+
+    function hasValue(el) {
+       if (el.tagName === "INPUT") {
+           if (el.type === "checkbox" || el.type === "radio") {
+               return el.checked;
+           }
+           return el.value !== "";
+       }
+       if (el.tagName === "SELECT") {
+           return el.selectedIndex !== -1;
+       }
+       if (el.tagName === "TEXTAREA") {
+           return el.value !== "";
+       }
+       return false;
+    };
 
     var transitions = {
         none: {hide: "hide", show: "show"},
@@ -2498,14 +2516,14 @@ define('pat-utils',[
         return results;
     }
 
-    isElementInViewport = function (el, partial, offset) { 
-        /* returns true if element is visible to the user ie. is in the viewport. 
+    isElementInViewport = function (el, partial, offset) {
+        /* returns true if element is visible to the user ie. is in the viewport.
          * Setting partial parameter to true, will only check if a part of the element is visible
-         * in the viewport, specifically that some part of that element is touching the top part 
+         * in the viewport, specifically that some part of that element is touching the top part
          * of the viewport. This only applies to the vertical direction, ie. doesnt check partial
          * visibility for horizontal scrolling
          * some code taken from:
-         * http://stackoverflow.com/questions/123999/how-to-tell-if-a-dom-element-is-visible-in-the-current-viewport/7557433#7557433         
+         * http://stackoverflow.com/questions/123999/how-to-tell-if-a-dom-element-is-visible-in-the-current-viewport/7557433#7557433
          */
         if (el === []) {
             return false;
@@ -2517,14 +2535,14 @@ define('pat-utils',[
             rec_values = [rec.top, rec.bottom, rec.left, rec.right];
         if ( _.every(rec_values, function zero(v) { if ( v === 0 ){ return true;}}) ) {
             // if every property of rec is 0, the element is invisible;
-            return false;            
+            return false;
         } else if (partial) {
             // when using getBoundingClientRect() (in the vertical case)
             // negative means above top of viewport, positive means below top of viewport
             // therefore for part of the element to be touching or crossing the top of the viewport
-            // rec.top must <= 0 and rec.bottom must >= 0 
-            // an optional tolerance offset can be added for when the desired element is not exactly 
-            // toucing the top of the viewport but needs to be considered as touching. 
+            // rec.top must <= 0 and rec.bottom must >= 0
+            // an optional tolerance offset can be added for when the desired element is not exactly
+            // toucing the top of the viewport but needs to be considered as touching.
             if (offset === undefined) {
                 offset = 0;
             }
@@ -2535,16 +2553,66 @@ define('pat-utils',[
                 // XXX do we want to include a check for the padding of an element?
                 // using window.getComputedStyle(target).paddingTop
             );
-        } else {           
-            // this will return true if the entire element is completely in the viewport 
-            return ( 
+        } else {
+            // this will return true if the entire element is completely in the viewport
+            return (
                 rec.top >= 0 &&
                 rec.left >= 0 &&
                 rec.bottom <= (window.innerHeight || document.documentElement.clientHeight) && /*or $(window).height() */
                 rec.right <= (window.innerWidth || document.documentElement.clientWidth) /*or $(window).width() */
-            );        
+            );
         }
     };
+
+    function parseTime(time) {
+        var m = /^(\d+(?:\.\d+)?)\s*(\w*)/.exec(time);
+        if (!m) {
+            throw new Error('Invalid time');
+        }
+        var amount = parseFloat(m[1])
+        switch (m[2]) {
+            case 's':
+                return Math.round(amount * 1000);
+            case 'm':
+                return Math.round(amount * 1000 * 60);
+            case 'ms':
+            default:
+                return Math.round(amount);
+        }
+    }
+
+    // Return a jQuery object with elements related to an input element.
+    function findRelatives(el) {
+        var $el = $(el),
+            $relatives = $(el),
+            $label = $();
+
+        $relatives=$relatives.add($el.closest("label"));
+        $relatives=$relatives.add($el.closest("fieldset"));
+
+        if (el.id)
+            $label=$("label[for='"+el.id+"']");
+        if (!$label.length) {
+            var $form = $el.closest("form");
+            if (!$form.length)
+                $form=$(document.body);
+            $label=$form.find("label[for='"+el.name+"']");
+        }
+        $relatives=$relatives.add($label);
+        return $relatives;
+    }
+
+    function getCSSValue(el, property, asPixels) {
+        /* Return a CSS property value for a given DOM node.
+         * For length-values, relative values are converted to pixels.
+         * Optionally parse as pixels, if applicable.
+        */
+        var value = window.getComputedStyle(el).getPropertyValue(property);
+        if (asPixels) {
+            value = parseFloat(value) || 0.0;
+        }
+        return value;
+    }
 
     var utils = {
         // pattern pimping - own module?
@@ -2561,7 +2629,11 @@ define('pat-utils',[
         addURLQueryParameter: addURLQueryParameter,
         removeDuplicateObjects: removeDuplicateObjects,
         mergeStack: mergeStack,
-        isElementInViewport: isElementInViewport
+        isElementInViewport: isElementInViewport,
+        hasValue: hasValue,
+        parseTime: parseTime,
+        findRelatives: findRelatives,
+        getCSSValue: getCSSValue
     };
     return utils;
 });
@@ -3042,8 +3114,8 @@ define('pat-jquery-ext',["jquery"], function($) {
                         "inExceptionArea": false
                     });
 
-                    $this.bind( "mouseover.timeout", methods.mouseMoved );
-                    $this.bind( "mouseenter.timeout", methods.mouseMoved );
+                    $this.on( "mouseover.timeout", methods.mouseMoved );
+                    $this.on( "mouseenter.timeout", methods.mouseMoved );
 
                     $(settings.exceptionAreas).each(function() {
                         $this.find(this)
@@ -3077,7 +3149,7 @@ define('pat-jquery-ext',["jquery"], function($) {
                 var $this = $(this),
                     data = $this.data("timeout");
 
-                $(window).unbind(".timeout");
+                $(window).off(".timeout");
                 data.timeout.remove();
                 $this.removeData("timeout");
             });
@@ -3190,6 +3262,25 @@ define('pat-jquery-ext',["jquery"], function($) {
         });
     };
 
+    //Work around warning for jQuery 3.x:
+    //JQMIGRATE: jQuery.fn.offset() requires an element connected to a document
+    $.fn.safeOffset = function() {
+        var docElem,
+            elem = this[ 0 ],
+            origin = { top: 0, left: 0 };
+
+	if ( !elem || !elem.nodeType ) {
+            return origin;
+	}
+
+        docElem = ( elem.ownerDocument || document).documentElement;
+        if ( !jQuery.contains(docElem, elem)) {
+            return origin;
+        }
+
+        return jQuery.fn.offset.apply( this, arguments );
+    };
+
     //Make absolute location
     $.fn.setPositionAbsolute = function(element,offsettop,offsetleft) {
         return this.each(function() {
@@ -3197,7 +3288,7 @@ define('pat-jquery-ext',["jquery"], function($) {
             // dynamically since every browser has different settings
             var $this = $(this);
             var thiswidth = $(this).width();
-            var    pos   = element.offset();
+            var    pos   = element.safeOffset();
             var    width = element.width();
             var    height = element.height();
             var setleft = (pos.left + width - thiswidth + offsetleft);
@@ -3216,10 +3307,10 @@ define('pat-jquery-ext',["jquery"], function($) {
             var $ancestor = $(this).closest(selector);
             if ($ancestor.length && $ancestor.css("position") !== "static") {
                 var $child = $(this);
-                var childMarginEdgeLeft = $child.offset().left - parseInt($child.css("marginLeft"), 10);
-                var childMarginEdgeTop = $child.offset().top - parseInt($child.css("marginTop"), 10);
-                var ancestorPaddingEdgeLeft = $ancestor.offset().left + parseInt($ancestor.css("borderLeftWidth"), 10);
-                var ancestorPaddingEdgeTop = $ancestor.offset().top + parseInt($ancestor.css("borderTopWidth"), 10);
+                var childMarginEdgeLeft = $child.safeOffset().left - parseInt($child.css("marginLeft"), 10);
+                var childMarginEdgeTop = $child.safeOffset().top - parseInt($child.css("marginTop"), 10);
+                var ancestorPaddingEdgeLeft = $ancestor.safeOffset().left + parseInt($ancestor.css("borderLeftWidth"), 10);
+                var ancestorPaddingEdgeTop = $ancestor.safeOffset().top + parseInt($ancestor.css("borderTopWidth"), 10);
                 left = childMarginEdgeLeft - ancestorPaddingEdgeLeft;
                 top = childMarginEdgeTop - ancestorPaddingEdgeTop;
                 // we have found the ancestor and computed the position
@@ -3237,9 +3328,16 @@ define('pat-jquery-ext',["jquery"], function($) {
     // XXX: In compat.js we include things for browser compatibility,
     // but these two seem to be only convenience. Do we really want to
     // include these as part of patterns?
-    String.prototype.startsWith = function(str) { return (this.match("^"+str) !== null); };
-    String.prototype.endsWith = function(str) { return (this.match(str+"$") !== null); };
-
+    if (!String.prototype.startsWith) {
+        String.prototype.startsWith = function (str) {
+            return (this.match("^" + str) !== null);
+        };
+    }
+    if (!String.prototype.endsWith) {
+        String.prototype.endsWith = function(str) {
+            return (this.match(str+"$") !== null);
+        };
+    }
 
     /******************************
 
@@ -5287,115 +5385,135 @@ define('pat-base',[
  *
  *  Or, it'll default to "/plonejsi18n"
  */
-define('mockup-i18n',[
-  'jquery'
-], function($) {
-  'use strict';
+define('mockup-i18n',["jquery"], function ($) {
+    "use strict";
 
-  var I18N = function() {
-    var self = this;
-    self.baseUrl = $('body').attr('data-i18ncatalogurl');
-    self.currentLanguage = $('html').attr('lang') || 'en';
+    var I18N = function () {
+        var self = this;
+        self.baseUrl = $("body").attr("data-i18ncatalogurl");
+        self.currentLanguage = $("html").attr("lang") || "en";
 
-    // Fix for country specific languages
-    if (self.currentLanguage.split('-').length > 1) {
-      self.currentLanguage = self.currentLanguage.split('-')[0] + '_' + self.currentLanguage.split('-')[1].toUpperCase();
-    }
-
-    self.storage = null;
-    self.catalogs = {};
-    self.ttl = 24 * 3600 * 1000;
-
-    // Internet Explorer 8 does not know Date.now() which is used in e.g. loadCatalog, so we "define" it
-    if (!Date.now) {
-      Date.now = function() {
-        return new Date().valueOf();
-      };
-    }
-
-    try {
-      if ('localStorage' in window && window.localStorage !== null && 'JSON' in window && window.JSON !== null) {
-        self.storage = window.localStorage;
-      }
-    } catch (e) {}
-
-    self.configure = function(config) {
-      for (var key in config){
-        self[key] = config[key];
-      }
-    };
-
-    self._setCatalog = function (domain, language, catalog) {
-      if (domain in self.catalogs) {
-        self.catalogs[domain][language] = catalog;
-      } else {
-        self.catalogs[domain] = {};
-        self.catalogs[domain][language] = catalog;
-      }
-    };
-
-    self._storeCatalog = function (domain, language, catalog) {
-      var key = domain + '-' + language;
-      if (self.storage !== null && catalog !== null) {
-        self.storage.setItem(key, JSON.stringify(catalog));
-        self.storage.setItem(key + '-updated', Date.now());
-      }
-    };
-
-    self.getUrl = function(domain, language) {
-      return self.baseUrl + '?domain=' + domain + '&language=' + language;
-    };
-
-    self.loadCatalog = function (domain, language) {
-      if (language === undefined) {
-        language = self.currentLanguage;
-      }
-      if (self.storage !== null) {
-        var key = domain + '-' + language;
-        if (key in self.storage) {
-          if ((Date.now() - parseInt(self.storage.getItem(key + '-updated'), 10)) < self.ttl) {
-            var catalog = JSON.parse(self.storage.getItem(key));
-            self._setCatalog(domain, language, catalog);
-            return;
-          }
+        // Fix for country specific languages
+        if (self.currentLanguage.split("-").length > 1) {
+            self.currentLanguage =
+                self.currentLanguage.split("-")[0] +
+                "_" +
+                self.currentLanguage.split("-")[1].toUpperCase();
         }
-      }
-      if (!self.baseUrl) {
-        return;
-      }
-      $.getJSON(self.getUrl(domain, language), function (catalog) {
-        if (catalog === null) {
-          return;
-        }
-        self._setCatalog(domain, language, catalog);
-        self._storeCatalog(domain, language, catalog);
-      });
-    };
 
-    self.MessageFactory = function (domain, language) {
-      language = language || self.currentLanguage;
-      return function translate (msgid, keywords) {
-        var msgstr;
-        if ((domain in self.catalogs) && (language in self.catalogs[domain]) && (msgid in self.catalogs[domain][language])) {
-          msgstr = self.catalogs[domain][language][msgid];
-        } else {
-          msgstr = msgid;
+        self.storage = null;
+        self.catalogs = {};
+        self.ttl = 24 * 3600 * 1000;
+
+        // Internet Explorer 8 does not know Date.now() which is used in e.g. loadCatalog, so we "define" it
+        if (!Date.now) {
+            Date.now = function () {
+                return new Date().valueOf();
+            };
         }
-        if (keywords) {
-          var regexp, keyword;
-          for (keyword in keywords) {
-            if (keywords.hasOwnProperty(keyword)) {
-              regexp = new RegExp('\\$\\{' + keyword + '\\}', 'g');
-              msgstr = msgstr.replace(regexp, keywords[keyword]);
+
+        try {
+            if (
+                "localStorage" in window &&
+                window.localStorage !== null &&
+                "JSON" in window &&
+                window.JSON !== null
+            ) {
+                self.storage = window.localStorage;
             }
-          }
-        }
-        return msgstr;
-      };
-    };
-  };
+        } catch (e) {}
 
-  return I18N;
+        self.configure = function (config) {
+            for (var key in config) {
+                self[key] = config[key];
+            }
+        };
+
+        self._setCatalog = function (domain, language, catalog) {
+            if (domain in self.catalogs) {
+                self.catalogs[domain][language] = catalog;
+            } else {
+                self.catalogs[domain] = {};
+                self.catalogs[domain][language] = catalog;
+            }
+        };
+
+        self._storeCatalog = function (domain, language, catalog) {
+            var key = domain + "-" + language;
+            if (self.storage !== null && catalog !== null) {
+                self.storage.setItem(key, JSON.stringify(catalog));
+                self.storage.setItem(key + "-updated", Date.now());
+            }
+        };
+
+        self.getUrl = function (domain, language) {
+            return self.baseUrl + "?domain=" + domain + "&language=" + language;
+        };
+
+        self.loadCatalog = function (domain, language) {
+            if (language === undefined) {
+                language = self.currentLanguage;
+            }
+            if (self.storage !== null) {
+                var key = domain + "-" + language;
+                if (key in self.storage) {
+                    if (
+                        Date.now() -
+                            parseInt(
+                                self.storage.getItem(key + "-updated"),
+                                10
+                            ) <
+                        self.ttl
+                    ) {
+                        var catalog = JSON.parse(self.storage.getItem(key));
+                        self._setCatalog(domain, language, catalog);
+                        return;
+                    }
+                }
+            }
+            if (!self.baseUrl) {
+                return;
+            }
+            $.getJSON(self.getUrl(domain, language), function (catalog) {
+                if (catalog === null) {
+                    return;
+                }
+                self._setCatalog(domain, language, catalog);
+                self._storeCatalog(domain, language, catalog);
+            });
+        };
+
+        self.MessageFactory = function (domain, language) {
+            language = language || self.currentLanguage;
+            return function translate(msgid, keywords) {
+                var msgstr;
+                if (
+                    domain in self.catalogs &&
+                    language in self.catalogs[domain] &&
+                    msgid in self.catalogs[domain][language]
+                ) {
+                    msgstr = self.catalogs[domain][language][msgid];
+                } else {
+                    msgstr = msgid;
+                }
+                if (keywords) {
+                    var regexp, keyword;
+                    for (keyword in keywords) {
+                        if (keywords.hasOwnProperty(keyword)) {
+                            regexp = new RegExp(
+                                "\\$\\{" + keyword + "\\}",
+                                "g"
+                            );
+                            msgstr = msgstr.replace(regexp, keywords[keyword]);
+                        }
+                    }
+                }
+                return msgstr;
+            };
+        };
+    };
+
+    return I18N;
 });
 
 /* i18n integration.
@@ -5407,1206 +5525,520 @@ define('mockup-i18n',[
  *  Or, it'll default to "/plonejsi18n"
  */
 
-define('translate',[
-  'mockup-i18n'
-], function(I18N) {
-  'use strict';
+define('translate',["mockup-i18n"], function (I18N) {
+    "use strict";
 
-  // we're creating a singleton here so we can potentially
-  // delay the initialization of the translate catalog
-  // until after the dom is available
-  var _t = null;
-  return function(msgid, keywords) {
-    if (_t === null) {
-      var i18n = new I18N();
-      i18n.loadCatalog('widgets');
-      _t = i18n.MessageFactory('widgets');
-    }
-    return _t(msgid, keywords);
-  };
+    // we're creating a singleton here so we can potentially
+    // delay the initialization of the translate catalog
+    // until after the dom is available
+    var _t = null;
+    return function (msgid, keywords) {
+        if (_t === null) {
+            var i18n = new I18N();
+            i18n.loadCatalog("widgets");
+            _t = i18n.MessageFactory("widgets");
+        }
+        return _t(msgid, keywords);
+    };
 });
 
-define('mockup-ui-url/views/base',[
-  'jquery',
-  'underscore',
-  'backbone',
-  'translate'
-], function($, _, Backbone, _t) {
-  'use strict';
+define('mockup-ui-url/views/base',["jquery", "underscore", "backbone", "translate"], function (
+    $,
+    _,
+    Backbone,
+    _t
+) {
+    "use strict";
 
-  var BaseView = Backbone.View.extend({
-    isUIView: true,
-    eventPrefix: 'ui',
-    template: null,
-    idPrefix: 'base-',
-    appendInContainer: true,
-    initialize: function(options) {
-      this.options = options;
-      for (var key in this.options) {
-        this[key] = this.options[key];
-      }
-      this.options._t = _t;
-    },
-    render: function() {
-      this.applyTemplate();
+    var BaseView = Backbone.View.extend({
+        isUIView: true,
+        eventPrefix: "ui",
+        template: null,
+        idPrefix: "base-",
+        appendInContainer: true,
+        initialize: function (options) {
+            this.options = options;
+            for (var key in this.options) {
+                this[key] = this.options[key];
+            }
+            this.options._t = _t;
+        },
+        render: function () {
+            this.applyTemplate();
 
-      this.trigger('render', this);
-      this.afterRender();
+            this.trigger("render", this);
+            this.afterRender();
 
-      if (this.options.id) {
-        // apply id to element
-        this.$el.attr('id', this.idPrefix + this.options.id);
-      }
-      return this;
-    },
-    afterRender: function() {
+            if (this.options.id) {
+                // apply id to element
+                this.$el.attr("id", this.idPrefix + this.options.id);
+            }
+            return this;
+        },
+        afterRender: function () {},
+        serializedModel: function () {
+            return this.options;
+        },
+        applyTemplate: function () {
+            if (this.template !== null) {
+                var data = $.extend(
+                    { _t: _t },
+                    this.options,
+                    this.serializedModel()
+                );
+                var template = this.template;
+                if (typeof template === "string") {
+                    template = _.template(template);
+                }
+                this.$el.html(template(data));
+            }
+        },
+        propagateEvent: function (eventName) {
+            if (eventName.indexOf(":") > 0) {
+                var eventId = eventName.split(":")[0];
+                if (this.eventPrefix !== "") {
+                    if (
+                        eventId === this.eventPrefix ||
+                        eventId === this.eventPrefix + "." + this.id
+                    ) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        },
+        uiEventTrigger: function (name) {
+            var args = [].slice.call(arguments, 0);
 
-    },
-    serializedModel: function() {
-      return this.options;
-    },
-    applyTemplate: function() {
-      if (this.template !== null) {
-        var data = $.extend({_t: _t}, this.options, this.serializedModel());
-        var template = this.template;
-        if(typeof(template) === 'string'){
-          template = _.template(template);
-        }
-        this.$el.html(template(data));
-      }
-    },
-    propagateEvent: function(eventName) {
-      if (eventName.indexOf(':') > 0) {
-        var eventId = eventName.split(':')[0];
-        if (this.eventPrefix !== '') {
-          if (eventId === this.eventPrefix ||
-              eventId === this.eventPrefix + '.' + this.id) { return true; }
-        }
-      }
-      return false;
-    },
-    uiEventTrigger: function(name) {
-      var args = [].slice.call(arguments, 0);
+            if (this.eventPrefix !== "") {
+                args[0] = this.eventPrefix + ":" + name;
+                Backbone.View.prototype.trigger.apply(this, args);
+                if (this.id) {
+                    args[0] = this.eventPrefix + "." + this.id + ":" + name;
+                    Backbone.View.prototype.trigger.apply(this, args);
+                }
+            }
+        },
+    });
 
-      if (this.eventPrefix !== '') {
-        args[0] = this.eventPrefix + ':' + name;
-        Backbone.View.prototype.trigger.apply(this, args);
-        if (this.id) {
-          args[0] =  this.eventPrefix + '.' + this.id + ':' + name;
-          Backbone.View.prototype.trigger.apply(this, args);
-        }
-      }
-    }
-  });
-
-  return BaseView;
+    return BaseView;
 });
 
 /* Pattern utils
  */
 
+define('mockup-utils',["jquery"], function ($) {
+    "use strict";
 
-define('mockup-utils',[
-  'jquery'
-], function($) {
-  'use strict';
+    var QueryHelper = function (options) {
+        /* if pattern argument provided, it can implement the interface of:
+         *    - browsing: boolean if currently browsing
+         *    - currentPath: string of current path to apply to search if browsing
+         *    - basePath: default path to provide if no subpath used
+         */
 
-  var QueryHelper = function(options) {
-    /* if pattern argument provided, it can implement the interface of:
-     *    - browsing: boolean if currently browsing
-     *    - currentPath: string of current path to apply to search if browsing
-     *    - basePath: default path to provide if no subpath used
-     */
+        var self = this;
+        var defaults = {
+            pattern: null, // must be passed in
+            vocabularyUrl: null,
+            searchParam: "SearchableText", // query string param to pass to search url
+            pathOperator: "plone.app.querystring.operation.string.path",
+            attributes: [
+                "UID",
+                "Title",
+                "Description",
+                "getURL",
+                "portal_type",
+            ],
+            batchSize: 10, // number of results to retrive
+            baseCriteria: [],
+            sort_on: "is_folderish",
+            sort_order: "reverse",
+            pathDepth: 1,
+        };
+        self.options = $.extend({}, defaults, options);
 
-    var self = this;
-    var defaults = {
-      pattern: null, // must be passed in
-      vocabularyUrl: null,
-      searchParam: 'SearchableText', // query string param to pass to search url
-      pathOperator: 'plone.app.querystring.operation.string.path',
-      attributes: ['UID', 'Title', 'Description', 'getURL', 'portal_type'],
-      batchSize: 10, // number of results to retrive
-      baseCriteria: [],
-      sort_on: 'is_folderish',
-      sort_order: 'reverse',
-      pathDepth: 1
+        self.pattern = self.options.pattern;
+        if (self.pattern === undefined || self.pattern === null) {
+            self.pattern = {
+                browsing: false,
+                basePath: "/",
+            };
+        }
+
+        if (self.options.url && !self.options.vocabularyUrl) {
+            self.options.vocabularyUrl = self.options.url;
+        } else if (self.pattern.vocabularyUrl) {
+            self.options.vocabularyUrl = self.pattern.vocabularyUrl;
+        }
+        self.valid = Boolean(self.options.vocabularyUrl);
+
+        self.getBatch = function (page) {
+            return {
+                page: page ? page : 1,
+                size: self.options.batchSize,
+            };
+        };
+
+        self.getCurrentPath = function () {
+            var pattern = self.pattern;
+            var currentPath;
+            /* If currentPath is set on the QueryHelper object, use that first.
+             * Then, check on the pattern.
+             * Finally, see if it is a function and call it if it is.
+             */
+            if (self.currentPath) {
+                currentPath = self.currentPath;
+            } else {
+                currentPath = pattern.currentPath;
+            }
+            if (typeof currentPath === "function") {
+                currentPath = currentPath();
+            }
+            var path = currentPath;
+            if (!path) {
+                if (pattern.basePath) {
+                    path = pattern.basePath;
+                } else if (pattern.options.basePath) {
+                    path = pattern.options.basePath;
+                } else {
+                    path = "/";
+                }
+            }
+            return path;
+        };
+
+        self.getCriterias = function (term, searchOptions) {
+            if (searchOptions === undefined) {
+                searchOptions = {};
+            }
+            searchOptions = $.extend(
+                {},
+                {
+                    useBaseCriteria: true,
+                    additionalCriterias: [],
+                },
+                searchOptions
+            );
+
+            var criterias = [];
+            if (searchOptions.useBaseCriteria) {
+                criterias = self.options.baseCriteria.slice(0);
+            }
+            if (term) {
+                term += "*";
+                criterias.push({
+                    i: self.options.searchParam,
+                    o: "plone.app.querystring.operation.string.contains",
+                    v: term,
+                });
+            }
+            if (searchOptions.searchPath) {
+                criterias.push({
+                    i: "path",
+                    o: self.options.pathOperator,
+                    v: searchOptions.searchPath + "::" + self.options.pathDepth,
+                });
+            } else if (self.pattern.browsing) {
+                criterias.push({
+                    i: "path",
+                    o: self.options.pathOperator,
+                    v: self.getCurrentPath() + "::" + self.options.pathDepth,
+                });
+            }
+            criterias = criterias.concat(searchOptions.additionalCriterias);
+            return criterias;
+        };
+
+        self.getQueryData = function (term, page) {
+            var data = {
+                query: JSON.stringify({
+                    criteria: self.getCriterias(term),
+                    sort_on: self.options.sort_on,
+                    sort_order: self.options.sort_order,
+                }),
+                attributes: JSON.stringify(self.options.attributes),
+            };
+            if (page) {
+                data.batch = JSON.stringify(self.getBatch(page));
+            }
+            return data;
+        };
+
+        self.getUrl = function () {
+            var url = self.options.vocabularyUrl;
+            if (url.indexOf("?") === -1) {
+                url += "?";
+            } else {
+                url += "&";
+            }
+            return url + $.param(self.getQueryData());
+        };
+
+        self.selectAjax = function () {
+            return {
+                url: self.options.vocabularyUrl,
+                dataType: "JSON",
+                quietMillis: 100,
+                data: function (term, page) {
+                    return self.getQueryData(term, page);
+                },
+                results: function (data, page) {
+                    var more = page * 10 < data.total; // whether or not there are more results available
+                    // notice we return the value of more so Select2 knows if more results can be loaded
+                    return {
+                        results: data.results,
+                        more: more,
+                    };
+                },
+            };
+        };
+
+        self.search = function (
+            term,
+            operation,
+            value,
+            callback,
+            useBaseCriteria,
+            type
+        ) {
+            if (useBaseCriteria === undefined) {
+                useBaseCriteria = true;
+            }
+            if (type === undefined) {
+                type = "GET";
+            }
+            var criteria = [];
+            if (useBaseCriteria) {
+                criteria = self.options.baseCriteria.slice(0);
+            }
+            criteria.push({
+                i: term,
+                o: operation,
+                v: value,
+            });
+            var data = {
+                query: JSON.stringify({
+                    criteria: criteria,
+                }),
+                attributes: JSON.stringify(self.options.attributes),
+            };
+            $.ajax({
+                url: self.options.vocabularyUrl,
+                dataType: "JSON",
+                data: data,
+                type: type,
+                success: callback,
+            });
+        };
+
+        return self;
     };
-    self.options = $.extend({}, defaults, options);
 
-    self.pattern = self.options.pattern;
-    if (self.pattern === undefined || self.pattern === null) {
-      self.pattern = {
-        browsing: false,
-        basePath: '/'
-      };
-    }
+    var Loading = function (options) {
+        /*
+         * Options:
+         *   backdrop(pattern): if you want to have the progress indicator work
+         *                      seamlessly with backdrop pattern
+         *   zIndex(integer or function): to override default z-index used
+         */
+        var self = this;
+        self.className = "plone-loader";
+        var defaults = {
+            backdrop: null,
+            zIndex: 10005, // can be a function
+        };
+        if (!options) {
+            options = {};
+        }
+        self.options = $.extend({}, defaults, options);
 
-    if (self.options.url && !self.options.vocabularyUrl) {
-      self.options.vocabularyUrl = self.options.url;
-    } else if (self.pattern.vocabularyUrl) {
-      self.options.vocabularyUrl = self.pattern.vocabularyUrl;
-    }
-    self.valid = Boolean(self.options.vocabularyUrl);
+        self.init = function () {
+            self.$el = $("." + self.className);
+            if (self.$el.length === 0) {
+                self.$el = $("<div><div></div></div>");
+                self.$el.addClass(self.className).hide().appendTo("body");
+            }
+        };
 
-    self.getBatch = function(page) {
-      return {
-        page: page ? page : 1,
-        size: self.options.batchSize
-      };
+        self.show = function (closable) {
+            self.init();
+            self.$el.show();
+            var zIndex = self.options.zIndex;
+            if (typeof zIndex === "function") {
+                zIndex = Math.max(zIndex(), 10005);
+            } else {
+                // go through all modals and backdrops and make sure we have a higher
+                // z-index to use
+                zIndex = 10005;
+                $(".plone-modal-wrapper,.plone-modal-backdrop").each(
+                    function () {
+                        zIndex = Math.max(
+                            zIndex,
+                            $(this).css("zIndex") || 10005
+                        );
+                    }
+                );
+                zIndex += 1;
+            }
+            self.$el.css("zIndex", zIndex);
+
+            if (closable === undefined) {
+                closable = true;
+            }
+            if (self.options.backdrop) {
+                self.options.backdrop.closeOnClick = closable;
+                self.options.backdrop.closeOnEsc = closable;
+                self.options.backdrop.init();
+                self.options.backdrop.show();
+            }
+        };
+
+        self.hide = function () {
+            self.init();
+            self.$el.hide();
+        };
+
+        return self;
     };
 
-    self.getCurrentPath = function() {
-      var pattern = self.pattern;
-      var currentPath;
-      /* If currentPath is set on the QueryHelper object, use that first.
-       * Then, check on the pattern.
-       * Finally, see if it is a function and call it if it is.
-       */
-      if (self.currentPath) {
-        currentPath = self.currentPath;
-      } else {
-        currentPath = pattern.currentPath;
-      }
-      if (typeof currentPath === 'function') {
-        currentPath = currentPath();
-      }
-      var path = currentPath;
-      if (!path) {
-        if (pattern.basePath) {
-          path = pattern.basePath;
-        } else if (pattern.options.basePath) {
-          path = pattern.options.basePath;
+    var getAuthenticator = function () {
+        var $el = $('input[name="_authenticator"]');
+        if ($el.length === 0) {
+            $el = $('a[href*="_authenticator"]');
+            if ($el.length > 0) {
+                return $el.attr("href").split("_authenticator=")[1];
+            }
+            return "";
         } else {
-          path = '/';
+            return $el.val();
         }
-      }
-      return path;
     };
 
-    self.getCriterias = function(term, searchOptions) {
-      if (searchOptions === undefined) {
-        searchOptions = {};
-      }
-      searchOptions = $.extend({}, {
-        useBaseCriteria: true,
-        additionalCriterias: []
-      }, searchOptions);
-
-      var criterias = [];
-      if (searchOptions.useBaseCriteria) {
-        criterias = self.options.baseCriteria.slice(0);
-      }
-      if (term) {
-        term += '*';
-        criterias.push({
-          i: self.options.searchParam,
-          o: 'plone.app.querystring.operation.string.contains',
-          v: term
-        });
-      }
-      if (searchOptions.searchPath) {
-        criterias.push({
-          i: 'path',
-          o: self.options.pathOperator,
-          v: searchOptions.searchPath + '::' + self.options.pathDepth
-        });
-      } else if (self.pattern.browsing) {
-        criterias.push({
-          i: 'path',
-          o: self.options.pathOperator,
-          v: self.getCurrentPath() + '::' + self.options.pathDepth
-        });
-      }
-      criterias = criterias.concat(searchOptions.additionalCriterias);
-      return criterias;
+    var generateId = function (prefix) {
+        if (prefix === undefined) {
+            prefix = "id";
+        }
+        return (
+            prefix +
+            Math.floor((1 + Math.random()) * 0x10000)
+                .toString(16)
+                .substring(1)
+        );
     };
 
-    self.getQueryData = function(term, page) {
-      var data = {
-        query: JSON.stringify({
-          criteria: self.getCriterias(term),
-          sort_on: self.options.sort_on,
-          sort_order: self.options.sort_order
-        }),
-        attributes: JSON.stringify(self.options.attributes)
-      };
-      if (page) {
-        data.batch = JSON.stringify(self.getBatch(page));
-      }
-      return data;
+    var setId = function ($el, prefix) {
+        if (prefix === undefined) {
+            prefix = "id";
+        }
+        var id = $el.attr("id");
+        if (id === undefined) {
+            id = generateId(prefix);
+        } else {
+            /* hopefully we don't screw anything up here... changing the id
+             * in some cases so we get a decent selector */
+            id = id.replace(/\./g, "-");
+        }
+        $el.attr("id", id);
+        return id;
     };
 
-    self.getUrl = function() {
-      var url = self.options.vocabularyUrl;
-      if (url.indexOf('?') === -1) {
-        url += '?';
-      } else {
-        url += '&';
-      }
-      return url + $.param(self.getQueryData());
+    var getWindow = function () {
+        var win = window;
+        if (win.parent !== window) {
+            win = win.parent;
+        }
+        return win;
     };
 
-    self.selectAjax = function() {
-      return {
-        url: self.options.vocabularyUrl,
-        dataType: 'JSON',
-        quietMillis: 100,
-        data: function(term, page) {
-          return self.getQueryData(term, page);
+    var parseBodyTag = function (txt) {
+        return $(
+            /<body[^>]*>[^]*<\/body>/im
+                .exec(txt)[0]
+                .replace("<body", "<div")
+                .replace("</body>", "</div>")
+        )
+            .eq(0)
+            .html();
+    };
+
+    var featureSupport = {
+        /* Well tested feature support for things we use in mockup.
+         * All gathered from: http://diveintohtml5.info/everything.html
+         * Alternative to using some form of modernizr.
+         */
+        dragAndDrop: function () {
+            return "draggable" in document.createElement("span");
         },
-        results: function(data, page) {
-          var more = (page * 10) < data.total; // whether or not there are more results available
-          // notice we return the value of more so Select2 knows if more results can be loaded
-          return {
-            results: data.results,
-            more: more
-          };
+        fileApi: function () {
+            return typeof FileReader != "undefined"; // jshint ignore:line
+        },
+        history: function () {
+            return !!(window.history && window.history.pushState);
+        },
+    };
+
+    var bool = function (val) {
+        if (typeof val === "string") {
+            val = $.trim(val).toLowerCase();
         }
-      };
+        return (
+            ["false", false, "0", 0, "", undefined, null].indexOf(val) === -1
+        );
     };
 
-    self.search = function(term, operation, value, callback, useBaseCriteria, type) {
-      if (useBaseCriteria === undefined) {
-        useBaseCriteria = true;
-      }
-      if (type === undefined) {
-        type = 'GET';
-      }
-      var criteria = [];
-      if (useBaseCriteria) {
-        criteria = self.options.baseCriteria.slice(0);
-      }
-      criteria.push({
-        i: term,
-        o: operation,
-        v: value
-      });
-      var data = {
-        query: JSON.stringify({
-          criteria: criteria
-        }),
-        attributes: JSON.stringify(self.options.attributes)
-      };
-      $.ajax({
-        url: self.options.vocabularyUrl,
-        dataType: 'JSON',
-        data: data,
-        type: type,
-        success: callback
-      });
+    var escapeHTML = function (val) {
+        return $("<div/>").text(val).html();
     };
 
-    return self;
-  };
-
-  var Loading = function(options) {
-    /*
-     * Options:
-     *   backdrop(pattern): if you want to have the progress indicator work
-     *                      seamlessly with backdrop pattern
-     *   zIndex(integer or function): to override default z-index used
-     */
-    var self = this;
-    self.className = 'plone-loader';
-    var defaults = {
-      backdrop: null,
-      zIndex: 10005 // can be a function
-    };
-    if (!options) {
-      options = {};
-    }
-    self.options = $.extend({}, defaults, options);
-
-    self.init = function() {
-      self.$el = $('.' + self.className);
-      if (self.$el.length === 0) {
-        self.$el = $('<div><div></div></div>');
-        self.$el.addClass(self.className).hide().appendTo('body');
-      }
+    var removeHTML = function (val) {
+        return val.replace(/<[^>]+>/gi, "");
     };
 
-    self.show = function(closable) {
-      self.init();
-      self.$el.show();
-      var zIndex = self.options.zIndex;
-      if (typeof(zIndex) === 'function') {
-        zIndex = Math.max(zIndex(), 10005);
-      } else {
-        // go through all modals and backdrops and make sure we have a higher
-        // z-index to use
-        zIndex = 10005;
-        $('.plone-modal-wrapper,.plone-modal-backdrop').each(function() {
-          zIndex = Math.max(zIndex, $(this).css('zIndex') || 10005);
-        });
-        zIndex += 1;
-      }
-      self.$el.css('zIndex', zIndex);
+    var storage = {
+        // Simple local storage wrapper, which doesn't break down if it's not available.
+        get: function (name) {
+            if (window.localStorage) {
+                var val = window.localStorage[name];
+                return typeof val === "string" ? JSON.parse(val) : undefined;
+            }
+        },
 
-      if (closable === undefined) {
-        closable = true;
-      }
-      if (self.options.backdrop) {
-        self.options.backdrop.closeOnClick = closable;
-        self.options.backdrop.closeOnEsc = closable;
-        self.options.backdrop.init();
-        self.options.backdrop.show();
-      }
+        set: function (name, val) {
+            if (window.localStorage) {
+                window.localStorage[name] = JSON.stringify(val);
+            }
+        },
     };
 
-    self.hide = function() {
-      self.init();
-      self.$el.hide();
+    var createElementFromHTML = function (htmlString) {
+        // From: https://stackoverflow.com/a/494348/1337474
+        var div = document.createElement("div");
+        div.innerHTML = htmlString.trim();
+        return div.firstChild;
     };
 
-    return self;
-  };
-
-  var getAuthenticator = function() {
-    var $el = $('input[name="_authenticator"]');
-    if ($el.length === 0) {
-      $el = $('a[href*="_authenticator"]');
-      if ($el.length > 0) {
-        return $el.attr('href').split('_authenticator=')[1];
-      }
-      return '';
-    } else {
-      return $el.val();
-    }
-  };
-
-  var generateId = function(prefix) {
-    if (prefix === undefined) {
-      prefix = 'id';
-    }
-    return prefix + (Math.floor((1 + Math.random()) * 0x10000)
-      .toString(16).substring(1));
-  };
-
-  var setId = function($el, prefix) {
-    if (prefix === undefined) {
-      prefix = 'id';
-    }
-    var id = $el.attr('id');
-    if (id === undefined) {
-      id = generateId(prefix);
-    } else {
-      /* hopefully we don't screw anything up here... changing the id
-       * in some cases so we get a decent selector */
-      id = id.replace(/\./g, '-');
-    }
-    $el.attr('id', id);
-    return id;
-  };
-
-  var getWindow = function() {
-    var win = window;
-    if (win.parent !== window) {
-      win = win.parent;
-    }
-    return win;
-  };
-
-  var parseBodyTag = function(txt) {
-    return $((/<body[^>]*>[^]*<\/body>/im).exec(txt)[0]
-      .replace('<body', '<div').replace('</body>', '</div>')).eq(0).html();
-  };
-
-  var featureSupport = {
-    /* Well tested feature support for things we use in mockup.
-     * All gathered from: http://diveintohtml5.info/everything.html
-     * Alternative to using some form of modernizr.
-     */
-    dragAndDrop: function() {
-      return 'draggable' in document.createElement('span');
-    },
-    fileApi: function() {
-      return typeof FileReader != 'undefined'; // jshint ignore:line
-    },
-    history: function() {
-      return !!(window.history && window.history.pushState);
-    }
-  };
-
-  var bool = function(val) {
-    if (typeof val === 'string') {
-      val = $.trim(val).toLowerCase();
-    }
-    return ['false', false, '0', 0, '', undefined, null].indexOf(val) === -1;
-  };
-
-  var escapeHTML = function(val) {
-    return $('<div/>').text(val).html();
-  };
-
-  var removeHTML = function(val) {
-    return val.replace(/<[^>]+>/ig, '');
-  };
-
-  var storage = {
-    // Simple local storage wrapper, which doesn't break down if it's not available.
-    get: function (name) {
-        if (window.localStorage) {
-          var val = window.localStorage[name];
-          return typeof(val) === 'string' ? JSON.parse(val) : undefined;
-      }
-    },
-
-    set: function (name, val) {
-      if (window.localStorage) {
-        window.localStorage[name] = JSON.stringify(val);
-      }
-    }
-  };
-
-  var createElementFromHTML = function(htmlString) {
-    // From: https://stackoverflow.com/a/494348/1337474
-    var div = document.createElement('div');
-    div.innerHTML = htmlString.trim();
-    return div.firstChild;
-  };
-
-  return {
-    bool: bool,
-    escapeHTML: escapeHTML,
-    removeHTML: removeHTML,
-    featureSupport: featureSupport,
-    generateId: generateId,
-    getAuthenticator: getAuthenticator,
-    getWindow: getWindow,
-    Loading: Loading,
-    loading: new Loading(),  // provide default loader
-    parseBodyTag: parseBodyTag,
-    QueryHelper: QueryHelper,
-    setId: setId,
-    storage: storage,
-    createElementFromHTML: createElementFromHTML
-  };
+    return {
+        bool: bool,
+        escapeHTML: escapeHTML,
+        removeHTML: removeHTML,
+        featureSupport: featureSupport,
+        generateId: generateId,
+        getAuthenticator: getAuthenticator,
+        getWindow: getWindow,
+        Loading: Loading,
+        loading: new Loading(), // provide default loader
+        parseBodyTag: parseBodyTag,
+        QueryHelper: QueryHelper,
+        setId: setId,
+        storage: storage,
+        createElementFromHTML: createElementFromHTML,
+    };
 });
 
-(function(root) {
-define("jquery.event.drop", ["jquery"], function() {
-  return (function() {
-/*! 
- * jquery.event.drop - v 2.2
- * Copyright (c) 2010 Three Dub Media - http://threedubmedia.com
- * Open Source MIT License - http://threedubmedia.com/code/license
- */
-// Created: 2008-06-04 
-// Updated: 2012-05-21
-// REQUIRES: jquery 1.7.x, event.drag 2.2
-
-;(function($){ // secure $ jQuery alias
-
-// Events: drop, dropstart, dropend
-
-// add the jquery instance method
-$.fn.drop = function( str, arg, opts ){
-	// figure out the event type
-	var type = typeof str == "string" ? str : "",
-	// figure out the event handler...
-	fn = $.isFunction( str ) ? str : $.isFunction( arg ) ? arg : null;
-	// fix the event type
-	if ( type.indexOf("drop") !== 0 ) 
-		type = "drop"+ type;
-	// were options passed
-	opts = ( str == fn ? arg : opts ) || {};
-	// trigger or bind event handler
-	return fn ? this.bind( type, opts, fn ) : this.trigger( type );
-};
-
-// DROP MANAGEMENT UTILITY
-// returns filtered drop target elements, caches their positions
-$.drop = function( opts ){ 
-	opts = opts || {};
-	// safely set new options...
-	drop.multi = opts.multi === true ? Infinity : 
-		opts.multi === false ? 1 : !isNaN( opts.multi ) ? opts.multi : drop.multi;
-	drop.delay = opts.delay || drop.delay;
-	drop.tolerance = $.isFunction( opts.tolerance ) ? opts.tolerance : 
-		opts.tolerance === null ? null : drop.tolerance;
-	drop.mode = opts.mode || drop.mode || 'intersect';
-};
-
-// local refs (increase compression)
-var $event = $.event, 
-$special = $event.special,
-// configure the drop special event
-drop = $.event.special.drop = {
-
-	// these are the default settings
-	multi: 1, // allow multiple drop winners per dragged element
-	delay: 20, // async timeout delay
-	mode: 'overlap', // drop tolerance mode
-		
-	// internal cache
-	targets: [], 
-	
-	// the key name for stored drop data
-	datakey: "dropdata",
-		
-	// prevent bubbling for better performance
-	noBubble: true,
-	
-	// count bound related events
-	add: function( obj ){ 
-		// read the interaction data
-		var data = $.data( this, drop.datakey );
-		// count another realted event
-		data.related += 1;
-	},
-	
-	// forget unbound related events
-	remove: function(){
-		$.data( this, drop.datakey ).related -= 1;
-	},
-	
-	// configure the interactions
-	setup: function(){
-		// check for related events
-		if ( $.data( this, drop.datakey ) ) 
-			return;
-		// initialize the drop element data
-		var data = { 
-			related: 0,
-			active: [],
-			anyactive: 0,
-			winner: 0,
-			location: {}
-		};
-		// store the drop data on the element
-		$.data( this, drop.datakey, data );
-		// store the drop target in internal cache
-		drop.targets.push( this );
-	},
-	
-	// destroy the configure interaction	
-	teardown: function(){ 
-		var data = $.data( this, drop.datakey ) || {};
-		// check for related events
-		if ( data.related ) 
-			return;
-		// remove the stored data
-		$.removeData( this, drop.datakey );
-		// reference the targeted element
-		var element = this;
-		// remove from the internal cache
-		drop.targets = $.grep( drop.targets, function( target ){ 
-			return ( target !== element ); 
-		});
-	},
-	
-	// shared event handler
-	handler: function( event, dd ){ 
-		// local vars
-		var results, $targets;
-		// make sure the right data is available
-		if ( !dd ) 
-			return;
-		// handle various events
-		switch ( event.type ){
-			// draginit, from $.event.special.drag
-			case 'mousedown': // DROPINIT >>
-			case 'touchstart': // DROPINIT >>
-				// collect and assign the drop targets
-				$targets =  $( drop.targets );
-				if ( typeof dd.drop == "string" )
-					$targets = $targets.filter( dd.drop );
-				// reset drop data winner properties
-				$targets.each(function(){
-					var data = $.data( this, drop.datakey );
-					data.active = [];
-					data.anyactive = 0;
-					data.winner = 0;
-				});
-				// set available target elements
-				dd.droppable = $targets;
-				// activate drop targets for the initial element being dragged
-				$special.drag.hijack( event, "dropinit", dd ); 
-				break;
-			// drag, from $.event.special.drag
-			case 'mousemove': // TOLERATE >>
-			case 'touchmove': // TOLERATE >>
-				drop.event = event; // store the mousemove event
-				if ( !drop.timer )
-					// monitor drop targets
-					drop.tolerate( dd ); 
-				break;
-			// dragend, from $.event.special.drag
-			case 'mouseup': // DROP >> DROPEND >>
-			case 'touchend': // DROP >> DROPEND >>
-				drop.timer = clearTimeout( drop.timer ); // delete timer	
-				if ( dd.propagates ){
-					$special.drag.hijack( event, "drop", dd ); 
-					$special.drag.hijack( event, "dropend", dd ); 
-				}
-				break;
-				
-		}
-	},
-		
-	// returns the location positions of an element
-	locate: function( elem, index ){ 
-		var data = $.data( elem, drop.datakey ),
-		$elem = $( elem ), 
-		posi = $elem.offset() || {}, 
-		height = $elem.outerHeight(), 
-		width = $elem.outerWidth(),
-		location = { 
-			elem: elem, 
-			width: width, 
-			height: height,
-			top: posi.top, 
-			left: posi.left, 
-			right: posi.left + width, 
-			bottom: posi.top + height
-		};
-		// drag elements might not have dropdata
-		if ( data ){
-			data.location = location;
-			data.index = index;
-			data.elem = elem;
-		}
-		return location;
-	},
-	
-	// test the location positions of an element against another OR an X,Y coord
-	contains: function( target, test ){ // target { location } contains test [x,y] or { location }
-		return ( ( test[0] || test.left ) >= target.left && ( test[0] || test.right ) <= target.right
-			&& ( test[1] || test.top ) >= target.top && ( test[1] || test.bottom ) <= target.bottom ); 
-	},
-	
-	// stored tolerance modes
-	modes: { // fn scope: "$.event.special.drop" object 
-		// target with mouse wins, else target with most overlap wins
-		'intersect': function( event, proxy, target ){
-			return this.contains( target, [ event.pageX, event.pageY ] ) ? // check cursor
-				1e9 : this.modes.overlap.apply( this, arguments ); // check overlap
-		},
-		// target with most overlap wins	
-		'overlap': function( event, proxy, target ){
-			// calculate the area of overlap...
-			return Math.max( 0, Math.min( target.bottom, proxy.bottom ) - Math.max( target.top, proxy.top ) )
-				* Math.max( 0, Math.min( target.right, proxy.right ) - Math.max( target.left, proxy.left ) );
-		},
-		// proxy is completely contained within target bounds	
-		'fit': function( event, proxy, target ){
-			return this.contains( target, proxy ) ? 1 : 0;
-		},
-		// center of the proxy is contained within target bounds	
-		'middle': function( event, proxy, target ){
-			return this.contains( target, [ proxy.left + proxy.width * .5, proxy.top + proxy.height * .5 ] ) ? 1 : 0;
-		}
-	},	
-	
-	// sort drop target cache by by winner (dsc), then index (asc)
-	sort: function( a, b ){
-		return ( b.winner - a.winner ) || ( a.index - b.index );
-	},
-		
-	// async, recursive tolerance execution
-	tolerate: function( dd ){		
-		// declare local refs
-		var i, drp, drg, data, arr, len, elem,
-		// interaction iteration variables
-		x = 0, ia, end = dd.interactions.length,
-		// determine the mouse coords
-		xy = [ drop.event.pageX, drop.event.pageY ],
-		// custom or stored tolerance fn
-		tolerance = drop.tolerance || drop.modes[ drop.mode ];
-		// go through each passed interaction...
-		do if ( ia = dd.interactions[x] ){
-			// check valid interaction
-			if ( !ia )
-				return; 
-			// initialize or clear the drop data
-			ia.drop = [];
-			// holds the drop elements
-			arr = []; 
-			len = ia.droppable.length;
-			// determine the proxy location, if needed
-			if ( tolerance )
-				drg = drop.locate( ia.proxy ); 
-			// reset the loop
-			i = 0;
-			// loop each stored drop target
-			do if ( elem = ia.droppable[i] ){ 
-				data = $.data( elem, drop.datakey );
-				drp = data.location;
-				if ( !drp ) continue;
-				// find a winner: tolerance function is defined, call it
-				data.winner = tolerance ? tolerance.call( drop, drop.event, drg, drp ) 
-					// mouse position is always the fallback
-					: drop.contains( drp, xy ) ? 1 : 0; 
-				arr.push( data );	
-			} while ( ++i < len ); // loop 
-			// sort the drop targets
-			arr.sort( drop.sort );			
-			// reset the loop
-			i = 0;
-			// loop through all of the targets again
-			do if ( data = arr[ i ] ){
-				// winners...
-				if ( data.winner && ia.drop.length < drop.multi ){
-					// new winner... dropstart
-					if ( !data.active[x] && !data.anyactive ){
-						// check to make sure that this is not prevented
-						if ( $special.drag.hijack( drop.event, "dropstart", dd, x, data.elem )[0] !== false ){ 	
-							data.active[x] = 1;
-							data.anyactive += 1;
-						}
-						// if false, it is not a winner
-						else
-							data.winner = 0;
-					}
-					// if it is still a winner
-					if ( data.winner )
-						ia.drop.push( data.elem );
-				}
-				// losers... 
-				else if ( data.active[x] && data.anyactive == 1 ){
-					// former winner... dropend
-					$special.drag.hijack( drop.event, "dropend", dd, x, data.elem ); 
-					data.active[x] = 0;
-					data.anyactive -= 1;
-				}
-			} while ( ++i < len ); // loop 		
-		} while ( ++x < end ) // loop
-		// check if the mouse is still moving or is idle
-		if ( drop.last && xy[0] == drop.last.pageX && xy[1] == drop.last.pageY ) 
-			delete drop.timer; // idle, don't recurse
-		else  // recurse
-			drop.timer = setTimeout(function(){ 
-				drop.tolerate( dd ); 
-			}, drop.delay );
-		// remember event, to compare idleness
-		drop.last = drop.event; 
-	}
-	
-};
-
-// share the same special event configuration with related events...
-$special.dropinit = $special.dropstart = $special.dropend = drop;
-
-})(jQuery); // confine scope	
+!function(t,e){"object"==typeof exports&&"undefined"!=typeof module?module.exports=e():"function"==typeof define&&define.amd?define('sortable',e):(t=t||self).Sortable=e()}(this,function(){function t(){return(t=Object.assign||function(t){for(var e=1;e<arguments.length;e++){var n=arguments[e];for(var o in n)Object.prototype.hasOwnProperty.call(n,o)&&(t[o]=n[o])}return t}).apply(this,arguments)}function e(t){if("undefined"!=typeof window&&window.navigator)return!!navigator.userAgent.match(t)}var n=e(/(?:Trident.*rv[ :]?11\.|msie|iemobile|Windows Phone)/i),o=e(/Edge/i),i=e(/firefox/i),r=e(/safari/i)&&!e(/chrome/i)&&!e(/android/i),a=e(/iP(ad|od|hone)/i),l=e(/chrome/i)&&e(/android/i),s={capture:!1,passive:!1};function c(t,e,o){t.addEventListener(e,o,!n&&s)}function u(t,e,o){t.removeEventListener(e,o,!n&&s)}function d(t,e){if(e){if(">"===e[0]&&(e=e.substring(1)),t)try{if(t.matches)return t.matches(e);if(t.msMatchesSelector)return t.msMatchesSelector(e);if(t.webkitMatchesSelector)return t.webkitMatchesSelector(e)}catch(t){return!1}return!1}}function h(t){return t.host&&t!==document&&t.host.nodeType?t.host:t.parentNode}function f(t,e,n,o){if(t){n=n||document;do{if(null!=e&&(">"===e[0]?t.parentNode===n&&d(t,e):d(t,e))||o&&t===n)return t;if(t===n)break}while(t=h(t))}return null}var p,g=/\s+/g;function v(t,e,n){if(t&&e)if(t.classList)t.classList[n?"add":"remove"](e);else{var o=(" "+t.className+" ").replace(g," ").replace(" "+e+" "," ");t.className=(o+(n?" "+e:"")).replace(g," ")}}function m(t,e,n){var o=t&&t.style;if(o){if(void 0===n)return document.defaultView&&document.defaultView.getComputedStyle?n=document.defaultView.getComputedStyle(t,""):t.currentStyle&&(n=t.currentStyle),void 0===e?n:n[e];e in o||-1!==e.indexOf("webkit")||(e="-webkit-"+e),o[e]=n+("string"==typeof n?"":"px")}}function b(t,e){var n="";if("string"==typeof t)n=t;else do{var o=m(t,"transform");o&&"none"!==o&&(n=o+" "+n)}while(!e&&(t=t.parentNode));var i=window.DOMMatrix||window.WebKitCSSMatrix||window.CSSMatrix||window.MSCSSMatrix;return i&&new i(n)}function w(t,e,n){if(t){var o=t.getElementsByTagName(e),i=0,r=o.length;if(n)for(;i<r;i++)n(o[i],i);return o}return[]}function E(){return document.scrollingElement||document.documentElement}function y(t,e,o,i,r){if(t.getBoundingClientRect||t===window){var a,l,s,c,u,d,h;if(t!==window&&t!==E()?(l=(a=t.getBoundingClientRect()).top,s=a.left,c=a.bottom,u=a.right,d=a.height,h=a.width):(l=0,s=0,c=window.innerHeight,u=window.innerWidth,d=window.innerHeight,h=window.innerWidth),(e||o)&&t!==window&&(r=r||t.parentNode,!n))do{if(r&&r.getBoundingClientRect&&("none"!==m(r,"transform")||o&&"static"!==m(r,"position"))){var f=r.getBoundingClientRect();l-=f.top+parseInt(m(r,"border-top-width")),s-=f.left+parseInt(m(r,"border-left-width")),c=l+a.height,u=s+a.width;break}}while(r=r.parentNode);if(i&&t!==window){var p=b(r||t),g=p&&p.a,v=p&&p.d;p&&(c=(l/=v)+(d/=v),u=(s/=g)+(h/=g))}return{top:l,left:s,bottom:c,right:u,width:h,height:d}}}function D(t,e,n){for(var o=x(t,!0),i=y(t)[e];o;){var r=y(o)[n];if(!("top"===n||"left"===n?i>=r:i<=r))return o;if(o===E())break;o=x(o,!1)}return!1}function _(t,e,n){for(var o=0,i=0,r=t.children;i<r.length;){if("none"!==r[i].style.display&&r[i]!==It.ghost&&r[i]!==It.dragged&&f(r[i],n.draggable,t,!1)){if(o===e)return r[i];o++}i++}return null}function S(t,e){for(var n=t.lastElementChild;n&&(n===It.ghost||"none"===m(n,"display")||e&&!d(n,e));)n=n.previousElementSibling;return n||null}function C(t,e){var n=0;if(!t||!t.parentNode)return-1;for(;t=t.previousElementSibling;)"TEMPLATE"===t.nodeName.toUpperCase()||t===It.clone||e&&!d(t,e)||n++;return n}function T(t){var e=0,n=0,o=E();if(t)do{var i=b(t);e+=t.scrollLeft*i.a,n+=t.scrollTop*i.d}while(t!==o&&(t=t.parentNode));return[e,n]}function x(t,e){if(!t||!t.getBoundingClientRect)return E();var n=t,o=!1;do{if(n.clientWidth<n.scrollWidth||n.clientHeight<n.scrollHeight){var i=m(n);if(n.clientWidth<n.scrollWidth&&("auto"==i.overflowX||"scroll"==i.overflowX)||n.clientHeight<n.scrollHeight&&("auto"==i.overflowY||"scroll"==i.overflowY)){if(!n.getBoundingClientRect||n===document.body)return E();if(o||e)return n;o=!0}}}while(n=n.parentNode);return E()}function M(t,e){return Math.round(t.top)===Math.round(e.top)&&Math.round(t.left)===Math.round(e.left)&&Math.round(t.height)===Math.round(e.height)&&Math.round(t.width)===Math.round(e.width)}function N(t,e){return function(){if(!p){var n=arguments,o=this;1===n.length?t.call(o,n[0]):t.apply(o,n),p=setTimeout(function(){p=void 0},e)}}}function O(t,e,n){t.scrollLeft+=e,t.scrollTop+=n}function A(t){var e=window.Polymer,n=window.jQuery||window.Zepto;return e&&e.dom?e.dom(t).cloneNode(!0):n?n(t).clone(!0)[0]:t.cloneNode(!0)}function I(t,e){m(t,"position","absolute"),m(t,"top",e.top),m(t,"left",e.left),m(t,"width",e.width),m(t,"height",e.height)}function P(t){m(t,"position",""),m(t,"top",""),m(t,"left",""),m(t,"width",""),m(t,"height","")}var k="Sortable"+(new Date).getTime(),R=[],X={initializeByDefault:!0},Y={mount:function(t){for(var e in X)X.hasOwnProperty(e)&&!(e in t)&&(t[e]=X[e]);R.push(t)},pluginEvent:function(e,n,o){var i=this;this.eventCanceled=!1,o.cancel=function(){i.eventCanceled=!0};var r=e+"Global";R.forEach(function(i){n[i.pluginName]&&(n[i.pluginName][r]&&n[i.pluginName][r](t({sortable:n},o)),n.options[i.pluginName]&&n[i.pluginName][e]&&n[i.pluginName][e](t({sortable:n},o)))})},initializePlugins:function(t,e,n,o){for(var i in R.forEach(function(o){var i=o.pluginName;if(t.options[i]||o.initializeByDefault){var r=new o(t,e,t.options);r.sortable=t,r.options=t.options,t[i]=r,Object.assign(n,r.defaults)}}),t.options)if(t.options.hasOwnProperty(i)){var r=this.modifyOption(t,i,t.options[i]);void 0!==r&&(t.options[i]=r)}},getEventProperties:function(t,e){var n={};return R.forEach(function(o){"function"==typeof o.eventProperties&&Object.assign(n,o.eventProperties.call(e[o.pluginName],t))}),n},modifyOption:function(t,e,n){var o;return R.forEach(function(i){t[i.pluginName]&&i.optionListeners&&"function"==typeof i.optionListeners[e]&&(o=i.optionListeners[e].call(t[i.pluginName],n))}),o}};function B(e){var i=e.sortable,r=e.rootEl,a=e.name,l=e.targetEl,s=e.cloneEl,c=e.toEl,u=e.fromEl,d=e.oldIndex,h=e.newIndex,f=e.oldDraggableIndex,p=e.newDraggableIndex,g=e.originalEvent,v=e.putSortable,m=e.extraEventProperties;if(i=i||r&&r[k]){var b,w=i.options,E="on"+a.charAt(0).toUpperCase()+a.substr(1);!window.CustomEvent||n||o?(b=document.createEvent("Event")).initEvent(a,!0,!0):b=new CustomEvent(a,{bubbles:!0,cancelable:!0}),b.to=c||r,b.from=u||r,b.item=l||r,b.clone=s,b.oldIndex=d,b.newIndex=h,b.oldDraggableIndex=f,b.newDraggableIndex=p,b.originalEvent=g,b.pullMode=v?v.lastPutMode:void 0;var y=t({},m,Y.getEventProperties(a,i));for(var D in y)b[D]=y[D];r&&r.dispatchEvent(b),w[E]&&w[E].call(i,b)}}var H=function(e,n,o){var i=void 0===o?{}:o,r=i.evt,a=function(t,e){if(null==t)return{};var n,o,i={},r=Object.keys(t);for(o=0;o<r.length;o++)e.indexOf(n=r[o])>=0||(i[n]=t[n]);return i}(i,["evt"]);Y.pluginEvent.bind(It)(e,n,t({dragEl:L,parentEl:j,ghostEl:K,rootEl:W,nextEl:z,lastDownEl:G,cloneEl:U,cloneHidden:q,dragStarted:lt,putSortable:tt,activeSortable:It.active,originalEvent:r,oldIndex:V,oldDraggableIndex:Q,newIndex:Z,newDraggableIndex:$,hideGhostForTarget:xt,unhideGhostForTarget:Mt,cloneNowHidden:function(){q=!0},cloneNowShown:function(){q=!1},dispatchSortableEvent:function(t){F({sortable:n,name:t,originalEvent:r})}},a))};function F(e){B(t({putSortable:tt,cloneEl:U,targetEl:L,rootEl:W,oldIndex:V,oldDraggableIndex:Q,newIndex:Z,newDraggableIndex:$},e))}var L,j,K,W,z,G,U,q,V,Z,Q,$,J,tt,et,nt,ot,it,rt,at,lt,st,ct,ut,dt,ht=!1,ft=!1,pt=[],gt=!1,vt=!1,mt=[],bt=!1,wt=[],Et="undefined"!=typeof document,yt=a,Dt=o||n?"cssFloat":"float",_t=Et&&!l&&!a&&"draggable"in document.createElement("div"),St=function(){if(Et){if(n)return!1;var t=document.createElement("x");return t.style.cssText="pointer-events:auto","auto"===t.style.pointerEvents}}(),Ct=function(t,e){var n=m(t),o=parseInt(n.width)-parseInt(n.paddingLeft)-parseInt(n.paddingRight)-parseInt(n.borderLeftWidth)-parseInt(n.borderRightWidth),i=_(t,0,e),r=_(t,1,e),a=i&&m(i),l=r&&m(r),s=a&&parseInt(a.marginLeft)+parseInt(a.marginRight)+y(i).width,c=l&&parseInt(l.marginLeft)+parseInt(l.marginRight)+y(r).width;return"flex"===n.display?"column"===n.flexDirection||"column-reverse"===n.flexDirection?"vertical":"horizontal":"grid"===n.display?n.gridTemplateColumns.split(" ").length<=1?"vertical":"horizontal":i&&a.float&&"none"!==a.float?!r||"both"!==l.clear&&l.clear!==("left"===a.float?"left":"right")?"horizontal":"vertical":i&&("block"===a.display||"flex"===a.display||"table"===a.display||"grid"===a.display||s>=o&&"none"===n[Dt]||r&&"none"===n[Dt]&&s+c>o)?"vertical":"horizontal"},Tt=function(t){function e(t,n){return function(o,i,r,a){if(null==t&&(n||o.options.group.name&&i.options.group.name&&o.options.group.name===i.options.group.name))return!0;if(null==t||!1===t)return!1;if(n&&"clone"===t)return t;if("function"==typeof t)return e(t(o,i,r,a),n)(o,i,r,a);var l=(n?o:i).options.group.name;return!0===t||"string"==typeof t&&t===l||t.join&&t.indexOf(l)>-1}}var n={},o=t.group;o&&"object"==typeof o||(o={name:o}),n.name=o.name,n.checkPull=e(o.pull,!0),n.checkPut=e(o.put),n.revertClone=o.revertClone,t.group=n},xt=function(){!St&&K&&m(K,"display","none")},Mt=function(){!St&&K&&m(K,"display","")};Et&&document.addEventListener("click",function(t){if(ft)return t.preventDefault(),t.stopPropagation&&t.stopPropagation(),t.stopImmediatePropagation&&t.stopImmediatePropagation(),ft=!1,!1},!0);var Nt,Ot=function(t){if(L){var e=(i=(t=t.touches?t.touches[0]:t).clientX,r=t.clientY,pt.some(function(t){if(!S(t)){var e=y(t),n=t[k].options.emptyInsertThreshold;return n&&i>=e.left-n&&i<=e.right+n&&r>=e.top-n&&r<=e.bottom+n?a=t:void 0}}),a);if(e){var n={};for(var o in t)t.hasOwnProperty(o)&&(n[o]=t[o]);n.target=n.rootEl=e,n.preventDefault=void 0,n.stopPropagation=void 0,e[k]._onDragOver(n)}}var i,r,a},At=function(t){L&&L.parentNode[k]._isOutsideThisEl(t.target)};function It(e,n){if(!e||!e.nodeType||1!==e.nodeType)throw"Sortable: `el` must be an HTMLElement, not "+{}.toString.call(e);this.el=e,this.options=n=Object.assign({},n),e[k]=this;var o,i,r={group:null,sort:!0,disabled:!1,store:null,handle:null,draggable:/^[uo]l$/i.test(e.nodeName)?">li":">*",swapThreshold:1,invertSwap:!1,invertedSwapThreshold:null,removeCloneOnHide:!0,direction:function(){return Ct(e,this.options)},ghostClass:"sortable-ghost",chosenClass:"sortable-chosen",dragClass:"sortable-drag",ignore:"a, img",filter:null,preventOnFilter:!0,animation:0,easing:null,setData:function(t,e){t.setData("Text",e.textContent)},dropBubble:!1,dragoverBubble:!1,dataIdAttr:"data-id",delay:0,delayOnTouchOnly:!1,touchStartThreshold:(Number.parseInt?Number:window).parseInt(window.devicePixelRatio,10)||1,forceFallback:!1,fallbackClass:"sortable-fallback",fallbackOnBody:!1,fallbackTolerance:0,fallbackOffset:{x:0,y:0},supportPointer:!1!==It.supportPointer&&"PointerEvent"in window,emptyInsertThreshold:5};for(var a in Y.initializePlugins(this,e,r),r)!(a in n)&&(n[a]=r[a]);for(var l in Tt(n),this)"_"===l.charAt(0)&&"function"==typeof this[l]&&(this[l]=this[l].bind(this));this.nativeDraggable=!n.forceFallback&&_t,this.nativeDraggable&&(this.options.touchStartThreshold=1),n.supportPointer?c(e,"pointerdown",this._onTapStart):(c(e,"mousedown",this._onTapStart),c(e,"touchstart",this._onTapStart)),this.nativeDraggable&&(c(e,"dragover",this),c(e,"dragenter",this)),pt.push(this.el),n.store&&n.store.get&&this.sort(n.store.get(this)||[]),Object.assign(this,(i=[],{captureAnimationState:function(){i=[],this.options.animation&&[].slice.call(this.el.children).forEach(function(e){if("none"!==m(e,"display")&&void 0!==e){i.push({target:e,rect:y(e)});var n=t({},i[i.length-1].rect);if(e.thisAnimationDuration){var o=b(e,!0);o&&(n.top-=o.f,n.left-=o.e)}e.fromRect=n}})},addAnimationState:function(t){i.push(t)},removeAnimationState:function(t){i.splice(function(t,e){for(var n in t)if(t.hasOwnProperty(n))for(var o in e)if(e.hasOwnProperty(o)&&e[o]===t[n][o])return Number(n);return-1}(i,{target:t}),1)},animateAll:function(t){var e=this;if(!this.options.animation)return clearTimeout(o),void("function"==typeof t&&t());var n=!1,r=0;i.forEach(function(t){var o=0,i=t.target,a=i.fromRect,l=y(i),s=i.prevFromRect,c=i.prevToRect,u=t.rect,d=b(i,!0);d&&(l.top-=d.f,l.left-=d.e),i.toRect=l,i.thisAnimationDuration&&M(s,l)&&!M(a,l)&&(u.top-l.top)/(u.left-l.left)==(a.top-l.top)/(a.left-l.left)&&(o=function(t,e,n,o){return Math.sqrt(Math.pow(e.top-t.top,2)+Math.pow(e.left-t.left,2))/Math.sqrt(Math.pow(e.top-n.top,2)+Math.pow(e.left-n.left,2))*o.animation}(u,s,c,e.options)),M(l,a)||(i.prevFromRect=a,i.prevToRect=l,o||(o=e.options.animation),e.animate(i,u,l,o)),o&&(n=!0,r=Math.max(r,o),clearTimeout(i.animationResetTimer),i.animationResetTimer=setTimeout(function(){i.animationTime=0,i.prevFromRect=null,i.fromRect=null,i.prevToRect=null,i.thisAnimationDuration=null},o),i.thisAnimationDuration=o)}),clearTimeout(o),n?o=setTimeout(function(){"function"==typeof t&&t()},r):"function"==typeof t&&t(),i=[]},animate:function(t,e,n,o){if(o){m(t,"transition",""),m(t,"transform","");var i=b(this.el),r=(e.left-n.left)/(i&&i.a||1),a=(e.top-n.top)/(i&&i.d||1);t.animatingX=!!r,t.animatingY=!!a,m(t,"transform","translate3d("+r+"px,"+a+"px,0)"),this.forRepaintDummy=function(t){return t.offsetWidth}(t),m(t,"transition","transform "+o+"ms"+(this.options.easing?" "+this.options.easing:"")),m(t,"transform","translate3d(0,0,0)"),"number"==typeof t.animated&&clearTimeout(t.animated),t.animated=setTimeout(function(){m(t,"transition",""),m(t,"transform",""),t.animated=!1,t.animatingX=!1,t.animatingY=!1},o)}}}))}function Pt(t,e,i,r,a,l,s,c){var u,d,h=t[k],f=h.options.onMove;return!window.CustomEvent||n||o?(u=document.createEvent("Event")).initEvent("move",!0,!0):u=new CustomEvent("move",{bubbles:!0,cancelable:!0}),u.to=e,u.from=t,u.dragged=i,u.draggedRect=r,u.related=a||e,u.relatedRect=l||y(e),u.willInsertAfter=c,u.originalEvent=s,t.dispatchEvent(u),f&&(d=f.call(h,u,s)),d}function kt(t){t.draggable=!1}function Rt(){bt=!1}function Xt(t){for(var e=t.tagName+t.className+t.src+t.href+t.textContent,n=e.length,o=0;n--;)o+=e.charCodeAt(n);return o.toString(36)}function Yt(t){return setTimeout(t,0)}function Bt(t){return clearTimeout(t)}It.prototype={constructor:It,_isOutsideThisEl:function(t){this.el.contains(t)||t===this.el||(st=null)},_getDirection:function(t,e){return"function"==typeof this.options.direction?this.options.direction.call(this,t,e,L):this.options.direction},_onTapStart:function(t){if(t.cancelable){var e=this,n=this.el,o=this.options,i=o.preventOnFilter,a=t.type,l=t.touches&&t.touches[0]||t.pointerType&&"touch"===t.pointerType&&t,s=(l||t).target,c=t.target.shadowRoot&&(t.path&&t.path[0]||t.composedPath&&t.composedPath()[0])||s,u=o.filter;if(function(t){wt.length=0;for(var e=t.getElementsByTagName("input"),n=e.length;n--;){var o=e[n];o.checked&&wt.push(o)}}(n),!L&&!(/mousedown|pointerdown/.test(a)&&0!==t.button||o.disabled)&&!c.isContentEditable&&(this.nativeDraggable||!r||!s||"SELECT"!==s.tagName.toUpperCase())&&!((s=f(s,o.draggable,n,!1))&&s.animated||G===s)){if(V=C(s),Q=C(s,o.draggable),"function"==typeof u){if(u.call(this,t,s,this))return F({sortable:e,rootEl:c,name:"filter",targetEl:s,toEl:n,fromEl:n}),H("filter",e,{evt:t}),void(i&&t.cancelable&&t.preventDefault())}else if(u&&(u=u.split(",").some(function(o){if(o=f(c,o.trim(),n,!1))return F({sortable:e,rootEl:o,name:"filter",targetEl:s,fromEl:n,toEl:n}),H("filter",e,{evt:t}),!0})))return void(i&&t.cancelable&&t.preventDefault());o.handle&&!f(c,o.handle,n,!1)||this._prepareDragStart(t,l,s)}}},_prepareDragStart:function(t,e,r){var a,l=this,s=l.el,u=l.options,d=s.ownerDocument;if(r&&!L&&r.parentNode===s){var h=y(r);if(W=s,j=(L=r).parentNode,z=L.nextSibling,G=r,J=u.group,It.dragged=L,rt=(et={target:L,clientX:(e||t).clientX,clientY:(e||t).clientY}).clientX-h.left,at=et.clientY-h.top,this._lastX=(e||t).clientX,this._lastY=(e||t).clientY,L.style["will-change"]="all",a=function(){H("delayEnded",l,{evt:t}),It.eventCanceled?l._onDrop():(l._disableDelayedDragEvents(),!i&&l.nativeDraggable&&(L.draggable=!0),l._triggerDragStart(t,e),F({sortable:l,name:"choose",originalEvent:t}),v(L,u.chosenClass,!0))},u.ignore.split(",").forEach(function(t){w(L,t.trim(),kt)}),c(d,"dragover",Ot),c(d,"mousemove",Ot),c(d,"touchmove",Ot),c(d,"mouseup",l._onDrop),c(d,"touchend",l._onDrop),c(d,"touchcancel",l._onDrop),i&&this.nativeDraggable&&(this.options.touchStartThreshold=4,L.draggable=!0),H("delayStart",this,{evt:t}),!u.delay||u.delayOnTouchOnly&&!e||this.nativeDraggable&&(o||n))a();else{if(It.eventCanceled)return void this._onDrop();c(d,"mouseup",l._disableDelayedDrag),c(d,"touchend",l._disableDelayedDrag),c(d,"touchcancel",l._disableDelayedDrag),c(d,"mousemove",l._delayedDragTouchMoveHandler),c(d,"touchmove",l._delayedDragTouchMoveHandler),u.supportPointer&&c(d,"pointermove",l._delayedDragTouchMoveHandler),l._dragStartTimer=setTimeout(a,u.delay)}}},_delayedDragTouchMoveHandler:function(t){var e=t.touches?t.touches[0]:t;Math.max(Math.abs(e.clientX-this._lastX),Math.abs(e.clientY-this._lastY))>=Math.floor(this.options.touchStartThreshold/(this.nativeDraggable&&window.devicePixelRatio||1))&&this._disableDelayedDrag()},_disableDelayedDrag:function(){L&&kt(L),clearTimeout(this._dragStartTimer),this._disableDelayedDragEvents()},_disableDelayedDragEvents:function(){var t=this.el.ownerDocument;u(t,"mouseup",this._disableDelayedDrag),u(t,"touchend",this._disableDelayedDrag),u(t,"touchcancel",this._disableDelayedDrag),u(t,"mousemove",this._delayedDragTouchMoveHandler),u(t,"touchmove",this._delayedDragTouchMoveHandler),u(t,"pointermove",this._delayedDragTouchMoveHandler)},_triggerDragStart:function(t,e){e=e||"touch"==t.pointerType&&t,!this.nativeDraggable||e?c(document,this.options.supportPointer?"pointermove":e?"touchmove":"mousemove",this._onTouchMove):(c(L,"dragend",this),c(W,"dragstart",this._onDragStart));try{document.selection?Yt(function(){document.selection.empty()}):window.getSelection().removeAllRanges()}catch(t){}},_dragStarted:function(t,e){if(ht=!1,W&&L){H("dragStarted",this,{evt:e}),this.nativeDraggable&&c(document,"dragover",At);var n=this.options;!t&&v(L,n.dragClass,!1),v(L,n.ghostClass,!0),It.active=this,t&&this._appendGhost(),F({sortable:this,name:"start",originalEvent:e})}else this._nulling()},_emulateDragOver:function(){if(nt){this._lastX=nt.clientX,this._lastY=nt.clientY,xt();for(var t=document.elementFromPoint(nt.clientX,nt.clientY),e=t;t&&t.shadowRoot&&(t=t.shadowRoot.elementFromPoint(nt.clientX,nt.clientY))!==e;)e=t;if(L.parentNode[k]._isOutsideThisEl(t),e)do{if(e[k]&&e[k]._onDragOver({clientX:nt.clientX,clientY:nt.clientY,target:t,rootEl:e})&&!this.options.dragoverBubble)break;t=e}while(e=e.parentNode);Mt()}},_onTouchMove:function(t){if(et){var e=this.options,n=e.fallbackTolerance,o=e.fallbackOffset,i=t.touches?t.touches[0]:t,r=K&&b(K,!0),a=K&&r&&r.a,l=K&&r&&r.d,s=yt&&dt&&T(dt),c=(i.clientX-et.clientX+o.x)/(a||1)+(s?s[0]-mt[0]:0)/(a||1),u=(i.clientY-et.clientY+o.y)/(l||1)+(s?s[1]-mt[1]:0)/(l||1);if(!It.active&&!ht){if(n&&Math.max(Math.abs(i.clientX-this._lastX),Math.abs(i.clientY-this._lastY))<n)return;this._onDragStart(t,!0)}if(K){r?(r.e+=c-(ot||0),r.f+=u-(it||0)):r={a:1,b:0,c:0,d:1,e:c,f:u};var d="matrix("+r.a+","+r.b+","+r.c+","+r.d+","+r.e+","+r.f+")";m(K,"webkitTransform",d),m(K,"mozTransform",d),m(K,"msTransform",d),m(K,"transform",d),ot=c,it=u,nt=i}t.cancelable&&t.preventDefault()}},_appendGhost:function(){if(!K){var t=this.options.fallbackOnBody?document.body:W,e=y(L,!0,yt,!0,t),n=this.options;if(yt){for(dt=t;"static"===m(dt,"position")&&"none"===m(dt,"transform")&&dt!==document;)dt=dt.parentNode;dt!==document.body&&dt!==document.documentElement?(dt===document&&(dt=E()),e.top+=dt.scrollTop,e.left+=dt.scrollLeft):dt=E(),mt=T(dt)}v(K=L.cloneNode(!0),n.ghostClass,!1),v(K,n.fallbackClass,!0),v(K,n.dragClass,!0),m(K,"transition",""),m(K,"transform",""),m(K,"box-sizing","border-box"),m(K,"margin",0),m(K,"top",e.top),m(K,"left",e.left),m(K,"width",e.width),m(K,"height",e.height),m(K,"opacity","0.8"),m(K,"position",yt?"absolute":"fixed"),m(K,"zIndex","100000"),m(K,"pointerEvents","none"),It.ghost=K,t.appendChild(K),m(K,"transform-origin",rt/parseInt(K.style.width)*100+"% "+at/parseInt(K.style.height)*100+"%")}},_onDragStart:function(t,e){var n=this,o=t.dataTransfer,i=n.options;H("dragStart",this,{evt:t}),It.eventCanceled?this._onDrop():(H("setupClone",this),It.eventCanceled||((U=A(L)).draggable=!1,U.style["will-change"]="",this._hideClone(),v(U,this.options.chosenClass,!1),It.clone=U),n.cloneId=Yt(function(){H("clone",n),It.eventCanceled||(n.options.removeCloneOnHide||W.insertBefore(U,L),n._hideClone(),F({sortable:n,name:"clone"}))}),!e&&v(L,i.dragClass,!0),e?(ft=!0,n._loopId=setInterval(n._emulateDragOver,50)):(u(document,"mouseup",n._onDrop),u(document,"touchend",n._onDrop),u(document,"touchcancel",n._onDrop),o&&(o.effectAllowed="move",i.setData&&i.setData.call(n,o,L)),c(document,"drop",n),m(L,"transform","translateZ(0)")),ht=!0,n._dragStartId=Yt(n._dragStarted.bind(n,e,t)),c(document,"selectstart",n),lt=!0,r&&m(document.body,"user-select","none"))},_onDragOver:function(e){var n,o,i,r,a=this.el,l=e.target,s=this.options,c=s.group,u=It.active,d=J===c,h=s.sort,p=tt||u,g=this,b=!1;if(!bt){if(void 0!==e.preventDefault&&e.cancelable&&e.preventDefault(),l=f(l,s.draggable,a,!0),B("dragOver"),It.eventCanceled)return b;if(L.contains(e.target)||l.animated&&l.animatingX&&l.animatingY||g._ignoreWhileAnimating===l)return U(!1);if(ft=!1,u&&!s.disabled&&(d?h||(i=!W.contains(L)):tt===this||(this.lastPutMode=J.checkPull(this,u,L,e))&&c.checkPut(this,u,L,e))){if(r="vertical"===this._getDirection(e,l),n=y(L),B("dragOverValid"),It.eventCanceled)return b;if(i)return j=W,G(),this._hideClone(),B("revert"),It.eventCanceled||(z?W.insertBefore(L,z):W.appendChild(L)),U(!0);var w=S(a,s.draggable);if(!w||function(t,e,n){var o=y(S(n.el,n.options.draggable));return e?t.clientX>o.right+10||t.clientX<=o.right&&t.clientY>o.bottom&&t.clientX>=o.left:t.clientX>o.right&&t.clientY>o.top||t.clientX<=o.right&&t.clientY>o.bottom+10}(e,r,this)&&!w.animated){if(w===L)return U(!1);if(w&&a===e.target&&(l=w),l&&(o=y(l)),!1!==Pt(W,a,L,n,l,o,e,!!l))return G(),a.appendChild(L),j=a,q(),U(!0)}else if(l.parentNode===a){o=y(l);var E,_,T,x=L.parentNode!==a,M=!function(t,e,n){var o=n?t.left:t.top,i=n?e.left:e.top;return o===i||(n?t.right:t.bottom)===(n?e.right:e.bottom)||o+(n?t.width:t.height)/2===i+(n?e.width:e.height)/2}(L.animated&&L.toRect||n,l.animated&&l.toRect||o,r),N=r?"top":"left",A=D(l,"top","top")||D(L,"top","top"),I=A?A.scrollTop:void 0;if(st!==l&&(_=o[N],gt=!1,vt=!M&&s.invertSwap||x),0!==(E=function(t,e,n,o,i,r,a,l){var s=o?t.clientY:t.clientX,c=o?n.height:n.width,u=o?n.top:n.left,d=o?n.bottom:n.right,h=!1;if(!a)if(l&&ut<c*i){if(!gt&&(1===ct?s>u+c*r/2:s<d-c*r/2)&&(gt=!0),gt)h=!0;else if(1===ct?s<u+ut:s>d-ut)return-ct}else if(s>u+c*(1-i)/2&&s<d-c*(1-i)/2)return function(t){return C(L)<C(t)?1:-1}(e);return(h=h||a)&&(s<u+c*r/2||s>d-c*r/2)?s>u+c/2?1:-1:0}(e,l,o,r,M?1:s.swapThreshold,null==s.invertedSwapThreshold?s.swapThreshold:s.invertedSwapThreshold,vt,st===l))){var P=C(L);do{T=j.children[P-=E]}while(T&&("none"===m(T,"display")||T===K))}if(0===E||T===l)return U(!1);st=l,ct=E;var R=l.nextElementSibling,X=!1,Y=Pt(W,a,L,n,l,o,e,X=1===E);if(!1!==Y)return 1!==Y&&-1!==Y||(X=1===Y),bt=!0,setTimeout(Rt,30),G(),X&&!R?a.appendChild(L):l.parentNode.insertBefore(L,X?R:l),A&&O(A,0,I-A.scrollTop),j=L.parentNode,void 0===_||vt||(ut=Math.abs(_-y(l)[N])),q(),U(!0)}if(a.contains(L))return U(!1)}return!1}function B(s,c){H(s,g,t({evt:e,isOwner:d,axis:r?"vertical":"horizontal",revert:i,dragRect:n,targetRect:o,canSort:h,fromSortable:p,target:l,completed:U,onMove:function(t,o){return Pt(W,a,L,n,t,y(t),e,o)},changed:q},c))}function G(){B("dragOverAnimationCapture"),g.captureAnimationState(),g!==p&&p.captureAnimationState()}function U(t){return B("dragOverCompleted",{insertion:t}),t&&(d?u._hideClone():u._showClone(g),g!==p&&(v(L,tt?tt.options.ghostClass:u.options.ghostClass,!1),v(L,s.ghostClass,!0)),tt!==g&&g!==It.active?tt=g:g===It.active&&tt&&(tt=null),p===g&&(g._ignoreWhileAnimating=l),g.animateAll(function(){B("dragOverAnimationComplete"),g._ignoreWhileAnimating=null}),g!==p&&(p.animateAll(),p._ignoreWhileAnimating=null)),(l===L&&!L.animated||l===a&&!l.animated)&&(st=null),s.dragoverBubble||e.rootEl||l===document||(L.parentNode[k]._isOutsideThisEl(e.target),!t&&Ot(e)),!s.dragoverBubble&&e.stopPropagation&&e.stopPropagation(),b=!0}function q(){Z=C(L),$=C(L,s.draggable),F({sortable:g,name:"change",toEl:a,newIndex:Z,newDraggableIndex:$,originalEvent:e})}},_ignoreWhileAnimating:null,_offMoveEvents:function(){u(document,"mousemove",this._onTouchMove),u(document,"touchmove",this._onTouchMove),u(document,"pointermove",this._onTouchMove),u(document,"dragover",Ot),u(document,"mousemove",Ot),u(document,"touchmove",Ot)},_offUpEvents:function(){var t=this.el.ownerDocument;u(t,"mouseup",this._onDrop),u(t,"touchend",this._onDrop),u(t,"pointerup",this._onDrop),u(t,"touchcancel",this._onDrop),u(document,"selectstart",this)},_onDrop:function(t){var e=this.el,n=this.options;Z=C(L),$=C(L,n.draggable),H("drop",this,{evt:t}),j=L&&L.parentNode,Z=C(L),$=C(L,n.draggable),It.eventCanceled||(ht=!1,vt=!1,gt=!1,clearInterval(this._loopId),clearTimeout(this._dragStartTimer),Bt(this.cloneId),Bt(this._dragStartId),this.nativeDraggable&&(u(document,"drop",this),u(e,"dragstart",this._onDragStart)),this._offMoveEvents(),this._offUpEvents(),r&&m(document.body,"user-select",""),m(L,"transform",""),t&&(lt&&(t.cancelable&&t.preventDefault(),!n.dropBubble&&t.stopPropagation()),K&&K.parentNode&&K.parentNode.removeChild(K),(W===j||tt&&"clone"!==tt.lastPutMode)&&U&&U.parentNode&&U.parentNode.removeChild(U),L&&(this.nativeDraggable&&u(L,"dragend",this),kt(L),L.style["will-change"]="",lt&&!ht&&v(L,tt?tt.options.ghostClass:this.options.ghostClass,!1),v(L,this.options.chosenClass,!1),F({sortable:this,name:"unchoose",toEl:j,newIndex:null,newDraggableIndex:null,originalEvent:t}),W!==j?(Z>=0&&(F({rootEl:j,name:"add",toEl:j,fromEl:W,originalEvent:t}),F({sortable:this,name:"remove",toEl:j,originalEvent:t}),F({rootEl:j,name:"sort",toEl:j,fromEl:W,originalEvent:t}),F({sortable:this,name:"sort",toEl:j,originalEvent:t})),tt&&tt.save()):Z!==V&&Z>=0&&(F({sortable:this,name:"update",toEl:j,originalEvent:t}),F({sortable:this,name:"sort",toEl:j,originalEvent:t})),It.active&&(null!=Z&&-1!==Z||(Z=V,$=Q),F({sortable:this,name:"end",toEl:j,originalEvent:t}),this.save())))),this._nulling()},_nulling:function(){H("nulling",this),W=L=j=K=z=U=G=q=et=nt=lt=Z=$=V=Q=st=ct=tt=J=It.dragged=It.ghost=It.clone=It.active=null,wt.forEach(function(t){t.checked=!0}),wt.length=ot=it=0},handleEvent:function(t){switch(t.type){case"drop":case"dragend":this._onDrop(t);break;case"dragenter":case"dragover":L&&(this._onDragOver(t),function(t){t.dataTransfer&&(t.dataTransfer.dropEffect="move"),t.cancelable&&t.preventDefault()}(t));break;case"selectstart":t.preventDefault()}},toArray:function(){for(var t,e=[],n=this.el.children,o=0,i=n.length,r=this.options;o<i;o++)f(t=n[o],r.draggable,this.el,!1)&&e.push(t.getAttribute(r.dataIdAttr)||Xt(t));return e},sort:function(t){var e={},n=this.el;this.toArray().forEach(function(t,o){var i=n.children[o];f(i,this.options.draggable,n,!1)&&(e[t]=i)},this),t.forEach(function(t){e[t]&&(n.removeChild(e[t]),n.appendChild(e[t]))})},save:function(){var t=this.options.store;t&&t.set&&t.set(this)},closest:function(t,e){return f(t,e||this.options.draggable,this.el,!1)},option:function(t,e){var n=this.options;if(void 0===e)return n[t];var o=Y.modifyOption(this,t,e);n[t]=void 0!==o?o:e,"group"===t&&Tt(n)},destroy:function(){H("destroy",this);var t=this.el;t[k]=null,u(t,"mousedown",this._onTapStart),u(t,"touchstart",this._onTapStart),u(t,"pointerdown",this._onTapStart),this.nativeDraggable&&(u(t,"dragover",this),u(t,"dragenter",this)),Array.prototype.forEach.call(t.querySelectorAll("[draggable]"),function(t){t.removeAttribute("draggable")}),this._onDrop(),this._disableDelayedDragEvents(),pt.splice(pt.indexOf(this.el),1),this.el=t=null},_hideClone:function(){if(!q){if(H("hideClone",this),It.eventCanceled)return;m(U,"display","none"),this.options.removeCloneOnHide&&U.parentNode&&U.parentNode.removeChild(U),q=!0}},_showClone:function(t){if("clone"===t.lastPutMode){if(q){if(H("showClone",this),It.eventCanceled)return;L.parentNode!=W||this.options.group.revertClone?z?W.insertBefore(U,z):W.appendChild(U):W.insertBefore(U,L),this.options.group.revertClone&&this.animate(L,U),m(U,"display",""),q=!1}}else this._hideClone()}},Et&&c(document,"touchmove",function(t){(It.active||ht)&&t.cancelable&&t.preventDefault()}),It.utils={on:c,off:u,css:m,find:w,is:function(t,e){return!!f(t,e,t,!1)},extend:function(t,e){if(t&&e)for(var n in e)e.hasOwnProperty(n)&&(t[n]=e[n]);return t},throttle:N,closest:f,toggleClass:v,clone:A,index:C,nextTick:Yt,cancelNextTick:Bt,detectDirection:Ct,getChild:_},It.get=function(t){return t[k]},It.mount=function(){var e=[].slice.call(arguments);e[0].constructor===Array&&(e=e[0]),e.forEach(function(e){if(!e.prototype||!e.prototype.constructor)throw"Sortable: Mounted plugin must be a constructor function, not "+{}.toString.call(e);e.utils&&(It.utils=t({},It.utils,e.utils)),Y.mount(e)})},It.create=function(t,e){return new It(t,e)},It.version="1.12.0";var Ht,Ft,Lt,jt,Kt,Wt=[],zt=[],Gt=!1,Ut=!1,qt=!1;function Vt(t,e){zt.forEach(function(n,o){var i=e.children[n.sortableIndex+(t?Number(o):0)];i?e.insertBefore(n,i):e.appendChild(n)})}function Zt(){Wt.forEach(function(t){t!==Lt&&t.parentNode&&t.parentNode.removeChild(t)})}var Qt=function(t){var e=t.originalEvent,n=t.putSortable,o=t.dragEl,i=t.dispatchSortableEvent,r=t.unhideGhostForTarget;if(e){var a=n||t.activeSortable;(0,t.hideGhostForTarget)();var l=e.changedTouches&&e.changedTouches.length?e.changedTouches[0]:e,s=document.elementFromPoint(l.clientX,l.clientY);r(),a&&!a.el.contains(s)&&(i("spill"),this.onSpill({dragEl:o,putSortable:n}))}};function $t(){}function Jt(){}$t.prototype={startIndex:null,dragStart:function(t){this.startIndex=t.oldDraggableIndex},onSpill:function(t){var e=t.dragEl,n=t.putSortable;this.sortable.captureAnimationState(),n&&n.captureAnimationState();var o=_(this.sortable.el,this.startIndex,this.options);o?this.sortable.el.insertBefore(e,o):this.sortable.el.appendChild(e),this.sortable.animateAll(),n&&n.animateAll()},drop:Qt},Object.assign($t,{pluginName:"revertOnSpill"}),Jt.prototype={onSpill:function(t){var e=t.dragEl,n=t.putSortable||this.sortable;n.captureAnimationState(),e.parentNode&&e.parentNode.removeChild(e),n.animateAll()},drop:Qt},Object.assign(Jt,{pluginName:"removeOnSpill"});var te,ee,ne,oe,ie,re,ae=[],le=!1;function se(){ae.forEach(function(t){clearInterval(t.pid)}),ae=[]}function ce(){clearInterval(re)}var ue=N(function(t,e,n,o){if(e.scroll){var i,r=(t.touches?t.touches[0]:t).clientX,a=(t.touches?t.touches[0]:t).clientY,l=e.scrollSensitivity,s=e.scrollSpeed,c=E(),u=!1;ee!==n&&(ee=n,se(),i=e.scrollFn,!0===(te=e.scroll)&&(te=x(n,!0)));var d=0,h=te;do{var f=h,p=y(f),g=p.top,v=p.bottom,b=p.left,w=p.right,D=p.width,_=p.height,S=void 0,C=void 0,T=f.scrollWidth,M=f.scrollHeight,N=m(f),A=f.scrollLeft,I=f.scrollTop;f===c?(S=D<T&&("auto"===N.overflowX||"scroll"===N.overflowX||"visible"===N.overflowX),C=_<M&&("auto"===N.overflowY||"scroll"===N.overflowY||"visible"===N.overflowY)):(S=D<T&&("auto"===N.overflowX||"scroll"===N.overflowX),C=_<M&&("auto"===N.overflowY||"scroll"===N.overflowY));var P=S&&(Math.abs(w-r)<=l&&A+D<T)-(Math.abs(b-r)<=l&&!!A),R=C&&(Math.abs(v-a)<=l&&I+_<M)-(Math.abs(g-a)<=l&&!!I);if(!ae[d])for(var X=0;X<=d;X++)ae[X]||(ae[X]={});ae[d].vx==P&&ae[d].vy==R&&ae[d].el===f||(ae[d].el=f,ae[d].vx=P,ae[d].vy=R,clearInterval(ae[d].pid),0==P&&0==R||(u=!0,ae[d].pid=setInterval(function(){o&&0===this.layer&&It.active._onTouchMove(ie);var e=ae[this.layer].vy?ae[this.layer].vy*s:0,n=ae[this.layer].vx?ae[this.layer].vx*s:0;"function"==typeof i&&"continue"!==i.call(It.dragged.parentNode[k],n,e,t,ie,ae[this.layer].el)||O(ae[this.layer].el,n,e)}.bind({layer:d}),24))),d++}while(e.bubbleScroll&&h!==c&&(h=x(h,!1)));le=u}},30);return It.mount(new function(){function t(){for(var t in this.defaults={scroll:!0,scrollSensitivity:30,scrollSpeed:10,bubbleScroll:!0},this)"_"===t.charAt(0)&&"function"==typeof this[t]&&(this[t]=this[t].bind(this))}return t.prototype={dragStarted:function(t){var e=t.originalEvent;this.sortable.nativeDraggable?c(document,"dragover",this._handleAutoScroll):c(document,this.options.supportPointer?"pointermove":e.touches?"touchmove":"mousemove",this._handleFallbackAutoScroll)},dragOverCompleted:function(t){var e=t.originalEvent;this.options.dragOverBubble||e.rootEl||this._handleAutoScroll(e)},drop:function(){this.sortable.nativeDraggable?u(document,"dragover",this._handleAutoScroll):(u(document,"pointermove",this._handleFallbackAutoScroll),u(document,"touchmove",this._handleFallbackAutoScroll),u(document,"mousemove",this._handleFallbackAutoScroll)),ce(),se(),clearTimeout(p),p=void 0},nulling:function(){ie=ee=te=le=re=ne=oe=null,ae.length=0},_handleFallbackAutoScroll:function(t){this._handleAutoScroll(t,!0)},_handleAutoScroll:function(t,e){var i=this,a=(t.touches?t.touches[0]:t).clientX,l=(t.touches?t.touches[0]:t).clientY,s=document.elementFromPoint(a,l);if(ie=t,e||o||n||r){ue(t,this.options,s,e);var c=x(s,!0);!le||re&&a===ne&&l===oe||(re&&ce(),re=setInterval(function(){var n=x(document.elementFromPoint(a,l),!0);n!==c&&(c=n,se()),ue(t,i.options,n,e)},10),ne=a,oe=l)}else{if(!this.options.bubbleScroll||x(s,!0)===E())return void se();ue(t,this.options,x(s,!1),!1)}}},Object.assign(t,{pluginName:"scroll",initializeByDefault:!0})}),It.mount(Jt,$t),It.mount(new function(){function t(){this.defaults={swapClass:"sortable-swap-highlight"}}return t.prototype={dragStart:function(t){Nt=t.dragEl},dragOverValid:function(t){var e=t.completed,n=t.target,o=t.changed,i=t.cancel;if(t.activeSortable.options.swap){var r=this.options;if(n&&n!==this.sortable.el){var a=Nt;!1!==(0,t.onMove)(n)?(v(n,r.swapClass,!0),Nt=n):Nt=null,a&&a!==Nt&&v(a,r.swapClass,!1)}o(),e(!0),i()}},drop:function(t){var e,n,o,i,r,a,l=t.activeSortable,s=t.putSortable,c=t.dragEl,u=s||this.sortable,d=this.options;Nt&&v(Nt,d.swapClass,!1),Nt&&(d.swap||s&&s.options.swap)&&c!==Nt&&(u.captureAnimationState(),u!==l&&l.captureAnimationState(),a=(n=Nt).parentNode,(r=(e=c).parentNode)&&a&&!r.isEqualNode(n)&&!a.isEqualNode(e)&&(o=C(e),i=C(n),r.isEqualNode(a)&&o<i&&i++,r.insertBefore(n,r.children[o]),a.insertBefore(e,a.children[i])),u.animateAll(),u!==l&&l.animateAll())},nulling:function(){Nt=null}},Object.assign(t,{pluginName:"swap",eventProperties:function(){return{swapItem:Nt}}})}),It.mount(new function(){function t(t){for(var e in this)"_"===e.charAt(0)&&"function"==typeof this[e]&&(this[e]=this[e].bind(this));t.options.supportPointer?c(document,"pointerup",this._deselectMultiDrag):(c(document,"mouseup",this._deselectMultiDrag),c(document,"touchend",this._deselectMultiDrag)),c(document,"keydown",this._checkKeyDown),c(document,"keyup",this._checkKeyUp),this.defaults={selectedClass:"sortable-selected",multiDragKey:null,setData:function(e,n){var o="";Wt.length&&Ft===t?Wt.forEach(function(t,e){o+=(e?", ":"")+t.textContent}):o=n.textContent,e.setData("Text",o)}}}return t.prototype={multiDragKeyDown:!1,isMultiDrag:!1,delayStartGlobal:function(t){Lt=t.dragEl},delayEnded:function(){this.isMultiDrag=~Wt.indexOf(Lt)},setupClone:function(t){var e=t.sortable,n=t.cancel;if(this.isMultiDrag){for(var o=0;o<Wt.length;o++)zt.push(A(Wt[o])),zt[o].sortableIndex=Wt[o].sortableIndex,zt[o].draggable=!1,zt[o].style["will-change"]="",v(zt[o],this.options.selectedClass,!1),Wt[o]===Lt&&v(zt[o],this.options.chosenClass,!1);e._hideClone(),n()}},clone:function(t){var e=t.dispatchSortableEvent,n=t.cancel;this.isMultiDrag&&(this.options.removeCloneOnHide||Wt.length&&Ft===t.sortable&&(Vt(!0,t.rootEl),e("clone"),n()))},showClone:function(t){var e=t.cloneNowShown,n=t.cancel;this.isMultiDrag&&(Vt(!1,t.rootEl),zt.forEach(function(t){m(t,"display","")}),e(),Kt=!1,n())},hideClone:function(t){var e=this,n=t.cloneNowHidden,o=t.cancel;this.isMultiDrag&&(zt.forEach(function(t){m(t,"display","none"),e.options.removeCloneOnHide&&t.parentNode&&t.parentNode.removeChild(t)}),n(),Kt=!0,o())},dragStartGlobal:function(t){!this.isMultiDrag&&Ft&&Ft.multiDrag._deselectMultiDrag(),Wt.forEach(function(t){t.sortableIndex=C(t)}),Wt=Wt.sort(function(t,e){return t.sortableIndex-e.sortableIndex}),qt=!0},dragStarted:function(t){var e=this,n=t.sortable;if(this.isMultiDrag){if(this.options.sort&&(n.captureAnimationState(),this.options.animation)){Wt.forEach(function(t){t!==Lt&&m(t,"position","absolute")});var o=y(Lt,!1,!0,!0);Wt.forEach(function(t){t!==Lt&&I(t,o)}),Ut=!0,Gt=!0}n.animateAll(function(){Ut=!1,Gt=!1,e.options.animation&&Wt.forEach(function(t){P(t)}),e.options.sort&&Zt()})}},dragOver:function(t){var e=t.completed,n=t.cancel;Ut&&~Wt.indexOf(t.target)&&(e(!1),n())},revert:function(t){var e=t.fromSortable,n=t.rootEl,o=t.sortable,i=t.dragRect;Wt.length>1&&(Wt.forEach(function(t){o.addAnimationState({target:t,rect:Ut?y(t):i}),P(t),t.fromRect=i,e.removeAnimationState(t)}),Ut=!1,function(t,e){Wt.forEach(function(n,o){var i=e.children[n.sortableIndex+(t?Number(o):0)];i?e.insertBefore(n,i):e.appendChild(n)})}(!this.options.removeCloneOnHide,n))},dragOverCompleted:function(t){var e=t.sortable,n=t.isOwner,o=t.activeSortable,i=t.parentEl,r=t.putSortable,a=this.options;if(t.insertion){if(n&&o._hideClone(),Gt=!1,a.animation&&Wt.length>1&&(Ut||!n&&!o.options.sort&&!r)){var l=y(Lt,!1,!0,!0);Wt.forEach(function(t){t!==Lt&&(I(t,l),i.appendChild(t))}),Ut=!0}if(!n)if(Ut||Zt(),Wt.length>1){var s=Kt;o._showClone(e),o.options.animation&&!Kt&&s&&zt.forEach(function(t){o.addAnimationState({target:t,rect:jt}),t.fromRect=jt,t.thisAnimationDuration=null})}else o._showClone(e)}},dragOverAnimationCapture:function(t){var e=t.dragRect,n=t.isOwner,o=t.activeSortable;if(Wt.forEach(function(t){t.thisAnimationDuration=null}),o.options.animation&&!n&&o.multiDrag.isMultiDrag){jt=Object.assign({},e);var i=b(Lt,!0);jt.top-=i.f,jt.left-=i.e}},dragOverAnimationComplete:function(){Ut&&(Ut=!1,Zt())},drop:function(t){var e=t.originalEvent,n=t.rootEl,o=t.parentEl,i=t.sortable,r=t.dispatchSortableEvent,a=t.oldIndex,l=t.putSortable,s=l||this.sortable;if(e){var c=this.options,u=o.children;if(!qt)if(c.multiDragKey&&!this.multiDragKeyDown&&this._deselectMultiDrag(),v(Lt,c.selectedClass,!~Wt.indexOf(Lt)),~Wt.indexOf(Lt))Wt.splice(Wt.indexOf(Lt),1),Ht=null,B({sortable:i,rootEl:n,name:"deselect",targetEl:Lt,originalEvt:e});else{if(Wt.push(Lt),B({sortable:i,rootEl:n,name:"select",targetEl:Lt,originalEvt:e}),e.shiftKey&&Ht&&i.el.contains(Ht)){var d,h,f=C(Ht),p=C(Lt);if(~f&&~p&&f!==p)for(p>f?(h=f,d=p):(h=p,d=f+1);h<d;h++)~Wt.indexOf(u[h])||(v(u[h],c.selectedClass,!0),Wt.push(u[h]),B({sortable:i,rootEl:n,name:"select",targetEl:u[h],originalEvt:e}))}else Ht=Lt;Ft=s}if(qt&&this.isMultiDrag){if((o[k].options.sort||o!==n)&&Wt.length>1){var g=y(Lt),m=C(Lt,":not(."+this.options.selectedClass+")");if(!Gt&&c.animation&&(Lt.thisAnimationDuration=null),s.captureAnimationState(),!Gt&&(c.animation&&(Lt.fromRect=g,Wt.forEach(function(t){if(t.thisAnimationDuration=null,t!==Lt){var e=Ut?y(t):g;t.fromRect=e,s.addAnimationState({target:t,rect:e})}})),Zt(),Wt.forEach(function(t){u[m]?o.insertBefore(t,u[m]):o.appendChild(t),m++}),a===C(Lt))){var b=!1;Wt.forEach(function(t){t.sortableIndex===C(t)||(b=!0)}),b&&r("update")}Wt.forEach(function(t){P(t)}),s.animateAll()}Ft=s}(n===o||l&&"clone"!==l.lastPutMode)&&zt.forEach(function(t){t.parentNode&&t.parentNode.removeChild(t)})}},nullingGlobal:function(){this.isMultiDrag=qt=!1,zt.length=0},destroyGlobal:function(){this._deselectMultiDrag(),u(document,"pointerup",this._deselectMultiDrag),u(document,"mouseup",this._deselectMultiDrag),u(document,"touchend",this._deselectMultiDrag),u(document,"keydown",this._checkKeyDown),u(document,"keyup",this._checkKeyUp)},_deselectMultiDrag:function(t){if(!(void 0!==qt&&qt||Ft!==this.sortable||t&&f(t.target,this.options.draggable,this.sortable.el,!1)||t&&0!==t.button))for(;Wt.length;){var e=Wt[0];v(e,this.options.selectedClass,!1),Wt.shift(),B({sortable:this.sortable,rootEl:this.sortable.el,name:"deselect",targetEl:e,originalEvt:t})}},_checkKeyDown:function(t){t.key===this.options.multiDragKey&&(this.multiDragKeyDown=!0)},_checkKeyUp:function(t){t.key===this.options.multiDragKey&&(this.multiDragKeyDown=!1)}},Object.assign(t,{pluginName:"multiDrag",utils:{select:function(t){var e=t.parentNode[k];e&&e.options.multiDrag&&!~Wt.indexOf(t)&&(Ft&&Ft!==e&&(Ft.multiDrag._deselectMultiDrag(),Ft=e),v(t,e.options.selectedClass,!0),Wt.push(t))},deselect:function(t){var e=t.parentNode[k],n=Wt.indexOf(t);e&&e.options.multiDrag&&~n&&(v(t,e.options.selectedClass,!1),Wt.splice(n,1))}},eventProperties:function(){var t=this,e=[],n=[];return Wt.forEach(function(o){var i;e.push({multiDragElement:o,index:o.sortableIndex}),i=Ut&&o!==Lt?-1:Ut?C(o,":not(."+t.options.selectedClass+")"):C(o),n.push({multiDragElement:o,index:i})}),{items:[].concat(Wt),clones:[].concat(zt),oldIndicies:e,newIndicies:n}},optionListeners:{multiDragKey:function(t){return"ctrl"===(t=t.toLowerCase())?t="Control":t.length>1&&(t=t.charAt(0).toUpperCase()+t.substr(1)),t}}})}),It});
+//# sourceMappingURL=sortable.umd.js.map
 ;
-return $.drop;
-  }).apply(root, arguments);
-});
-}(this));
-
-(function(root) {
-define("jquery.event.drag", ["jquery"], function() {
-  return (function() {
-/*!
- * jquery.event.drag - v 2.2
- * Copyright (c) 2010 Three Dub Media - http://threedubmedia.com
- * Open Source MIT License - http://threedubmedia.com/code/license
- */
-// Created: 2008-06-04
-// Updated: 2012-05-21
-// REQUIRES: jquery 1.7.x
-
-// UPDATED FROM https://github.com/sutoiku/jquery.event.drag-drop
-
-;(function( $ ){
-
-// add the jquery instance method
-$.fn.drag = function( str, arg, opts ){
-	// figure out the event type
-	var type = typeof str == "string" ? str : "",
-	// figure out the event handler...
-	fn = $.isFunction( str ) ? str : $.isFunction( arg ) ? arg : null;
-	// fix the event type
-	if ( type.indexOf("drag") !== 0 )
-		type = "drag"+ type;
-	// were options passed
-	opts = ( str == fn ? arg : opts ) || {};
-	// trigger or bind event handler
-	return fn ? this.bind( type, opts, fn ) : this.trigger( type );
-};
-
-// local refs (increase compression)
-var $event = $.event,
-$special = $event.special,
-// configure the drag special event
-drag = $special.drag = {
-
-	// these are the default settings
-	defaults: {
-		which: 1, // mouse button pressed to start drag sequence
-		distance: 0, // distance dragged before dragstart
-		not: ':input', // selector to suppress dragging on target elements
-		handle: null, // selector to match handle target elements
-		relative: false, // true to use "position", false to use "offset"
-		drop: true, // false to suppress drop events, true or selector to allow
-		click: false // false to suppress click events after dragend (no proxy)
-	},
-
-	// the key name for stored drag data
-	datakey: "dragdata",
-
-	// prevent bubbling for better performance
-	noBubble: true,
-
-	// count bound related events
-	add: function( obj ){
-		// read the interaction data
-		var data = $.data( this, drag.datakey ),
-		// read any passed options
-		opts = obj.data || {};
-		// count another realted event
-		data.related += 1;
-		// extend data options bound with this event
-		// don't iterate "opts" in case it is a node
-		$.each( drag.defaults, function( key, def ){
-			if ( opts[ key ] !== undefined )
-				data[ key ] = opts[ key ];
-		});
-	},
-
-	// forget unbound related events
-	remove: function(){
-		$.data( this, drag.datakey ).related -= 1;
-	},
-
-	// configure interaction, capture settings
-	setup: function(){
-		// check for related events
-		if ( $.data( this, drag.datakey ) )
-			return;
-		// initialize the drag data with copied defaults
-		var data = $.extend({ related:0 }, drag.defaults );
-		// store the interaction data
-		$.data( this, drag.datakey, data );
-		// bind the mousedown event, which starts drag interactions
-		$event.add( this, "touchstart mousedown", drag.init, data );
-		// prevent image dragging in IE...
-		if ( this.attachEvent )
-			this.attachEvent("ondragstart", drag.dontstart );
-	},
-
-	// destroy configured interaction
-	teardown: function(){
-		var data = $.data( this, drag.datakey ) || {};
-		// check for related events
-		if ( data.related )
-			return;
-		// remove the stored data
-		$.removeData( this, drag.datakey );
-		// remove the mousedown event
-		$event.remove( this, "touchstart mousedown", drag.init );
-		// enable text selection
-		drag.textselect( true );
-		// un-prevent image dragging in IE...
-		if ( this.detachEvent )
-			this.detachEvent("ondragstart", drag.dontstart );
-	},
-
-	// initialize the interaction
-	init: function( event ){
-		// sorry, only one touch at a time
-		if ( drag.touched )
-			return;
-		// the drag/drop interaction data
-		var dd = event.data, results;
-		// check the which directive
-		if ( event.which != 0 && dd.which > 0 && event.which != dd.which )
-			return;
-		// check for suppressed selector
-		if ( $( event.target ).is( dd.not ) )
-			return;
-		// check for handle selector
-		if ( dd.handle && !$( event.target ).closest( dd.handle, event.currentTarget ).length )
-			return;
-
-		drag.touched = event.type == 'touchstart' ? this : null;
-		dd.propagates = 1;
-		dd.mousedown = this;
-		dd.interactions = [ drag.interaction( this, dd ) ];
-		dd.target = event.target;
-		dd.pageX = event.pageX;
-		dd.pageY = event.pageY;
-		dd.dragging = null;
-		// handle draginit event...
-		results = drag.hijack( event, "draginit", dd );
-		// early cancel
-		if ( !dd.propagates )
-			return;
-		// flatten the result set
-		results = drag.flatten( results );
-		// insert new interaction elements
-		if ( results && results.length ){
-			dd.interactions = [];
-			$.each( results, function(){
-				dd.interactions.push( drag.interaction( this, dd ) );
-			});
-		}
-		// remember how many interactions are propagating
-		dd.propagates = dd.interactions.length;
-		// locate and init the drop targets
-		if ( dd.drop !== false && $special.drop )
-			$special.drop.handler( event, dd );
-		// disable text selection
-		drag.textselect( false );
-		// bind additional events...
-		if ( drag.touched )
-			$event.add( drag.touched, "touchmove touchend", drag.handler, dd );
-		else
-			$event.add( document, "mousemove mouseup", drag.handler, dd );
-		// helps prevent text selection or scrolling
-		if ( !drag.touched || dd.live )
-			return false;
-	},
-
-	// returns an interaction object
-	interaction: function( elem, dd ){
-		var offset = $( elem )[ dd.relative ? "position" : "offset" ]() || { top:0, left:0 };
-		return {
-			drag: elem,
-			callback: new drag.callback(),
-			droppable: [],
-			offset: offset
-		};
-	},
-
-	// handle drag-releatd DOM events
-	handler: function( event ){
-		// read the data before hijacking anything
-		var dd = event.data;
-		// handle various events
-		switch ( event.type ){
-			// mousemove, check distance, start dragging
-			case !dd.dragging && 'touchmove':
-				event.preventDefault();
-			case !dd.dragging && 'mousemove':
-				//  drag tolerance, x² + y² = distance²
-				if ( Math.pow(  event.pageX-dd.pageX, 2 ) + Math.pow(  event.pageY-dd.pageY, 2 ) < Math.pow( dd.distance, 2 ) )
-					break; // distance tolerance not reached
-				event.target = dd.target; // force target from "mousedown" event (fix distance issue)
-				drag.hijack( event, "dragstart", dd ); // trigger "dragstart"
-				if ( dd.propagates ) // "dragstart" not rejected
-					dd.dragging = true; // activate interaction
-			// mousemove, dragging
-			case 'touchmove':
-				event.preventDefault();
-			case 'mousemove':
-				if ( dd.dragging ){
-					// trigger "drag"
-					drag.hijack( event, "drag", dd );
-					if ( dd.propagates ){
-						// manage drop events
-						if ( dd.drop !== false && $special.drop )
-							$special.drop.handler( event, dd ); // "dropstart", "dropend"
-						break; // "drag" not rejected, stop
-					}
-					event.type = "mouseup"; // helps "drop" handler behave
-				}
-			// mouseup, stop dragging
-			case 'touchend':
-			case 'mouseup':
-			default:
-				if ( drag.touched )
-					$event.remove( drag.touched, "touchmove touchend", drag.handler ); // remove touch events
-				else
-					$event.remove( document, "mousemove mouseup", drag.handler ); // remove page events
-				if ( dd.dragging ){
-					if ( dd.drop !== false && $special.drop )
-						$special.drop.handler( event, dd ); // "drop"
-					drag.hijack( event, "dragend", dd ); // trigger "dragend"
-				}
-				drag.textselect( true ); // enable text selection
-				// if suppressing click events...
-				if ( dd.click === false && dd.dragging )
-					$.data( dd.mousedown, "suppress.click", new Date().getTime() + 5 );
-				dd.dragging = drag.touched = false; // deactivate element
-				break;
-		}
-	},
-
-	// re-use event object for custom events
-	hijack: function( event, type, dd, x, elem ){
-		// not configured
-		if ( !dd )
-			return;
-		// remember the original event and type
-		var orig = { event:event.originalEvent, type:event.type },
-		// is the event drag related or drog related?
-		mode = type.indexOf("drop") ? "drag" : "drop",
-		// iteration vars
-		result, i = x || 0, ia, $elems, callback,
-		len = !isNaN( x ) ? x : dd.interactions.length;
-		// modify the event type
-		event.type = type;
-		// remove the original event
-		event.originalEvent = null;
-		// initialize the results
-		dd.results = [];
-		// handle each interacted element
-		do if ( ia = dd.interactions[ i ] ){
-			// validate the interaction
-			if ( type !== "dragend" && ia.cancelled )
-				continue;
-			// set the dragdrop properties on the event object
-			callback = drag.properties( event, dd, ia );
-			// prepare for more results
-			ia.results = [];
-			// handle each element
-			$( elem || ia[ mode ] || dd.droppable ).each(function( p, subject ){
-				// identify drag or drop targets individually
-				callback.target = subject;
-				// force propagtion of the custom event
-				event.isPropagationStopped = function(){ return false; };
-				// handle the event
-				result = subject ? $event.dispatch.call( subject, event, callback ) : null;
-				// stop the drag interaction for this element
-				if ( result === false ){
-					if ( mode == "drag" ){
-						ia.cancelled = true;
-						dd.propagates -= 1;
-					}
-					if ( type == "drop" ){
-						ia[ mode ][p] = null;
-					}
-				}
-				// assign any dropinit elements
-				else if ( type == "dropinit" )
-					ia.droppable.push( drag.element( result ) || subject );
-				// accept a returned proxy element
-				if ( type == "dragstart" )
-					ia.proxy = $( drag.element( result ) || ia.drag )[0];
-				// remember this result
-				ia.results.push( result );
-				// forget the event result, for recycling
-				delete event.result;
-				// break on cancelled handler
-				if ( type !== "dropinit" )
-					return result;
-			});
-			// flatten the results
-			dd.results[ i ] = drag.flatten( ia.results );
-			// accept a set of valid drop targets
-			if ( type == "dropinit" )
-				ia.droppable = drag.flatten( ia.droppable );
-			// locate drop targets
-			if ( type == "dragstart" && !ia.cancelled )
-				callback.update();
-		}
-		while ( ++i < len )
-		// restore the original event & type
-		event.type = orig.type;
-		event.originalEvent = orig.event;
-		// return all handler results
-		return drag.flatten( dd.results );
-	},
-
-	// extend the callback object with drag/drop properties...
-	properties: function( event, dd, ia ){
-		var obj = ia.callback;
-		// elements
-		obj.drag = ia.drag;
-		obj.proxy = ia.proxy || ia.drag;
-		// starting mouse position
-		obj.startX = dd.pageX;
-		obj.startY = dd.pageY;
-		// current distance dragged
-		obj.deltaX = event.pageX - dd.pageX;
-		obj.deltaY = event.pageY - dd.pageY;
-		// original element position
-		obj.originalX = ia.offset.left;
-		obj.originalY = ia.offset.top;
-		// adjusted element position
-		obj.offsetX = obj.originalX + obj.deltaX;
-		obj.offsetY = obj.originalY + obj.deltaY;
-		// assign the drop targets information
-		obj.drop = drag.flatten( ( ia.drop || [] ).slice() );
-		obj.available = drag.flatten( ( ia.droppable || [] ).slice() );
-		return obj;
-	},
-
-	// determine is the argument is an element or jquery instance
-	element: function( arg ){
-		if ( arg && ( arg.jquery || arg.nodeType == 1 ) )
-			return arg;
-	},
-
-	// flatten nested jquery objects and arrays into a single dimension array
-	flatten: function( arr ){
-		return $.map( arr, function( member ){
-			return member && member.jquery ? $.makeArray( member ) :
-				member && member.length ? drag.flatten( member ) : member;
-		});
-	},
-
-	// toggles text selection attributes ON (true) or OFF (false)
-	textselect: function( bool ){
-		$( document )[ bool ? "unbind" : "bind" ]("selectstart", drag.dontstart )
-			.css("MozUserSelect", bool ? "" : "none" );
-		// .attr("unselectable", bool ? "off" : "on" )
-		document.unselectable = bool ? "off" : "on";
-	},
-
-	// suppress "selectstart" and "ondragstart" events
-	dontstart: function(){
-		return false;
-	},
-
-	// a callback instance contructor
-	callback: function(){}
-
-};
-
-// callback methods
-drag.callback.prototype = {
-	update: function(){
-		if ( $special.drop && this.available.length )
-			$.each( this.available, function( i ){
-				$special.drop.locate( this, i );
-			});
-	}
-};
-
-// patch $.event.$dispatch to allow suppressing clicks
-var $dispatch = $event.dispatch;
-$event.dispatch = function( event ){
-	if ( $.data( this, "suppress."+ event.type ) - new Date().getTime() > 0 ){
-		$.removeData( this, "suppress."+ event.type );
-		return;
-	}
-	return $dispatch.apply( this, arguments );
-};
-
-// event fix hooks for touch events...
-var touchHooks =
-$event.fixHooks.touchstart =
-$event.fixHooks.touchmove =
-$event.fixHooks.touchend =
-$event.fixHooks.touchcancel = {
-	props: "clientX clientY pageX pageY screenX screenY".split( " " ),
-	filter: function( event, orig ) {
-		if ( orig ){
-			var touched = ( orig.touches && orig.touches[0] )
-				|| ( orig.changedTouches && orig.changedTouches[0] )
-				|| null;
-			// iOS webkit: touchstart, touchmove, touchend
-			if ( touched )
-				$.each( touchHooks.props, function( i, prop ){
-					event[ prop ] = touched[ prop ];
-				});
-		}
-		return event;
-	}
-};
-
-// share the same special event configuration with related events...
-//$special.draginit = $special.dragstart = $special.dragend = drag;
-
-})( jQuery );
-
-
-  }).apply(root, arguments);
-});
-}(this));
-
 /* Sortable pattern.
  *
  * Options:
@@ -6622,9 +6054,17 @@ $event.fixHooks.touchcancel = {
  *
  *    # Table
  *
+ *    The patttern needs to be defined on the direct parent element of the elements to be sorted.
+ *    Heads up: A <tbody> would be added to the table by browser automatically.
+ *    The pattern needs to be defined on the <tbody> then.
+ *
  *    {{ example-2 }}
  *
  * Example: example-1
+ *    <style type="text/css" media="screen">
+ *      .item-dragging { background-color: red; }
+ *      .dragging { background: green; }
+ *    </style>
  *    <ul class="pat-sortable">
  *      <li>One</li>
  *      <li>Two</li>
@@ -6632,9 +6072,8 @@ $event.fixHooks.touchcancel = {
  *    </ul>
  *
  * Example: example-2
- *    <table class="table table-stripped pat-sortable"
- *           data-pat-sortable="selector:tr;">
- *      <tbody>
+ *    <table class="table table-stripped">
+ *      <tbody class="pat-sortable" data-pat-sortable="selector:tr;">
  *        <tr>
  *          <td>One One</td>
  *          <td>One Two</td>
@@ -6652,100 +6091,39 @@ $event.fixHooks.touchcancel = {
  *
  */
 
-define('mockup-patterns-sortable',[
-  'jquery',
-  'pat-base',
-  'jquery.event.drop',
-  'jquery.event.drag',
-], function($, Base, drop) {
-  'use strict';
+define('mockup-patterns-sortable',["jquery", "pat-base", "sortable"], function ($, Base, Sortable) {
+    "use strict";
 
-  var SortablePattern = Base.extend({
-    name: 'sortable',
-    trigger: '.pat-sortable',
-    parser: 'mockup',
-    defaults: {
-      selector: 'li',
-      dragClass: 'item-dragging',
-      cloneClass: 'dragging',
-      createDragItem: function(pattern, $el) {
-        return $el
-          .clone()
-          .addClass(pattern.options.cloneClass)
-          .css({ opacity: 0.75, position: 'absolute' })
-          .appendTo(document.body);
-      },
-      drop: undefined, // callback function or name of global function
-      dragOptions: {
-        distance: 2,
-      },
-    },
-    init: function() {
-      var self = this;
-      var start = 0;
+    var SortablePattern = Base.extend({
+        name: "sortable",
+        trigger: ".pat-sortable",
+        parser: "mockup",
+        defaults: {
+            selector: "li",
+            dragClass: "item-dragging",
+            cloneClass: "dragging",
+            drop: undefined, // callback function or name of global function
+        },
+        init: function () {
+            var sortable = new Sortable(this.$el[0], {
+                draggable: this.options.selector,
+                chosenClass: this.options.dragClass,
+                dragClass: this.options.cloneClass,
+                onEnd: function (e) {
+                    var cb = this.options.drop;
+                    if (!cb) {
+                        return;
+                    }
+                    if (typeof cb === "string") {
+                        cb = window[this.options.drop];
+                    }
+                    cb($(e.item), e.newIndex - e.oldIndex);
+                }.bind(this),
+            });
+        },
+    });
 
-      self.$el
-        .find(self.options.selector)
-        .drag('start', function(e, dd) {
-          var dragged = this;
-          var $el = $(this);
-          $(dragged).addClass(self.options.dragClass);
-          drop({
-            tolerance: function(event, proxy, target) {
-              if ($(target.elem).closest(self.$el).length === 0) {
-                /* prevent dragging conflict over another drag area */
-                return;
-              }
-              var test = event.pageY > target.top + target.height / 2;
-              $.data(
-                target.elem,
-                'drop+reorder',
-                test ? 'insertAfter' : 'insertBefore'
-              );
-              return this.contains(target, [event.pageX, event.pageY]);
-            },
-          });
-
-          start = $el.index();
-          return self.options.createDragItem(self, $el);
-        })
-        .drag(function(e, dd) {
-          /*jshint eqeqeq:false */
-          $(dd.proxy).css({
-            top: dd.offsetY,
-            left: dd.offsetX,
-          });
-          var drop = dd.drop[0],
-            method = $.data(drop || {}, 'drop+reorder');
-          /* XXX Cannot use triple equals here */
-          if (method && drop && (drop != dd.current || method != dd.method)) {
-            $(this)[method](drop);
-            dd.current = drop;
-            dd.method = method;
-            dd.update();
-          }
-        }, self.options.dragOptions)
-        .drag('end', function(e, dd) {
-          var $el = $(this);
-          $el.removeClass(self.options.dragClass);
-          $(dd.proxy).remove();
-          if (self.options.drop) {
-            if (typeof self.options.drop === 'string') {
-              window[self.options.drop]($el, $el.index() - start);
-            } else {
-              self.options.drop($el, $el.index() - start);
-            }
-          }
-        })
-        .drop('init', function(e, dd) {
-          /*jshint eqeqeq:false */
-          /* XXX Cannot use triple equals here */
-          return this == dd.drag ? false : true;
-        });
-    },
-  });
-
-  return SortablePattern;
+    return SortablePattern;
 });
 
 (function(root) {
@@ -10552,740 +9930,775 @@ the specific language governing permissions and limitations under the Apache Lic
  *
  */
 
+define('mockup-patterns-select2',["jquery", "pat-base", "mockup-utils", "sortable", "select2"], function (
+    $,
+    Base,
+    utils,
+    Sortable
+) {
+    "use strict";
 
-define('mockup-patterns-select2',[
-  'jquery',
-  'pat-base',
-  'mockup-utils',
-  'select2',
-  'jquery.event.drag',
-  'jquery.event.drop'
-], function($, Base, utils) {
-  'use strict';
+    var Select2 = Base.extend({
+        name: "select2",
+        trigger: ".pat-select2",
+        parser: "mockup",
+        defaults: {
+            separator: ",",
+        },
+        initializeValues: function () {
+            var self = this;
+            // Init Selection ---------------------------------------------
+            if (self.options.initialValues) {
+                self.options.id = function (term) {
+                    return term.id;
+                };
+                self.options.initSelection = function ($el, callback) {
+                    var data = [],
+                        value = $el.val(),
+                        seldefaults = self.options.initialValues;
 
-  var Select2 = Base.extend({
-    name: 'select2',
-    trigger: '.pat-select2',
-    parser: 'mockup',
-    defaults: {
-      separator: ','
-    },
-    initializeValues: function() {
-      var self = this;
-      // Init Selection ---------------------------------------------
-      if (self.options.initialValues) {
-        self.options.id = function(term) {
-          return term.id;
-        };
-        self.options.initSelection = function ($el, callback) {
-          var data = [],
-              value = $el.val(),
-              seldefaults = self.options.initialValues;
+                    // Create the initSelection value that contains the default selection,
+                    // but in a javascript object
+                    if (
+                        typeof self.options.initialValues === "string" &&
+                        self.options.initialValues !== ""
+                    ) {
+                        // if default selection value starts with a '{', then treat the value as
+                        // a JSON object that needs to be parsed
+                        if (self.options.initialValues[0] === "{") {
+                            seldefaults = JSON.parse(
+                                self.options.initialValues
+                            );
+                        }
+                        // otherwise, treat the value as a list, separated by the defaults.separator value of
+                        // strings in the format "id:text", and convert it to an object
+                        else {
+                            seldefaults = {};
+                            $(
+                                self.options.initialValues.split(
+                                    self.options.separator
+                                )
+                            ).each(function () {
+                                var selection = this.split(":");
+                                var id = $.trim(selection[0]);
+                                var text = $.trim(selection[1]);
+                                seldefaults[id] = text;
+                            });
+                        }
+                    }
 
-          // Create the initSelection value that contains the default selection,
-          // but in a javascript object
-          if (typeof(self.options.initialValues) === 'string' && self.options.initialValues !== '') {
-            // if default selection value starts with a '{', then treat the value as
-            // a JSON object that needs to be parsed
-            if (self.options.initialValues[0] === '{') {
-              seldefaults = JSON.parse(self.options.initialValues);
+                    $(value.split(self.options.separator)).each(function () {
+                        var text = this;
+                        if (seldefaults[this]) {
+                            text = seldefaults[this];
+                        }
+                        data.push({
+                            id: utils.removeHTML(this),
+                            text: utils.removeHTML(text),
+                        });
+                    });
+                    callback(data);
+                };
             }
-            // otherwise, treat the value as a list, separated by the defaults.separator value of
-            // strings in the format "id:text", and convert it to an object
-            else {
-              seldefaults = {};
-              $(self.options.initialValues.split(self.options.separator)).each(function() {
-                var selection = this.split(':');
-                var id = $.trim(selection[0]);
-                var text = $.trim(selection[1]);
-                seldefaults[id] = text;
-              });
-            }
-          }
-
-          $(value.split(self.options.separator)).each(function() {
-            var text = this;
-            if (seldefaults[this]) {
-              text = seldefaults[this];
-            }
-            data.push({id: utils.removeHTML(this), text: utils.removeHTML(text)});
-          });
-          callback(data);
-        };
-      }
-    },
-    initializeTags: function() {
-      var self = this;
-      if (self.options.tags && typeof(self.options.tags) === 'string') {
-        if (self.options.tags.substr(0, 1) === '[') {
-          self.options.tags = JSON.parse(self.options.tags);
-        } else {
-          self.options.tags = self.options.tags.split(self.options.separator);
-        }
-      }
-
-      if (self.options.tags && !self.options.allowNewItems) {
-        self.options.data = $.map (self.options.tags, function (value, i) {
-          return { id: value, text: value };
-        });
-        self.options.multiple = true;
-        delete self.options.tags;
-      }
-    },
-    initializeOrdering: function() {
-      var self = this;
-      if (self.options.orderable) {
-        var formatSelection = function(data, $container) {
-          return data ? data.text : undefined;
-        };
-        if (self.options.formatSelection) {
-          formatSelection = self.options.formatSelection;
-        }
-
-        self.options.formatSelection = function(data, $container) {
-          $container.parents('li')
-            .drag('start', function(e, dd) {
-              $(this).addClass('select2-choice-dragging');
-              self.$el.select2('onSortStart');
-              $.drop({
-                tolerance: function(event, proxy, target) {
-                  var test = event.pageY > (target.top + target.height / 2);
-                  $.data(target.elem, 'drop+reorder', test ? 'insertAfter' : 'insertBefore' );
-                  return this.contains(target, [event.pageX, event.pageY]);
+        },
+        initializeTags: function () {
+            var self = this;
+            if (self.options.tags && typeof self.options.tags === "string") {
+                if (self.options.tags.substr(0, 1) === "[") {
+                    self.options.tags = JSON.parse(self.options.tags);
+                } else {
+                    self.options.tags = self.options.tags.split(
+                        self.options.separator
+                    );
                 }
-              });
-              return $( this ).clone().
-                addClass('dragging').
-                css({opacity: 0.75, position: 'absolute'}).
-                appendTo(document.body);
-            })
-            .drag(function(e, dd) {
-              /*jshint eqeqeq:false */
-              $( dd.proxy ).css({
-                top: dd.offsetY,
-                left: dd.offsetX
-              });
-              var drop = dd.drop[0],
-                  method = $.data(drop || {}, 'drop+reorder');
-
-              /* XXX Cannot use triple equals here */
-              if (drop && (drop != dd.current || method != dd.method)) {
-                $(this)[method](drop);
-                dd.current = drop;
-                dd.method = method;
-                dd.update();
-              }
-            })
-            .drag('end', function(e, dd) {
-              $(this).removeClass('select2-choice-dragging');
-              self.$el.select2('onSortEnd');
-              $( dd.proxy ).remove();
-            })
-            .drop('init', function(e, dd ) {
-              /*jshint eqeqeq:false */
-              /* XXX Cannot use triple equals here */
-              return (this == dd.drag) ? false: true;
-            });
-          return formatSelection(data, $container);
-        };
-      }
-    },
-    initializeSelect2: function() {
-      var self = this;
-      self.options.formatResultCssClass = function(ob){
-        if(ob.id){
-          return 'select2-option-' + ob.id.toLowerCase().replace(/[ \:\)\(\[\]\{\}\_\+\=\&\*\%\#]/g, '-');
-        }
-      };
-
-      function callback(action, e) {
-        if (!!action) {
-          if (self.options.debug) {
-            console.debug('callback', action, e)
-          }
-          if (typeof action === 'string') {
-            action = window[action];
-          }
-          return action(e);
-        } else {
-          return action;
-        }
-      }
-
-      self.$el.select2(self.options);
-      self.$el.on('select2-selected', function(e) {
-          callback(self.options.onSelected, e);
-      });
-      self.$el.on('select2-selecting', function(e) {
-          callback(self.options.onSelecting, e);
-      });
-      self.$el.on('select2-deselecting', function(e) {
-          callback(self.options.onDeselecting, e);
-      });
-      self.$el.on('select2-deselected', function(e) {
-          callback(self.options.onDeselected, e);
-      });
-      self.$select2 = self.$el.parent().find('.select2-container');
-      self.$el.parent().off('close.plone-modal.patterns');
-      if (self.options.orderable) {
-        self.$select2.addClass('select2-orderable');
-      }
-    },
-    opened: function () {
-      var self = this;
-      var isOpen = $('.select2-dropdown-open', self.$el.parent()).length === 1;
-      return isOpen;
-    },
-    init: function() {
-      var self = this;
-
-      self.options.allowNewItems = self.options.hasOwnProperty ('allowNewItems') ?
-            JSON.parse(self.options.allowNewItems) : true;
-
-      if (self.options.ajax || self.options.vocabularyUrl) {
-        if (self.options.vocabularyUrl) {
-          self.options.multiple = self.options.multiple === undefined ? true : self.options.multiple;
-          self.options.ajax = self.options.ajax || {};
-          self.options.ajax.url = self.options.vocabularyUrl;
-          // XXX removing the following function does'nt break tests. dead code?
-          self.options.initSelection = function ($el, callback) {
-            var data = [], value = $el.val();
-            $(value.split(self.options.separator)).each(function () {
-              var val = utils.removeHTML(this);
-              data.push({id: val, text: val});
-            });
-            callback(data);
-          };
-        }
-
-        var queryTerm = '';
-        self.options.ajax = $.extend({
-          quietMillis: 300,
-          data: function (term, page) {
-            queryTerm = term;
-            return {
-              query: term,
-              'page_limit': 10,
-              page: page
-            };
-          },
-          results: function (data, page) {
-            var results = data.results;
-            if (self.options.vocabularyUrl) {
-              var dataIds = [];
-              $.each(data.results, function(i, item) {
-                dataIds.push(item.id);
-              });
-              results = [];
-
-              var haveResult = queryTerm === '' || $.inArray(queryTerm, dataIds) >= 0;
-              if (self.options.allowNewItems && !haveResult) {
-                queryTerm = utils.removeHTML(queryTerm);
-                results.push({id: queryTerm, text: queryTerm});
-              }
-
-              $.each(data.results, function(i, item) {
-                results.push(item);
-              });
             }
-            return { results: results };
-          }
-        }, self.options.ajax);
-      } else if (self.options.multiple && self.$el.is('select')) {
-        // Multiselects need to be converted to input[type=hidden]
-        // for Select2
-        var vals = self.$el.val() || [];
-        var options = $.map(self.$el.find('option'), function (o) { return {text: $(o).html(), id: o.value}; });
-        var $hidden = $('<input type="hidden" />');
-        $hidden.val(vals.join(self.options.separator));
-        $hidden.attr('class', self.$el.attr('class'));
-        $hidden.attr('name', self.$el.attr('name'));
-        $hidden.attr('id', self.$el.attr('id'));
-        self.$orig = self.$el;
-        self.$el.replaceWith($hidden);
-        self.$el = $hidden;
-        self.options.data = options;
-      }
 
-      self.initializeValues();
-      self.initializeTags();
-      self.initializeOrdering();
-      self.initializeSelect2();
-    }
-  });
+            if (self.options.tags && !self.options.allowNewItems) {
+                self.options.data = $.map(self.options.tags, function (
+                    value,
+                    i
+                ) {
+                    return { id: value, text: value };
+                });
+                self.options.multiple = true;
+                delete self.options.tags;
+            }
+        },
+        initializeOrdering: function () {
+            var self = this;
+            if (!self.options.orderable) {
+                return;
+            }
+            this.$el.on(
+                "change",
+                function (e) {
+                    var sortable_el = this.$select2[0].querySelector(
+                        ".select2-choices"
+                    );
+                    var sortable = new Sortable(sortable_el, {
+                        draggable: "li",
+                        dragClass: "select2-choice-dragging",
+                        chosenClass: "dragging",
+                        onStart: function (e) {
+                            self.$el.select2("onSortStart");
+                        }.bind(this),
+                        onEnd: function (e) {
+                            this.$el.select2("onSortEnd");
+                        }.bind(this),
+                    });
+                }.bind(this)
+            );
+        },
+        initializeSelect2: function () {
+            var self = this;
+            self.options.formatResultCssClass = function (ob) {
+                if (ob.id) {
+                    return (
+                        "select2-option-" +
+                        ob.id
+                            .toLowerCase()
+                            .replace(/[ \:\)\(\[\]\{\}\_\+\=\&\*\%\#]/g, "-")
+                    );
+                }
+            };
 
-  return Select2;
+            function callback(action, e) {
+                if (action) {
+                    if (self.options.debug) {
+                        console.debug("callback", action, e);
+                    }
+                    if (typeof action === "string") {
+                        action = window[action];
+                    }
+                    return action(e);
+                } else {
+                    return action;
+                }
+            }
 
+            self.$el.select2(self.options);
+            self.$el.on("select2-selected", function (e) {
+                callback(self.options.onSelected, e);
+            });
+            self.$el.on("select2-selecting", function (e) {
+                callback(self.options.onSelecting, e);
+            });
+            self.$el.on("select2-deselecting", function (e) {
+                callback(self.options.onDeselecting, e);
+            });
+            self.$el.on("select2-deselected", function (e) {
+                callback(self.options.onDeselected, e);
+            });
+            self.$select2 = self.$el.parent().find(".select2-container");
+            self.$el.parent().off("close.plone-modal.patterns");
+            if (self.options.orderable) {
+                self.$select2.addClass("select2-orderable");
+            }
+        },
+        opened: function () {
+            var self = this;
+            var isOpen =
+                $(".select2-dropdown-open", self.$el.parent()).length === 1;
+            return isOpen;
+        },
+        init: function () {
+            var self = this;
+
+            self.options.allowNewItems = self.options.hasOwnProperty(
+                "allowNewItems"
+            )
+                ? JSON.parse(self.options.allowNewItems)
+                : true;
+
+            if (self.options.ajax || self.options.vocabularyUrl) {
+                if (self.options.vocabularyUrl) {
+                    self.options.multiple =
+                        self.options.multiple === undefined
+                            ? true
+                            : self.options.multiple;
+                    self.options.ajax = self.options.ajax || {};
+                    self.options.ajax.url = self.options.vocabularyUrl;
+                    // XXX removing the following function does'nt break tests. dead code?
+                    self.options.initSelection = function ($el, callback) {
+                        var data = [],
+                            value = $el.val();
+                        $(value.split(self.options.separator)).each(
+                            function () {
+                                var val = utils.removeHTML(this);
+                                data.push({ id: val, text: val });
+                            }
+                        );
+                        callback(data);
+                    };
+                }
+
+                var queryTerm = "";
+                self.options.ajax = $.extend(
+                    {
+                        quietMillis: 300,
+                        data: function (term, page) {
+                            queryTerm = term;
+                            return {
+                                query: term,
+                                page_limit: 10,
+                                page: page,
+                            };
+                        },
+                        results: function (data, page) {
+                            var results = data.results;
+                            if (self.options.vocabularyUrl) {
+                                var dataIds = [];
+                                $.each(data.results, function (i, item) {
+                                    dataIds.push(item.id);
+                                });
+                                results = [];
+
+                                var haveResult =
+                                    queryTerm === "" ||
+                                    $.inArray(queryTerm, dataIds) >= 0;
+                                if (self.options.allowNewItems && !haveResult) {
+                                    queryTerm = utils.removeHTML(queryTerm);
+                                    results.push({
+                                        id: queryTerm,
+                                        text: queryTerm,
+                                    });
+                                }
+
+                                $.each(data.results, function (i, item) {
+                                    results.push(item);
+                                });
+                            }
+                            return { results: results };
+                        },
+                    },
+                    self.options.ajax
+                );
+            } else if (self.options.multiple && self.$el.is("select")) {
+                // Multiselects need to be converted to input[type=hidden]
+                // for Select2
+                var vals = self.$el.val() || [];
+                var options = $.map(self.$el.find("option"), function (o) {
+                    return { text: $(o).html(), id: o.value };
+                });
+                var $hidden = $('<input type="hidden" />');
+                $hidden.val(vals.join(self.options.separator));
+                $hidden.attr("class", self.$el.attr("class"));
+                $hidden.attr("name", self.$el.attr("name"));
+                $hidden.attr("id", self.$el.attr("id"));
+                self.$orig = self.$el;
+                self.$el.replaceWith($hidden);
+                self.$el = $hidden;
+                self.options.data = options;
+            }
+
+            self.initializeValues();
+            self.initializeTags();
+            self.initializeOrdering();
+            self.initializeSelect2();
+        },
+    });
+
+    return Select2;
 });
 
 define('mockup-patterns-resourceregistry-url/js/fields',[
-  'jquery',
-  'underscore',
-  'mockup-ui-url/views/base',
-  'mockup-patterns-sortable',
-  'mockup-patterns-select2',
-  'translate'
-], function($, _, BaseView, Sortable, Select2, _t) {
-  'use strict';
+    "jquery",
+    "underscore",
+    "mockup-ui-url/views/base",
+    "mockup-patterns-sortable",
+    "mockup-patterns-select2",
+    "translate",
+], function ($, _, BaseView, Sortable, Select2, _t) {
+    "use strict";
 
-
-  var ResourceDisplayFieldView = BaseView.extend({
-    tagName: 'div',
-    className: 'form-group',
-    template: _.template(
-      '<label class="col-sm-3 control-label"><%- title %></label>' +
-      '<div class="col-sm-9">' +
-        '<strong><%- value %></strong><br/>' +
-        '<%= description %>' +
-      '</div>'),
-    initialize: function(options) {
-      this.options = options;
-      for (var key in this.options) {
-        this[key] = this.options[key];
-      }
-      if (! this.value) {
-        this.template = _.template('');
-      }
-    },
-    serializedModel: function(){
-    },
-    afterRender: function(){
-      this.$el.addClass('field-' + this.options.name);
-    }
-
-  });
-
-  var ResourceInputFieldView = BaseView.extend({
-    tagName: 'div',
-    className: 'form-group',
-    events: {
-      'change input': 'inputChanged',
-      'keyup input': 'textChanged'
-    },
-    template: _.template(
-      '<label class="col-sm-3 control-label"><%- title %></label>' +
-      '<div class="col-sm-9">' +
-        '<input class="form-control input-sm" name="name" value="<%- value %>" />' +
-        '<%= description %>' +
-      '</div>'),
-    timeout: -1,
-
-    serializedModel: function(){
-      return $.extend({}, {description: ''}, this.options);
-    },
-
-    textChanged: function(){
-      var self = this;
-      if(self.timeout){
-        clearTimeout(self.timeout);
-      }
-      self.timeout = setTimeout(function(){
-        self.inputChanged();
-      }, 200);
-    },
-
-    inputChanged: function(){
-      this.options.registryData[this.options.name] = this.$('input').val();
-      $(document).trigger('resource-data-changed');
-    },
-
-    afterRender: function(){
-      this.$el.addClass('field-' + this.options.name);
-    }
-
-  });
-
-  var VariableFieldView = ResourceInputFieldView.extend({
-    template: _.template(
-      '<div class="col-sm-4">' +
-        '<input class="form-control input-sm field-name" value="<%- name %>" />' +
-      '</div>' +
-      '<div class="col-sm-7">' +
-        '<input class="form-control input-sm field-value" value="<%- value %>" />' +
-      '</div>' +
-      '<div class="col-sm-1">' +
-        '<button class="plone-btn plone-btn-danger plone-btn-xs">Remove</button>' +
-      '</div>'),
-    events: {
-      'change input': 'inputChanged',
-      'keyup input': 'textChanged',
-      'click .plone-btn-danger': 'removeClicked'
-    },
-    removeClicked: function(e){
-      e.preventDefault();
-      this.$el.remove();
-      this.inputChanged();
-    },
-    inputChanged: function(e){
-      if(this.options.onChange){
-        this.options.onChange(e, this);
-      }
-    }
-  });
-
-
-  var PatternFieldView = VariableFieldView.extend({
-    events: {
-      'change input': 'inputChanged',
-      'keyup input': 'textChanged',
-      'change textarea': 'inputChanged',
-      'keyup textarea': 'textChanged',
-      'click .plone-btn-danger': 'removeClicked'
-    },
-    template: _.template(
-      '<div class="col-sm-4">' +
-        '<input class="form-control input-sm field-name" value="<%- name %>" />' +
-      '</div>' +
-      '<div class="col-sm-7">' +
-        '<textarea class="form-control field-value"><%- value %></textarea>' +
-        '<span class="hidden glyphicon glyphicon-remove form-control-feedback"></span>' +
-      '</div>' +
-      '<div class="col-sm-1">' +
-        '<button class="plone-btn plone-btn-danger plone-btn-xs"><%- _t("Remove") %></button>' +
-      '</div>')
-  });
-
-
-  var ResourceBoolFieldView = ResourceInputFieldView.extend({
-    className: 'col-sm-offset-3 col-sm-9',
-    template: _.template(
-      '<div class="checkbox">' +
-        '<label>' +
-          '<input type="checkbox"> <%- title %></label>' +
-      '</div>'),
-    inputChanged: function(){
-      if(this.$('input')[0].checked){
-        this.options.registryData[this.options.name] = true;
-      }else{
-        this.options.registryData[this.options.name] = false;
-      }
-      $(document).trigger('resource-data-changed');
-    },
-    afterRender: function(){
-      ResourceInputFieldView.prototype.afterRender.apply(this);
-      if(this.options.value){
-        this.$('input')[0].checked = true;
-      }
-    }
-  });
-
-
-  var ResourceListFieldView = ResourceInputFieldView.extend({
-    sortable: false,
-    template: _.template(
-      '<label class="col-sm-3 control-label"><%- title %></label>' +
-      '<ul class="col-sm-9 fields list-group" />' +
-      '<button class="plone-btn plone-btn-default add pull-right"><%- _t("Add") %></button>'),
-    events: {
-      'click button.add': 'addRowClicked',
-      'change input': 'inputChanged',
-      'keyup input': 'textChanged',
-      'click button.remove': 'removeItem'
-    },
-
-    initialize: function(options){
-      ResourceInputFieldView.prototype.initialize.apply(this, [options]);
-      if(!this.options.value){
-        this.options.value = [];
-      }
-    },
-
-    inputChanged: function(){
-      var self = this;
-      var data = [];
-      self.$('input').each(function(){
-        data.push($(this).val());
-      });
-      self.options.registryData[self.options.name] = self.options.value = data;
-      $(document).trigger('resource-data-changed');
-    },
-
-    addRowClicked: function(e){
-      var self = this;
-      e.preventDefault();
-      self.options.value.push('');
-      self.render();
-      self.inputChanged();
-    },
-
-    removeItem: function(e){
-      e.preventDefault();
-      var $el = $(e.target).parents('li');
-      var index = $el.index();
-      this.options.value.splice(index, 1);
-      $el.remove();
-      this.inputChanged();
-    },
-
-    afterRender: function(){
-      ResourceInputFieldView.prototype.afterRender.apply(this);
-      var self = this;
-      var $container = self.$('.fields');
-      _.each(self.options.value, function(value){
-        $container.append('<li class="list-group-item"><div class="input-group">' +
-          '<input class="form-control input-sm" value="' + value + '" />' +
-          '<span class="input-group-btn">' +
-            '<button class="plone-btn plone-btn-default remove plone-btn-sm">' + _t('Remove') + '</button></div></li>');
-      });
-
-      if(self.sortable){
-        $container.addClass('pat-sortable');
-        self.dd = new Sortable($container, {
-          selector: 'li',
-          dragClass: 'dragging',
-          drop: function($el, delta) {
-            if (delta !== 0){
-              self.inputChanged();
+    var ResourceDisplayFieldView = BaseView.extend({
+        tagName: "div",
+        className: "form-group",
+        template: _.template(
+            '<label class="col-sm-3 control-label"><%- title %></label>' +
+                '<div class="col-sm-9">' +
+                "<strong><%- value %></strong><br/>" +
+                "<%= description %>" +
+                "</div>"
+        ),
+        initialize: function (options) {
+            this.options = options;
+            for (var key in this.options) {
+                this[key] = this.options[key];
             }
-          }
-        });
-      }
-    }
-  });
+            if (!this.value) {
+                this.template = _.template("");
+            }
+        },
+        serializedModel: function () {},
+        afterRender: function () {
+            this.$el.addClass("field-" + this.options.name);
+        },
+    });
 
+    var ResourceInputFieldView = BaseView.extend({
+        tagName: "div",
+        className: "form-group",
+        events: {
+            "change input": "inputChanged",
+            "keyup input": "textChanged",
+        },
+        template: _.template(
+            '<label class="col-sm-3 control-label"><%- title %></label>' +
+                '<div class="col-sm-9">' +
+                '<input class="form-control input-sm" name="name" value="<%- value %>" />' +
+                "<%= description %>" +
+                "</div>"
+        ),
+        timeout: -1,
 
-  var ResourceSortableListFieldView = ResourceListFieldView.extend({
-    sortable: true
-  });
+        serializedModel: function () {
+            return $.extend({}, { description: "" }, this.options);
+        },
 
+        textChanged: function () {
+            var self = this;
+            if (self.timeout) {
+                clearTimeout(self.timeout);
+            }
+            self.timeout = setTimeout(function () {
+                self.inputChanged();
+            }, 200);
+        },
 
-  var ResourceTextAreaFieldView = ResourceInputFieldView.extend({
-    inputChanged: function(){
-      this.options.registryData[this.options.name] = this.options.value = this.$('textarea').val();
-    },
-    template: _.template(
-      '<label class="col-sm-3 control-label"><%- title %></label>' +
-      '<div class="col-sm-9">' +
-        '<textarea class="form-control input-sm" name="name"><%- value %></textarea>' +
-      '</div>')
-  });
+        inputChanged: function () {
+            this.options.registryData[this.options.name] = this.$(
+                "input"
+            ).val();
+            $(document).trigger("resource-data-changed");
+        },
 
+        afterRender: function () {
+            this.$el.addClass("field-" + this.options.name);
+        },
+    });
 
-  var ResourceSelectFieldView = ResourceInputFieldView.extend({
-    events: {
-      'change select': 'inputChanged'
-    },
-    inputChanged: function(){
-      this.options.registryData[this.options.name] = this.options.value = this.$('.select').select2('val');
-      $(document).trigger('resource-data-changed');
-    },
+    var VariableFieldView = ResourceInputFieldView.extend({
+        template: _.template(
+            '<div class="col-sm-4">' +
+                '<input class="form-control input-sm field-name" value="<%- name %>" />' +
+                "</div>" +
+                '<div class="col-sm-7">' +
+                '<input class="form-control input-sm field-value" value="<%- value %>" />' +
+                "</div>" +
+                '<div class="col-sm-1">' +
+                '<button class="plone-btn plone-btn-danger plone-btn-xs">Remove</button>' +
+                "</div>"
+        ),
+        events: {
+            "change input": "inputChanged",
+            "keyup input": "textChanged",
+            "click .plone-btn-danger": "removeClicked",
+        },
+        removeClicked: function (e) {
+            e.preventDefault();
+            this.$el.remove();
+            this.inputChanged();
+        },
+        inputChanged: function (e) {
+            if (this.options.onChange) {
+                this.options.onChange(e, this);
+            }
+        },
+    });
 
-    getSelectOptions: function(){
-      return [];
-    },
+    var PatternFieldView = VariableFieldView.extend({
+        events: {
+            "change input": "inputChanged",
+            "keyup input": "textChanged",
+            "change textarea": "inputChanged",
+            "keyup textarea": "textChanged",
+            "click .plone-btn-danger": "removeClicked",
+        },
+        template: _.template(
+            '<div class="col-sm-4">' +
+                '<input class="form-control input-sm field-name" value="<%- name %>" />' +
+                "</div>" +
+                '<div class="col-sm-7">' +
+                '<textarea class="form-control field-value"><%- value %></textarea>' +
+                '<span class="hidden glyphicon glyphicon-remove form-control-feedback"></span>' +
+                "</div>" +
+                '<div class="col-sm-1">' +
+                '<button class="plone-btn plone-btn-danger plone-btn-xs"><%- _t("Remove") %></button>' +
+                "</div>"
+        ),
+    });
 
-    serializedModel: function(){
-      var self = this;
-      return $.extend({}, {
-        'options': self.getSelectOptions(),
-        'description': ''
-      }, self.options);
-    },
+    var ResourceBoolFieldView = ResourceInputFieldView.extend({
+        className: "col-sm-offset-3 col-sm-9",
+        template: _.template(
+            '<div class="checkbox">' +
+                "<label>" +
+                '<input type="checkbox"> <%- title %></label>' +
+                "</div>"
+        ),
+        inputChanged: function () {
+            if (this.$("input")[0].checked) {
+                this.options.registryData[this.options.name] = true;
+            } else {
+                this.options.registryData[this.options.name] = false;
+            }
+            $(document).trigger("resource-data-changed");
+        },
+        afterRender: function () {
+            ResourceInputFieldView.prototype.afterRender.apply(this);
+            if (this.options.value) {
+                this.$("input")[0].checked = true;
+            }
+        },
+    });
 
-    afterRender: function(){
-      ResourceInputFieldView.prototype.afterRender.apply(this);
-      var self = this;
-      var values = self.options.value;
-      var $select = self.$('.select');
-      self.select2 = new Select2($select, {
-        orderable: self.multiple,
-        multiple: self.multiple,
-        data: _.map(self.getSelectOptions(), function(val){
-          return {id: val, text: val};
-        })
-      });
-      $select.select2('val', values);
-      $select.on('change', function(){
-        self.inputChanged();
-      });
-    },
+    var ResourceListFieldView = ResourceInputFieldView.extend({
+        sortable: false,
+        template: _.template(
+            '<label class="col-sm-3 control-label"><%- title %></label>' +
+                '<ul class="col-sm-9 fields list-group" />' +
+                '<button class="plone-btn plone-btn-default add pull-right"><%- _t("Add") %></button>'
+        ),
+        events: {
+            "click button.add": "addRowClicked",
+            "change input": "inputChanged",
+            "keyup input": "textChanged",
+            "click button.remove": "removeItem",
+        },
 
-    template: _.template(
-      '<label class="col-sm-3 control-label"><%- title %></label>' +
-      '<div class="col-sm-9">' +
-        '<input name="name" class="select" type="hidden" style="width: 100%" />' +
-        '<%= description %>' +
-      '</div>')
-  });
+        initialize: function (options) {
+            ResourceInputFieldView.prototype.initialize.apply(this, [options]);
+            if (!this.options.value) {
+                this.options.value = [];
+            }
+        },
 
+        inputChanged: function () {
+            var self = this;
+            var data = [];
+            self.$("input").each(function () {
+                data.push($(this).val());
+            });
+            self.options.registryData[
+                self.options.name
+            ] = self.options.value = data;
+            $(document).trigger("resource-data-changed");
+        },
 
-  var BundleDependsFieldView = ResourceSelectFieldView.extend({
-    getSelectOptions: function(){
-      var self = this;
-      return ['', '*'].concat(_.filter(_.keys(self.options.containerData), function(name){
-        return name !== self.options.name;
-      }));
-    }
-  });
+        addRowClicked: function (e) {
+            var self = this;
+            e.preventDefault();
+            self.options.value.push("");
+            self.render();
+            self.inputChanged();
+        },
 
+        removeItem: function (e) {
+            e.preventDefault();
+            var $el = $(e.target).parents("li");
+            var index = $el.index();
+            this.options.value.splice(index, 1);
+            $el.remove();
+            this.inputChanged();
+        },
 
-  var BundleResourcesFieldView = ResourceSelectFieldView.extend({
-    multiple: true,
-    getSelectOptions: function(){
-      var self = this;
-      return _.sortBy(_.filter(_.keys(self.options.registryView.options.data.resources), function(name){
-        return name !== self.options.name;
-      }), function(item){
-        return item.toLowerCase();
-      });
-    }
-  });
+        afterRender: function () {
+            ResourceInputFieldView.prototype.afterRender.apply(this);
+            var self = this;
+            var $container = self.$(".fields");
+            _.each(self.options.value, function (value) {
+                $container.append(
+                    '<li class="list-group-item"><div class="input-group">' +
+                        '<input class="form-control input-sm" value="' +
+                        value +
+                        '" />' +
+                        '<span class="input-group-btn">' +
+                        '<button class="plone-btn plone-btn-default remove plone-btn-sm">' +
+                        _t("Remove") +
+                        "</button></div></li>"
+                );
+            });
 
+            if (self.sortable) {
+                $container.addClass("pat-sortable");
+                self.dd = new Sortable($container, {
+                    selector: "li",
+                    dragClass: "dragging",
+                    drop: function ($el, delta) {
+                        if (delta !== 0) {
+                            self.inputChanged();
+                        }
+                    },
+                });
+            }
+        },
+    });
 
-  var ResourceNameFieldView = ResourceInputFieldView.extend({
-    afterRender: function(){
-      ResourceInputFieldView.prototype.afterRender.apply(this);
-      this.$el.append('<span class="hidden glyphicon glyphicon-remove form-control-feedback"></span>');
-    },
+    var ResourceSortableListFieldView = ResourceListFieldView.extend({
+        sortable: true,
+    });
 
-    handleError: function(error){
-      if(error){
-        this.$el.addClass('has-error').addClass('has-feedback');
-        this.$('.form-control-feedback').removeClass('hidden');
-      }else{
-        this.$el.removeClass('has-error').removeClass('has-feedback');
-        this.$('.form-control-feedback').addClass('hidden');
-      }
-    },
+    var ResourceTextAreaFieldView = ResourceInputFieldView.extend({
+        inputChanged: function () {
+            this.options.registryData[
+                this.options.name
+            ] = this.options.value = this.$("textarea").val();
+        },
+        template: _.template(
+            '<label class="col-sm-3 control-label"><%- title %></label>' +
+                '<div class="col-sm-9">' +
+                '<textarea class="form-control input-sm" name="name"><%- value %></textarea>' +
+                "</div>"
+        ),
+    });
 
-    inputChanged: function(){
-      $(document).trigger('resource-data-changed');
-      var value = this.$('input').val();
-      if(value === this.resourceName){
-        return this.handleError(false);
-      }
-      if(this.options.containerData[value] || !value){
-        // already taken
-        return this.handleError(true);
-      }
-      // move data
-      var data = this.options.containerData[this.resourceName];
-      this.options.containerData[value] = data;
+    var ResourceSelectFieldView = ResourceInputFieldView.extend({
+        events: {
+            "change select": "inputChanged",
+        },
+        inputChanged: function () {
+            this.options.registryData[
+                this.options.name
+            ] = this.options.value = this.$(".select").select2("val");
+            $(document).trigger("resource-data-changed");
+        },
 
-      if(this.resourceName !== value){
-        // and now delete old
-        delete this.options.containerData[this.resourceName];
-      }
-      this.resourceName = this.options.value = this.options.form.options.name = this.options.form.name = value;
+        getSelectOptions: function () {
+            return [];
+        },
 
-      if(this.options.parent){
-        this.options.parent.options.name = value;
-        this.options.parent.render();
-      }
-      if(this.options.form){
-        this.options.form.$('h3').html(value);
-      }
-      return this.handleError(false);
-    },
-    serializedModel: function(){
-      var data = $.extend({}, {
-        description: ''
-      }, this.options);
-      data.value = this.options.resourceName;
-      return data;
-    }
-  });
+        serializedModel: function () {
+            var self = this;
+            return $.extend(
+                {},
+                {
+                    options: self.getSelectOptions(),
+                    description: "",
+                },
+                self.options
+            );
+        },
 
+        afterRender: function () {
+            ResourceInputFieldView.prototype.afterRender.apply(this);
+            var self = this;
+            var values = self.options.value;
+            var $select = self.$(".select");
+            self.select2 = new Select2($select, {
+                orderable: self.multiple,
+                multiple: self.multiple,
+                data: _.map(self.getSelectOptions(), function (val) {
+                    return { id: val, text: val };
+                }),
+            });
+            $select.select2("val", values);
+            $select.on("change", function () {
+                self.inputChanged();
+            });
+        },
 
-  var MergeWithFieldView = ResourceSelectFieldView.extend({
-    multiple: false,
-    getSelectOptions: function() {
-      var self = this;
-      return ['', 'default', 'logged-in'];
-    }
-  });
+        template: _.template(
+            '<label class="col-sm-3 control-label"><%- title %></label>' +
+                '<div class="col-sm-9">' +
+                '<input name="name" class="select" type="hidden" style="width: 100%" />' +
+                "<%= description %>" +
+                "</div>"
+        ),
+    });
 
+    var BundleDependsFieldView = ResourceSelectFieldView.extend({
+        getSelectOptions: function () {
+            var self = this;
+            return ["", "*"].concat(
+                _.filter(_.keys(self.options.containerData), function (name) {
+                    return name !== self.options.name;
+                })
+            );
+        },
+    });
 
-  return {
-    ResourceDisplayFieldView: ResourceDisplayFieldView,
-    VariableFieldView: VariableFieldView,
-    ResourceInputFieldView: ResourceInputFieldView,
-    ResourceNameFieldView: ResourceNameFieldView,
-    ResourceSortableListFieldView: ResourceSortableListFieldView,
-    ResourceTextAreaFieldView: ResourceTextAreaFieldView,
-    BundleResourcesFieldView: BundleResourcesFieldView,
-    BundleDependsFieldView: BundleDependsFieldView,
-    ResourceBoolFieldView: ResourceBoolFieldView,
-    PatternFieldView: PatternFieldView,
-    MergeWithFieldView: MergeWithFieldView
-  };
+    var BundleResourcesFieldView = ResourceSelectFieldView.extend({
+        multiple: true,
+        getSelectOptions: function () {
+            var self = this;
+            return _.sortBy(
+                _.filter(
+                    _.keys(self.options.registryView.options.data.resources),
+                    function (name) {
+                        return name !== self.options.name;
+                    }
+                ),
+                function (item) {
+                    return item.toLowerCase();
+                }
+            );
+        },
+    });
+
+    var ResourceNameFieldView = ResourceInputFieldView.extend({
+        afterRender: function () {
+            ResourceInputFieldView.prototype.afterRender.apply(this);
+            this.$el.append(
+                '<span class="hidden glyphicon glyphicon-remove form-control-feedback"></span>'
+            );
+        },
+
+        handleError: function (error) {
+            if (error) {
+                this.$el.addClass("has-error").addClass("has-feedback");
+                this.$(".form-control-feedback").removeClass("hidden");
+            } else {
+                this.$el.removeClass("has-error").removeClass("has-feedback");
+                this.$(".form-control-feedback").addClass("hidden");
+            }
+        },
+
+        inputChanged: function () {
+            $(document).trigger("resource-data-changed");
+            var value = this.$("input").val();
+            if (value === this.resourceName) {
+                return this.handleError(false);
+            }
+            if (this.options.containerData[value] || !value) {
+                // already taken
+                return this.handleError(true);
+            }
+            // move data
+            var data = this.options.containerData[this.resourceName];
+            this.options.containerData[value] = data;
+
+            if (this.resourceName !== value) {
+                // and now delete old
+                delete this.options.containerData[this.resourceName];
+            }
+            this.resourceName = this.options.value = this.options.form.options.name = this.options.form.name = value;
+
+            if (this.options.parent) {
+                this.options.parent.options.name = value;
+                this.options.parent.render();
+            }
+            if (this.options.form) {
+                this.options.form.$("h3").html(value);
+            }
+            return this.handleError(false);
+        },
+        serializedModel: function () {
+            var data = $.extend(
+                {},
+                {
+                    description: "",
+                },
+                this.options
+            );
+            data.value = this.options.resourceName;
+            return data;
+        },
+    });
+
+    var MergeWithFieldView = ResourceSelectFieldView.extend({
+        multiple: false,
+        getSelectOptions: function () {
+            var self = this;
+            return ["", "default", "logged-in"];
+        },
+    });
+
+    return {
+        ResourceDisplayFieldView: ResourceDisplayFieldView,
+        VariableFieldView: VariableFieldView,
+        ResourceInputFieldView: ResourceInputFieldView,
+        ResourceNameFieldView: ResourceNameFieldView,
+        ResourceSortableListFieldView: ResourceSortableListFieldView,
+        ResourceTextAreaFieldView: ResourceTextAreaFieldView,
+        BundleResourcesFieldView: BundleResourcesFieldView,
+        BundleDependsFieldView: BundleDependsFieldView,
+        ResourceBoolFieldView: ResourceBoolFieldView,
+        PatternFieldView: PatternFieldView,
+        MergeWithFieldView: MergeWithFieldView,
+    };
 });
 
 define('mockup-patterns-resourceregistry-url/js/less',[
-  'jquery',
-  'mockup-ui-url/views/base',
-  'underscore',
-  'mockup-utils',
-  'mockup-patterns-resourceregistry-url/js/fields',
-], function($, BaseView, _, utils, fields) {
-  'use strict';
+    "jquery",
+    "mockup-ui-url/views/base",
+    "underscore",
+    "mockup-utils",
+    "mockup-patterns-resourceregistry-url/js/fields",
+], function ($, BaseView, _, utils, fields) {
+    "use strict";
 
-  var LessVariablesView = BaseView.extend({
-    tagName: 'div',
-    className: 'tab-pane lessvariables',
-    template: _.template(
-      '<div class="buttons-container">' +
-        '<div class="btn-group pull-right">' +
-          '<button class="plone-btn plone-btn-default add-variable"><%- _t("Add variable") %></button>' +
-          '<button class="plone-btn plone-btn-primary save"><%- _t("Save") %></button>' +
-        '</div>' +
-      '</div>' +
-      '<div class="row clearfix">' +
-        '<div class="form col-md-12"></div></div>'),
-    events: {
-      'click .plone-btn.save': 'saveClicked',
-      'click .plone-btn.add-variable': 'addVariable'
-    },
+    var LessVariablesView = BaseView.extend({
+        tagName: "div",
+        className: "tab-pane lessvariables",
+        template: _.template(
+            '<div class="buttons-container">' +
+                '<div class="btn-group pull-right">' +
+                '<button class="plone-btn plone-btn-default add-variable"><%- _t("Add variable") %></button>' +
+                '<button class="plone-btn plone-btn-primary save"><%- _t("Save") %></button>' +
+                "</div>" +
+                "</div>" +
+                '<div class="row clearfix">' +
+                '<div class="form col-md-12"></div></div>'
+        ),
+        events: {
+            "click .plone-btn.save": "saveClicked",
+            "click .plone-btn.add-variable": "addVariable",
+        },
 
-    initialize: function(options){
-      BaseView.prototype.initialize.apply(this, [options]);
-      this.loading = this.options.tabView.loading;
-    },
+        initialize: function (options) {
+            BaseView.prototype.initialize.apply(this, [options]);
+            this.loading = this.options.tabView.loading;
+        },
 
-    saveClicked: function(e){
-      e.preventDefault();
-      var self = this;
-      self.options.tabView.saveData('save-less-variables', {
-        data: JSON.stringify(self.options.data.lessvariables)
-      });
-    },
+        saveClicked: function (e) {
+            e.preventDefault();
+            var self = this;
+            self.options.tabView.saveData("save-less-variables", {
+                data: JSON.stringify(self.options.data.lessvariables),
+            });
+        },
 
-    addVariable: function(e){
-      e.preventDefault();
-      var self = this;
-      self.options.data.lessvariables[utils.generateId('new-variable-')] = '';
-      self.render();
-    },
+        addVariable: function (e) {
+            e.preventDefault();
+            var self = this;
+            self.options.data.lessvariables[utils.generateId("new-variable-")] =
+                "";
+            self.render();
+        },
 
-    inputChanged: function(){
-      var self = this;
-      var data = {};
-      self.$('.form-group').each(function(){
-        data[$(this).find('.field-name').val()] = $(this).find('.field-value').val();
-      });
-     self.options.data.lessvariables = data;
-    },
+        inputChanged: function () {
+            var self = this;
+            var data = {};
+            self.$(".form-group").each(function () {
+                data[$(this).find(".field-name").val()] = $(this)
+                    .find(".field-value")
+                    .val();
+            });
+            self.options.data.lessvariables = data;
+        },
 
-    afterRender: function(){
-      var self = this;
-      var settings = self.options.data.lessvariables;
-      var $form = self.$('.form');
-      _.each(_.keys(settings), function(name){
-        $form.append((new fields.VariableFieldView({
-          registryData: settings,
-          title: name,
-          name: name,
-          value: settings[name],
-          onChange: function(){
-            self.inputChanged();
-          }
-         }).render().el));
-      });
-    }
-  });
+        afterRender: function () {
+            var self = this;
+            var settings = self.options.data.lessvariables;
+            var $form = self.$(".form");
+            _.each(_.keys(settings), function (name) {
+                $form.append(
+                    new fields.VariableFieldView({
+                        registryData: settings,
+                        title: name,
+                        name: name,
+                        value: settings[name],
+                        onChange: function () {
+                            self.inputChanged();
+                        },
+                    }).render().el
+                );
+            });
+        },
+    });
 
-  return LessVariablesView;
-
+    return LessVariablesView;
 });
 
 (function(root) {
@@ -30420,321 +29833,374 @@ exports.version = "1.2.6";
  *
  */
 
+define('mockup-patterns-texteditor',["jquery", "pat-base", "mockup-utils", "ace"], function (
+    $,
+    Base,
+    utils
+) {
+    "use strict";
 
-define('mockup-patterns-texteditor',[
-  'jquery',
-  'pat-base',
-  'mockup-utils',
-  'ace',
-], function($, Base, utils) {
-  'use strict';
+    var AcePattern = Base.extend({
+        name: "texteditor",
+        trigger: ".pat-texteditor",
+        parser: "mockup",
+        defaults: {
+            theme: null,
+            mode: "text",
+            width: 500,
+            height: 200,
+            tabSize: 4,
+            softTabs: true,
+            wrapMode: false,
+            showGutter: true,
+            showPrintMargin: false,
+            readOnly: false,
+        },
+        init: function () {
+            var self = this;
+            if (!window.ace) {
+                // XXX hack...
+                // wait, try loading later
+                setTimeout(function () {
+                    self.init();
+                }, 200);
+                return;
+            }
+            var ace = window.ace;
 
-  var AcePattern = Base.extend({
-    name: 'texteditor',
-    trigger: '.pat-texteditor',
-    parser: 'mockup',
-    defaults: {
-      theme: null,
-      mode: 'text',
-      width: 500,
-      height: 200,
-      tabSize: 4,
-      softTabs: true,
-      wrapMode: false,
-      showGutter: true,
-      showPrintMargin: false,
-      readOnly: false
-    },
-    init: function() {
-      var self = this;
-      if (!window.ace){
-        // XXX hack...
-        // wait, try loading later
-        setTimeout(function() {
-          self.init();
-        }, 200);
-        return;
-      }
-      var ace = window.ace;
+            ace.config.set("packaged", true);
+            ace.config.set(
+                "basePath",
+                "++plone++static/components/ace-builds/src/"
+            );
 
-      ace.config.set("packaged", true);
-      ace.config.set("basePath", "++plone++static/components/ace-builds/src/");
+            // set id on current element
+            var id = utils.setId(self.$el);
+            self.$wrapper = $('<div class="editorWrapper" />').css({
+                height: parseInt(self.options.height) + 25, // weird sizing issue here...
+                width: self.options.width,
+                position: "relative",
+            });
+            if (!self.$el.parent().hasClass("editorWrapper")) {
+                self.$el.wrap(self.$wrapper);
+            }
+            self.$el.css({
+                width: self.options.width,
+                height: self.options.height,
+                position: "absolute",
+            });
 
-      // set id on current element
-      var id = utils.setId(self.$el);
-      self.$wrapper = $('<div class="editorWrapper" />').css({
-        height: parseInt(self.options.height) + 25, // weird sizing issue here...
-        width: self.options.width,
-        position: 'relative'
-      });
-      if( !self.$el.parent().hasClass('editorWrapper') ) {
-          self.$el.wrap(self.$wrapper);
-      }
-      self.$el.css({
-        width: self.options.width,
-        height: self.options.height,
-        position: 'absolute'
-      });
+            self.editor = ace.edit(id);
+            if (self.options.theme) {
+                self.setTheme(self.options.theme);
+            }
+            self.editor.getSession().setMode("ace/mode/" + self.options.mode);
+            self.editor
+                .getSession()
+                .setTabSize(parseInt(self.options.tabSize, 10));
+            self.editor
+                .getSession()
+                .setUseSoftTabs(utils.bool(self.options.softTabs));
+            self.editor
+                .getSession()
+                .setUseWrapMode(utils.bool(self.options.wrapMode));
+            self.editor.renderer.setShowGutter(
+                utils.bool(self.options.showGutter)
+            );
+            self.editor.setShowPrintMargin(
+                utils.bool(self.options.showPrintMargin)
+            );
+            self.editor.setReadOnly(utils.bool(self.options.readOnly));
+        },
+        setSyntax: function (name) {
+            var self = this;
+            var modes = {
+                js: "javascript",
+                txt: "text",
+                css: "css",
+                html: "html",
+                xml: "xml",
+                less: "less",
+                py: "python",
+                pt: "xml",
+                cfg: "ini",
+            };
 
-      self.editor = ace.edit(id);
-      if (self.options.theme) {
-        self.setTheme(self.options.theme);
-      }
-      self.editor.getSession().setMode('ace/mode/' + self.options.mode);
-      self.editor.getSession().setTabSize(parseInt(self.options.tabSize, 10));
-      self.editor.getSession().setUseSoftTabs(utils.bool(self.options.softTabs));
-      self.editor.getSession().setUseWrapMode(utils.bool(self.options.wrapMode));
-      self.editor.renderer.setShowGutter(utils.bool(self.options.showGutter));
-      self.editor.setShowPrintMargin(utils.bool(self.options.showPrintMargin));
-      self.editor.setReadOnly(utils.bool(self.options.readOnly));
-    },
-    setSyntax: function(name)
-    {
-      var self = this;
-      var modes = {
-        'js': 'javascript',
-        'txt': 'text',
-        'css': 'css',
-        'html': 'html',
-        'xml': 'xml',
-        'less': 'less',
-        'py': 'python',
-        'pt': 'xml',
-        'cfg': 'ini'
-      };
+            var extension = name.substr(name.lastIndexOf(".") + 1);
+            var mode = modes[extension];
 
-      var extension = name.substr(name.lastIndexOf('.') + 1);
-      var mode = modes[extension];
+            if (mode !== undefined) {
+                self.editor.getSession().setMode("ace/mode/" + mode);
+                return true;
+            }
+        },
+        setTheme: function (theme) {
+            var self = this;
+            self.editor.setTheme("ace/theme/" + theme);
+        },
+        setText: function (data) {
+            var self = this;
+            if (self.editor) {
+                self.editor.setValue(data);
+            }
+        },
+    });
 
-      if (mode !== undefined){
-        self.editor.getSession().setMode('ace/mode/' + mode);
-        return true;
-      }
-    },
-    setTheme: function(theme) {
-      var self = this;
-      self.editor.setTheme('ace/theme/' + theme);
-    },
-    setText: function(data) {
-      var self = this;
-      if(self.editor){
-        self.editor.setValue(data);
-      }
-    }
-  });
-
-  return AcePattern;
-
+    return AcePattern;
 });
 
 define('mockup-patterns-resourceregistry-url/js/overrides',[
-  'jquery',
-  'underscore',
-  'mockup-ui-url/views/base',
-  'mockup-patterns-texteditor',
-  'mockup-utils',
-  'mockup-patterns-select2',
-  'translate'
-], function($, _, BaseView, TextEditor, utils, Select2, _t) {
-  'use strict';
+    "jquery",
+    "underscore",
+    "mockup-ui-url/views/base",
+    "mockup-patterns-texteditor",
+    "mockup-utils",
+    "mockup-patterns-select2",
+    "translate",
+], function ($, _, BaseView, TextEditor, utils, Select2, _t) {
+    "use strict";
 
-  var OverridesView = BaseView.extend({
-    tagName: 'div',
-    className: 'tab-pane overrides',
-    editing: null,
-    canSave: false,
-    newFile: false,
+    var OverridesView = BaseView.extend({
+        tagName: "div",
+        className: "tab-pane overrides",
+        editing: null,
+        canSave: false,
+        newFile: false,
 
-    template: _.template(
-      '<div class="buttons-container">' +
-        '<div class="btn-group pull-right">' +
-          '<button class="plone-btn plone-btn-primary add-file"><%- _t("Add file") %></button> ' +
-        '</div>' +
-      '</div>' +
-      '<form class="row">' +
-        '<div class="col-md-12">' +
-          '<p><%- _t("Only ++plone++ resources are available to override") %></p>' +
-          '<input class="select" type="hidden" placeholder="<%- _t("Select resource to override...") %>" style="width: 100%" />' +
-        '</div>' +
-      '</form>' +
-      '<div class="row">' +
-        '<div class="col-md-12 edit-area">' +
-          '<% if(view.editing){ %>' +
-            '<p class="resource-name text-primary"><%- view.editing %></p> ' +
-            '<div class="plone-btn-group">' +
-              '<button class="plone-btn plone-btn-primary plone-btn-xs" disabled><%- _t("Save") %></button> ' +
-              '<button class="plone-btn plone-btn-default plone-btn-xs" disabled><%- _t("Cancel") %></button>' +
-              '<button class="plone-btn plone-btn-danger plone-btn-xs"><%- _t("Delete customizations") %></button>' +
-            '</div>' +
-          '<% } %>' +
-          '<div class="editor" />' +
-        '</div>' +
-      '</div>'),
-    events: {
-      'click .edit-area button.plone-btn-danger': 'itemDeleted',
-      'click .edit-area button.plone-btn-primary': 'itemSaved',
-      'click .edit-area button.plone-btn-default': 'itemCancel',
-      'click .plone-btn.add-file': 'addFile'
-    },
+        template: _.template(
+            '<div class="buttons-container">' +
+                '<div class="btn-group pull-right">' +
+                '<button class="plone-btn plone-btn-primary add-file"><%- _t("Add file") %></button> ' +
+                "</div>" +
+                "</div>" +
+                '<form class="row">' +
+                '<div class="col-md-12">' +
+                '<p><%- _t("Only ++plone++ resources are available to override") %></p>' +
+                '<input class="select" type="hidden" placeholder="<%- _t("Select resource to override...") %>" style="width: 100%" />' +
+                "</div>" +
+                "</form>" +
+                '<div class="row">' +
+                '<div class="col-md-12 edit-area">' +
+                "<% if(view.editing){ %>" +
+                '<p class="resource-name text-primary"><%- view.editing %></p> ' +
+                '<div class="plone-btn-group">' +
+                '<button class="plone-btn plone-btn-primary plone-btn-xs" disabled><%- _t("Save") %></button> ' +
+                '<button class="plone-btn plone-btn-default plone-btn-xs" disabled><%- _t("Cancel") %></button>' +
+                '<button class="plone-btn plone-btn-danger plone-btn-xs"><%- _t("Delete customizations") %></button>' +
+                "</div>" +
+                "<% } %>" +
+                '<div class="editor" />' +
+                "</div>" +
+                "</div>"
+        ),
+        events: {
+            "click .edit-area button.plone-btn-danger": "itemDeleted",
+            "click .edit-area button.plone-btn-primary": "itemSaved",
+            "click .edit-area button.plone-btn-default": "itemCancel",
+            "click .plone-btn.add-file": "addFile",
+        },
 
-    initialize: function(options){
-      BaseView.prototype.initialize.apply(this, [options]);
-      this.tabView = options.tabView;
-    },
+        initialize: function (options) {
+            BaseView.prototype.initialize.apply(this, [options]);
+            this.tabView = options.tabView;
+        },
 
-    serializedModel: function(){
-      return $.extend({}, { view: this }, this.options);
-    },
+        serializedModel: function () {
+            return $.extend({}, { view: this }, this.options);
+        },
 
-    addFile: function(){
-      var resource = window.prompt('Enter full path and filename', '++plone++static/' + _t('you-filename.js'));
-      if(resource.indexOf('++plone++static/') === -1){
-        window.alert(_t('Filename must start with ++plone++static/'));
-      }else{
-        if(this.options.data.overrides.indexOf(resource) === -1){
-          this.options.data.overrides.push(resource);
-        }
-        this.newFile = true;
-        this.editing = resource;
-        this.render();
-      }
-    },
-
-    itemSaved: function(e){
-      e.preventDefault();
-      var that = this;
-      that.tabView.saveData('save-file', {
-        filepath: that.editing,
-        data: that.editor.editor.getValue()
-      }, function(){
-        that.$el.find('.plone-btn-primary,.plone-btn-default').prop('disabled', true);
-      });
-    },
-
-    itemDeleted: function(e){
-      e.preventDefault();
-      var that = this;
-      if(window.confirm('Are you sure you want to delete this override?')){
-        that.options.data.overrides.splice(
-          that.options.data.overrides.indexOf(that.editing), 1);
-        that.tabView.saveData('delete-file', {
-          filepath: that.editing
-        }, function(){
-          that.editing = null;
-          that.render();
-        });
-      }
-    },
-
-    itemCancel: function(e){
-      e.preventDefault();
-      this.editing = null;
-      this.render();
-    },
-
-    customizeResource: function(resource){
-      if(this.options.data.overrides.indexOf(resource) === -1){
-        this.options.data.overrides.push(resource);
-      }
-      this.editing = resource;
-      this.render();
-    },
-
-    afterRender: function(){
-      var that = this;
-      var $select = that.$el.find('.select');
-      var overrides = _.map(that.options.data.overrides, function(override){
-        return {
-          id: override,
-          text: override,
-          override: true
-        };
-      });
-      var resources = _.flatten(_.map(that.options.data.resources, function(resource){
-        var base = resource.url || '';
-        if(base){
-          base += '/';
-        }
-        var items = [];
-        var url;
-        if(resource.js){
-          if(resource.js && resource.js.indexOf('++plone++') !== -1){
-            url = base + resource.js;
-            if(overrides.indexOf(url) === -1){
-              items.push({id: url, text: url});
+        addFile: function () {
+            var resource = window.prompt(
+                "Enter full path and filename",
+                "++plone++static/" + _t("you-filename.js")
+            );
+            if (resource.indexOf("++plone++static/") === -1) {
+                window.alert(_t("Filename must start with ++plone++static/"));
+            } else {
+                if (this.options.data.overrides.indexOf(resource) === -1) {
+                    this.options.data.overrides.push(resource);
+                }
+                this.newFile = true;
+                this.editing = resource;
+                this.render();
             }
-          }
-        }
-        if(resource.css){
-          for(var i=0; i<resource.css.length; i=i+1){
-            url = base + resource.css[i];
-            if(overrides.indexOf(url) === -1 && url.indexOf('++plone++') !== -1){
-              items.push({id: url, text: url});
+        },
+
+        itemSaved: function (e) {
+            e.preventDefault();
+            var that = this;
+            that.tabView.saveData(
+                "save-file",
+                {
+                    filepath: that.editing,
+                    data: that.editor.editor.getValue(),
+                },
+                function () {
+                    that.$el
+                        .find(".plone-btn-primary,.plone-btn-default")
+                        .prop("disabled", true);
+                }
+            );
+        },
+
+        itemDeleted: function (e) {
+            e.preventDefault();
+            var that = this;
+            if (
+                window.confirm("Are you sure you want to delete this override?")
+            ) {
+                that.options.data.overrides.splice(
+                    that.options.data.overrides.indexOf(that.editing),
+                    1
+                );
+                that.tabView.saveData(
+                    "delete-file",
+                    {
+                        filepath: that.editing,
+                    },
+                    function () {
+                        that.editing = null;
+                        that.render();
+                    }
+                );
             }
-          }
-        }
-        return items;
-      }));
+        },
 
-      var format = function(data){
-        if(data.override){
-          return '<span class="customized">' + data.text + ' - ' + _t('customized') + '</span>';
-        }
-        return data.text;
-      };
-      that.select2 = new Select2($select, {
-        data: overrides.concat(_.sortBy(resources, function(d){ return d.id; })),
-        formatResult: format,
-        formatSelection: format
-      });
+        itemCancel: function (e) {
+            e.preventDefault();
+            this.editing = null;
+            this.render();
+        },
 
-      $select.on('change', function(){
-        that.customizeResource($select.select2('val'));
-      });
+        customizeResource: function (resource) {
+            if (this.options.data.overrides.indexOf(resource) === -1) {
+                this.options.data.overrides.push(resource);
+            }
+            this.editing = resource;
+            this.render();
+        },
 
-      that.$editorContainer = that.$('.editor');
-      if(that.editing !== null){
-        var url = that.options.data.baseUrl;
-        if(url[url.length - 1] !== '/'){
-          url += '/';
-        }
-        if(that.newFile){
-          that.showEditor('');
-          that.newFile = false;
-        }else{
-          that.tabView.loading.show();
-          $.ajax({
-            // cache busting url
-            url: url + that.editing + '?' + utils.generateId(),
-            dataType: 'text'
-          }).done(function(data){
-            that.showEditor(data);
-          }).fail(function(){
-            window.alert(_t('error loading resource for editing'));
+        afterRender: function () {
+            var that = this;
+            var $select = that.$el.find(".select");
+            var overrides = _.map(that.options.data.overrides, function (
+                override
+            ) {
+                return {
+                    id: override,
+                    text: override,
+                    override: true,
+                };
+            });
+            var resources = _.flatten(
+                _.map(that.options.data.resources, function (resource) {
+                    var base = resource.url || "";
+                    if (base) {
+                        base += "/";
+                    }
+                    var items = [];
+                    var url;
+                    if (resource.js) {
+                        if (
+                            resource.js &&
+                            resource.js.indexOf("++plone++") !== -1
+                        ) {
+                            url = base + resource.js;
+                            if (overrides.indexOf(url) === -1) {
+                                items.push({ id: url, text: url });
+                            }
+                        }
+                    }
+                    if (resource.css) {
+                        for (var i = 0; i < resource.css.length; i = i + 1) {
+                            url = base + resource.css[i];
+                            if (
+                                overrides.indexOf(url) === -1 &&
+                                url.indexOf("++plone++") !== -1
+                            ) {
+                                items.push({ id: url, text: url });
+                            }
+                        }
+                    }
+                    return items;
+                })
+            );
+
+            var format = function (data) {
+                if (data.override) {
+                    return (
+                        '<span class="customized">' +
+                        data.text +
+                        " - " +
+                        _t("customized") +
+                        "</span>"
+                    );
+                }
+                return data.text;
+            };
+            that.select2 = new Select2($select, {
+                data: overrides.concat(
+                    _.sortBy(resources, function (d) {
+                        return d.id;
+                    })
+                ),
+                formatResult: format,
+                formatSelection: format,
+            });
+
+            $select.on("change", function () {
+                that.customizeResource($select.select2("val"));
+            });
+
+            that.$editorContainer = that.$(".editor");
+            if (that.editing !== null) {
+                var url = that.options.data.baseUrl;
+                if (url[url.length - 1] !== "/") {
+                    url += "/";
+                }
+                if (that.newFile) {
+                    that.showEditor("");
+                    that.newFile = false;
+                } else {
+                    that.tabView.loading.show();
+                    $.ajax({
+                        // cache busting url
+                        url: url + that.editing + "?" + utils.generateId(),
+                        dataType: "text",
+                    })
+                        .done(function (data) {
+                            that.showEditor(data);
+                        })
+                        .fail(function () {
+                            window.alert(
+                                _t("error loading resource for editing")
+                            );
+                            that.tabView.loading.hide();
+                        });
+                }
+            }
+        },
+
+        showEditor: function (data) {
+            var that = this;
+            var $pre = $('<pre class="pat-texteditor" />');
+            $pre.text(data);
+            that.$editorContainer.empty().append($pre);
+            that.editor = new TextEditor($pre, {
+                width: $(".editor").width(),
+                height: 500,
+            });
+            that.editor.setSyntax(that.editing);
             that.tabView.loading.hide();
-          });
-        }
-      }
-    },
+            that.editor.editor.on("change", function () {
+                that.$el
+                    .find(".plone-btn-primary,.plone-btn-default")
+                    .prop("disabled", false);
+            });
+        },
+    });
 
-    showEditor: function(data){
-      var that = this;
-      var $pre = $('<pre class="pat-texteditor" />');
-      $pre.text(data);
-      that.$editorContainer.empty().append($pre);
-      that.editor = new TextEditor($pre, {
-        width: $('.editor').width(),
-        height: 500
-      });
-      that.editor.setSyntax(that.editing);
-      that.tabView.loading.hide();
-      that.editor.editor.on('change', function(){
-        that.$el.find('.plone-btn-primary,.plone-btn-default').prop('disabled', false);
-      });
-    }
-  });
-
-  return OverridesView;
+    return OverridesView;
 });
 
 /* Backdrop pattern.
@@ -30754,164 +30220,183 @@ define('mockup-patterns-resourceregistry-url/js/overrides',[
  *
  */
 
+define('mockup-patterns-backdrop',["jquery", "pat-base"], function ($, Base) {
+    "use strict";
 
-define('mockup-patterns-backdrop',[
-  'jquery',
-  'pat-base'
-], function($, Base) {
-  'use strict';
-
-  var Backdrop = Base.extend({
-    name: 'backdrop',
-    trigger: '.pat-backdrop',
-    parser: 'mockup',
-    defaults: {
-      zIndex: null,
-      opacity: 0.8,
-      className: 'plone-backdrop',
-      classActiveName: 'plone-backdrop-active',
-      closeOnEsc: true,
-      closeOnClick: true
-    },
-    init: function() {
-      var self = this;
-      self.$backdrop = $('> .' + self.options.className, self.$el);
-      if (self.$backdrop.size() === 0) {
-        self.$backdrop = $('<div/>')
-            .hide()
-            .appendTo(self.$el)
-            .addClass(self.options.className);
-        if (self.options.zIndex !== null) {
-          self.$backdrop.css('z-index', self.options.zIndex);
-        }
-      }
-      if (self.options.closeOnEsc === true) {
-        $(document).on('keydown', function(e, data) {
-          if (self.$el.is('.' + self.options.classActiveName)) {
-            if (e.keyCode === 27) {  // ESC key pressed
-              self.hide();
+    var Backdrop = Base.extend({
+        name: "backdrop",
+        trigger: ".pat-backdrop",
+        parser: "mockup",
+        defaults: {
+            zIndex: null,
+            opacity: 0.8,
+            className: "plone-backdrop",
+            classActiveName: "plone-backdrop-active",
+            closeOnEsc: true,
+            closeOnClick: true,
+        },
+        init: function () {
+            var self = this;
+            self.$backdrop = $("> ." + self.options.className, self.$el);
+            if (self.$backdrop.length === 0) {
+                self.$backdrop = $("<div/>")
+                    .hide()
+                    .appendTo(self.$el)
+                    .addClass(self.options.className);
+                if (self.options.zIndex !== null) {
+                    self.$backdrop.css("z-index", self.options.zIndex);
+                }
             }
-          }
-        });
-      }
-      if (self.options.closeOnClick === true) {
-        self.$backdrop.on('click', function() {
-          if (self.$el.is('.' + self.options.classActiveName)) {
-            self.hide();
-          }
-        });
-      }
-    },
-    show: function() {
-      var self = this;
-      if (!self.$el.hasClass(self.options.classActiveName)) {
-        self.emit('show');
-        self.$backdrop.css('opacity', '0').show();
-        self.$el.addClass(self.options.classActiveName);
-        self.$backdrop.animate({ opacity: self.options.opacity }, 500);
-        self.emit('shown');
-      }
-    },
-    hide: function() {
-      var self = this;
-      if (self.$el.hasClass(self.options.classActiveName)) {
-        self.emit('hide');
-        self.$backdrop.animate({ opacity: '0' }, 500).hide();
-        self.$el.removeClass(self.options.classActiveName);
-        self.emit('hidden');
-      }
-    }
-  });
+            if (self.options.closeOnEsc === true) {
+                $(document).on("keydown", function (e, data) {
+                    if (self.$el.is("." + self.options.classActiveName)) {
+                        if (e.keyCode === 27) {
+                            // ESC key pressed
+                            self.hide();
+                        }
+                    }
+                });
+            }
+            if (self.options.closeOnClick === true) {
+                self.$backdrop.on("click", function () {
+                    if (self.$el.is("." + self.options.classActiveName)) {
+                        self.hide();
+                    }
+                });
+            }
+        },
+        show: function () {
+            var self = this;
+            if (!self.$el.hasClass(self.options.classActiveName)) {
+                self.emit("show");
+                self.$backdrop.css("opacity", "0").show();
+                self.$el.addClass(self.options.classActiveName);
+                self.$backdrop.animate({ opacity: self.options.opacity }, 500);
+                self.emit("shown");
+            }
+        },
+        hide: function () {
+            var self = this;
+            if (self.$el.hasClass(self.options.classActiveName)) {
+                self.emit("hide");
+                self.$backdrop.animate({ opacity: "0" }, 500).hide();
+                self.$el.removeClass(self.options.classActiveName);
+                self.emit("hidden");
+            }
+        },
+    });
 
-  return Backdrop;
-
+    return Backdrop;
 });
 
 /* Pattern router
  */
-define('mockup-router',[
-  'underscore',
-  'backbone'
-], function(_, Backbone) {
-  'use strict';
+define('mockup-router',["underscore", "backbone"], function (_, Backbone) {
+    "use strict";
 
-  var regexEscape = function(s) {
-    return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
-  };
+    var regexEscape = function (s) {
+        return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
+    };
 
-  var Router = Backbone.Router.extend({
-    actions: [],
-    redirects: {},
-    addRoute: function(patternName, id, callback, context, pathExp, expReplace) {
-      if (_.findWhere(this.patterns, {patternName: patternName, id: id}) === undefined) {
-        this.actions.push({patternName: patternName, id: id, callback: callback, context: context, pathExp: pathExp, expReplace: expReplace});
-      }
-      var regex = new RegExp('(' + regexEscape(patternName) + ':' + regexEscape(id) + ')');
-      this.route(regex, 'handleRoute');
-    },
-    addRedirect: function(pathExp, destination) {
-      this.redirects[pathExp] = destination;
-    },
-    handleRoute: function(pattern) {
-      var parts = pattern.split(':');
-      var patternName = parts[0];
-      var id = parts[1];
-      var action = _.findWhere(this.actions, {patternName: patternName, id: id});
-      if (action) {
-        action.callback.call(action.context);
-      }
-    },
-    redirect: function() {
-      var path = window.parent.location.pathname,
-          newPath,
-          regex,
-          hash;
-
-      _.some(this.actions, function(action) {
-        if (action.pathExp) {
-          regex = new RegExp(action.pathExp);
-          if (path.match(regex)) {
-            hash = '!/' + action.patternName + ':' + action.id;
-            var replaceWith = '';
-            if (action.expReplace) {
-              replaceWith = action.expReplace;
+    var Router = Backbone.Router.extend({
+        actions: [],
+        redirects: {},
+        addRoute: function (
+            patternName,
+            id,
+            callback,
+            context,
+            pathExp,
+            expReplace
+        ) {
+            if (
+                _.findWhere(this.patterns, {
+                    patternName: patternName,
+                    id: id,
+                }) === undefined
+            ) {
+                this.actions.push({
+                    patternName: patternName,
+                    id: id,
+                    callback: callback,
+                    context: context,
+                    pathExp: pathExp,
+                    expReplace: expReplace,
+                });
             }
-            newPath = path.replace(regex, replaceWith);
-            return true;
-          }
-        }
-      }, this);
+            var regex = new RegExp(
+                "(" + regexEscape(patternName) + ":" + regexEscape(id) + ")"
+            );
+            this.route(regex, "handleRoute");
+        },
+        addRedirect: function (pathExp, destination) {
+            this.redirects[pathExp] = destination;
+        },
+        handleRoute: function (pattern) {
+            var parts = pattern.split(":");
+            var patternName = parts[0];
+            var id = parts[1];
+            var action = _.findWhere(this.actions, {
+                patternName: patternName,
+                id: id,
+            });
+            if (action) {
+                action.callback.call(action.context);
+            }
+        },
+        redirect: function () {
+            var path = window.parent.location.pathname,
+                newPath,
+                regex,
+                hash;
 
-      if (hash === undefined) {
-        for (var pathExp in this.redirects) {
-          regex = new RegExp(pathExp);
-          if (path.match(regex)) {
-            hash = '!/' + this.redirects[pathExp];
-            newPath = path.replace(regex, '');
-            break;
-          }
-        }
-      }
+            _.some(
+                this.actions,
+                function (action) {
+                    if (action.pathExp) {
+                        regex = new RegExp(action.pathExp);
+                        if (path.match(regex)) {
+                            hash = "!/" + action.patternName + ":" + action.id;
+                            var replaceWith = "";
+                            if (action.expReplace) {
+                                replaceWith = action.expReplace;
+                            }
+                            newPath = path.replace(regex, replaceWith);
+                            return true;
+                        }
+                    }
+                },
+                this
+            );
 
-      if (hash !== undefined) {
-        this._changeLocation.apply(this, [newPath, hash]);
-      }
-    },
-    _changeLocation: function(path, hash) {
-      window.parent.location.hash = hash;
-      window.parent.location.pathname = path;
-    },
-    start: function() {
-      Backbone.history.start();
-    },
-    reset: function() {
-      this.actions = [];
-    }
+            if (hash === undefined) {
+                for (var pathExp in this.redirects) {
+                    regex = new RegExp(pathExp);
+                    if (path.match(regex)) {
+                        hash = "!/" + this.redirects[pathExp];
+                        newPath = path.replace(regex, "");
+                        break;
+                    }
+                }
+            }
 
-  });
+            if (hash !== undefined) {
+                this._changeLocation.apply(this, [newPath, hash]);
+            }
+        },
+        _changeLocation: function (path, hash) {
+            window.parent.location.hash = hash;
+            window.parent.location.pathname = path;
+        },
+        start: function () {
+            Backbone.history.start();
+        },
+        reset: function () {
+            this.actions = [];
+        },
+    });
 
-  return new Router();
-
+    return new Router();
 });
 
 /*!
@@ -32518,861 +32003,1056 @@ define('mockup-router',[
  */
 
 define('mockup-patterns-modal',[
-  'jquery',
-  'underscore',
-  'pat-base',
-  'mockup-patterns-backdrop',
-  'pat-registry',
-  'mockup-router',
-  'mockup-utils',
-  'translate',
-  'jquery.form'
-], function($, _, Base, Backdrop, registry, Router, utils, _t) {
-  'use strict';
+    "jquery",
+    "underscore",
+    "pat-base",
+    "mockup-patterns-backdrop",
+    "pat-registry",
+    "mockup-router",
+    "mockup-utils",
+    "translate",
+    "jquery.form",
+], function ($, _, Base, Backdrop, registry, Router, utils, _t) {
+    "use strict";
 
-  var Modal = Base.extend({
-    name: 'plone-modal',
-    trigger: '.pat-plone-modal',
-    parser: 'mockup',
-    createModal: null,
-    $model: null,
-    defaults: {
-      width: '',
-      height: '',
-      margin: 20,
-      position: 'center middle', // format: '<horizontal> <vertical>' -- allowed values: top, bottom, left, right, center, middle
-      triggers: [],
-      zIndexSelector: '.plone-modal-wrapper,.plone-modal-backdrop',
-      backdrop: 'body', // Element to initiate the Backdrop on.
-      backdropOptions: {
-        zIndex: '1040',
-        opacity: '0.85',
-        className: 'plone-modal-backdrop',
-        classActiveName: 'plone-backdrop-active',
-        closeOnEsc: true,
-        closeOnClick: true
-      },
-      title: null,
-      titleSelector: 'h1:first',
-      buttons: '.formControls > input[type="submit"], .formControls > button',
-      content: '#content',
-      automaticallyAddButtonActions: true,
-      loadLinksWithinModal: true,
-      prependContent: '.portalMessage, #global_statusmessage',
-      onRender: null,
-      templateOptions: {
-        className: 'plone-modal fade',
-        classDialog: 'plone-modal-dialog',
-        classModal: 'plone-modal-content',
-        classHeaderName: 'plone-modal-header',
-        classBodyName: 'plone-modal-body',
-        classFooterName: 'plone-modal-footer',
-        classWrapperName: 'plone-modal-wrapper',
-        classWrapperInnerName: 'modal-wrapper-inner',
-        classActiveName: 'in',
-        classPrependName: '', // String, css class to be applied to the wrapper of the prepended content
-        classContentName: '',  // String, class name to be applied to the content of the modal, useful for modal specific styling
-        template: '' +
-          '<div class="<%= options.className %>">' +
-          '  <div class="<%= options.classDialog %>">' +
-          '    <div class="<%= options.classModal %>">' +
-          '      <div class="<%= options.classHeaderName %>">' +
-          '        <a class="plone-modal-close">&times;</a>' +
-          '        <% if (title) { %><h2 class="plone-modal-title"><%= title %></h2><% } %>' +
-          '      </div>' +
-          '      <div class="<%= options.classBodyName %>">' +
-          '        <div class="<%= options.classPrependName %>"><%= prepend %></div> ' +
-          '        <div class="<%= options.classContentName %>"><%= content %></div>' +
-          '      </div>' +
-          '      <div class="<%= options.classFooterName %>"> ' +
-          '        <% if (buttons) { %><%= buttons %><% } %>' +
-          '      </div>' +
-          '    </div>' +
-          '  </div>' +
-          '</div>'
-      },
-      actions: {},
-      actionOptions: {
-        eventType: 'click',
-        disableAjaxFormSubmit: false,
-        target: null,
-        ajaxUrl: null, // string, or function($el, options) that returns a string
-        modalFunction: null, // String, function name on self to call
-        isForm: false,
-        timeout: 5000,
-        displayInModal: true,
-        reloadWindowOnClose: true,
-        error: '.portalMessage.error, .alert-danger',
-        formFieldError: '.field.error',
-        onSuccess: null,
-        onError: null,
-        onFormError: null,
-        onTimeout: null,
-        redirectOnResponse: false,
-        redirectToUrl: function($action, response, options) {
-          var reg;
-          reg = /<body.*data-view-url=[\"'](.*)[\"'].*/im.exec(response);
-          if (reg && reg.length > 1) {
-            // view url as data attribute on body (Plone 5)
-            return reg[1].split('"')[0];
-          }
-          reg = /<body.*data-base-url=[\"'](.*)[\"'].*/im.exec(response);
-          if (reg && reg.length > 1) {
-            // Base url as data attribute on body (Plone 5)
-            return reg[1].split('"')[0];
-          }
-          reg = /<base.*href=[\"'](.*)[\"'].*/im.exec(response);
-          if (reg && reg.length > 1) {
-              // base tag available (Plone 4)
-              return reg[1];
-          }
-          return '';
-        }
-      },
-      routerOptions: {
-        id: null,
-        pathExp: null
-      },
-      form: function(actions) {
-        var self = this;
-        var $modal = self.$modal;
+    var Modal = Base.extend({
+        name: "plone-modal",
+        trigger: ".pat-plone-modal",
+        parser: "mockup",
+        createModal: null,
+        $model: null,
+        defaults: {
+            width: "",
+            height: "",
+            margin: 20,
+            position: "center middle", // format: '<horizontal> <vertical>' -- allowed values: top, bottom, left, right, center, middle
+            triggers: [],
+            zIndexSelector: ".plone-modal-wrapper,.plone-modal-backdrop",
+            backdrop: "body", // Element to initiate the Backdrop on.
+            backdropOptions: {
+                zIndex: "1040",
+                opacity: "0.85",
+                className: "plone-modal-backdrop",
+                classActiveName: "plone-backdrop-active",
+                closeOnEsc: true,
+                closeOnClick: true,
+            },
+            title: null,
+            titleSelector: "h1:first",
+            buttons:
+                '.formControls > input[type="submit"], .formControls > button',
+            content: "#content",
+            automaticallyAddButtonActions: true,
+            loadLinksWithinModal: true,
+            prependContent: ".portalMessage, #global_statusmessage",
+            onRender: null,
+            templateOptions: {
+                className: "plone-modal fade",
+                classDialog: "plone-modal-dialog",
+                classModal: "plone-modal-content",
+                classHeaderName: "plone-modal-header",
+                classBodyName: "plone-modal-body",
+                classFooterName: "plone-modal-footer",
+                classWrapperName: "plone-modal-wrapper",
+                classWrapperInnerName: "modal-wrapper-inner",
+                classActiveName: "in",
+                classPrependName: "", // String, css class to be applied to the wrapper of the prepended content
+                classContentName: "", // String, class name to be applied to the content of the modal, useful for modal specific styling
+                template:
+                    "" +
+                    '<div class="<%= options.className %>">' +
+                    '  <div class="<%= options.classDialog %>">' +
+                    '    <div class="<%= options.classModal %>">' +
+                    '      <div class="<%= options.classHeaderName %>">' +
+                    '        <a class="plone-modal-close">&times;</a>' +
+                    '        <% if (title) { %><h2 class="plone-modal-title"><%= title %></h2><% } %>' +
+                    '      </div>' +
+                    '      <div class="<%= options.classBodyName %>">' +
+                    '        <div class="<%= options.classPrependName %>"><%= prepend %></div> ' +
+                    '        <div class="<%= options.classContentName %>"><%= content %></div>' +
+                    "      </div>" +
+                    '      <div class="<%= options.classFooterName %>"> ' +
+                    "        <% if (buttons) { %><%= buttons %><% } %>" +
+                    "      </div>" +
+                    "    </div>" +
+                    "  </div>" +
+                    "</div>",
+            },
+            actions: {},
+            actionOptions: {
+                eventType: "click",
+                disableAjaxFormSubmit: false,
+                target: null,
+                ajaxUrl: null, // string, or function($el, options) that returns a string
+                modalFunction: null, // String, function name on self to call
+                isForm: false,
+                timeout: 5000,
+                displayInModal: true,
+                reloadWindowOnClose: true,
+                error: ".portalMessage.error, .alert-danger",
+                formFieldError: ".field.error",
+                onSuccess: null,
+                onError: null,
+                onFormError: null,
+                onTimeout: null,
+                redirectOnResponse: false,
+                redirectToUrl: function ($action, response, options) {
+                    var reg;
+                    reg = /<body.*data-view-url=[\"'](.*)[\"'].*/im.exec(
+                        response
+                    );
+                    if (reg && reg.length > 1) {
+                        // view url as data attribute on body (Plone 5)
+                        return reg[1].split('"')[0];
+                    }
+                    reg = /<body.*data-base-url=[\"'](.*)[\"'].*/im.exec(
+                        response
+                    );
+                    if (reg && reg.length > 1) {
+                        // Base url as data attribute on body (Plone 5)
+                        return reg[1].split('"')[0];
+                    }
+                    reg = /<base.*href=[\"'](.*)[\"'].*/im.exec(response);
+                    if (reg && reg.length > 1) {
+                        // base tag available (Plone 4)
+                        return reg[1];
+                    }
+                    return "";
+                },
+            },
+            routerOptions: {
+                id: null,
+                pathExp: null,
+            },
+            form: function (actions) {
+                var self = this;
+                var $modal = self.$modal;
 
-        if (self.options.automaticallyAddButtonActions) {
-          actions[self.options.buttons] = {};
-        }
-        actions.a = {};
-
-        $.each(actions, function(action, options) {
-          var actionKeys = _.union(_.keys(self.options.actionOptions), ['templateOptions']);
-          var actionOptions = $.extend(true, {}, self.options.actionOptions, _.pick(options, actionKeys));
-          options.templateOptions = $.extend(true, options.templateOptions, self.options.templateOptions);
-
-          var patternKeys = _.union(_.keys(self.options.actionOptions), ['actions', 'actionOptions']);
-          var patternOptions = $.extend(true, _.omit(options, patternKeys), self.options);
-
-          $(action, $('.' + options.templateOptions.classBodyName, $modal)).each(function(action) {
-            var $action = $(this);
-            $action.on(actionOptions.eventType, function(e) {
-              e.stopPropagation();
-              e.preventDefault();
-
-              self.loading.show(false);
-
-              // handle event on $action using a function on self
-              if (actionOptions.modalFunction !== null) {
-                self[actionOptions.modalFunction]();
-              // handle event on input/button using jquery.form library
-              } else if ($.nodeName($action[0], 'input') || $.nodeName($action[0], 'button') || options.isForm === true) {
-                self.options.handleFormAction.apply(self, [$action, actionOptions, patternOptions]);
-              // handle event on link with jQuery.ajax
-              } else if (options.ajaxUrl !== null || $.nodeName($action[0], 'a')) {
-                self.options.handleLinkAction.apply(self, [$action, actionOptions, patternOptions]);
-              }
-
-            });
-          });
-        });
-      },
-      handleFormAction: function($action, options, patternOptions) {
-        var self = this;
-
-        // pass action that was clicked when submiting form
-        var extraData = {};
-        extraData[$action.attr('name')] = $action.attr('value');
-
-        var $form;
-
-        if ($.nodeName($action[0], 'form')) {
-          $form = $action;
-        } else {
-          $form = $action.parents('form:not(.disableAutoSubmit)');
-        }
-
-        var url;
-        if (options.ajaxUrl !== null) {
-          if (typeof options.ajaxUrl === 'function') {
-            url = options.ajaxUrl.apply(self, [$action, options]);
-          } else {
-            url = options.ajaxUrl;
-          }
-        } else {
-          url = $action.parents('form').attr('action');
-        }
-
-        if(options.disableAjaxFormSubmit){
-          if($action.attr('name') && $action.attr('value')){
-            $form.append($('<input type="hidden" name="' + $action.attr('name') + '" value="' + $action.attr('value') + '" />'));
-          }
-          $form.trigger('submit');
-          return;
-        }
-        // We want to trigger the form submit event but NOT use the default
-        $form.on('submit', function(e) {
-          e.preventDefault();
-        });
-        $form.trigger('submit');
-
-        self.loading.show(false);
-        $form.ajaxSubmit({
-          timeout: options.timeout,
-          data: extraData,
-          url: url,
-          error: function(xhr, textStatus, errorStatus) {
-            self.loading.hide();
-            if (textStatus === 'timeout' && options.onTimeout) {
-              options.onTimeout.apply(self, xhr, errorStatus);
-            // on "error", "abort", and "parsererror"
-            } else if (options.onError) {
-              if (typeof options.onError === 'string') {
-                window[options.onError](xhr, textStatus, errorStatus);
-              } else {
-                  options.onError(xhr, textStatus, errorStatus);
-              }
-            } else {
-              // window.alert(_t('There was an error submitting the form.'));
-              console.log('error happened', textStatus, ' do something');
-            }
-            self.emit('formActionError', [xhr, textStatus, errorStatus]);
-          },
-          success: function(response, state, xhr, form) {
-            self.loading.hide();
-            // if error is found (NOTE: check for both the portal errors
-            // and the form field-level errors)
-            if ($(options.error, response).size() !== 0 ||
-                $(options.formFieldError, response).size() !== 0) {
-              if (options.onFormError) {
-                if (typeof options.onFormError === 'string') {
-                  window[options.onFormError](self, response, state, xhr, form);
-                } else {
-                  options.onFormError(self, response, state, xhr, form);
+                if (self.options.automaticallyAddButtonActions) {
+                    actions[self.options.buttons] = {};
                 }
-              } else {
-                self.redraw(response, patternOptions);
-              }
-              return;
+                actions.a = {};
+
+                $.each(actions, function (action, options) {
+                    var actionKeys = _.union(
+                        _.keys(self.options.actionOptions),
+                        ["templateOptions"]
+                    );
+                    var actionOptions = $.extend(
+                        true,
+                        {},
+                        self.options.actionOptions,
+                        _.pick(options, actionKeys)
+                    );
+                    options.templateOptions = $.extend(
+                        true,
+                        options.templateOptions,
+                        self.options.templateOptions
+                    );
+
+                    var patternKeys = _.union(
+                        _.keys(self.options.actionOptions),
+                        ["actions", "actionOptions"]
+                    );
+                    var patternOptions = $.extend(
+                        true,
+                        _.omit(options, patternKeys),
+                        self.options
+                    );
+
+                    $(
+                        action,
+                        $("." + options.templateOptions.classBodyName, $modal)
+                    ).each(function (action) {
+                        var $action = $(this);
+                        $action.on(actionOptions.eventType, function (e) {
+                            e.stopPropagation();
+                            e.preventDefault();
+
+                            self.loading.show(false);
+
+                            // handle event on $action using a function on self
+                            if (actionOptions.modalFunction !== null) {
+                                self[actionOptions.modalFunction]();
+                                // handle event on input/button using jquery.form library
+                            } else if (
+                                $.nodeName($action[0], "input") ||
+                                $.nodeName($action[0], "button") ||
+                                options.isForm === true
+                            ) {
+                                self.options.handleFormAction.apply(self, [
+                                    $action,
+                                    actionOptions,
+                                    patternOptions,
+                                ]);
+                                // handle event on link with jQuery.ajax
+                            } else if (
+                                options.ajaxUrl !== null ||
+                                $.nodeName($action[0], "a")
+                            ) {
+                                self.options.handleLinkAction.apply(self, [
+                                    $action,
+                                    actionOptions,
+                                    patternOptions,
+                                ]);
+                            }
+                        });
+                    });
+                });
+            },
+            handleFormAction: function ($action, options, patternOptions) {
+                var self = this;
+
+                // pass action that was clicked when submiting form
+                var extraData = {};
+                extraData[$action.attr("name")] = $action.attr("value");
+
+                var $form;
+
+                if ($.nodeName($action[0], "form")) {
+                    $form = $action;
+                } else {
+                    $form = $action.parents("form:not(.disableAutoSubmit)");
+                }
+
+                var url;
+                if (options.ajaxUrl !== null) {
+                    if (typeof options.ajaxUrl === "function") {
+                        url = options.ajaxUrl.apply(self, [$action, options]);
+                    } else {
+                        url = options.ajaxUrl;
+                    }
+                } else {
+                    url = $action.parents("form").attr("action");
+                }
+
+                if (options.disableAjaxFormSubmit) {
+                    if ($action.attr("name") && $action.attr("value")) {
+                        $form.append(
+                            $(
+                                '<input type="hidden" name="' +
+                                    $action.attr("name") +
+                                    '" value="' +
+                                    $action.attr("value") +
+                                    '" />'
+                            )
+                        );
+                    }
+                    $form.trigger("submit");
+                    return;
+                }
+                // We want to trigger the form submit event but NOT use the default
+                $form.on("submit", function (e) {
+                    e.preventDefault();
+                });
+                $form.trigger("submit");
+
+                self.loading.show(false);
+                $form.ajaxSubmit({
+                    timeout: options.timeout,
+                    data: extraData,
+                    url: url,
+                    error: function (xhr, textStatus, errorStatus) {
+                        self.loading.hide();
+                        if (textStatus === "timeout" && options.onTimeout) {
+                            options.onTimeout.apply(self, xhr, errorStatus);
+                            // on "error", "abort", and "parsererror"
+                        } else if (options.onError) {
+                            if (typeof options.onError === "string") {
+                                window[options.onError](
+                                    xhr,
+                                    textStatus,
+                                    errorStatus
+                                );
+                            } else {
+                                options.onError(xhr, textStatus, errorStatus);
+                            }
+                        } else {
+                            // window.alert(_t('There was an error submitting the form.'));
+                            console.log(
+                                "error happened",
+                                textStatus,
+                                " do something"
+                            );
+                        }
+                        self.emit("formActionError", [
+                            xhr,
+                            textStatus,
+                            errorStatus,
+                        ]);
+                    },
+                    success: function (response, state, xhr, form) {
+                        self.loading.hide();
+                        // if error is found (NOTE: check for both the portal errors
+                        // and the form field-level errors)
+                        if (
+                            $(options.error, response).length !== 0 ||
+                            $(options.formFieldError, response).length !== 0
+                        ) {
+                            if (options.onFormError) {
+                                if (typeof options.onFormError === "string") {
+                                    window[options.onFormError](
+                                        self,
+                                        response,
+                                        state,
+                                        xhr,
+                                        form
+                                    );
+                                } else {
+                                    options.onFormError(
+                                        self,
+                                        response,
+                                        state,
+                                        xhr,
+                                        form
+                                    );
+                                }
+                            } else {
+                                self.redraw(response, patternOptions);
+                            }
+                            return;
+                        }
+
+                        if (options.redirectOnResponse === true) {
+                            if (typeof options.redirectToUrl === "function") {
+                                window.parent.location.href = options.redirectToUrl.apply(
+                                    self,
+                                    [$action, response, options]
+                                );
+                            } else {
+                                window.parent.location.href =
+                                    options.redirectToUrl;
+                            }
+                            return; // cut out right here since we're changing url
+                        }
+
+                        if (options.onSuccess) {
+                            if (typeof options.onSuccess === "string") {
+                                window[options.onSuccess](
+                                    self,
+                                    response,
+                                    state,
+                                    xhr,
+                                    form
+                                );
+                            } else {
+                                options.onSuccess(
+                                    self,
+                                    response,
+                                    state,
+                                    xhr,
+                                    form
+                                );
+                            }
+                        }
+
+                        if (options.displayInModal === true) {
+                            self.redraw(response, patternOptions);
+                        } else {
+                            $action.trigger("destroy.plone-modal.patterns");
+                            // also calls hide
+                            if (options.reloadWindowOnClose) {
+                                self.reloadWindow();
+                            }
+                        }
+                        self.emit("formActionSuccess", [
+                            response,
+                            state,
+                            xhr,
+                            form,
+                        ]);
+                    },
+                });
+            },
+            handleLinkAction: function ($action, options, patternOptions) {
+                var self = this;
+                var url;
+                if ($action.hasClass("pat-plone-modal")) {
+                    // if link is a modal pattern, do not reload the page
+                    return;
+                }
+
+                // Figure out URL
+                if (options.ajaxUrl) {
+                    if (typeof options.ajaxUrl === "function") {
+                        url = options.ajaxUrl.apply(self, [$action, options]);
+                    } else {
+                        url = options.ajaxUrl;
+                    }
+                } else {
+                    url = $action.attr("href");
+                }
+
+                // Non-ajax link (I know it says "ajaxUrl" ...)
+                if (options.displayInModal === false) {
+                    if ($action.attr("target") === "_blank") {
+                        window.open(url, "_blank");
+                        self.loading.hide();
+                    } else {
+                        window.location = url;
+                    }
+                    return;
+                }
+
+                // ajax version
+                $.ajax({
+                    url: url,
+                })
+                    .fail(function (xhr, textStatus, errorStatus) {
+                        if (textStatus === "timeout" && options.onTimeout) {
+                            options.onTimeout(self.$modal, xhr, errorStatus);
+
+                            // on "error", "abort", and "parsererror"
+                        } else if (options.onError) {
+                            options.onError(xhr, textStatus, errorStatus);
+                        } else {
+                            window.alert(
+                                _t("There was an error loading modal.")
+                            );
+                        }
+                        self.emit("linkActionError", [
+                            xhr,
+                            textStatus,
+                            errorStatus,
+                        ]);
+                    })
+                    .done(function (response, state, xhr) {
+                        self.redraw(response, patternOptions);
+                        if (options.onSuccess) {
+                            if (typeof options.onSuccess === "string") {
+                                window[options.onSuccess](
+                                    self,
+                                    response,
+                                    state,
+                                    xhr
+                                );
+                            } else {
+                                options.onSuccess(self, response, state, xhr);
+                            }
+                        }
+
+                        self.emit("linkActionSuccess", [response, state, xhr]);
+                    })
+                    .always(function () {
+                        self.loading.hide();
+                    });
+            },
+            render: function (options) {
+                var self = this;
+
+                self.emit("before-render");
+
+                if (!self.$raw) {
+                    return;
+                }
+                var $raw = self.$raw.clone();
+                // fix for IE9 bug (see http://bugs.jquery.com/ticket/10550)
+                $("input:checked", $raw).each(function () {
+                    if (this.setAttribute) {
+                        this.setAttribute("checked", "checked");
+                    }
+                });
+
+                // Object that will be passed to the template
+                var tplObject = {
+                    title: "",
+                    prepend: "<div />",
+                    content: "",
+                    buttons: '<div class="pattern-modal-buttons"></div>',
+                    options: options.templateOptions,
+                };
+
+                // setup the Title
+                if (options.title === null) {
+                    var $title = $(options.titleSelector, $raw);
+                    tplObject.title = $title.html();
+                    $(options.titleSelector, $raw).remove();
+                } else {
+                    tplObject.title = options.title;
+                }
+
+                // Grab items to to insert into the prepend area
+                if (options.prependContent) {
+                    tplObject.prepend = $("<div />")
+                        .append($(options.prependContent, $raw).clone())
+                        .html();
+                    $(options.prependContent, $raw).remove();
+                }
+
+                // Filter out the content if there is a selector provided
+                if (options.content) {
+                    tplObject.content = $(options.content, $raw).html();
+                } else {
+                    tplObject.content = $raw.html();
+                }
+
+                // Render html
+                self.$modal = $(
+                    _.template(self.options.templateOptions.template)(tplObject)
+                );
+                self.$modalDialog = $(
+                    "> ." + self.options.templateOptions.classDialog,
+                    self.$modal
+                );
+                self.$modalContent = $(
+                    "> ." + self.options.templateOptions.classModal,
+                    self.$modalDialog
+                );
+
+                // In most browsers, when you hit the enter key while a form element is focused
+                // the browser will trigger the form 'submit' event.  Google Chrome also does this,
+                // but not when when the default submit button is hidden with 'display: none'.
+                // The following code will work around this issue:
+                $("form", self.$modal).on("keydown", function (event) {
+                    // ignore keys which are not enter, and ignore enter inside a textarea.
+                    if (
+                        event.keyCode !== 13 ||
+                        event.target.nodeName === "TEXTAREA"
+                    ) {
+                        return;
+                    }
+                    event.preventDefault();
+                    $(
+                        "input[type=submit], button[type=submit], button:not(type)",
+                        this
+                    )
+                        .eq(0)
+                        .trigger("click");
+                });
+
+                // Setup buttons
+                $(options.buttons, self.$modal).each(function () {
+                    var $button = $(this);
+                    $button
+                        .on("click", function (e) {
+                            e.stopPropagation();
+                            e.preventDefault();
+                        })
+                        .clone()
+                        .appendTo($(".pattern-modal-buttons", self.$modal))
+                        .off("click")
+                        .on("click", function (e) {
+                            e.stopPropagation();
+                            e.preventDefault();
+                            $button.trigger("click");
+                        });
+                    $button.hide();
+                });
+
+                self.emit("before-events-setup");
+
+                // Wire up events
+                $(
+                    ".plone-modal-header > a.plone-modal-close, .plone-modal-footer > a.plone-modal-close",
+                    self.$modal
+                )
+                    .off("click")
+                    .on("click", function (e) {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        $(e.target).trigger("destroy.plone-modal.patterns");
+                    });
+
+                // form
+                if (options.form) {
+                    options.form.apply(self, [options.actions]);
+                }
+
+                self.$modal
+                    .addClass(self.options.templateOptions.className)
+                    .on("destroy.plone-modal.patterns", function (e) {
+                        e.stopPropagation();
+                        self.hide();
+                    })
+                    .on("resize.plone-modal.patterns", function (e) {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        self.positionModal();
+                    })
+                    .appendTo(self.$wrapperInner);
+
+                if (self.options.loadLinksWithinModal) {
+                    self.$modal.on("click", function (e) {
+                        e.stopPropagation();
+                        if ($.nodeName(e.target, "a")) {
+                            e.preventDefault();
+                            // TODO: open links inside modal
+                            // and slide modal body
+                        }
+                        self.$modal.trigger("modal-click");
+                    });
+                }
+                self.$modal.data("pattern-" + self.name, self);
+                self.emit("after-render");
+                if (options.onRender) {
+                    if (typeof options.onRender === "string") {
+                        window[options.onRender](self);
+                    } else {
+                        options.onRender(self);
+                    }
+                }
+            },
+        },
+        reloadWindow: function () {
+            window.parent.location.reload();
+        },
+        init: function () {
+            var self = this;
+            self.options.loadLinksWithinModal = $.parseJSON(
+                self.options.loadLinksWithinModal
+            );
+
+            // Router
+            if (self.options.routerOptions.id !== null) {
+                Router.addRoute(
+                    "modal",
+                    self.options.routerOptions.id,
+                    function () {
+                        this.show();
+                    },
+                    self,
+                    self.options.routerOptions.pathExp,
+                    self.options.routerOptions.expReplace
+                );
             }
 
-            if (options.redirectOnResponse === true) {
-              if (typeof options.redirectToUrl === 'function') {
-                window.parent.location.href = options.redirectToUrl.apply(self, [$action, response, options]);
-              } else {
-                window.parent.location.href = options.redirectToUrl;
-              }
-              return; // cut out right here since we're changing url
+            if (self.options.backdropOptions.closeOnEsc === true) {
+                $(document).on("keydown", function (e, data) {
+                    if (
+                        self.$el.is(
+                            "." + self.options.templateOptions.classActiveName
+                        )
+                    ) {
+                        if (e.keyCode === 27) {
+                            // ESC key pressed
+                            self.hide();
+                        }
+                    }
+                });
             }
 
-            if (options.onSuccess) {
-              if (typeof options.onSuccess === 'string') {
-                window[options.onSuccess](self, response, state, xhr, form);
-              } else {
-                  options.onSuccess(self, response, state, xhr, form);
-              }
-            }
-
-            if (options.displayInModal === true) {
-              self.redraw(response, patternOptions);
-            } else {
-              $action.trigger('destroy.plone-modal.patterns');
-              // also calls hide
-              if (options.reloadWindowOnClose) {
-                self.reloadWindow();
-              }
-            }
-            self.emit('formActionSuccess', [response, state, xhr, form]);
-          }
-        });
-      },
-      handleLinkAction: function($action, options, patternOptions) {
-        var self = this;
-        var url;
-        if ($action.hasClass('pat-plone-modal')) {
-          // if link is a modal pattern, do not reload the page
-          return ;
-        }
-
-        // Figure out URL
-        if (options.ajaxUrl) {
-          if (typeof options.ajaxUrl === 'function') {
-            url = options.ajaxUrl.apply(self, [$action, options]);
-          } else {
-            url = options.ajaxUrl;
-          }
-        } else {
-          url = $action.attr('href');
-        }
-
-        // Non-ajax link (I know it says "ajaxUrl" ...)
-        if (options.displayInModal === false) {
-          if($action.attr('target') === '_blank'){
-            window.open(url, '_blank');
-            self.loading.hide();
-          }else{
-            window.location = url;
-          }
-          return;
-        }
-
-        // ajax version
-        $.ajax({
-          url: url
-        }).fail(function(xhr, textStatus, errorStatus) {
-          if (textStatus === 'timeout' && options.onTimeout) {
-            options.onTimeout(self.$modal, xhr, errorStatus);
-
-          // on "error", "abort", and "parsererror"
-          } else if (options.onError) {
-            options.onError(xhr, textStatus, errorStatus);
-          } else {
-            window.alert(_t('There was an error loading modal.'));
-          }
-          self.emit('linkActionError', [xhr, textStatus, errorStatus]);
-        }).done(function(response, state, xhr) {
-          self.redraw(response, patternOptions);
-          if (options.onSuccess) {
-            if (typeof options.onSuccess === 'string') {
-              window[options.onSuccess](self, response, state, xhr);
-            } else {
-                options.onSuccess(self, response, state, xhr);
-            }
-          }
-
-          self.emit('linkActionSuccess', [response, state, xhr]);
-        }).always(function(){
-          self.loading.hide();
-        });
-      },
-      render: function(options) {
-        var self = this;
-
-        self.emit('before-render');
-
-        if (!self.$raw) {
-          return;
-        }
-        var $raw = self.$raw.clone();
-        // fix for IE9 bug (see http://bugs.jquery.com/ticket/10550)
-        $('input:checked', $raw).each(function() {
-          if (this.setAttribute) {
-            this.setAttribute('checked', 'checked');
-          }
-        });
-
-        // Object that will be passed to the template
-        var tplObject = {
-          title: '',
-          prepend: '<div />',
-          content: '',
-          buttons: '<div class="pattern-modal-buttons"></div>',
-          options: options.templateOptions
-        };
-
-        // setup the Title
-        if (options.title === null) {
-          var $title = $(options.titleSelector, $raw);
-          tplObject.title = $title.html();
-          $(options.titleSelector, $raw).remove();
-        } else {
-          tplObject.title = options.title;
-        }
-
-        // Grab items to to insert into the prepend area
-        if (options.prependContent) {
-          tplObject.prepend = $('<div />').append($(options.prependContent, $raw).clone()).html();
-          $(options.prependContent, $raw).remove();
-        }
-
-        // Filter out the content if there is a selector provided
-        if (options.content) {
-          tplObject.content = $(options.content, $raw).html();
-        } else {
-          tplObject.content = $raw.html();
-        }
-
-        // Render html
-        self.$modal = $(_.template(self.options.templateOptions.template)(tplObject));
-        self.$modalDialog = $('> .' + self.options.templateOptions.classDialog, self.$modal);
-        self.$modalContent = $('> .' + self.options.templateOptions.classModal, self.$modalDialog);
-
-        // In most browsers, when you hit the enter key while a form element is focused
-        // the browser will trigger the form 'submit' event.  Google Chrome also does this,
-        // but not when when the default submit button is hidden with 'display: none'.
-        // The following code will work around this issue:
-        $('form', self.$modal).on ('keydown', function (event) {
-          // ignore keys which are not enter, and ignore enter inside a textarea.
-          if (event.keyCode !== 13 || event.target.nodeName === 'TEXTAREA') {
-            return;
-          }
-          event.preventDefault();
-          $('input[type=submit], button[type=submit], button:not(type)', this).eq(0).trigger('click');
-        });
-
-        // Setup buttons
-        $(options.buttons, self.$modal).each(function() {
-          var $button = $(this);
-          $button
-            .on('click', function(e) {
-              e.stopPropagation();
-              e.preventDefault();
-            })
-            .clone()
-            .appendTo($('.pattern-modal-buttons', self.$modal))
-            .off('click').on('click', function(e) {
-              e.stopPropagation();
-              e.preventDefault();
-              $button.trigger('click');
+            $(window.parent).resize(function () {
+                self.positionModal();
             });
-          $button.hide();
-        });
 
-        self.emit('before-events-setup');
+            if (self.options.triggers) {
+                $.each(self.options.triggers, function (i, item) {
+                    var e = item.substring(0, item.indexOf(" "));
+                    var selector = item.substring(
+                        item.indexOf(" "),
+                        item.length
+                    );
+                    $(selector || self.$el).on(e, function (e) {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        self.show();
+                    });
+                });
+            }
 
-        // Wire up events
-        $('.plone-modal-header > a.plone-modal-close, .plone-modal-footer > a.plone-modal-close', self.$modal)
-          .off('click')
-          .on('click', function(e) {
-            e.stopPropagation();
-            e.preventDefault();
-            $(e.target).trigger('destroy.plone-modal.patterns');
-          });
+            if (self.$el.is("a")) {
+                if (self.$el.attr("href") && !self.options.image) {
+                    if (
+                        !self.options.target &&
+                        self.$el.attr("href").substr(0, 1) === "#" &&
+                        self.$el.attr("href").length > 1
+                    ) {
+                        self.options.target = self.$el.attr("href");
+                        self.options.content = "";
+                    }
+                    if (
+                        !self.options.ajaxUrl &&
+                        self.$el.attr("href").substr(0, 1) !== "#"
+                    ) {
+                        self.options.ajaxUrl = function () {
+                            // Resolve ``href`` attribute later, when modal is shown.
+                            return self.$el.attr("href");
+                        };
+                    }
+                }
+                self.$el.on("click", function (e) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    self.show();
+                });
+            }
+            self.initModal();
+        },
 
-        // form
-        if (options.form) {
-          options.form.apply(self, [options.actions]);
-        }
+        createAjaxModal: function () {
+            var self = this;
+            self.emit("before-ajax");
+            self.loading.show();
 
-        self.$modal
-          .addClass(self.options.templateOptions.className)
-          .on('destroy.plone-modal.patterns', function(e) {
-            e.stopPropagation();
-            self.hide();
-          })
-          .on('resize.plone-modal.patterns', function(e) {
-            e.stopPropagation();
-            e.preventDefault();
+            var ajaxUrl = self.options.ajaxUrl;
+            if (typeof ajaxUrl === "function") {
+                ajaxUrl = ajaxUrl.apply(self, [self.options]);
+            }
+
+            self.ajaxXHR = $.ajax({
+                url: ajaxUrl,
+                type: self.options.ajaxType,
+            })
+                .done(function (response, textStatus, xhr) {
+                    self.ajaxXHR = undefined;
+                    self.$raw = $("<div />").append(
+                        $(utils.parseBodyTag(response))
+                    );
+                    self.emit("after-ajax", self, textStatus, xhr);
+                    self._show();
+                })
+                .fail(function (xhr, textStatus, errorStatus) {
+                    var options = self.options.actionOptions;
+                    if (textStatus === "timeout" && options.onTimeout) {
+                        options.onTimeout(self.$modal, xhr, errorStatus);
+                    } else if (options.onError) {
+                        options.onError(xhr, textStatus, errorStatus);
+                    } else {
+                        window.alert(_t("There was an error loading modal."));
+                        self.hide();
+                    }
+                    self.emit("linkActionError", [
+                        xhr,
+                        textStatus,
+                        errorStatus,
+                    ]);
+                })
+                .always(function () {
+                    self.loading.hide();
+                });
+        },
+
+        createTargetModal: function () {
+            var self = this;
+            self.$raw = $(self.options.target).clone();
+            self._show();
+        },
+
+        createBasicModal: function () {
+            var self = this;
+            self.$raw = $("<div/>").html(self.$el.clone());
+            self._show();
+        },
+
+        createHtmlModal: function () {
+            var self = this;
+            var $el = $(self.options.html);
+            self.$raw = $el;
+            self._show();
+        },
+
+        createImageModal: function () {
+            var self = this;
+            self.$wrapper.addClass("image-modal");
+            var src = self.$el.attr("href");
+            var srcset = self.$el.attr("data-modal-srcset") || "";
+            var title = $.trim(self.$el.context.innerText) || "Image";
+            // XXX aria?
+            self.$raw = $(
+                "<div><h1>" +
+                    title +
+                    '</h1><div id="content"><div class="modal-image"><img src="' +
+                    src +
+                    '" srcset="' +
+                    srcset +
+                    '" /></div></div></div>'
+            );
+            self._show();
+        },
+
+        initModal: function () {
+            var self = this;
+            if (self.options.ajaxUrl) {
+                self.createModal = self.createAjaxModal;
+            } else if (self.options.target) {
+                self.createModal = self.createTargetModal;
+            } else if (self.options.html) {
+                self.createModal = self.createHtmlModal;
+            } else if (self.options.image) {
+                self.createModal = self.createImageModal;
+            } else {
+                self.createModal = self.createBasicModal;
+            }
+        },
+
+        findPosition: function (
+            horpos,
+            vertpos,
+            margin,
+            modalWidth,
+            modalHeight,
+            wrapperInnerWidth,
+            wrapperInnerHeight
+        ) {
+            var returnpos = {};
+            var absTop, absBottom, absLeft, absRight;
+            absRight = absLeft = absTop = absLeft = "auto";
+
+            // -- HORIZONTAL POSITION -----------------------------------------------
+            if (horpos === "left") {
+                absLeft = margin + "px";
+                // if the width of the wrapper is smaller than the modal, and thus the
+                // screen is smaller than the modal, force the left to simply be 0
+                if (modalWidth > wrapperInnerWidth) {
+                    absLeft = "0px";
+                }
+                returnpos.left = absLeft;
+            } else if (horpos === "right") {
+                absRight = margin + "px";
+                // if the width of the wrapper is smaller than the modal, and thus the
+                // screen is smaller than the modal, force the right to simply be 0
+                if (modalWidth > wrapperInnerWidth) {
+                    absRight = "0px";
+                }
+                returnpos.right = absRight;
+                returnpos.left = "auto";
+            }
+            // default, no specified location, is to center
+            else {
+                absLeft =
+                    wrapperInnerWidth / 2 - modalWidth / 2 - margin + "px";
+                // if the width of the wrapper is smaller than the modal, and thus the
+                // screen is smaller than the modal, force the left to simply be 0
+                if (modalWidth > wrapperInnerWidth) {
+                    absLeft = "0px";
+                }
+                returnpos.left = absLeft;
+            }
+
+            // -- VERTICAL POSITION -------------------------------------------------
+            if (vertpos === "top") {
+                absTop = margin + "px";
+                // if the height of the wrapper is smaller than the modal, and thus the
+                // screen is smaller than the modal, force the top to simply be 0
+                if (modalHeight > wrapperInnerHeight) {
+                    absTop = "0px";
+                }
+                returnpos.top = absTop;
+            } else if (vertpos === "bottom") {
+                absBottom = margin + "px";
+                // if the height of the wrapper is smaller than the modal, and thus the
+                // screen is smaller than the modal, force the bottom to simply be 0
+                if (modalHeight > wrapperInnerHeight) {
+                    absBottom = "0px";
+                }
+                returnpos.bottom = absBottom;
+                returnpos.top = "auto";
+            } else {
+                // default case, no specified location, is to center
+                absTop =
+                    wrapperInnerHeight / 2 - modalHeight / 2 - margin + "px";
+                // if the height of the wrapper is smaller than the modal, and thus the
+                // screen is smaller than the modal, force the top to simply be 0
+                if (modalHeight > wrapperInnerHeight) {
+                    absTop = "0px";
+                }
+                returnpos.top = absTop;
+            }
+            return returnpos;
+        },
+
+        modalInitialized: function () {
+            var self = this;
+            return self.$modal !== null && self.$modal !== undefined;
+        },
+
+        positionModal: function () {
+            /* re-position modal at any point.
+             *
+             * Uses:
+             *  options.margin
+             *  options.width
+             *  options.height
+             *  options.position
+             */
+            var self = this;
+            // modal isn't initialized
+            if (!self.modalInitialized()) {
+                return;
+            }
+            // clear out any previously set styling
+            self.$modal.removeAttr("style");
+
+            // if backdrop wrapper is set on body, then wrapper should have height of
+            // the window, so we can do scrolling of inner wrapper
+            if (self.$wrapper.parent().is("body")) {
+                self.$wrapper.height($(window.parent).height());
+            }
+
+            var margin =
+                typeof self.options.margin === "function"
+                    ? self.options.margin()
+                    : self.options.margin;
+            self.$modal.css({
+                position: "absolute",
+                padding: margin,
+            });
+            self.$modalDialog.css({
+                margin: "0",
+                padding: "0",
+                width: self.options.width, // defaults to "", which doesn't override other css
+                height: self.options.height, // defaults to "", which doesn't override other css
+            });
+            self.$modalContent.css({
+                width: self.options.width, // defaults to "", which doesn't override other css
+            });
+
+            var posopt = self.options.position.split(" "),
+                horpos = posopt[0],
+                vertpos = posopt[1];
+            var modalWidth = self.$modalDialog.outerWidth(true);
+            var modalHeight = self.$modalDialog.outerHeight(true);
+            var wrapperInnerWidth = self.$wrapperInner.width();
+            var wrapperInnerHeight = self.$wrapperInner.height();
+            var pos = self.findPosition(
+                horpos,
+                vertpos,
+                margin,
+                modalWidth,
+                modalHeight,
+                wrapperInnerWidth,
+                wrapperInnerHeight
+            );
+            for (var key in pos) {
+                self.$modalDialog.css(key, pos[key]);
+            }
+        },
+
+        render: function (options) {
+            var self = this;
+            self.emit("render");
+            self.options.render.apply(self, [options]);
+            self.emit("rendered");
+        },
+
+        show: function () {
+            var self = this;
+            self.backdrop = self.createBackdrop();
+            self.createModal();
+        },
+
+        createBackdrop: function () {
+            var self = this,
+                backdrop = new Backdrop(
+                    self.$el.parents(self.options.backdrop),
+                    self.options.backdropOptions
+                ),
+                zIndex = 1041;
+
+            $(self.options.zIndexSelector).each(function () {
+                zIndex = Math.max(
+                    zIndex,
+                    parseInt($(this).css("zIndex")) + 1 || 1041
+                );
+            });
+
+            self.$wrapper = $("<div/>")
+                .hide()
+                .css({
+                    "z-index": zIndex,
+                    "overflow-y": "auto",
+                    "position": "fixed",
+                    "height": "100%",
+                    "width": "100%",
+                    "bottom": "0",
+                    "left": "0",
+                    "right": "0",
+                    "top": "0",
+                })
+                .addClass(self.options.templateOptions.classWrapperName)
+                .insertBefore(backdrop.$backdrop)
+                .on("click", function (e) {
+                    if (self.options.backdropOptions.closeOnClick) {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        backdrop.hide();
+                    }
+                });
+            backdrop.on("hidden", function (e) {
+                if (
+                    self.$modal !== undefined &&
+                    self.$modal.hasClass(
+                        self.options.templateOptions.classActiveName
+                    )
+                ) {
+                    self.hide();
+                }
+            });
+            self.loading = new utils.Loading({
+                backdrop: backdrop,
+            });
+            self.$wrapperInner = $("<div/>")
+                .addClass(self.options.classWrapperInnerName)
+                .css({
+                    position: "absolute",
+                    bottom: "0",
+                    left: "0",
+                    right: "0",
+                    top: "0",
+                })
+                .appendTo(self.$wrapper);
+            return backdrop;
+        },
+
+        _show: function () {
+            var self = this;
+            self.render.apply(self, [self.options]);
+            self.emit("show");
+            self.backdrop.show();
+            self.$wrapper.show();
+            self.loading.hide();
+            self.$el.addClass(self.options.templateOptions.classActiveName);
+            self.$modal.addClass(self.options.templateOptions.classActiveName);
+            registry.scan(self.$modal);
             self.positionModal();
-          })
-          .appendTo(self.$wrapperInner);
-
-        if (self.options.loadLinksWithinModal) {
-          self.$modal.on('click', function(e) {
-            e.stopPropagation();
-            if ($.nodeName(e.target, 'a')) {
-              e.preventDefault();
-              // TODO: open links inside modal
-              // and slide modal body
+            $(window.parent).on("resize.plone-modal.patterns", function () {
+                self.positionModal();
+            });
+            $("body").addClass("plone-modal-open");
+            self.emit("shown");
+        },
+        hide: function () {
+            var self = this;
+            if (self.ajaxXHR) {
+                self.ajaxXHR.abort();
             }
-            self.$modal.trigger('modal-click');
-          });
-        }
-        self.$modal.data('pattern-' + self.name, self);
-        self.emit('after-render');
-        if (options.onRender) {
-          if (typeof options.onRender === 'string') {
-            window[options.onRender](self);
-          } else {
-              options.onRender(self);
-          }
-        }
-
-      }
-    },
-    reloadWindow: function() {
-      window.parent.location.reload();
-    },
-    init: function() {
-      var self = this;
-      self.options.loadLinksWithinModal = $.parseJSON(self.options.loadLinksWithinModal);
-
-      // Router
-      if (self.options.routerOptions.id !== null) {
-        Router.addRoute('modal', self.options.routerOptions.id, function() {
-          this.show();
-        }, self, self.options.routerOptions.pathExp, self.options.routerOptions.expReplace);
-      }
-
-      if (self.options.backdropOptions.closeOnEsc === true) {
-        $(document).on('keydown', function(e, data) {
-          if (self.$el.is('.' + self.options.templateOptions.classActiveName)) {
-            if (e.keyCode === 27) {  // ESC key pressed
-              self.hide();
+            self.emit("hide");
+            if (self._suppressHide) {
+                if (!window.confirm(self._suppressHide)) {
+                    return;
+                }
             }
-          }
-        });
-      }
+            self.loading.hide();
+            self.$el.removeClass(self.options.templateOptions.classActiveName);
+            if (self.$modal !== undefined) {
+                self.$modal.remove();
+                self.initModal();
+            }
+            self.$wrapper.remove();
+            if ($(".plone-modal", $("body")).length < 1) {
+                self._suppressHide = undefined;
+                self.backdrop.hide();
+                $("body").removeClass("plone-modal-open");
+                $(window.parent).off("resize.plone-modal.patterns");
+            }
+            self.emit("hidden");
+            self.$el.focus();
+        },
 
+        redraw: function (response, options) {
+            var self = this;
+            self.emit("beforeDraw");
+            self.$modal.remove();
+            self.$raw = $("<div />").append($(utils.parseBodyTag(response)));
+            self.render.apply(self, [options || self.options]);
+            self.$modal.addClass(self.options.templateOptions.classActiveName);
+            self.positionModal();
+            registry.scan(self.$modal);
+            self.emit("afterDraw");
+        },
+    });
 
-
-
-      $(window.parent).resize(function() {
-        self.positionModal();
-      });
-
-      if (self.options.triggers) {
-        $.each(self.options.triggers, function(i, item) {
-          var e = item.substring(0, item.indexOf(' '));
-          var selector = item.substring(item.indexOf(' '), item.length);
-          $(selector || self.$el).on(e, function(e) {
-            e.stopPropagation();
-            e.preventDefault();
-            self.show();
-          });
-        });
-      }
-
-      if (self.$el.is('a')) {
-        if (self.$el.attr('href') && !self.options.image) {
-          if (!self.options.target && self.$el.attr('href').substr(0, 1) === '#') {
-            self.options.target = self.$el.attr('href');
-            self.options.content = '';
-          }
-          if (!self.options.ajaxUrl && self.$el.attr('href').substr(0, 1) !== '#') {
-            self.options.ajaxUrl = function () {
-              // Resolve ``href`` attribute later, when modal is shown.
-              return self.$el.attr('href');
-            };
-          }
-        }
-        self.$el.on('click', function(e) {
-          e.stopPropagation();
-          e.preventDefault();
-          self.show();
-        });
-      }
-      self.initModal();
-    },
-
-    createAjaxModal: function() {
-      var self = this;
-      self.emit('before-ajax');
-      self.loading.show();
-
-      var ajaxUrl = self.options.ajaxUrl;
-      if (typeof ajaxUrl === 'function') {
-        ajaxUrl = ajaxUrl.apply(self, [self.options]);
-      }
-
-      self.ajaxXHR = $.ajax({
-        url: ajaxUrl,
-        type: self.options.ajaxType
-      }).done(function(response, textStatus, xhr) {
-        self.ajaxXHR = undefined;
-        self.$raw = $('<div />').append($(utils.parseBodyTag(response)));
-        self.emit('after-ajax', self, textStatus, xhr);
-        self._show();
-      }).fail(function(xhr, textStatus, errorStatus){
-        var options = self.options.actionOptions;
-        if (textStatus === 'timeout' && options.onTimeout) {
-          options.onTimeout(self.$modal, xhr, errorStatus);
-        } else if (options.onError) {
-          options.onError(xhr, textStatus, errorStatus);
-        } else {
-          window.alert(_t('There was an error loading modal.'));
-          self.hide();
-        }
-        self.emit('linkActionError', [xhr, textStatus, errorStatus]);
-      }).always(function(){
-        self.loading.hide();
-      });
-    },
-
-    createTargetModal: function() {
-      var self = this;
-      self.$raw = $(self.options.target).clone();
-      self._show();
-    },
-
-    createBasicModal: function() {
-      var self = this;
-      self.$raw = $('<div/>').html(self.$el.clone());
-      self._show();
-    },
-
-    createHtmlModal: function() {
-      var self = this;
-      var $el = $(self.options.html);
-      self.$raw = $el;
-      self._show();
-    },
-
-    createImageModal: function(){
-      var self = this;
-      self.$wrapper.addClass('image-modal');
-      var src = self.$el.attr('href');
-      var srcset = self.$el.attr('data-modal-srcset') || '';
-      var title = $.trim(self.$el.context.innerText) || 'Image';
-      // XXX aria?
-      self.$raw = $('<div><h1>' + title + '</h1><div id="content"><div class="modal-image"><img src="' + src + '" srcset="' + srcset + '" /></div></div></div>');
-      self._show();
-    },
-
-    initModal: function() {
-      var self = this;
-      if (self.options.ajaxUrl) {
-        self.createModal = self.createAjaxModal;
-      } else if (self.options.target) {
-        self.createModal = self.createTargetModal;
-      } else if (self.options.html) {
-        self.createModal = self.createHtmlModal;
-      } else if (self.options.image){
-        self.createModal = self.createImageModal;
-      } else {
-        self.createModal = self.createBasicModal;
-      }
-    },
-
-    findPosition: function(horpos, vertpos, margin, modalWidth, modalHeight,
-                           wrapperInnerWidth, wrapperInnerHeight) {
-      var returnpos = {};
-      var absTop, absBottom, absLeft, absRight;
-      absRight = absLeft = absTop = absLeft = 'auto';
-
-      // -- HORIZONTAL POSITION -----------------------------------------------
-      if (horpos === 'left') {
-        absLeft = margin + 'px';
-        // if the width of the wrapper is smaller than the modal, and thus the
-        // screen is smaller than the modal, force the left to simply be 0
-        if (modalWidth > wrapperInnerWidth) {
-          absLeft = '0px';
-        }
-        returnpos.left = absLeft;
-      }
-      else if (horpos === 'right') {
-        absRight =  margin + 'px';
-        // if the width of the wrapper is smaller than the modal, and thus the
-        // screen is smaller than the modal, force the right to simply be 0
-        if (modalWidth > wrapperInnerWidth) {
-          absRight = '0px';
-        }
-        returnpos.right = absRight;
-        returnpos.left = 'auto';
-      }
-      // default, no specified location, is to center
-      else {
-        absLeft = ((wrapperInnerWidth / 2) - (modalWidth / 2) - margin) + 'px';
-        // if the width of the wrapper is smaller than the modal, and thus the
-        // screen is smaller than the modal, force the left to simply be 0
-        if (modalWidth > wrapperInnerWidth) {
-          absLeft = '0px';
-        }
-        returnpos.left = absLeft;
-      }
-
-      // -- VERTICAL POSITION -------------------------------------------------
-      if (vertpos === 'top') {
-        absTop = margin + 'px';
-        // if the height of the wrapper is smaller than the modal, and thus the
-        // screen is smaller than the modal, force the top to simply be 0
-        if (modalHeight > wrapperInnerHeight) {
-          absTop = '0px';
-        }
-        returnpos.top = absTop;
-      }
-      else if (vertpos === 'bottom') {
-        absBottom = margin + 'px';
-        // if the height of the wrapper is smaller than the modal, and thus the
-        // screen is smaller than the modal, force the bottom to simply be 0
-        if (modalHeight > wrapperInnerHeight) {
-          absBottom = '0px';
-        }
-        returnpos.bottom = absBottom;
-        returnpos.top = 'auto';
-      }
-      else {
-        // default case, no specified location, is to center
-        absTop = ((wrapperInnerHeight / 2) - (modalHeight / 2) - margin) + 'px';
-        // if the height of the wrapper is smaller than the modal, and thus the
-        // screen is smaller than the modal, force the top to simply be 0
-        if (modalHeight > wrapperInnerHeight) {
-          absTop = '0px';
-        }
-        returnpos.top = absTop;
-      }
-      return returnpos;
-    },
-
-    modalInitialized: function() {
-      var self = this;
-      return self.$modal !== null && self.$modal !== undefined;
-    },
-
-    positionModal: function() {
-      /* re-position modal at any point.
-       *
-       * Uses:
-       *  options.margin
-       *  options.width
-       *  options.height
-       *  options.position
-       */
-      var self = this;
-      // modal isn't initialized
-      if (!self.modalInitialized()) { return; }
-      // clear out any previously set styling
-      self.$modal.removeAttr('style');
-
-      // if backdrop wrapper is set on body, then wrapper should have height of
-      // the window, so we can do scrolling of inner wrapper
-      if (self.$wrapper.parent().is('body')) {
-        self.$wrapper.height($(window.parent).height());
-      }
-
-      var margin = typeof self.options.margin === 'function' ? self.options.margin() : self.options.margin;
-      self.$modal.css({
-        'position': 'absolute',
-        'padding': margin
-      });
-      self.$modalDialog.css({
-        margin: '0',
-        padding: '0',
-        width: self.options.width, // defaults to "", which doesn't override other css
-        height: self.options.height // defaults to "", which doesn't override other css
-      });
-      self.$modalContent.css({
-        width: self.options.width, // defaults to "", which doesn't override other css
-      });
-
-      var posopt = self.options.position.split(' '),
-          horpos = posopt[0],
-          vertpos = posopt[1];
-      var modalWidth = self.$modalDialog.outerWidth(true);
-      var modalHeight = self.$modalDialog.outerHeight(true);
-      var wrapperInnerWidth = self.$wrapperInner.width();
-      var wrapperInnerHeight = self.$wrapperInner.height();
-      var pos = self.findPosition(
-        horpos, vertpos, margin, modalWidth, modalHeight,
-        wrapperInnerWidth, wrapperInnerHeight
-      );
-      for (var key in pos) {
-        self.$modalDialog.css(key, pos[key]);
-      }
-    },
-
-    render: function(options) {
-      var self = this;
-      self.emit('render');
-      self.options.render.apply(self, [options]);
-      self.emit('rendered');
-    },
-
-    show: function() {
-      var self = this;
-      self.backdrop = self.createBackdrop();
-      self.createModal();
-    },
-
-    createBackdrop: function() {
-      var self = this,
-          backdrop = new Backdrop(
-            self.$el.parents(self.options.backdrop),
-            self.options.backdropOptions
-          ),
-          zIndex = 1041;
-
-      $(self.options.zIndexSelector).each(function(){
-        zIndex = Math.max(zIndex, parseInt($(this).css('zIndex')) + 1 || 1041);
-      });
-
-      self.$wrapper = $('<div/>')
-        .hide()
-        .css({
-          'z-index': zIndex,
-          'overflow-y': 'auto',
-          'position': 'fixed',
-          'height': '100%',
-          'width': '100%',
-          'bottom': '0',
-          'left': '0',
-          'right': '0',
-          'top': '0'
-        })
-        .addClass(self.options.templateOptions.classWrapperName)
-        .insertBefore(backdrop.$backdrop)
-        .on('click', function(e) {
-          if (self.options.backdropOptions.closeOnClick) {
-            e.stopPropagation();
-            e.preventDefault();
-            backdrop.hide();
-          }
-        });
-      backdrop.on('hidden', function(e) {
-        if (self.$modal !== undefined && self.$modal.hasClass(self.options.templateOptions.classActiveName)) {
-          self.hide();
-        }
-      });
-      self.loading = new utils.Loading({
-        'backdrop': backdrop
-      });
-      self.$wrapperInner = $('<div/>')
-        .addClass(self.options.classWrapperInnerName)
-        .css({
-          'position': 'absolute',
-          'bottom': '0',
-          'left': '0',
-          'right': '0',
-          'top': '0'
-        })
-        .appendTo(self.$wrapper);
-      return backdrop;
-    },
-
-    _show: function() {
-      var self = this;
-      self.render.apply(self, [ self.options ]);
-      self.emit('show');
-      self.backdrop.show();
-      self.$wrapper.show();
-      self.loading.hide();
-      self.$el.addClass(self.options.templateOptions.classActiveName);
-      self.$modal.addClass(self.options.templateOptions.classActiveName);
-      registry.scan(self.$modal);
-      self.positionModal();
-      $(window.parent).on('resize.plone-modal.patterns', function() {
-        self.positionModal();
-      });
-      $('body').addClass('plone-modal-open');
-      self.emit('shown');
-    },
-    hide: function() {
-      var self = this;
-      if (self.ajaxXHR) {
-        self.ajaxXHR.abort();
-      }
-      self.emit('hide');
-      if (self._suppressHide) {
-        if (!window.confirm(self._suppressHide)) {
-          return;
-        }
-      }
-      self.loading.hide();
-      self.$el.removeClass(self.options.templateOptions.classActiveName);
-      if (self.$modal !== undefined) {
-        self.$modal.remove();
-        self.initModal();
-      }
-      self.$wrapper.remove();
-      if ($('.plone-modal', $('body')).size() < 1) {
-        self._suppressHide = undefined;
-        self.backdrop.hide();
-        $('body').removeClass('plone-modal-open');
-        $(window.parent).off('resize.plone-modal.patterns');
-      }
-      self.emit('hidden');
-    },
-
-    redraw: function(response, options) {
-      var self = this;
-      self.emit('beforeDraw');
-      self.$modal.remove();
-      self.$raw = $('<div />').append($(utils.parseBodyTag(response)));
-      self.render.apply(self, [options || self.options]);
-      self.$modal.addClass(self.options.templateOptions.classActiveName);
-      self.positionModal();
-      registry.scan(self.$modal);
-      self.emit('afterDraw');
-    }
-  });
-
-  return Modal;
+    return Modal;
 });
 
 /*
@@ -33380,673 +33060,782 @@ define('mockup-patterns-modal',[
  * code that has since been removed from mockup
  */
 
-define('mockup-patterns-resourceregistry-url/js/iframe',[
-  'jquery'
-], function($) {
-  'use strict';
+define('mockup-patterns-resourceregistry-url/js/iframe',["jquery"], function ($) {
+    "use strict";
 
-  window.IFrame = function(options) { this.init(options); };
-  window.IFrame.prototype = {
-    defaults: {
-      doctype: '<!doctype html>',
-      title: '',
-      name: '',
-      resources: [],
-      callback: function(){},
-      configure: function(){},
-      onLoad: function(){}
-    },
+    window.IFrame = function (options) {
+        this.init(options);
+    };
+    window.IFrame.prototype = {
+        defaults: {
+            doctype: "<!doctype html>",
+            title: "",
+            name: "",
+            resources: [],
+            callback: function () {},
+            configure: function () {},
+            onLoad: function () {},
+        },
 
-    init: function(options) {
-      var self = this;
-      self.options = $.extend({}, self.defaults, options);
+        init: function (options) {
+            var self = this;
+            self.options = $.extend({}, self.defaults, options);
 
-      // register this guy
-      if(!window.iframe){
-        window.iframe = {};
-      }
-      window.iframe[self.options.name] = self;
+            // register this guy
+            if (!window.iframe) {
+                window.iframe = {};
+            }
+            window.iframe[self.options.name] = self;
 
-      self.loaded = false;
+            self.loaded = false;
 
-      // Create iframe
-      var iframe = window.document.createElement('iframe');
+            // Create iframe
+            var iframe = window.document.createElement("iframe");
 
-      iframe.setAttribute('id', self.options.name);
-      iframe.setAttribute('name', self.options.name);
-      iframe.setAttribute('style', 'display:none;');
-      iframe.setAttribute('src', 'javascript:false');
+            iframe.setAttribute("id", self.options.name);
+            iframe.setAttribute("name", self.options.name);
+            iframe.setAttribute("style", "display:none;");
+            iframe.setAttribute("src", "javascript:false");
 
-      window.document.body.appendChild(iframe);
-      self.el = iframe;
-      self.window = iframe.contentWindow;
-      self.document = self.window.document;
+            window.document.body.appendChild(iframe);
+            self.el = iframe;
+            self.window = iframe.contentWindow;
+            self.document = self.window.document;
 
-      self.options.configure(self);
+            self.options.configure(self);
 
-      var resourcesData = '';
-      for(var i=0; i<self.options.resources.length; i=i+1){
-        var url = self.options.resources[i];
-        var resource;
-        if (url.slice( -3 ) === '.js') {
-          resource = window.document.createElement('script');
-          resource.src = url;
-          resource.type = 'text/javascript';
-          resource.async = false;
-        } else if (url.slice( -4 ) === '.css') {
-          resource = window.document.createElement('link');
-          resource.href = url;
-          resource.type = 'text/css';
-          resource.rel = 'stylesheet';
-        } else if (url.slice( -5 ) === '.less') {
-          resource = window.document.createElement('link');
-          resource.href = url;
-          resource.type = 'text/css';
-          resource.rel = 'stylesheet/less';
-        }
-        resourcesData += '\n' + resource.outerHTML;
-      }
+            var resourcesData = "";
+            for (var i = 0; i < self.options.resources.length; i = i + 1) {
+                var url = self.options.resources[i];
+                var resource;
+                if (url.slice(-3) === ".js") {
+                    resource = window.document.createElement("script");
+                    resource.src = url;
+                    resource.type = "text/javascript";
+                    resource.async = false;
+                } else if (url.slice(-4) === ".css") {
+                    resource = window.document.createElement("link");
+                    resource.href = url;
+                    resource.type = "text/css";
+                    resource.rel = "stylesheet";
+                } else if (url.slice(-5) === ".less") {
+                    resource = window.document.createElement("link");
+                    resource.href = url;
+                    resource.type = "text/css";
+                    resource.rel = "stylesheet/less";
+                }
+                resourcesData += "\n" + resource.outerHTML;
+            }
 
-      self.document.open();
-      self.document.write(
-          self.options.doctype +
-          '<html>' +
-            '<head>' +
-              '<title>' + self.options.title + '</title>' +
-              '<meta http-equiv="X-UA-Compatible" content="IE=edge">' +
-            '</head>' +
-            '<body onload="parent.window.iframe[\'' +
-                self.options.name + '\'].load()">' +
-              resourcesData +
-            '</body>' +
-          '</html>'
-      );
-      self.document.close();
-    },
+            self.document.open();
+            self.document.write(
+                self.options.doctype +
+                    "<html>" +
+                    "<head>" +
+                    "<title>" +
+                    self.options.title +
+                    "</title>" +
+                    '<meta http-equiv="X-UA-Compatible" content="IE=edge">' +
+                    "</head>" +
+                    "<body onload=\"parent.window.iframe['" +
+                    self.options.name +
+                    "'].load()\">" +
+                    resourcesData +
+                    "</body>" +
+                    "</html>"
+            );
+            self.document.close();
+        },
 
-    load: function() {
-      var self = this;
+        load: function () {
+            var self = this;
 
-      // check if already loaded
-      if ( self.loaded === true ) {
-        return;
-      }
+            // check if already loaded
+            if (self.loaded === true) {
+                return;
+            }
 
-      // mark iframe as loaded
-      self.loaded = true;
+            // mark iframe as loaded
+            self.loaded = true;
 
-      self.options.onLoad(self);
-    },
-    destroy: function(){
-      delete window.iframe[this.options.name];
-      window.document.body.removeChild(this.el);
-    }
-  };
+            self.options.onLoad(self);
+        },
+        destroy: function () {
+            delete window.iframe[this.options.name];
+            window.document.body.removeChild(this.el);
+        },
+    };
 
-  return window.IFrame;
+    return window.IFrame;
 });
 
-
 define('mockup-patterns-resourceregistry-url/js/builder',[
-  'jquery',
-  'mockup-patterns-modal',
-  'underscore',
-  'mockup-utils',
-  'mockup-patterns-resourceregistry-url/js/iframe',
-  'translate'
-], function($, Modal, _, utils, IFrame, _t){
-  'use strict';
+    "jquery",
+    "mockup-patterns-modal",
+    "underscore",
+    "mockup-utils",
+    "mockup-patterns-resourceregistry-url/js/iframe",
+    "translate",
+], function ($, Modal, _, utils, IFrame, _t) {
+    "use strict";
 
-  var Builder = function(bundleName, bundleListItem){
-    var self = this;
-    self.bundleName = bundleName;
-    self.bundleListItem = bundleListItem;
-    self.rview = bundleListItem.options.registryView;
-    self.$results = null;
-    self.$btnClose = null;
+    var Builder = function (bundleName, bundleListItem) {
+        var self = this;
+        self.bundleName = bundleName;
+        self.bundleListItem = bundleListItem;
+        self.rview = bundleListItem.options.registryView;
+        self.$results = null;
+        self.$btnClose = null;
 
-    self.rview.loading.show();
-    self.modal = new Modal($('<div/>').appendTo(self.rview.$el), {
-      html: _.template('<div id="content">' +
-        '<h1>Bundle Builder</h1>' +
-        '<div class="start-info"><p>You are about to build the <span class="label label-primary">' +
-          '<%= name %></span> pattern. </p><p>This may take some a bit of time so ' +
-          'we will try to keep you updated on the progress.</p><p> Press the "Build it" ' +
-          'button to proceed.</p></div>' +
-        '<ul class="list-group hidden"></ul>' +
-        '<button class="plone-btn plone-btn-default cancel hidden cancel-build"><%- _t("Close") %></button>' +
-        '<button class="plone-btn plone-btn-primary build"><%- _t("Build it") %></button>' +
-      '</div>')($.extend({ _t: _t }, bundleListItem.options)),
-      content: null,
-      width: 500,
-      buttons: '.plone-btn'
-    });
-    self.modal.on('shown', function() {
-      var $el = self.modal.$modal;
-      var $info = $el.find('.start-info');
-      self.$btnClose = $el.find('button.cancel-build');
-      var $btn = $el.find('button.build');
-      $btn.off('click').on('click', function(e){
-        e.preventDefault();
-        $info.addClass('hidden');
-        $btn.prop('disabled', true);
-        self.$results = $el.find('.list-group').removeClass('hidden');
-        self.buildJS();
         self.rview.loading.show();
-      });
-
-      self.$btnClose.off('click').on('click', function(){
-        self.modal.hide();
-      });
-    });
-
-    self.addResult = function(txt, klass){
-      if(!klass){
-        klass = '';
-      }
-      self.$results.append('<li class="list-group-item ' + klass + '">' + txt + '</li>');
-    };
-
-    self.run = function(){
-      self.modal.show();
-    };
-
-    self.finished = function(error){
-      var msg = _t('Finished!');
-      if(error){
-        msg = _t('Error in build process');
-      }
-      self.addResult(msg, 'list-group-item-warning');
-      self.$btnClose.removeClass('hidden');
-      self.rview.loading.hide();
-    };
-
-    self.buildJS = function(){
-      self.addResult(_t('building javascripts'));
-      $.ajax({
-        url: self.rview.options.data.manageUrl,
-        type: 'POST',
-        dataType: 'json',
-        data: {
-          action: 'js-build-config',
-          bundle: self.bundleName,
-          _authenticator: utils.getAuthenticator()
-        },
-        success: function(data){
-          /* sort of weird here, follow along. We'll build CSS after JS */
-          self._buildJSBundle(data);
-        },
-        error: function(){
-          self.addResult(_t('Error building resources'));
-          self.finished(true);
-        }
-      });
-    };
-
-    self._buildCSSBundle = function(config){
-      var iframe = new IFrame({
-        name: 'lessc',
-        resources: config.less.concat([
-          self.rview.options.data.lessConfigUrl,
-          self.rview.options.data.lessUrl]),
-        configure: function(iframe){
-          iframe.window.lessErrorReporting = function(what, error, href){
-            if(what !== 'remove'){
-              self.addResult(_t('less compilation error on file ') + href + ': ' + error);
-            }
-          };
-        }
-      });
-
-      /* XXX okay, wish there were a better way,
-         but we need to pool to find the out if it's down loading less */
-      self.addResult(config.less.length + _t(' css files to build'));
-      var lessModified = Boolean(
-          self.rview.options.data.lessModifyUrl === null ||
-          self.rview.options.data.lessModifyUrl === undefined
-      );
-      var checkFinished = function(){
-        var $styles =  $('style[type="text/css"][id]', iframe.document);
-        for(var i=0; i<$styles.length; i=i+1){
-          var $style = $styles.eq(i);
-          if($style.attr('id') === 'less:error-message'){
-            self.addResult(_t('Error compiling less'));
-            return self.finished(true);
-          }
-        }
-        if($styles.length === config.less.length && lessModified === true){
-          // we're finished, save it
-          var data = {};
-          $styles.each(function(){
-            var $el = $(this);
-            data['data-' + $el.attr('id')] = $el.html();
-          });
-          iframe.destroy();
-          $.ajax({
-            url: self.rview.options.data.manageUrl,
-            type: 'POST',
-            dataType: 'json',
-            data: $.extend(data, {
-              action: 'save-less-build',
-              bundle: self.bundleName,
-              _authenticator: utils.getAuthenticator()
-            }),
-            success: function(data){
-              self.rview.options.data.overrides.push(data.filepath);
-              self.rview.tabView.overridesView.render();
-              self.addResult(_t('finished saving css bundles'));
-              self.finished();
-            },
-            error: function(){
-              self.addResult(_t('Error saving css bundle'));
-              self.finished(true);
-            }
-          });
-        }else if($styles.length === config.less.length){
-          $styles.each(function(){$(this).remove();});
-          /* XXX is this dead code? */
-          script = document.createElement('script');
-          script.setAttribute('type', 'text/javascript');
-          script.setAttribute('src', self.rview.options.data.lessModifyUrl);
-          head.appendChild(script);
-
-          lessModified = true;
-          setTimeout(checkFinished, 300);
-        }else{
-          setTimeout(checkFinished, 300);
-        }
-      };
-      checkFinished();
-    };
-
-    self.buildCSSBundle = function(){
-      self.addResult(_t('building CSS bundle'));
-      $.ajax({
-        url: self.rview.options.data.manageUrl,
-        type: 'POST',
-        dataType: 'json',
-        data: {
-          action: 'less-build-config',
-          bundle: self.bundleName,
-          _authenticator: utils.getAuthenticator()
-        },
-        success: function(data){
-          /* sort of weird here, follow along. We'll build CSS after JS */
-          self._buildCSSBundle(data);
-        },
-        error: function(){
-          self.addResult(_t('Error building css bundle'));
-          self.finished(true);
-        }
-      });
-    };
-
-    self._buildJSBundle = function(config){
-      if(config.include.length === 0){
-        self.addResult(_t('No javascripts to build, skipping'));
-        return self.buildCSSBundle();
-      }
-
-      config.out = function(results){
-        $.ajax({
-          url: self.rview.options.data.manageUrl,
-          type: 'POST',
-          dataType: 'json',
-          data: {
-            action: 'save-js-build',
-            bundle: self.bundleName,
-            data: results,
-            _authenticator: utils.getAuthenticator()
-          },
-          success: function(data){
-            self.rview.options.data.overrides.push(data.filepath);
-            self.rview.tabView.overridesView.render();
-          },
-          error: function(){
-            self.addResult(_t('Error building bundle'));
-            self.finished(true);
-          }
+        self.modal = new Modal($("<div/>").appendTo(self.rview.$el), {
+            html: _.template(
+                '<div id="content">' +
+                    "<h1>Bundle Builder</h1>" +
+                    '<div class="start-info"><p>You are about to build the <span class="label label-primary">' +
+                    "<%= name %></span> pattern. </p><p>This may take some a bit of time so " +
+                    'we will try to keep you updated on the progress.</p><p> Press the "Build it" ' +
+                    "button to proceed.</p></div>" +
+                    '<ul class="list-group hidden"></ul>' +
+                    '<button class="plone-btn plone-btn-default cancel hidden cancel-build"><%- _t("Close") %></button>' +
+                    '<button class="plone-btn plone-btn-primary build"><%- _t("Build it") %></button>' +
+                    "</div>"
+            )($.extend({ _t: _t }, bundleListItem.options)),
+            content: null,
+            width: 500,
+            buttons: ".plone-btn",
         });
-      };
-      new IFrame({
-        name: 'rjs',
-        resources: [self.rview.options.data.rjsUrl],
-        onLoad: function(iframe){
-          iframe.window.requirejs.optimize(config, function(combined_files){
-            self.addResult(_t('Saved javascript bundle, Build results') + ': <pre>' + combined_files + '</pre>');
-            self.buildCSSBundle();
-            iframe.destroy();
-          });
-        }
-      });
+        self.modal.on("shown", function () {
+            var $el = self.modal.$modal;
+            var $info = $el.find(".start-info");
+            self.$btnClose = $el.find("button.cancel-build");
+            var $btn = $el.find("button.build");
+            $btn.off("click").on("click", function (e) {
+                e.preventDefault();
+                $info.addClass("hidden");
+                $btn.prop("disabled", true);
+                self.$results = $el.find(".list-group").removeClass("hidden");
+                self.buildJS();
+                self.rview.loading.show();
+            });
+
+            self.$btnClose.off("click").on("click", function () {
+                self.modal.hide();
+            });
+        });
+
+        self.addResult = function (txt, klass) {
+            if (!klass) {
+                klass = "";
+            }
+            self.$results.append(
+                '<li class="list-group-item ' + klass + '">' + txt + "</li>"
+            );
+        };
+
+        self.run = function () {
+            self.modal.show();
+        };
+
+        self.finished = function (error) {
+            var msg = _t("Finished!");
+            if (error) {
+                msg = _t("Error in build process");
+            }
+            self.addResult(msg, "list-group-item-warning");
+            self.$btnClose.removeClass("hidden");
+            self.rview.loading.hide();
+        };
+
+        self.buildJS = function () {
+            self.addResult(_t("building javascripts"));
+            $.ajax({
+                url: self.rview.options.data.manageUrl,
+                type: "POST",
+                dataType: "json",
+                data: {
+                    action: "js-build-config",
+                    bundle: self.bundleName,
+                    _authenticator: utils.getAuthenticator(),
+                },
+                success: function (data) {
+                    /* sort of weird here, follow along. We'll build CSS after JS */
+                    self._buildJSBundle(data);
+                },
+                error: function () {
+                    self.addResult(_t("Error building resources"));
+                    self.finished(true);
+                },
+            });
+        };
+
+        self._buildCSSBundle = function (config) {
+            var iframe = new IFrame({
+                name: "lessc",
+                resources: config.less.concat([
+                    self.rview.options.data.lessConfigUrl,
+                    self.rview.options.data.lessUrl,
+                ]),
+                configure: function (iframe) {
+                    iframe.window.lessErrorReporting = function (
+                        what,
+                        error,
+                        href
+                    ) {
+                        if (what !== "remove") {
+                            self.addResult(
+                                _t("less compilation error on file ") +
+                                    href +
+                                    ": " +
+                                    error
+                            );
+                        }
+                    };
+                },
+            });
+
+            /* XXX okay, wish there were a better way,
+         but we need to pool to find the out if it's down loading less */
+            self.addResult(config.less.length + _t(" css files to build"));
+            var lessModified = Boolean(
+                self.rview.options.data.lessModifyUrl === null ||
+                    self.rview.options.data.lessModifyUrl === undefined
+            );
+            var checkFinished = function () {
+                var $styles = $('style[type="text/css"][id]', iframe.document);
+                for (var i = 0; i < $styles.length; i = i + 1) {
+                    var $style = $styles.eq(i);
+                    if ($style.attr("id") === "less:error-message") {
+                        self.addResult(_t("Error compiling less"));
+                        return self.finished(true);
+                    }
+                }
+                if (
+                    $styles.length === config.less.length &&
+                    lessModified === true
+                ) {
+                    // we're finished, save it
+                    var data = {};
+                    $styles.each(function () {
+                        var $el = $(this);
+                        data["data-" + $el.attr("id")] = $el.html();
+                    });
+                    iframe.destroy();
+                    $.ajax({
+                        url: self.rview.options.data.manageUrl,
+                        type: "POST",
+                        dataType: "json",
+                        data: $.extend(data, {
+                            action: "save-less-build",
+                            bundle: self.bundleName,
+                            _authenticator: utils.getAuthenticator(),
+                        }),
+                        success: function (data) {
+                            self.rview.options.data.overrides.push(
+                                data.filepath
+                            );
+                            self.rview.tabView.overridesView.render();
+                            self.addResult(_t("finished saving css bundles"));
+                            self.finished();
+                        },
+                        error: function () {
+                            self.addResult(_t("Error saving css bundle"));
+                            self.finished(true);
+                        },
+                    });
+                } else if ($styles.length === config.less.length) {
+                    $styles.each(function () {
+                        $(this).remove();
+                    });
+                    /* XXX is this dead code? */
+                    script = document.createElement("script");
+                    script.setAttribute("type", "text/javascript");
+                    script.setAttribute(
+                        "src",
+                        self.rview.options.data.lessModifyUrl
+                    );
+                    head.appendChild(script);
+
+                    lessModified = true;
+                    setTimeout(checkFinished, 300);
+                } else {
+                    setTimeout(checkFinished, 300);
+                }
+            };
+            checkFinished();
+        };
+
+        self.buildCSSBundle = function () {
+            self.addResult(_t("building CSS bundle"));
+            $.ajax({
+                url: self.rview.options.data.manageUrl,
+                type: "POST",
+                dataType: "json",
+                data: {
+                    action: "less-build-config",
+                    bundle: self.bundleName,
+                    _authenticator: utils.getAuthenticator(),
+                },
+                success: function (data) {
+                    /* sort of weird here, follow along. We'll build CSS after JS */
+                    self._buildCSSBundle(data);
+                },
+                error: function () {
+                    self.addResult(_t("Error building css bundle"));
+                    self.finished(true);
+                },
+            });
+        };
+
+        self._buildJSBundle = function (config) {
+            if (config.include.length === 0) {
+                self.addResult(_t("No javascripts to build, skipping"));
+                return self.buildCSSBundle();
+            }
+
+            config.out = function (results) {
+                $.ajax({
+                    url: self.rview.options.data.manageUrl,
+                    type: "POST",
+                    dataType: "json",
+                    data: {
+                        action: "save-js-build",
+                        bundle: self.bundleName,
+                        data: results,
+                        _authenticator: utils.getAuthenticator(),
+                    },
+                    success: function (data) {
+                        self.rview.options.data.overrides.push(data.filepath);
+                        self.rview.tabView.overridesView.render();
+                    },
+                    error: function () {
+                        self.addResult(_t("Error building bundle"));
+                        self.finished(true);
+                    },
+                });
+            };
+            new IFrame({
+                name: "rjs",
+                resources: [self.rview.options.data.rjsUrl],
+                onLoad: function (iframe) {
+                    iframe.window.requirejs.optimize(config, function (
+                        combined_files
+                    ) {
+                        self.addResult(
+                            _t("Saved javascript bundle, Build results") +
+                                ": <pre>" +
+                                combined_files +
+                                "</pre>"
+                        );
+                        self.buildCSSBundle();
+                        iframe.destroy();
+                    });
+                },
+            });
+        };
+
+        return self;
     };
 
-    return self;
-  };
-
-  return Builder;
+    return Builder;
 });
 
 define('mockup-patterns-resourceregistry-url/js/registry',[
-  'jquery',
-  'underscore',
-  'mockup-ui-url/views/base',
-  'mockup-utils',
-  'mockup-patterns-resourceregistry-url/js/fields',
-  'mockup-patterns-resourceregistry-url/js/builder',
-  'translate'
-], function($, _, BaseView, utils, fields, Builder, _t) {
-  'use strict';
+    "jquery",
+    "underscore",
+    "mockup-ui-url/views/base",
+    "mockup-utils",
+    "mockup-patterns-resourceregistry-url/js/fields",
+    "mockup-patterns-resourceregistry-url/js/builder",
+    "translate",
+], function ($, _, BaseView, utils, fields, Builder, _t) {
+    "use strict";
 
-  var AbstractResourceEntryView = BaseView.extend({
-    tagName: 'div',
-    className: 'resource-entry',
-    template: _.template(
-      '<h3><%- name %></h3>' +
-      '<div class="panel-body form-horizontal">' +
-      '</div>'
-    ),
+    var AbstractResourceEntryView = BaseView.extend({
+        tagName: "div",
+        className: "resource-entry",
+        template: _.template(
+            "<h3><%- name %></h3>" +
+                '<div class="panel-body form-horizontal">' +
+                "</div>"
+        ),
 
-    serializedModel: function(){
-      return $.extend({}, {name: this.name}, this.options);
-    },
+        serializedModel: function () {
+            return $.extend({}, { name: this.name }, this.options);
+        },
 
-    afterRender: function(){
-      var self = this;
-      var $body = self.$('.panel-body');
-      self.$el.addClass(self.name + '-resource-entry');
-      _.each(self.fields, function(field){
-        var options = $.extend({}, field, {
-          value: self.options.data[field.name],
-          registryData: self.options.data,
-          containerData: self.options.containerData,
-          resourceName: self.options.name,
-          registryView: self.options.registryView,
-          parent: self.options.parent,
-          form: self
-        });
-        if(!options.value){
-          options.value = '';
-        }
-        var View = field.view;
-        if(!View){
-          View = fields.ResourceInputFieldView;
-        }
-        $body.append((new View(options)).render().el);
-      });
-    }
-  });
+        afterRender: function () {
+            var self = this;
+            var $body = self.$(".panel-body");
+            self.$el.addClass(self.name + "-resource-entry");
+            _.each(self.fields, function (field) {
+                var options = $.extend({}, field, {
+                    value: self.options.data[field.name],
+                    registryData: self.options.data,
+                    containerData: self.options.containerData,
+                    resourceName: self.options.name,
+                    registryView: self.options.registryView,
+                    parent: self.options.parent,
+                    form: self,
+                });
+                if (!options.value) {
+                    options.value = "";
+                }
+                var View = field.view;
+                if (!View) {
+                    View = fields.ResourceInputFieldView;
+                }
+                $body.append(new View(options).render().el);
+            });
+        },
+    });
 
+    var ResourceEntryView = AbstractResourceEntryView.extend({
+        fields: [
+            {
+                name: "name",
+                title: _t("Name"),
+                view: fields.ResourceNameFieldView,
+            },
+            {
+                name: "url",
+                title: _t("URL"),
+                description: _t("Resources base URL"),
+            },
+            {
+                name: "js",
+                title: _t("JS"),
+                description: _t("Main JavaScript file"),
+            },
+            {
+                name: "css",
+                title: _t("CSS/LESS"),
+                description: _t("List of CSS/LESS files to use for resource"),
+                view: fields.ResourceSortableListFieldView,
+            },
+            {
+                name: "init",
+                title: _t("Init"),
+                description: _t("Init instruction for requirejs shim"),
+            },
+            {
+                name: "deps",
+                title: _t("Dependencies"),
+                description: _t(
+                    "Comma-separated values of resources for requirejs shim"
+                ),
+            },
+            {
+                name: "export",
+                title: _t("Export"),
+                description: _t("Export vars for requirejs shim"),
+            },
+            {
+                name: "conf",
+                title: _t("Configuration"),
+                description: _t("Configuration in JSON for the widget"),
+                view: fields.ResourceTextAreaFieldView,
+            },
+        ],
+    });
 
-  var ResourceEntryView = AbstractResourceEntryView.extend({
-    fields: [{
-      name: 'name',
-      title: _t('Name'),
-      view: fields.ResourceNameFieldView
-    }, {
-      name: 'url',
-      title: _t('URL'),
-      description: _t('Resources base URL')
-    }, {
-      name: 'js',
-      title: _t('JS'),
-      description: _t('Main JavaScript file')
-    }, {
-      name: 'css',
-      title: _t('CSS/LESS'),
-      description: _t('List of CSS/LESS files to use for resource'),
-      view: fields.ResourceSortableListFieldView
-    },{
-      name: 'init',
-      title: _t('Init'),
-      description: _t('Init instruction for requirejs shim')
-    }, {
-      name: 'deps',
-      title: _t('Dependencies'),
-      description: _t('Comma-separated values of resources for requirejs shim')
-    }, {
-      name: 'export',
-      title: _t('Export'),
-      description: _t('Export vars for requirejs shim')
-    }, {
-      name: 'conf',
-      title: _t('Configuration'),
-      description: _t('Configuration in JSON for the widget'),
-      view: fields.ResourceTextAreaFieldView
-    }]
-  });
+    var BundleEntryView = AbstractResourceEntryView.extend({
+        fields: [
+            {
+                name: "name",
+                title: _t("Name"),
+                view: fields.ResourceNameFieldView,
+            },
+            {
+                name: "resources",
+                title: _t("Resources"),
+                description: _t(
+                    "A main resource file to bootstrap bundle or a list of resources to load."
+                ),
+                view: fields.BundleResourcesFieldView,
+            },
+            {
+                name: "depends",
+                title: _t("Depends"),
+                description: _t("Bundle this depends on"),
+                view: fields.BundleDependsFieldView,
+            },
+            {
+                name: "expression",
+                title: _t("Expression"),
+                description: _t(
+                    "Conditional expression to decide if this resource will run"
+                ),
+            },
+            {
+                name: "enabled",
+                title: _t("Enabled"),
+                view: fields.ResourceBoolFieldView,
+            },
+            {
+                name: "conditionalcomment",
+                title: _t("Conditional comment"),
+                description: _t("Internet Explorer conditional comment"),
+            },
+            {
+                name: "load_async",
+                title: _t("Load JavaScript asynchronously?"),
+                view: fields.ResourceBoolFieldView,
+            },
+            {
+                name: "load_defer",
+                title: _t("Load JavaScript deferred?"),
+                view: fields.ResourceBoolFieldView,
+            },
+            {
+                name: "compile",
+                title: _t(
+                    "Does your bundle contain any RequireJS or LESS files?"
+                ),
+                view: fields.ResourceBoolFieldView,
+            },
+            {
+                name: "merge_with",
+                title: _t("Merge with"),
+                description: _t(
+                    "In production, the bundle is merged together with others. Select which one here."
+                ),
+                view: fields.MergeWithFieldView,
+            },
+            {
+                name: "last_compilation",
+                title: _t("Last compilation"),
+                description: _t(
+                    "Date/Time when your bundle was last compiled. Empty, if it was never compiled."
+                ),
+            },
+            {
+                name: "jscompilation",
+                title: _t("Compiled JavaScript"),
+                description: _t(
+                    "Automatically generated path to the compiled JavaScript."
+                ),
+            },
+            {
+                name: "csscompilation",
+                title: _t("Compiled CSS"),
+                description: _t(
+                    "Automatically generated path to the compiled CSS."
+                ),
+            },
+            {
+                name: "stub_js_modules",
+                title: _t("Stub JS Modules"),
+                description: _t(
+                    "Define list of modules that will be not be defined empty " +
+                        "on RequireJS build steps to prevent loading modules multiple times."
+                ),
+                view: fields.ResourceSortableListFieldView,
+            },
+        ],
+    });
 
+    var RegistryResourceListItem = BaseView.extend({
+        tagName: "li",
+        type: "resource",
+        className: "list-group-item",
+        template: _.template(
+            '<a href="#"><%- name %></a> ' +
+                '<button class="pull-right plone-btn plone-btn-danger delete plone-btn-xs"><%- _t("Delete") %></button>'
+        ),
+        events: {
+            "click a": "editResource",
+            "click button.delete": "deleteClicked",
+        },
+        defaults: {
+            develop_javascript: false,
+            develop_css: false,
+            compile: true,
+        },
+        afterRender: function () {
+            this.$el.attr("data-name", this.options.name);
+            this.$el.addClass(this.type + "-list-item-" + this.options.name);
+        },
+        serializedModel: function () {
+            return $.extend(
+                {},
+                this.defaults,
+                {
+                    name: this.options.name,
+                    view: this.options.registryView,
+                },
+                this.options.data
+            );
+        },
+        editResource: function (e) {
+            if (e) {
+                e.preventDefault();
+            }
+            var options = $.extend({}, this.options, {
+                containerData: this.options.registryView.options.data.resources,
+                parent: this,
+            });
+            var resource = new ResourceEntryView(options);
+            this.registryView.showResourceEditor(resource, this, "resource");
 
-  var BundleEntryView = AbstractResourceEntryView.extend({
-    fields: [{
-      name: 'name',
-      title: _t('Name'),
-      view: fields.ResourceNameFieldView
-    }, {
-      name: 'resources',
-      title: _t('Resources'),
-      description: _t('A main resource file to bootstrap bundle or a list of resources to load.'),
-      view: fields.BundleResourcesFieldView
-    }, {
-      name: 'depends',
-      title: _t('Depends'),
-      description: _t('Bundle this depends on'),
-      view: fields.BundleDependsFieldView
-    }, {
-      name: 'expression',
-      title: _t('Expression'),
-      description: _t('Conditional expression to decide if this resource will run')
-    }, {
-      name: 'enabled',
-      title: _t('Enabled'),
-      view: fields.ResourceBoolFieldView
-    }, {
-      name: 'conditionalcomment',
-      title: _t('Conditional comment'),
-      description: _t('Internet Explorer conditional comment')
-    }, {
-      name: 'load_async',
-      title: _t('Load JavaScript asynchronously?'),
-      view: fields.ResourceBoolFieldView
-    }, {
-      name: 'load_defer',
-      title: _t('Load JavaScript deferred?'),
-      view: fields.ResourceBoolFieldView
-    }, {
-      name: 'compile',
-      title: _t('Does your bundle contain any RequireJS or LESS files?'),
-      view: fields.ResourceBoolFieldView
-    }, {
-      name: 'merge_with',
-      title: _t('Merge with'),
-      description: _t('In production, the bundle is merged together with others. Select which one here.'),
-      view: fields.MergeWithFieldView
-    }, {
-      name: 'last_compilation',
-      title: _t('Last compilation'),
-      description: _t('Date/Time when your bundle was last compiled. Empty, if it was never compiled.')
-    }, {
-      name: 'jscompilation',
-      title: _t('Compiled JavaScript'),
-      description: _t('Automatically generated path to the compiled JavaScript.')
-    }, {
-      name: 'csscompilation',
-      title: _t('Compiled CSS'),
-      description: _t('Automatically generated path to the compiled CSS.')
-    }, {
-      name: 'stub_js_modules',
-      title: _t('Stub JS Modules'),
-      description: _t('Define list of modules that will be not be defined empty ' +
-                      'on RequireJS build steps to prevent loading modules multiple times.'),
-      view: fields.ResourceSortableListFieldView
-    }]
-  });
+            // and scroll to resource since huge list makes this hard to notice
+            $("html, body").animate(
+                {
+                    scrollTop: resource.$el.offset().top,
+                },
+                1000
+            );
+        },
+        deleteClicked: function (e) {
+            e.preventDefault();
+            if (
+                window.confirm(
+                    _t(
+                        "Are you sure you want to delete the ${name} resource?",
+                        { name: this.options.name }
+                    )
+                )
+            ) {
+                delete this.options.registryView.options.data.resources[
+                    this.options.name
+                ];
+                this.options.registryView.dirty = true;
+                if (
+                    this.options.registryView.activeResource &&
+                    this.options.registryView.activeResource.resource.name ===
+                        this.options.name
+                ) {
+                    this.options.registryView.activeResource = null;
+                }
+                this.options.registryView.render();
+            }
+        },
+    });
 
+    var RegistryBundleListItem = RegistryResourceListItem.extend({
+        type: "bundle",
+        active: false,
+        template: _.template(
+            '<a href="#"><%- name %></a> ' +
+                '<div class="actions">' +
+                '<div class="plone-btn-group">' +
+                "<% if(view.options.data.development) { %>" +
+                "<% if(develop_javascript){ %>" +
+                '<button class="plone-btn plone-btn-warning on develop-js plone-btn-xs"><%- _t("Stop Developing JavaScript") %></button>' +
+                "<% } else { %>" +
+                '<button class="plone-btn plone-btn-default develop-js plone-btn-xs"><%- _t("Develop JavaScript") %></button>' +
+                "<% } %>" +
+                "<% if(develop_css){ %>" +
+                '<button class="plone-btn plone-btn-warning on develop-css plone-btn-xs"><%- _t("Stop Developing CSS") %></button>' +
+                "<% } else { %>" +
+                '<button class="plone-btn plone-btn-default develop-css plone-btn-xs"><%- _t("Develop CSS") %></button>' +
+                "<% } %>" +
+                "<% } %>" +
+                "<% if(compile){ %>" +
+                '<button class="plone-btn plone-btn-default build plone-btn-xs"><%- _t("Build") %></button>' +
+                "<% } %>" +
+                '<button class="plone-btn plone-btn-danger delete plone-btn-xs"><%- _t("Delete") %></button>' +
+                "</div>" +
+                "</div>"
+        ),
+        events: $.extend({}, RegistryResourceListItem.prototype.events, {
+            "click button.build": "buildClicked",
+            "click button.develop-js": "developJavaScriptClicked",
+            "click button.develop-css": "developCSSClicked",
+        }),
+        developJavaScriptClicked: function (e) {
+            e.preventDefault();
+            this.options.data.develop_javascript = !this.options.data
+                .develop_javascript;
+            this.options.registryView.dirty = true;
+            this.options.registryView.render();
+            this.render();
+        },
+        developCSSClicked: function (e) {
+            e.preventDefault();
+            this.options.data.develop_css = !this.options.data.develop_css;
+            this.options.registryView.dirty = true;
+            this.options.registryView.render();
+            this.render();
+        },
+        afterRender: function () {
+            RegistryResourceListItem.prototype.afterRender.apply(this);
+            if (this.active) {
+                this.editResource();
+            }
+        },
+        editResource: function (e) {
+            if (e) {
+                e.preventDefault();
+            }
+            var options = $.extend({}, this.options, {
+                containerData: this.options.registryView.options.data.bundles,
+            });
+            var resource = new BundleEntryView(options);
+            this.registryView.showResourceEditor(resource, this, "bundle");
 
-  var RegistryResourceListItem = BaseView.extend({
-    tagName: 'li',
-    type: 'resource',
-    className: 'list-group-item',
-    template: _.template(
-      '<a href="#"><%- name %></a> ' +
-      '<button class="pull-right plone-btn plone-btn-danger delete plone-btn-xs"><%- _t("Delete") %></button>'
-    ),
-    events: {
-      'click a': 'editResource',
-      'click button.delete': 'deleteClicked'
-    },
-    defaults: {
-      develop_javascript: false,
-      develop_css: false,
-      compile: true
-    },
-    afterRender: function(){
-      this.$el.attr('data-name', this.options.name);
-      this.$el.addClass(this.type + '-list-item-' + this.options.name);
-    },
-    serializedModel: function(){
-      return $.extend({}, this.defaults, {
-        name: this.options.name,
-        view: this.options.registryView
-      }, this.options.data);
-    },
-    editResource: function(e){
-      if(e){
-        e.preventDefault();
-      }
-      var options = $.extend({}, this.options, {
-        containerData: this.options.registryView.options.data.resources,
-        parent: this
-      });
-      var resource = new ResourceEntryView(options);
-      this.registryView.showResourceEditor(resource, this, 'resource');
+            // only one can be edited at a time, deactivate
+            _.each(this.options.registryView.items.bundles, function (
+                bundleItem
+            ) {
+                bundleItem.active = false;
+            });
+            this.active = true;
+            this.$el.parent().find(".list-group-item").removeClass("active");
+            this.$el.addClass("active");
+        },
+        deleteClicked: function (e) {
+            e.preventDefault();
+            if (
+                window.confirm(
+                    _t("Are you sure you want to delete the ${name} bundle?", {
+                        name: this.options.name,
+                    })
+                )
+            ) {
+                delete this.options.registryView.options.data.bundles[
+                    this.options.name
+                ];
+                this.options.registryView.dirty = true;
+                if (
+                    this.options.registryView.activeResource &&
+                    this.options.registryView.activeResource.resource.name ===
+                        this.options.name
+                ) {
+                    this.options.registryView.activeResource = null;
+                }
+                this.options.registryView.render();
+            }
+        },
 
-      // and scroll to resource since huge list makes this hard to notice
-      $('html, body').animate({
-        scrollTop: resource.$el.offset().top
-      }, 1000);
-    },
-    deleteClicked: function(e){
-      e.preventDefault();
-      if(window.confirm(_t('Are you sure you want to delete the ${name} resource?', {name: this.options.name}))){
-        delete this.options.registryView.options.data.resources[this.options.name];
-        this.options.registryView.dirty = true;
-        if(this.options.registryView.activeResource &&
-           this.options.registryView.activeResource.resource.name === this.options.name){
-          this.options.registryView.activeResource = null;
-        }
-        this.options.registryView.render();
-      }
-    }
-  });
+        buildClicked: function (e) {
+            e.preventDefault();
+            var self = this;
+            if (this.options.registryView.dirty) {
+                window.alert(
+                    _t(
+                        "You have unsaved changes. Save or discard before building."
+                    )
+                );
+            } else {
+                var builder = new Builder(self.options.name, self);
+                builder.run();
+            }
+        },
+    });
 
+    var BaseResourcesPane = BaseView.extend({
+        tagName: "div",
+        className: "tab-pane",
+        $form: null,
+        activeResource: null,
 
-  var RegistryBundleListItem = RegistryResourceListItem.extend({
-    type: 'bundle',
-    active: false,
-    template: _.template(
-      '<a href="#"><%- name %></a> ' +
-      '<div class="actions">' +
-        '<div class="plone-btn-group">' +
-          '<% if(view.options.data.development) { %>' +
-            '<% if(develop_javascript){ %>' +
-              '<button class="plone-btn plone-btn-warning on develop-js plone-btn-xs"><%- _t("Stop Developing JavaScript") %></button>' +
-            '<% } else { %>' +
-              '<button class="plone-btn plone-btn-default develop-js plone-btn-xs"><%- _t("Develop JavaScript") %></button>' +
-            '<% } %>' +
-            '<% if(develop_css){ %>' +
-              '<button class="plone-btn plone-btn-warning on develop-css plone-btn-xs"><%- _t("Stop Developing CSS") %></button>' +
-            '<% } else { %>' +
-              '<button class="plone-btn plone-btn-default develop-css plone-btn-xs"><%- _t("Develop CSS") %></button>' +
-            '<% } %>' +
-          '<% } %>' +
-          '<% if(compile){ %>' +
-            '<button class="plone-btn plone-btn-default build plone-btn-xs"><%- _t("Build") %></button>' +
-          '<% } %>' +
-          '<button class="plone-btn plone-btn-danger delete plone-btn-xs"><%- _t("Delete") %></button>' +
-        '</div>' +
-      '</div>'
-    ),
-    events: $.extend({}, RegistryResourceListItem.prototype.events, {
-      'click button.build': 'buildClicked',
-      'click button.develop-js': 'developJavaScriptClicked',
-      'click button.develop-css': 'developCSSClicked'
-    }),
-    developJavaScriptClicked: function(e){
-      e.preventDefault();
-      this.options.data.develop_javascript = !this.options.data.develop_javascript;
-      this.options.registryView.dirty = true;
-      this.options.registryView.render();
-      this.render();
-    },
-    developCSSClicked: function(e){
-      e.preventDefault();
-      this.options.data.develop_css = !this.options.data.develop_css;
-      this.options.registryView.dirty = true;
-      this.options.registryView.render();
-      this.render();
-    },
-    afterRender: function(){
-      RegistryResourceListItem.prototype.afterRender.apply(this);
-      if(this.active){
-        this.editResource();
-      }
-    },
-    editResource: function(e){
-      if(e){
-        e.preventDefault();
-      }
-      var options = $.extend({}, this.options, {
-        containerData: this.options.registryView.options.data.bundles
-      });
-      var resource = new BundleEntryView(options);
-      this.registryView.showResourceEditor(resource, this, 'bundle');
-
-      // only one can be edited at a time, deactivate
-      _.each(this.options.registryView.items.bundles, function(bundleItem){
-        bundleItem.active = false;
-      });
-      this.active = true;
-      this.$el.parent().find('.list-group-item').removeClass('active');
-      this.$el.addClass('active');
-    },
-    deleteClicked: function(e){
-      e.preventDefault();
-      if(window.confirm(_t('Are you sure you want to delete the ${name} bundle?', {name: this.options.name}))){
-        delete this.options.registryView.options.data.bundles[this.options.name];
-        this.options.registryView.dirty = true;
-        if(this.options.registryView.activeResource &&
-           this.options.registryView.activeResource.resource.name === this.options.name){
-          this.options.registryView.activeResource = null;
-        }
-        this.options.registryView.render();
-      }
-    },
-
-    buildClicked: function(e){
-      e.preventDefault();
-      var self = this;
-      if(this.options.registryView.dirty){
-        window.alert(_t('You have unsaved changes. Save or discard before building.'));
-      }else{
-        var builder = new Builder(self.options.name, self);
-        builder.run();
-      }
-    }
-  });
-
-  var BaseResourcesPane = BaseView.extend({
-    tagName: 'div',
-    className: 'tab-pane',
-    $form: null,
-    activeResource: null,
-
-    initialize: function(options) {
-      var self = this;
-      BaseView.prototype.initialize.apply(self, [options]);
-      self.previousData = self._copyData();
-      /* setup scroll spy to move form into view if necessary */
-      /* disabled, at least for now, forms too bad to do this with...
+        initialize: function (options) {
+            var self = this;
+            BaseView.prototype.initialize.apply(self, [options]);
+            self.previousData = self._copyData();
+            /* setup scroll spy to move form into view if necessary */
+            /* disabled, at least for now, forms too bad to do this with...
       $(window).scroll(function(){
         if(self.$form){
           var offset = self.$el.parent().offset();
@@ -34059,348 +33848,404 @@ define('mockup-patterns-resourceregistry-url/js/registry',[
         }
       });
       */
-    },
+        },
 
-    showResourceEditor: function(resource, view, type){
-      this.activeResource = {
-        resource: resource,
-        item: view,
-        type: type
-      };
-      this.$form.empty().append(resource.render().el);
-    },
+        showResourceEditor: function (resource, view, type) {
+            this.activeResource = {
+                resource: resource,
+                item: view,
+                type: type,
+            };
+            this.$form.empty().append(resource.render().el);
+        },
 
-    _copyData: function(){
-      return $.extend(true, {}, this.options.data);
-    },
+        _copyData: function () {
+            return $.extend(true, {}, this.options.data);
+        },
 
-    _revertData: function(data){
-      this.options.data = $.extend(true, {}, data);
-    },
+        _revertData: function (data) {
+            this.options.data = $.extend(true, {}, data);
+        },
 
-    revertChanges: function(e){
-      if(e){
-        e.preventDefault();
-      }
-      if(window.confirm(_t('Are you sure you want to cancel? You will lose all changes.'))){
-        this._revertData(this.previousData);
-        this.activeResource = null;
-        this.render();
-      }
-    },
-    afterRender: function(){
-      this.$form = this.$('.form');
-      this.loading = this.options.tabView.loading;
-    }
-  });
-
-
-  var RegistryView = BaseResourcesPane.extend({
-    template: _.template(
-      '<div class="row buttons-container">' +
-        '<div class="plone-btn-group pull-right">' +
-          '<button class="plone-btn plone-btn-primary save"><%- _t("Save") %></button>' +
-          '<button class="plone-btn plone-btn-default cancel"><%- _t("Cancel") %></button>' +
-        '</div>' +
-        '<div class="plone-btn-group pull-right">' +
-          '<button class="plone-btn plone-btn-default add-bundle"><%- _t("Add bundle") %></button>' +
-          '<button class="plone-btn plone-btn-default add-resource"><%- _t("Add resource") %></button>' +
-        '</div>' +
-      '</div>' +
-      '<div class="row">' +
-        '<div class="checkbox development-mode">' +
-          '<label>' +
-            '<input type="checkbox" ' +
-              '<% if(data.development){ %> checked="checked" <% } %>' +
-              ' > <%- _t("Development Mode(only logged in users)") %>' +
-          '</label>' +
-        '</div>' +
-      '</div>' +
-      '<div class="row">' +
-        '<div class="items col-md-5">' +
-          '<ul class="bundles list-group">' +
-            '<li class="list-group-item list-group-item-warning"><%- _t("Bundles") %></li>' +
-          '</ul>' +
-          '<ul class="resources-header list-group">' +
-            '<li class="list-group-item list-group-item-warning"><%- _t("Resources") %> ' +
-              '<input class="float-right form-control input-xs" ' +
-                      'placeholder="<%- _t("Filter...") %>" />' +
-            '</li>' +
-          '</ul>' +
-          '<ul class="resources list-group">' +
-          '</ul>' +
-        '</div>' +
-        '<div class="form col-md-7"></div>' +
-      '</div>'),
-    events: {
-      'click button.save': 'saveClicked',
-      'click button.add-resource': 'addResourceClicked',
-      'click button.add-bundle': 'addBundleClicked',
-      'click button.cancel': 'revertChanges',
-      'keyup .resources-header input': 'filterResources',
-      'change .development-mode input': 'developmentModeChanged'
-    },
-    filterTimeout: 0,
-    dirty: false,
-
-    initialize: function(options){
-      var self = this;
-      BaseResourcesPane.prototype.initialize.apply(self, [options]);
-      $(document).on('resource-data-changed', function(){
-        self.dirty = true;
-        self.showHideButtons();
-      });
-    },
-
-    showHideButtons: function(){
-      var val = true;
-      if(this.dirty){
-        val = false;
-      }
-      this.$('button.save').prop('disabled', val);
-      this.$('button.cancel').prop('disabled', val);
-    },
-
-    filterResources: function(){
-      var self = this;
-      if(self.filterTimeout){
-        clearTimeout(self.filterTimeout);
-      }
-      self.filterTimeout = setTimeout(function(){
-        var filterText = self.$('.resources-header input').val().toLowerCase();
-        var $els = self.$('.resources .list-group-item');
-        if(!filterText || filterText.length < 3){
-          $els.removeClass('hidden');
-        }else{
-          $els.each(function(){
-            var $el = $(this);
-            if($el.find('a').html().toLowerCase().indexOf(filterText) !== -1){
-              $el.removeClass('hidden');
-            }else{
-              $el.addClass('hidden');
+        revertChanges: function (e) {
+            if (e) {
+                e.preventDefault();
             }
-          });
-        }
-      }, 200);
-    },
+            if (
+                window.confirm(
+                    _t(
+                        "Are you sure you want to cancel? You will lose all changes."
+                    )
+                )
+            ) {
+                this._revertData(this.previousData);
+                this.activeResource = null;
+                this.render();
+            }
+        },
+        afterRender: function () {
+            this.$form = this.$(".form");
+            this.loading = this.options.tabView.loading;
+        },
+    });
 
-    _copyData: function(){
-      return $.extend(true, {}, {
-        bundles: this.options.data.bundles,
-        resources: this.options.data.resources
-      });
-    },
+    var RegistryView = BaseResourcesPane.extend({
+        template: _.template(
+            '<div class="row buttons-container">' +
+                '<div class="plone-btn-group pull-right">' +
+                '<button class="plone-btn plone-btn-primary save"><%- _t("Save") %></button>' +
+                '<button class="plone-btn plone-btn-default cancel"><%- _t("Cancel") %></button>' +
+                "</div>" +
+                '<div class="plone-btn-group pull-right">' +
+                '<button class="plone-btn plone-btn-default add-bundle"><%- _t("Add bundle") %></button>' +
+                '<button class="plone-btn plone-btn-default add-resource"><%- _t("Add resource") %></button>' +
+                "</div>" +
+                "</div>" +
+                '<div class="row">' +
+                '<div class="checkbox development-mode">' +
+                "<label>" +
+                '<input type="checkbox" ' +
+                '<% if(data.development){ %> checked="checked" <% } %>' +
+                ' > <%- _t("Development Mode(only logged in users)") %>' +
+                "</label>" +
+                "</div>" +
+                "</div>" +
+                '<div class="row">' +
+                '<div class="items col-md-5">' +
+                '<ul class="bundles list-group">' +
+                '<li class="list-group-item list-group-item-warning"><%- _t("Bundles") %></li>' +
+                "</ul>" +
+                '<ul class="resources-header list-group">' +
+                '<li class="list-group-item list-group-item-warning"><%- _t("Resources") %> ' +
+                '<input class="float-right form-control input-xs" ' +
+                'placeholder="<%- _t("Filter...") %>" />' +
+                "</li>" +
+                "</ul>" +
+                '<ul class="resources list-group">' +
+                "</ul>" +
+                "</div>" +
+                '<div class="form col-md-7"></div>' +
+                "</div>"
+        ),
+        events: {
+            "click button.save": "saveClicked",
+            "click button.add-resource": "addResourceClicked",
+            "click button.add-bundle": "addBundleClicked",
+            "click button.cancel": "revertChanges",
+            "keyup .resources-header input": "filterResources",
+            "change .development-mode input": "developmentModeChanged",
+        },
+        filterTimeout: 0,
+        dirty: false,
 
-    _revertData: function(data){
-      this.options.data.bundles = $.extend(true, {}, data.bundles);
-      this.options.data.resources = $.extend(true, {}, data.resources);
-      this.dirty = false;
-    },
+        initialize: function (options) {
+            var self = this;
+            BaseResourcesPane.prototype.initialize.apply(self, [options]);
+            $(document).on("resource-data-changed", function () {
+                self.dirty = true;
+                self.showHideButtons();
+            });
+        },
 
-    afterRender: function(){
-      var self = this;
-      self.showHideButtons();
-      self.$bundles = self.$('ul.bundles');
-      self.$resources = self.$('ul.resources');
-      var data = self.options.data;
-      var bundles = _.sortBy(_.keys(data.bundles), function(v){ return v.toLowerCase(); });
-      self.items = {
-        bundles: {},
-        resources: {}
-      };
-      _.each(bundles, function(resourceName){
-        var item;
-        if(self.activeResource && self.activeResource.type === 'bundle' &&
-           self.activeResource.item.options.name === resourceName){
-          item = new RegistryBundleListItem({
-            data: self.activeResource.item.data,
-            name: resourceName,
-            registryView: self});
-        }else{
-          item = new RegistryBundleListItem({
-            data: data.bundles[resourceName],
-            name: resourceName,
-            registryView: self});
-        }
-        self.items.bundles[resourceName] = item;
-        self.$bundles.append(item.render().el);
-      });
-      var resources = _.sortBy(_.keys(data.resources), function(v){ return v.toLowerCase(); });
-      _.each(resources, function(resourceName){
-        var item;
-        if(self.activeResource && self.activeResource.type === 'resource' &&
-           self.activeResource.item.options.name === resourceName){
-          item = new RegistryResourceListItem({
-            data: self.activeResource.item.data,
-            name: resourceName,
-            registryView: self});
-        } else {
-          item = new RegistryResourceListItem({
-            data: data.resources[resourceName],
-            name: resourceName,
-            registryView: self});
-        }
-        self.items.resources[resourceName] = item;
-        self.$resources.append(item.render().el);
-      });
-      BaseResourcesPane.prototype.afterRender.apply(self);
+        showHideButtons: function () {
+            var val = true;
+            if (this.dirty) {
+                val = false;
+            }
+            this.$("button.save").prop("disabled", val);
+            this.$("button.cancel").prop("disabled", val);
+        },
 
-      // finally, show edit pane if there is an active resource
-      if(self.activeResource){
-        self.showResourceEditor(self.activeResource.resource, self.activeResource.item, self.activeResource.type);
-      }
-      return self;
-    },
+        filterResources: function () {
+            var self = this;
+            if (self.filterTimeout) {
+                clearTimeout(self.filterTimeout);
+            }
+            self.filterTimeout = setTimeout(function () {
+                var filterText = self
+                    .$(".resources-header input")
+                    .val()
+                    .toLowerCase();
+                var $els = self.$(".resources .list-group-item");
+                if (!filterText || filterText.length < 3) {
+                    $els.removeClass("hidden");
+                } else {
+                    $els.each(function () {
+                        var $el = $(this);
+                        if (
+                            $el
+                                .find("a")
+                                .html()
+                                .toLowerCase()
+                                .indexOf(filterText) !== -1
+                        ) {
+                            $el.removeClass("hidden");
+                        } else {
+                            $el.addClass("hidden");
+                        }
+                    });
+                }
+            }, 200);
+        },
 
-    addResourceClicked: function(e){
-      e.preventDefault();
-      var name = utils.generateId('new-resource-');
-      this.options.data.resources[name] = {
-        enabled: true
-      };
-      this.dirty = true;
-      this.render();
-      this.items.resources[name].editResource();
-    },
+        _copyData: function () {
+            return $.extend(
+                true,
+                {},
+                {
+                    bundles: this.options.data.bundles,
+                    resources: this.options.data.resources,
+                }
+            );
+        },
 
-    addBundleClicked: function(e){
-      e.preventDefault();
-      var name = utils.generateId('new-bundle-');
-      this.options.data.bundles[name] = {
-        enabled: true
-      };
-      this.dirty = true;
-      this.render();
-      this.items.bundles[name].editResource();
-    },
+        _revertData: function (data) {
+            this.options.data.bundles = $.extend(true, {}, data.bundles);
+            this.options.data.resources = $.extend(true, {}, data.resources);
+            this.dirty = false;
+        },
 
-    saveClicked: function(e){
-      var self = this;
-      e.preventDefault();
-      self.options.tabView.saveData('save-registry', {
-        resources: JSON.stringify(self.options.data.resources),
-        bundles: JSON.stringify(self.options.data.bundles),
-        development: self.options.data.development && 'true' || 'false'
-      }, function(){
-        self.dirty = false;
-        var activeResource = self.activeResource;
-        self.activeResource = null;
-        self.previousData = self._copyData();
-        self.render();
-        if(activeResource){
-          var name = activeResource.resource.name;
-          self.options.data.resources[name] = {
-            enabled: true
-          };
-          if(activeResource.type === 'bundle'){
-            self.items.bundles[name].editResource();
-          }else{
-            self.items.resources[name].editResource();
-          }
-        }
-      });
-    },
+        afterRender: function () {
+            var self = this;
+            self.showHideButtons();
+            self.$bundles = self.$("ul.bundles");
+            self.$resources = self.$("ul.resources");
+            var data = self.options.data;
+            var bundles = _.sortBy(_.keys(data.bundles), function (v) {
+                return v.toLowerCase();
+            });
+            self.items = {
+                bundles: {},
+                resources: {},
+            };
+            _.each(bundles, function (resourceName) {
+                var item;
+                if (
+                    self.activeResource &&
+                    self.activeResource.type === "bundle" &&
+                    self.activeResource.item.options.name === resourceName
+                ) {
+                    item = new RegistryBundleListItem({
+                        data: self.activeResource.item.data,
+                        name: resourceName,
+                        registryView: self,
+                    });
+                } else {
+                    item = new RegistryBundleListItem({
+                        data: data.bundles[resourceName],
+                        name: resourceName,
+                        registryView: self,
+                    });
+                }
+                self.items.bundles[resourceName] = item;
+                self.$bundles.append(item.render().el);
+            });
+            var resources = _.sortBy(_.keys(data.resources), function (v) {
+                return v.toLowerCase();
+            });
+            _.each(resources, function (resourceName) {
+                var item;
+                if (
+                    self.activeResource &&
+                    self.activeResource.type === "resource" &&
+                    self.activeResource.item.options.name === resourceName
+                ) {
+                    item = new RegistryResourceListItem({
+                        data: self.activeResource.item.data,
+                        name: resourceName,
+                        registryView: self,
+                    });
+                } else {
+                    item = new RegistryResourceListItem({
+                        data: data.resources[resourceName],
+                        name: resourceName,
+                        registryView: self,
+                    });
+                }
+                self.items.resources[resourceName] = item;
+                self.$resources.append(item.render().el);
+            });
+            BaseResourcesPane.prototype.afterRender.apply(self);
 
-    developmentModeChanged: function(){
-      var self = this;
-      if(self.$('.development-mode input')[0].checked){
-        this.options.data.development = true;
-      }else{
-        this.options.data.development = false;
-      }
-      this.dirty = true;
-      this.render();
-    }
-  });
+            // finally, show edit pane if there is an active resource
+            if (self.activeResource) {
+                self.showResourceEditor(
+                    self.activeResource.resource,
+                    self.activeResource.item,
+                    self.activeResource.type
+                );
+            }
+            return self;
+        },
 
-  return RegistryView;
+        addResourceClicked: function (e) {
+            e.preventDefault();
+            var name = utils.generateId("new-resource-");
+            this.options.data.resources[name] = {
+                enabled: true,
+            };
+            this.dirty = true;
+            this.render();
+            this.items.resources[name].editResource();
+        },
 
+        addBundleClicked: function (e) {
+            e.preventDefault();
+            var name = utils.generateId("new-bundle-");
+            this.options.data.bundles[name] = {
+                enabled: true,
+            };
+            this.dirty = true;
+            this.render();
+            this.items.bundles[name].editResource();
+        },
+
+        saveClicked: function (e) {
+            var self = this;
+            e.preventDefault();
+            self.options.tabView.saveData(
+                "save-registry",
+                {
+                    resources: JSON.stringify(self.options.data.resources),
+                    bundles: JSON.stringify(self.options.data.bundles),
+                    development:
+                        (self.options.data.development && "true") || "false",
+                },
+                function () {
+                    self.dirty = false;
+                    var activeResource = self.activeResource;
+                    self.activeResource = null;
+                    self.previousData = self._copyData();
+                    self.render();
+                    if (activeResource) {
+                        var name = activeResource.resource.name;
+                        self.options.data.resources[name] = {
+                            enabled: true,
+                        };
+                        if (activeResource.type === "bundle") {
+                            self.items.bundles[name].editResource();
+                        } else {
+                            self.items.resources[name].editResource();
+                        }
+                    }
+                }
+            );
+        },
+
+        developmentModeChanged: function () {
+            var self = this;
+            if (self.$(".development-mode input")[0].checked) {
+                this.options.data.development = true;
+            } else {
+                this.options.data.development = false;
+            }
+            this.dirty = true;
+            this.render();
+        },
+    });
+
+    return RegistryView;
 });
 
 define('mockup-patterns-resourceregistry-url/js/patternoptions',[
-  'jquery',
-  'mockup-ui-url/views/base',
-  'underscore',
-  'mockup-utils',
-  'mockup-patterns-resourceregistry-url/js/fields',
-], function($, BaseView, _, utils, fields) {
-  'use strict';
+    "jquery",
+    "mockup-ui-url/views/base",
+    "underscore",
+    "mockup-utils",
+    "mockup-patterns-resourceregistry-url/js/fields",
+], function ($, BaseView, _, utils, fields) {
+    "use strict";
 
-  var PatternOptionsView = BaseView.extend({
-    tagName: 'div',
-    className: 'tab-pane patternoptions',
-    template: _.template(
-      '<div class="buttons-container">' +
-        '<div class="btn-group pull-right">' +
-          '<button class="plone-btn plone-btn-default add-pattern"><%- _t("Add pattern") %></button>' +
-          '<button class="plone-btn plone-btn-primary save"><%- _t("Save") %></button>' +
-        '</div>' +
-      '</div>' +
-      '<div class="row clearfix">' +
-        '<div class="form col-md-12"></div></div>'),
-    events: {
-      'click .plone-btn.save': 'saveClicked',
-      'click .plone-btn.add-pattern': 'addPattern'
-    },
+    var PatternOptionsView = BaseView.extend({
+        tagName: "div",
+        className: "tab-pane patternoptions",
+        template: _.template(
+            '<div class="buttons-container">' +
+                '<div class="btn-group pull-right">' +
+                '<button class="plone-btn plone-btn-default add-pattern"><%- _t("Add pattern") %></button>' +
+                '<button class="plone-btn plone-btn-primary save"><%- _t("Save") %></button>' +
+                "</div>" +
+                "</div>" +
+                '<div class="row clearfix">' +
+                '<div class="form col-md-12"></div></div>'
+        ),
+        events: {
+            "click .plone-btn.save": "saveClicked",
+            "click .plone-btn.add-pattern": "addPattern",
+        },
 
-    initialize: function(options){
-      BaseView.prototype.initialize.apply(this, [options]);
-      this.loading = this.options.tabView.loading;
-    },
+        initialize: function (options) {
+            BaseView.prototype.initialize.apply(this, [options]);
+            this.loading = this.options.tabView.loading;
+        },
 
-    saveClicked: function(e){
-      e.preventDefault();
-      var self = this;
-      self.options.tabView.saveData('save-pattern-options', {
-        data: JSON.stringify(self.options.data.patternoptions),
-      });
-    },
+        saveClicked: function (e) {
+            e.preventDefault();
+            var self = this;
+            self.options.tabView.saveData("save-pattern-options", {
+                data: JSON.stringify(self.options.data.patternoptions),
+            });
+        },
 
-    addPattern: function(e){
-      e.preventDefault();
-      var self = this;
-      self.options.data.patternoptions[utils.generateId('new-pattern-')] = '';
-      self.render();
-    },
+        addPattern: function (e) {
+            e.preventDefault();
+            var self = this;
+            self.options.data.patternoptions[utils.generateId("new-pattern-")] =
+                "";
+            self.render();
+        },
 
-    inputChanged: function(){
-      var self = this;
-      var data = {};
-      self.$('.form-group').each(function(){
-        data[$(this).find('.field-name').val()] = $(this).find('.field-value').val();
-      });
-      self.options.data.patternoptions = data;
-    },
+        inputChanged: function () {
+            var self = this;
+            var data = {};
+            self.$(".form-group").each(function () {
+                data[$(this).find(".field-name").val()] = $(this)
+                    .find(".field-value")
+                    .val();
+            });
+            self.options.data.patternoptions = data;
+        },
 
-    afterRender: function(){
-      var self = this;
-      var settings = self.options.data.patternoptions;
-      var $form = self.$('.form');
-      _.each(_.keys(settings), function(name){
-        $form.append((new fields.PatternFieldView({
-          registryData: settings,
-          title: name,
-          name: name,
-          value: settings[name],
-          onChange: function(e, field){
-            try{
-              // check that the json is in correct structure
-              $.parseJSON(field.$el.find('.field-value').val());
-              field.$el.removeClass('has-error').removeClass('has-feedback');
-              field.$('.form-control-feedback').addClass('hidden');
-            }catch(err){
-              field.$el.addClass('has-error').addClass('has-feedback');
-              field.$('.form-control-feedback').removeClass('hidden');
-            }
-            self.inputChanged();
-          }
-         }).render().el));
-      });
-    }
-  });
+        afterRender: function () {
+            var self = this;
+            var settings = self.options.data.patternoptions;
+            var $form = self.$(".form");
+            _.each(_.keys(settings), function (name) {
+                $form.append(
+                    new fields.PatternFieldView({
+                        registryData: settings,
+                        title: name,
+                        name: name,
+                        value: settings[name],
+                        onChange: function (e, field) {
+                            try {
+                                // check that the json is in correct structure
+                                $.parseJSON(
+                                    field.$el.find(".field-value").val()
+                                );
+                                field.$el
+                                    .removeClass("has-error")
+                                    .removeClass("has-feedback");
+                                field
+                                    .$(".form-control-feedback")
+                                    .addClass("hidden");
+                            } catch (err) {
+                                field.$el
+                                    .addClass("has-error")
+                                    .addClass("has-feedback");
+                                field
+                                    .$(".form-control-feedback")
+                                    .removeClass("hidden");
+                            }
+                            self.inputChanged();
+                        },
+                    }).render().el
+                );
+            });
+        },
+    });
 
-  return PatternOptionsView;
-
+    return PatternOptionsView;
 });
 
 /* Resource Registry pattern.
@@ -34409,7 +34254,7 @@ define('mockup-patterns-resourceregistry-url/js/patternoptions',[
  *    bundles(object): object with all bundles ({})
  *    resources(object): object with all resources ({})
  *    javascripts(object): object with all legacy type javascripts ({})
- *    css(object): object with all legacy type css ({}) 
+ *    css(object): object with all legacy type css ({})
  *    overrides(array): List of current overrides ([])
  *    managerUrl(string): url to handle manage actions(null)
  *    baseUrl(string): to render resources from(null)
@@ -34492,163 +34337,186 @@ define('mockup-patterns-resourceregistry-url/js/patternoptions',[
  */
 
 define('mockup-patterns-resourceregistry',[
-  'jquery',
-  'pat-base',
-  'underscore',
-  'mockup-ui-url/views/base',
-  'mockup-utils',
-  'mockup-patterns-resourceregistry-url/js/less',
-  'mockup-patterns-resourceregistry-url/js/overrides',
-  'mockup-patterns-resourceregistry-url/js/registry',
-  'mockup-patterns-resourceregistry-url/js/patternoptions',
-  'translate'
-], function($, Base, _, BaseView, utils, LessVariablesView,
-            OverridesView,RegistryView, PatternOptionsView, _t) {
-  'use strict';
+    "jquery",
+    "pat-base",
+    "underscore",
+    "mockup-ui-url/views/base",
+    "mockup-utils",
+    "mockup-patterns-resourceregistry-url/js/less",
+    "mockup-patterns-resourceregistry-url/js/overrides",
+    "mockup-patterns-resourceregistry-url/js/registry",
+    "mockup-patterns-resourceregistry-url/js/patternoptions",
+    "translate",
+], function (
+    $,
+    Base,
+    _,
+    BaseView,
+    utils,
+    LessVariablesView,
+    OverridesView,
+    RegistryView,
+    PatternOptionsView,
+    _t
+) {
+    "use strict";
 
-  var TabView = BaseView.extend({
-    tagName: 'div',
-    activeTab: 'registry',
-    template: _.template('' +
-      '<div class="autotabs">' +
-        '<ul class="main-tabs autotoc-nav" role="tablist">' +
-          '<li class="registry-btn"><a href="#"><%- _t("Registry") %></a></li>' +
-          '<li class="overrides-btn"><a href="#"><%- _t("Overrides") %></a></li>' +
-          '<li class="lessvariables-btn"><a href="#"><%- _t("Less Variables") %></a></li>' +
-          '<li class="patternoptions-btn"><a href="#"><%- _t("Pattern Options") %></a></li>' +
-        '</ul>' +
-      '</div>' +
-      '<div class="tab-content" />'
-    ),
-    events: {
-      'click .registry-btn a': 'hideShow',
-      'click .overrides-btn a': 'hideShow',
-      'click .lessvariables-btn a': 'hideShow',
-      'click .patternoptions-btn a': 'hideShow'
-    },
-    hideShow: function(e){
-      var self = this;
-      if(e !== undefined){
-        e.preventDefault();
-        self.activeTab = $(e.target).parent()[0].className.replace('-btn', '');
-      }
-      self.$('.main-tabs > li a').removeClass('active');
-      self.$content.find('.tab-pane').removeClass('active');
-      self.tabs[self.activeTab].btn.find('a').addClass('active');
-      self.tabs[self.activeTab].content.addClass('active');
-    },
-    initialize: function(options) {
-      var self = this;
-
-      BaseView.prototype.initialize.apply(self, [options]);
-      self.registryView = new RegistryView({
-        data: options,
-        tabView: self});
-      self.overridesView = new OverridesView({
-        data: options,
-        tabView: self});
-      self.lessvariablesView = new LessVariablesView({
-        data: options,
-        tabView: self});
-      self.patternoptionsView = new PatternOptionsView({
-        data: options,
-        tabView: self});
-      self.tabs = {};
-    },
-
-    render: function(){
-      var self = this;
-      self.$el.append(self.template({_t: _t}));
-      self.loading = new utils.Loading();
-      self.$tabs = self.$('ul.main-tabs');
-      self.$content = self.$('.tab-content');
-      self.$content.append(self.registryView.render().el);
-      self.$content.append(self.overridesView.render().el);
-      self.$content.append(self.lessvariablesView.render().el);
-      self.$content.append(self.patternoptionsView.render().el);
-      self.tabs = {
-        registry: {
-          btn: self.$('.registry-btn'),
-          content: self.registryView.$el
+    var TabView = BaseView.extend({
+        tagName: "div",
+        activeTab: "registry",
+        template: _.template(
+            "" +
+                '<div class="pat-autotoc autotabs">' +
+                '<nav class="main-tabs autotoc-nav">' +
+                '<a class="registry-btn" href="#"><%- _t("Registry") %></a>' +
+                '<a class="overrides-btn" href="#"><%- _t("Overrides") %></a>' +
+                '<a class="lessvariables-btn" href="#"><%- _t("Less Variables") %></a>' +
+                '<a class="patternoptions-btn" href="#"><%- _t("Pattern Options") %></a>' +
+                "</nav>" +
+                '<div class="tab-content" />' +
+                "</div>"
+        ),
+        events: {
+            "click a.registry-btn": "hideShow",
+            "click a.overrides-btn": "hideShow",
+            "click a.lessvariables-btn": "hideShow",
+            "click a.patternoptions-btn": "hideShow",
         },
-        overrides: {
-          btn: self.$('.overrides-btn'),
-          content: self.overridesView.$el
+        hideShow: function (e) {
+            var self = this;
+            if (e !== undefined) {
+                e.preventDefault();
+                self.activeTab = e.target.className.replace("-btn", "");
+            }
+            self.$(".main-tabs > a").removeClass("active");
+            self.$content.find(".tab-pane").removeClass("active");
+            self.tabs[self.activeTab].btn.addClass("active");
+            self.tabs[self.activeTab].content.addClass("active");
         },
-        lessvariables: {
-          btn: self.$('.lessvariables-btn'),
-          content: self.lessvariablesView.$el
+        initialize: function (options) {
+            var self = this;
+
+            BaseView.prototype.initialize.apply(self, [options]);
+            self.registryView = new RegistryView({
+                data: options,
+                tabView: self,
+            });
+            self.overridesView = new OverridesView({
+                data: options,
+                tabView: self,
+            });
+            self.lessvariablesView = new LessVariablesView({
+                data: options,
+                tabView: self,
+            });
+            self.patternoptionsView = new PatternOptionsView({
+                data: options,
+                tabView: self,
+            });
+            self.tabs = {};
         },
-        patternoptions: {
-          btn: self.$('.patternoptions-btn'),
-          content: self.patternoptionsView.$el
-        }
-      };
-      self.hideShow();
-      return self;
-    },
 
-    saveData: function(action, data, onSave, onError){
-      var self = this;
-      self.loading.show();
-      if(!data){
-        data = {};
-      }
-      data = $.extend({}, data, {
-        action: action,
-        _authenticator: utils.getAuthenticator()
-      });
-      $.ajax({
-        url: self.options.manageUrl,
-        type: 'POST',
-        dataType: 'json',
-        data: data
-      }).done(function(resp){
-        if(onSave){
-          onSave(resp);
-        }
-        if(resp.success !== undefined && !resp.success && resp.msg){
-          window.alert(resp.msg);
-        }
-      }).always(function(){
-        self.loading.hide();
-      }).fail(function(resp){
-        if(onError){
-          onError(resp);
-        }else{
-          window.alert(_t('Error processing ajax request for action: ') + action);
-        }
-      });
-    }
-  });
+        render: function () {
+            var self = this;
+            self.$el.append(self.template({ _t: _t }));
+            self.loading = new utils.Loading();
+            self.$tabs = self.$("ul.main-tabs");
+            self.$content = self.$(".tab-content");
+            self.$content.append(self.registryView.render().el);
+            self.$content.append(self.overridesView.render().el);
+            self.$content.append(self.lessvariablesView.render().el);
+            self.$content.append(self.patternoptionsView.render().el);
+            self.tabs = {
+                registry: {
+                    btn: self.$(".registry-btn"),
+                    content: self.registryView.$el,
+                },
+                overrides: {
+                    btn: self.$(".overrides-btn"),
+                    content: self.overridesView.$el,
+                },
+                lessvariables: {
+                    btn: self.$(".lessvariables-btn"),
+                    content: self.lessvariablesView.$el,
+                },
+                patternoptions: {
+                    btn: self.$(".patternoptions-btn"),
+                    content: self.patternoptionsView.$el,
+                },
+            };
+            self.hideShow();
+            return self;
+        },
 
+        saveData: function (action, data, onSave, onError) {
+            var self = this;
+            self.loading.show();
+            if (!data) {
+                data = {};
+            }
+            data = $.extend({}, data, {
+                action: action,
+                _authenticator: utils.getAuthenticator(),
+            });
+            $.ajax({
+                url: self.options.manageUrl,
+                type: "POST",
+                dataType: "json",
+                data: data,
+            })
+                .done(function (resp) {
+                    if (onSave) {
+                        onSave(resp);
+                    }
+                    if (
+                        resp.success !== undefined &&
+                        !resp.success &&
+                        resp.msg
+                    ) {
+                        window.alert(resp.msg);
+                    }
+                })
+                .always(function () {
+                    self.loading.hide();
+                })
+                .fail(function (resp) {
+                    if (onError) {
+                        onError(resp);
+                    } else {
+                        window.alert(
+                            _t("Error processing ajax request for action: ") +
+                                action
+                        );
+                    }
+                });
+        },
+    });
 
-  var ResourceRegistry = Base.extend({
-    name: 'resourceregistry',
-    trigger: '.pat-resourceregistry',
-    parser: 'mockup',
-    defaults: {
-      bundles: {},
-      resources: {},
-      javascripts: {},
-      css: {},
-      overrides: [],
-      manageUrl: null,
-      baseUrl: null,
-      rjsUrl: null,
-      lessvariables: {},
-      patternoptions: {}
-    },
-    init: function() {
-      var self = this;
-      self.$el.empty();
-      self.tabs = new TabView(self.options);
-      self.$el.append(self.tabs.render().el);
-    }
-  });
+    var ResourceRegistry = Base.extend({
+        name: "resourceregistry",
+        trigger: ".pat-resourceregistry",
+        parser: "mockup",
+        defaults: {
+            bundles: {},
+            resources: {},
+            javascripts: {},
+            css: {},
+            overrides: [],
+            manageUrl: null,
+            baseUrl: null,
+            rjsUrl: null,
+            lessvariables: {},
+            patternoptions: {},
+        },
+        init: function () {
+            var self = this;
+            self.$el.empty();
+            self.tabs = new TabView(self.options);
+            self.$el.append(self.tabs.render().el);
+        },
+    });
 
-  return ResourceRegistry;
-
+    return ResourceRegistry;
 });
 
 /* globals requirejs */
@@ -34681,5 +34549,5 @@ require([
   'use strict';
 });
 
-define("/Users/fred/buildouts/coredev-plone5.2/src/plone.staticresources/src/plone/staticresources/static/resourceregistry.js", function(){});
+define("/Volumes/WORKSPACE2/kinderdorf_plone5/srccore/plone.staticresources/src/plone/staticresources/static/resourceregistry.js", function(){});
 

@@ -11,8 +11,9 @@ define([
     "pat-base",
     "pat-utils",
     "moment",
-    "validate"
-], function($, _, Parser, Base, utils, moment, validate) {
+    "validate",
+    "modernizr"
+], function($, _, Parser, Base, utils, moment, validate, Modernizr) {
     "use strict";
     validate.moment = moment;
     var parser = new Parser("validation");
@@ -25,8 +26,11 @@ define([
     parser.addArgument("message-min", "This value must be greater than or equal to %{count}");
     parser.addArgument("message-number", "This value must be a number");
     parser.addArgument("message-required", "This field is required");
+    parser.addArgument("message-equality", "is not equal to %{attribute}");
+    parser.addArgument("message-confirm", "This field is required");
     parser.addArgument("not-after");
     parser.addArgument("not-before");
+    parser.addArgument("equality");
     parser.addArgument("type", undefined, ["integer", "date", "datetime"]);
     var VALIDATION_TYPE_MAP = {
         'required': 'presence',
@@ -35,6 +39,21 @@ define([
         'date': 'date'
     };
 
+    // Before using it we must add the parse and format functions
+    // Here is a sample implementation using moment.js
+    validate.extend(validate.validators.datetime, {
+      // The value is guaranteed not to be null or undefined but otherwise it
+      // could be anything.
+      parse: function(value, options) {
+        return +moment.utc(value);
+      },
+      // Input is a unix timestamp
+      format: function(value, options) {
+        var format = options.dateOnly ? "YYYY-MM-DD" : "YYYY-MM-DD hh:mm:ss";
+        return moment.utc(value).format(format);
+      }
+    });
+
     return Base.extend({
         name: "validation",
         trigger: "form.pat-validation",
@@ -42,11 +61,14 @@ define([
         init: function($el, opts) {
             this.errors = 0;
             this.options = parser.parse(this.$el, opts);
-            this.$inputs = this.$el.find(':input[name]');
-            this.$el.find(":input[type=number]").bind('keyup mouseup', _.debounce(function (ev) {
+            this.$inputs = this.$el.find('input[name], select[name], textarea[name]');
+            this.$el.find("input[type=number]").on('keyup mouseup', _.debounce(function (ev) {
                 this.validateElement(ev.target);
             }.bind(this), 500));
             this.$inputs.on('change.pat-validation', function (ev) { this.validateElement(ev.target); }.bind(this));
+            // formaction causes form validation to be skipped, so validate on
+            // submit button click instead.
+            this.$el.find('button[type=submit][formaction]').on('click.pat-validation', this.validateForm.bind(this));
             this.$el.on('submit.pat-validation', this.validateForm.bind(this));
             this.$el.on('pat-update.pat-validation', this.onPatternUpdate.bind(this));
             this.$el.on("click.pat-validation", ".close-panel", function (ev) {
@@ -62,41 +84,47 @@ define([
             if (_.contains(['datetime', 'date'], opts.type)) {
                 type = opts.type;
             }
+            if (type === 'datetime-local') {
+                type = 'datetime';
+            }
             return type;
         },
 
         setLocalDateConstraints: function (input, opts, constraints) {
             /* Set the relative date constraints, i.e. not-after and not-before, as well as custom messages.
              */
-            var name = input.getAttribute('name').replace(/\./g, '\\.'),
-                type = this.getFieldType(input),
-                c = constraints[name][type];
+            var name = input.getAttribute('name').replace(/\./g, '\\.');
+            var type = this.getFieldType(input);
+            var c = constraints[name][type];
 
-            if (typeof opts == "undefined") {
+            if (!c || typeof opts == "undefined") {
                 return constraints;
             }
+
             _.each(['before', 'after'], function (relation) {
-                var isDate = validate.moment.isDate,
-                    relative = opts.not && opts.not[relation] || undefined,
-                    arr, constraint, $ref;
-                if (typeof relative == "undefined") {
+                var relative = opts.not ? opts.not[relation] : undefined;
+                var $ref;
+                if (typeof relative === "undefined") {
                     return;
                 }
-                constraint = relation === "before" ? 'earliest' : 'latest';
-                if (isDate(relative)) {
-                    c[constraint] = relative;
+                var relative_constraint = relation === "before" ? 'earliest' : 'latest';
+                if (validate.moment.isDate(relative)) {
+                    c[relative_constraint] = relative;
                 } else {
                     try {
                         $ref = $(relative);
                     } catch (e) {
                         console.log(e);
                     }
-                    arr = $ref.data('pat-validation-refs') || [];
+                    var arr = $ref.data('pat-validation-refs') || [];
                     if (!_.contains(arr, input)) {
                         arr.unshift(input);
                         $ref.data('pat-validation-refs', arr);
                     }
-                    c[constraint] = $ref.val();
+                    if ($ref && $ref.val()) {
+                        // relative constraint validation
+                        c[relative_constraint] = $ref.val();
+                    }
                 }
             });
             return constraints;
@@ -113,7 +141,7 @@ define([
                 opts = parser.parse($(input)),
                 constraint = constraints[name];
             if (_.contains(['datetime', 'date'], type)) {
-                this.setLocalDateConstraints(input, opts, constraints);
+                constraints = this.setLocalDateConstraints(input, opts, constraints);
             } else if (type == 'number') {
                 _.each(['min', 'max'], function (limit) {
                     // TODO: need to figure out how to add local validation
@@ -135,6 +163,18 @@ define([
                     constraint.numericality.onlyInteger = true;
                 }
             }
+
+            // Handle fields equality
+            if (opts.equality) {
+                this.$el.find("[name=" + opts.equality + "]").each(
+                    function (idx, el) {
+                        if (input.value !== el.value) {
+                            constraint.equality = {'attribute': opts.equality, 'message': '^'+opts.message["equality"]};
+                        }
+                    }
+                );
+            }
+
             // Set local validation messages.
             _.each(Object.keys(VALIDATION_TYPE_MAP), function (type) {
                 var c = constraints[name][VALIDATION_TYPE_MAP[type]];
@@ -154,13 +194,37 @@ define([
                 constraints = {};
             if (!name) { return; }
             constraints[name.replace(/\./g, '\\.')] = {
-                'presence': input.getAttribute('required') ? { 'message': '^'+this.options.message.required } : false,
-                'email': type == 'email' ? { 'message': '^'+this.options.message.email } : false,
-                'numericality': type == 'number' ? true : false,
-                'datetime': type == 'datetime' ? { 'message': '^'+this.options.message.datetime } : false,
-                'date': type == 'date' ? { 'message': '^'+this.options.message.date } : false
+                'presence': input.hasAttribute('required') ? { 'message': '^'+this.options.message.required, allowEmpty: false } : false,
+                'email': type === 'email' ? { 'message': '^'+this.options.message.email } : false,
+                'numericality': type === 'number' ? true : false,
+                'datetime': type === 'datetime' && this.doDateCheck(input) ? { 'message': '^'+this.options.message.datetime } : false,
+                'date': type === 'date' && this.doDateCheck(input) ? { 'message': '^'+this.options.message.date } : false
             };
-            return this.setLocalConstraints(input, constraints);
+            constraints = this.setLocalConstraints(input, constraints);
+            return constraints;
+        },
+
+        doDateCheck: function (input) {
+            // Returns true if a date check should be done.
+            // Don't check if there is no input - this should be handled by
+            // the ``required`` attribute.
+            // In case of HTML5 date/datetime-local support we also have to
+            // check for ``badInput`` as invalid date input will result in an
+            // empty ``value``.
+            var type = input.getAttribute('type');  // we need the raw type here
+            if (
+                Modernizr.inputtypes.date &&
+                type.indexOf('date') === 0 &&
+                typeof input.validity.badInput !== "undefined"
+            ) {
+                // Do the date check if the input is invalid or not missing
+                // (actually double-checking here - HTML5 and validate.js).
+                return input.validity.badInput || !!input.value;
+            } else {
+                // Do the date check if input is not empty (Safari has yet no
+                // date support at all)
+                return !!input.value;
+            }
         },
 
         getValueDict: function (input) {
@@ -170,11 +234,15 @@ define([
             var value_dict = {};
             var name = input.getAttribute('name');
             var value = input.value;
-            if (input.getAttribute('type') == "number") {
-                try {
-                    value = Number(input.value);
-                } catch (e) {
-                    value = input.value;
+            if (input.getAttribute('type') == 'number') {
+            if (value !== '') {
+                    try {
+                        value = Number(input.value);
+                    } catch (e) {
+                        value = input.value;
+                    }
+                } else {
+                    value = null;
                 }
             }
             value_dict[name] = value;
@@ -189,7 +257,7 @@ define([
             // Ignore invisible elements (otherwise pat-clone template
             // elements get validated). Not aware of other cases where this
             // might cause problems.
-            var $single = this.$inputs.filter(':visible:enabled:not(:checkbox):not(:radio)');
+            var $single = this.$inputs.filter(':visible:enabled:not(:checkbox):not(:radio), .pat-autosuggest:not(:visible)');
             var group_names = this.$inputs
                     .filter(':enabled:checkbox, :enabled:radio')
                     .map(function () { return this.getAttribute('name'); });
@@ -252,7 +320,7 @@ define([
         },
 
         validateElement: function (input, no_recurse) {
-            /* Handler which gets called when a single form :input element
+            /* Handler which gets called when a single form input element
              * needs to be validated. Will prevent the event's default action
              * if validation fails.
              */
@@ -308,6 +376,7 @@ define([
             var $errors = this.findErrorMessages(input);
             this.errors = this.errors - $errors.length;
             $errors.remove();
+            utils.findRelatives(input).removeClass('is-invalid').addClass('is-valid');
             if (this.errors < 1 && this.options.disableSelector) {
                 $(this.options.disableSelector).prop('disabled', false).removeClass('disabled');
             }
@@ -315,6 +384,7 @@ define([
 
         showError: function(error, input) {
             var $el = $(input),
+                $relatives = utils.findRelatives(input),
                 $position = $el,
                 strategy="after",
                 $message = $("<em/>", {"class": "validation warning message"}),
@@ -336,6 +406,7 @@ define([
                     $message.insertAfter($position);
                     break;
             }
+            $relatives.removeClass('is-valid').addClass('is-invalid');
             this.errors += 1;
             if (this.options.disableSelector) {
                 $(this.options.disableSelector).prop('disabled', true).addClass('disabled');

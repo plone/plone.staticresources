@@ -4,19 +4,21 @@
   "description": "Static resources for Plone",
   "repository": "git@github.com:plone/plone.staticresources.git",
   "license": "BSD-3-Clause",
+  "dependencies": {
+    "bootstrap3": "https://github.com/twbs/bootstrap.git#68b0d231a13201eb14acd3dc84e51543d16e5f7e",
+    "bootstrap": "^5.0.0-beta1",
+    "bootstrap-icons": "^1.3.0",
+    "jquery": "^3.5.1",
+    "less": "~2.7.3",
+    "mockup": "https://github.com/plone/mockup.git#barceloneta-lts",
+    "requirejs": "^2.3.6"
+  },
   "resolutions": {
-    "backbone": "https://github.com/jashkenas/backbone.git#1.1.2",
+    "backbone": "1.1.2",
     "underscore": "1.9.1",
     "jqtree": "1.4.10",
-    "jquery": "1.12.4",
-    "datatables.net": "https://github.com/DataTables/Dist-DataTables.git#1.10.16",
-    "datatables.net-bs": "https://github.com/DataTables/Dist-DataTables-Bootstrap.git#1.10.16"
-  },
-  "dependencies": {
-    "bootstrap-icons": "1.0.0",
-    "jquery": "1.12.4",
-    "less": "https://github.com/less/less.git#v2.7.3",
-    "mockup": "https://github.com/plone/mockup.git#97b4010cebc59a1556aff8f2d96f97d7705a53e7",
-    "requirejs": "^2.3.6"
+    "jquery": "3.5.1",
+    "datatables.net": "1.10.16",
+    "datatables.net-bs": "1.10.16"
   }
 }

@@ -62,89 +62,95 @@
       <value key="deps">backbone</value>
   </records>
 
+  <records prefix="plone.resources/bootstrap-js"
+            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
+      <value key="js">++plone++static/components/bootstrap/dist/js/bootstrap.bundle.min.js</value>
+  </records>
+
+
   <records prefix="plone.resources/bootstrap-variables"
             interface='Products.CMFPlone.interfaces.IResourceRegistry'>
       <value key="css">
-        <element>++plone++static/components/bootstrap/less/variables.less</element>
+        <element>++plone++static/components/bootstrap3/less/variables.less</element>
       </value>
   </records>
   <records prefix="plone.resources/bootstrap-mixins"
             interface='Products.CMFPlone.interfaces.IResourceRegistry'>
       <value key="css">
-        <element>++plone++static/components/bootstrap/less/mixins.less</element>
+        <element>++plone++static/components/bootstrap3/less/mixins.less</element>
       </value>
   </records>
 
   <records prefix="plone.resources/bootstrap-basic"
             interface='Products.CMFPlone.interfaces.IResourceRegistry'>
       <value key="css">
-        <element>++plone++static/components/bootstrap/less/utilities.less</element>
-        <element>++plone++static/components/bootstrap/less/forms.less</element>
-        <element>++plone++static/components/bootstrap/less/navs.less</element>
-        <element>++plone++static/components/bootstrap/less/navbar.less</element>
+        <element>++plone++static/components/bootstrap3/less/utilities.less</element>
+        <element>++plone++static/components/bootstrap3/less/forms.less</element>
+        <element>++plone++static/components/bootstrap3/less/navs.less</element>
+        <element>++plone++static/components/bootstrap3/less/navbar.less</element>
       </value>
   </records>
 
   <records prefix="plone.resources/bootstrap-progress-bars"
             interface='Products.CMFPlone.interfaces.IResourceRegistry'>
       <value key="css">
-        <element>++plone++static/components/bootstrap/less/progress-bars.less</element>
+        <element>++plone++static/components/bootstrap3/less/progress-bars.less</element>
       </value>
   </records>
 
   <records prefix="plone.resources/bootstrap-modal"
             interface='Products.CMFPlone.interfaces.IResourceRegistry'>
       <value key="css">
-        <element>++plone++static/components/bootstrap/less/modals.less</element>
+        <element>++plone++static/components/bootstrap3/less/modals.less</element>
       </value>
   </records>
 
   <records prefix="plone.resources/bootstrap-button-groups"
             interface='Products.CMFPlone.interfaces.IResourceRegistry'>
       <value key="css">
-        <element>++plone++static/components/bootstrap/less/button-groups.less</element>
+        <element>++plone++static/components/bootstrap3/less/button-groups.less</element>
       </value>
   </records>
 
   <records prefix="plone.resources/bootstrap-buttons"
             interface='Products.CMFPlone.interfaces.IResourceRegistry'>
       <value key="css">
-        <element>++plone++static/components/bootstrap/less/buttons.less</element>
-        <element>++plone++static/components/bootstrap/less/close.less</element>
+        <element>++plone++static/components/bootstrap3/less/buttons.less</element>
+        <element>++plone++static/components/bootstrap3/less/close.less</element>
       </value>
   </records>
 
   <records prefix="plone.resources/bootstrap-alert"
             interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-      <value key="js">++plone++static/components/bootstrap/js/alert.js</value>
+      <value key="js">++plone++static/components/bootstrap3/js/alert.js</value>
       <value key="deps">jquery</value>
   </records>
 
   <records prefix="plone.resources/bootstrap-dropdown"
             interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-      <value key="js">++plone++static/components/bootstrap/js/dropdown.js</value>
+      <value key="js">++plone++static/components/bootstrap3/js/dropdown.js</value>
       <value key="css">
-        <element>++plone++static/components/bootstrap/less/dropdowns.less</element>
+        <element>++plone++static/components/bootstrap3/less/dropdowns.less</element>
       </value>
       <value key="deps">jquery</value>
   </records>
 
   <records prefix="plone.resources/bootstrap-collapse"
             interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-      <value key="js">++plone++static/components/bootstrap/js/collapse.js</value>
+      <value key="js">++plone++static/components/bootstrap3/js/collapse.js</value>
       <value key="deps">jquery</value>
       <value key="export">window.jQuery.fn.collapse.Constructor</value>
   </records>
 
   <records prefix="plone.resources/bootstrap-tooltip"
             interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-      <value key="js">++plone++static/components/bootstrap/js/tooltip.js</value>
+      <value key="js">++plone++static/components/bootstrap3/js/tooltip.js</value>
       <value key="deps">jquery</value>
   </records>
 
   <records prefix="plone.resources/bootstrap-transition"
             interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-      <value key="js">++plone++static/components/bootstrap/js/transition.js</value>
+      <value key="js">++plone++static/components/bootstrap3/js/transition.js</value>
       <value key="deps">jquery</value>
       <value key="export">window.jQuery.support.transition</value>
   </records>
@@ -152,14 +158,14 @@
   <records prefix="plone.resources/bootstrap-glyphicons"
             interface='Products.CMFPlone.interfaces.IResourceRegistry'>
       <value key="css">
-        <element>++plone++static/components/bootstrap/less/glyphicons.less</element>
+        <element>++plone++static/components/bootstrap3/less/glyphicons.less</element>
       </value>
   </records>
 
   <records prefix="plone.resources/bootstrap-badges"
             interface='Products.CMFPlone.interfaces.IResourceRegistry'>
       <value key="css">
-        <element>++plone++static/components/bootstrap/less/badges.less</element>
+        <element>++plone++static/components/bootstrap3/less/badges.less</element>
       </value>
   </records>
 
@@ -237,22 +243,14 @@
       </value>
   </records>
 
+  <records prefix="plone.resources/sortable"
+            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
+      <value key="js">++plone++static/components/sortablejs/dist/sortable.umd.js</value>
+  </records>
+
   <records prefix="plone.resources/text"
             interface='Products.CMFPlone.interfaces.IResourceRegistry'>
       <value key="js">++plone++static/components/requirejs-text/text.js</value>
-  </records>
-
-  <records prefix="plone.resources/jquery.event.drag"
-            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-      <value key="js">++resource++mockuplib/jquery.event.drag.js</value>
-      <value key="deps">jquery</value>
-  </records>
-
-  <records prefix="plone.resources/jquery.event.drop"
-            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
-      <value key="js">++resource++mockuplib/jquery.event.drop.js</value>
-      <value key="deps">jquery</value>
-      <value key="export">$.drop</value>
   </records>
 
   <records prefix="plone.resources/tinymce-advlist"

@@ -68,511 +68,567 @@
  *
  */
 
-define('mockup-patterns-autotoc',[
-  'jquery',
-  'pat-base'
-], function($, Base) {
-  'use strict';
+define('mockup-patterns-autotoc',["jquery", "pat-base"], function ($, Base) {
+    "use strict";
 
-  var AutoTOC = Base.extend({
-    name: 'autotoc',
-    trigger: '.pat-autotoc',
-    parser: 'mockup',
-    defaults: {
-      section: 'section',
-      levels: 'h1,h2,h3',
-      IDPrefix: 'autotoc-item-',
-      classTOCName: 'autotoc-nav',
-      classSectionName: 'autotoc-section',
-      classLevelPrefixName: 'autotoc-level-',
-      classActiveName: 'active',
-      scrollDuration: 'slow',
-      scrollEasing: 'swing'
-    },
-    init: function() {
-      var self = this;
+    var AutoTOC = Base.extend({
+        name: "autotoc",
+        trigger: ".pat-autotoc",
+        parser: "mockup",
+        defaults: {
+            section: "section",
+            levels: "h1,h2,h3",
+            IDPrefix: "autotoc-item-",
+            classTOCName: "autotoc-nav",
+            classSectionName: "autotoc-section",
+            classLevelPrefixName: "autotoc-level-",
+            classActiveName: "active",
+            scrollDuration: "slow",
+            scrollEasing: "swing",
+        },
+        init: function () {
+            var self = this;
 
-      self.$toc = $('<nav/>').addClass(self.options.classTOCName);
+            self.$toc = $("<nav/>").addClass(self.options.classTOCName);
 
-      if (self.options.prependTo) {
-        self.$toc.prependTo(self.options.prependTo);
-      } else if (self.options.appendTo) {
-        self.$toc.appendTo(self.options.appendTo);
-      } else {
-        self.$toc.prependTo(self.$el);
-      }
-
-      if (self.options.className) {
-        self.$el.addClass(self.options.className);
-      }
-
-      $(self.options.section, self.$el).addClass(self.options.classSectionName);
-
-      var asTabs = self.$el.hasClass('autotabs');
-
-      var activeId = null;
-
-      $(self.options.levels, self.$el).each(function(i) {
-        var $level = $(this),
-            id = $level.prop('id') ? $level.prop('id') :
-                 $level.parents(self.options.section).prop('id');
-        if (!id || $('#' + id).length > 0) {
-          id = self.options.IDPrefix + self.name + '-' + i;
-        }
-        if(window.location.hash === '#' + id){
-          activeId = id;
-        }
-        if(activeId===null && $level.hasClass(self.options.classActiveName)){
-          activeId = id;
-        }
-        $level.data('navref', id);
-        $('<a/>')
-          .appendTo(self.$toc)
-          .text($level.text())
-          .attr('id', id)
-          .attr('href', '#' + id)
-          .addClass(self.options.classLevelPrefixName + self.getLevel($level))
-          .on('click', function(e, options) {
-            e.stopPropagation();
-            e.preventDefault();
-            if(!options){
-              options = {
-                doScroll: true,
-                skipHash: false
-              };
+            if (self.options.prependTo) {
+                self.$toc.prependTo(self.options.prependTo);
+            } else if (self.options.appendTo) {
+                self.$toc.appendTo(self.options.appendTo);
+            } else {
+                self.$toc.prependTo(self.$el);
             }
-            var $el = $(this);
-            self.$toc.children('.' + self.options.classActiveName).removeClass(self.options.classActiveName);
-            self.$el.children('.' + self.options.classActiveName).removeClass(self.options.classActiveName);
-            $(e.target).addClass(self.options.classActiveName);
-            $level.parents(self.options.section).addClass(self.options.classActiveName);
-            if (options.doScroll !== false &&
-                self.options.scrollDuration &&
-                $level &&
-                !asTabs) {
-              $('body,html').animate({
-                scrollTop: $level.offset().top
-              }, self.options.scrollDuration, self.options.scrollEasing);
-            }
-            if (self.$el.parents('.plone-modal').size() !== 0) {
-              self.$el.trigger('resize.plone-modal.patterns');
-            }
-            $(this).trigger('clicked');
-            if(!options.skipHash){
-              if(window.history && window.history.pushState){
-                window.history.pushState({}, '', '#' + $el.attr('id'));
-              }
-            }
-          });
-        $level.data('autotoc-trigger-id', id);
-      });
 
-      if(activeId){
-        $('a#' + activeId).trigger('click', {
-          doScroll: true,
-          skipHash: true
-        });
-      }else{
-        self.$toc.find('a').first().trigger('click', {
-          doScroll: false,
-          skipHash: true});
-      }
-    },
-    getLevel: function($el) {
-      var elementLevel = 0;
-      $.each(this.options.levels.split(','), function(level, levelSelector) {
-        if ($el.filter(levelSelector).size() === 1) {
-          elementLevel = level + 1;
-          return false;
-        }
-      });
-      return elementLevel;
-    }
-  });
+            if (self.options.className) {
+                self.$el.addClass(self.options.className);
+            }
 
-  return AutoTOC;
+            $(self.options.section, self.$el).addClass(
+                self.options.classSectionName
+            );
 
+            var asTabs = self.$el.hasClass("autotabs");
+
+            var activeId = null;
+
+            $(self.options.levels, self.$el).each(function (i) {
+                var $level = $(this),
+                    id = $level.prop("id")
+                        ? $level.prop("id")
+                        : $level.parents(self.options.section).prop("id");
+                if (!id || $("#" + id).length > 0) {
+                    id = self.options.IDPrefix + self.name + "-" + i;
+                }
+                if (window.location.hash === "#" + id) {
+                    activeId = id;
+                }
+                if (
+                    activeId === null &&
+                    $level.hasClass(self.options.classActiveName)
+                ) {
+                    activeId = id;
+                }
+                $level.data("navref", id);
+                $("<a/>")
+                    .appendTo(self.$toc)
+                    .text($level.text())
+                    .attr("id", id)
+                    .attr("href", "#" + id)
+                    .addClass(
+                        self.options.classLevelPrefixName +
+                            self.getLevel($level)
+                    )
+                    .on("click", function (e, options) {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        if (!options) {
+                            options = {
+                                doScroll: true,
+                                skipHash: false,
+                            };
+                        }
+                        var $el = $(this);
+                        self.$toc
+                            .children("." + self.options.classActiveName)
+                            .removeClass(self.options.classActiveName);
+                        self.$el
+                            .children("." + self.options.classActiveName)
+                            .removeClass(self.options.classActiveName);
+                        $(e.target).addClass(self.options.classActiveName);
+                        $level
+                            .parents(self.options.section)
+                            .addClass(self.options.classActiveName);
+                        if (
+                            options.doScroll !== false &&
+                            self.options.scrollDuration &&
+                            $level &&
+                            !asTabs
+                        ) {
+                            $("body,html").animate(
+                                {
+                                    scrollTop: $level.offset().top,
+                                },
+                                self.options.scrollDuration,
+                                self.options.scrollEasing
+                            );
+                        }
+                        if (self.$el.parents(".plone-modal").length !== 0) {
+                            self.$el.trigger("resize.plone-modal.patterns");
+                        }
+                        $(this).trigger("clicked");
+                        if (!options.skipHash) {
+                            if (window.history && window.history.pushState) {
+                                window.history.pushState(
+                                    {},
+                                    "",
+                                    "#" + $el.attr("id")
+                                );
+                            }
+                        }
+                    });
+                $level.data("autotoc-trigger-id", id);
+            });
+
+            if (activeId) {
+                $("a#" + activeId).trigger("click", {
+                    doScroll: true,
+                    skipHash: true,
+                });
+            } else {
+                self.$toc.find("a").first().trigger("click", {
+                    doScroll: false,
+                    skipHash: true,
+                });
+            }
+        },
+        getLevel: function ($el) {
+            var elementLevel = 0;
+            $.each(this.options.levels.split(","), function (
+                level,
+                levelSelector
+            ) {
+                if ($el.filter(levelSelector).length === 1) {
+                    elementLevel = level + 1;
+                    return false;
+                }
+            });
+            return elementLevel;
+        },
+    });
+
+    return AutoTOC;
 });
 
 /* Pattern utils
  */
 
+define('mockup-utils',["jquery"], function ($) {
+    "use strict";
 
-define('mockup-utils',[
-  'jquery'
-], function($) {
-  'use strict';
+    var QueryHelper = function (options) {
+        /* if pattern argument provided, it can implement the interface of:
+         *    - browsing: boolean if currently browsing
+         *    - currentPath: string of current path to apply to search if browsing
+         *    - basePath: default path to provide if no subpath used
+         */
 
-  var QueryHelper = function(options) {
-    /* if pattern argument provided, it can implement the interface of:
-     *    - browsing: boolean if currently browsing
-     *    - currentPath: string of current path to apply to search if browsing
-     *    - basePath: default path to provide if no subpath used
-     */
+        var self = this;
+        var defaults = {
+            pattern: null, // must be passed in
+            vocabularyUrl: null,
+            searchParam: "SearchableText", // query string param to pass to search url
+            pathOperator: "plone.app.querystring.operation.string.path",
+            attributes: [
+                "UID",
+                "Title",
+                "Description",
+                "getURL",
+                "portal_type",
+            ],
+            batchSize: 10, // number of results to retrive
+            baseCriteria: [],
+            sort_on: "is_folderish",
+            sort_order: "reverse",
+            pathDepth: 1,
+        };
+        self.options = $.extend({}, defaults, options);
 
-    var self = this;
-    var defaults = {
-      pattern: null, // must be passed in
-      vocabularyUrl: null,
-      searchParam: 'SearchableText', // query string param to pass to search url
-      pathOperator: 'plone.app.querystring.operation.string.path',
-      attributes: ['UID', 'Title', 'Description', 'getURL', 'portal_type'],
-      batchSize: 10, // number of results to retrive
-      baseCriteria: [],
-      sort_on: 'is_folderish',
-      sort_order: 'reverse',
-      pathDepth: 1
+        self.pattern = self.options.pattern;
+        if (self.pattern === undefined || self.pattern === null) {
+            self.pattern = {
+                browsing: false,
+                basePath: "/",
+            };
+        }
+
+        if (self.options.url && !self.options.vocabularyUrl) {
+            self.options.vocabularyUrl = self.options.url;
+        } else if (self.pattern.vocabularyUrl) {
+            self.options.vocabularyUrl = self.pattern.vocabularyUrl;
+        }
+        self.valid = Boolean(self.options.vocabularyUrl);
+
+        self.getBatch = function (page) {
+            return {
+                page: page ? page : 1,
+                size: self.options.batchSize,
+            };
+        };
+
+        self.getCurrentPath = function () {
+            var pattern = self.pattern;
+            var currentPath;
+            /* If currentPath is set on the QueryHelper object, use that first.
+             * Then, check on the pattern.
+             * Finally, see if it is a function and call it if it is.
+             */
+            if (self.currentPath) {
+                currentPath = self.currentPath;
+            } else {
+                currentPath = pattern.currentPath;
+            }
+            if (typeof currentPath === "function") {
+                currentPath = currentPath();
+            }
+            var path = currentPath;
+            if (!path) {
+                if (pattern.basePath) {
+                    path = pattern.basePath;
+                } else if (pattern.options.basePath) {
+                    path = pattern.options.basePath;
+                } else {
+                    path = "/";
+                }
+            }
+            return path;
+        };
+
+        self.getCriterias = function (term, searchOptions) {
+            if (searchOptions === undefined) {
+                searchOptions = {};
+            }
+            searchOptions = $.extend(
+                {},
+                {
+                    useBaseCriteria: true,
+                    additionalCriterias: [],
+                },
+                searchOptions
+            );
+
+            var criterias = [];
+            if (searchOptions.useBaseCriteria) {
+                criterias = self.options.baseCriteria.slice(0);
+            }
+            if (term) {
+                term += "*";
+                criterias.push({
+                    i: self.options.searchParam,
+                    o: "plone.app.querystring.operation.string.contains",
+                    v: term,
+                });
+            }
+            if (searchOptions.searchPath) {
+                criterias.push({
+                    i: "path",
+                    o: self.options.pathOperator,
+                    v: searchOptions.searchPath + "::" + self.options.pathDepth,
+                });
+            } else if (self.pattern.browsing) {
+                criterias.push({
+                    i: "path",
+                    o: self.options.pathOperator,
+                    v: self.getCurrentPath() + "::" + self.options.pathDepth,
+                });
+            }
+            criterias = criterias.concat(searchOptions.additionalCriterias);
+            return criterias;
+        };
+
+        self.getQueryData = function (term, page) {
+            var data = {
+                query: JSON.stringify({
+                    criteria: self.getCriterias(term),
+                    sort_on: self.options.sort_on,
+                    sort_order: self.options.sort_order,
+                }),
+                attributes: JSON.stringify(self.options.attributes),
+            };
+            if (page) {
+                data.batch = JSON.stringify(self.getBatch(page));
+            }
+            return data;
+        };
+
+        self.getUrl = function () {
+            var url = self.options.vocabularyUrl;
+            if (url.indexOf("?") === -1) {
+                url += "?";
+            } else {
+                url += "&";
+            }
+            return url + $.param(self.getQueryData());
+        };
+
+        self.selectAjax = function () {
+            return {
+                url: self.options.vocabularyUrl,
+                dataType: "JSON",
+                quietMillis: 100,
+                data: function (term, page) {
+                    return self.getQueryData(term, page);
+                },
+                results: function (data, page) {
+                    var more = page * 10 < data.total; // whether or not there are more results available
+                    // notice we return the value of more so Select2 knows if more results can be loaded
+                    return {
+                        results: data.results,
+                        more: more,
+                    };
+                },
+            };
+        };
+
+        self.search = function (
+            term,
+            operation,
+            value,
+            callback,
+            useBaseCriteria,
+            type
+        ) {
+            if (useBaseCriteria === undefined) {
+                useBaseCriteria = true;
+            }
+            if (type === undefined) {
+                type = "GET";
+            }
+            var criteria = [];
+            if (useBaseCriteria) {
+                criteria = self.options.baseCriteria.slice(0);
+            }
+            criteria.push({
+                i: term,
+                o: operation,
+                v: value,
+            });
+            var data = {
+                query: JSON.stringify({
+                    criteria: criteria,
+                }),
+                attributes: JSON.stringify(self.options.attributes),
+            };
+            $.ajax({
+                url: self.options.vocabularyUrl,
+                dataType: "JSON",
+                data: data,
+                type: type,
+                success: callback,
+            });
+        };
+
+        return self;
     };
-    self.options = $.extend({}, defaults, options);
 
-    self.pattern = self.options.pattern;
-    if (self.pattern === undefined || self.pattern === null) {
-      self.pattern = {
-        browsing: false,
-        basePath: '/'
-      };
-    }
+    var Loading = function (options) {
+        /*
+         * Options:
+         *   backdrop(pattern): if you want to have the progress indicator work
+         *                      seamlessly with backdrop pattern
+         *   zIndex(integer or function): to override default z-index used
+         */
+        var self = this;
+        self.className = "plone-loader";
+        var defaults = {
+            backdrop: null,
+            zIndex: 10005, // can be a function
+        };
+        if (!options) {
+            options = {};
+        }
+        self.options = $.extend({}, defaults, options);
 
-    if (self.options.url && !self.options.vocabularyUrl) {
-      self.options.vocabularyUrl = self.options.url;
-    } else if (self.pattern.vocabularyUrl) {
-      self.options.vocabularyUrl = self.pattern.vocabularyUrl;
-    }
-    self.valid = Boolean(self.options.vocabularyUrl);
+        self.init = function () {
+            self.$el = $("." + self.className);
+            if (self.$el.length === 0) {
+                self.$el = $("<div><div></div></div>");
+                self.$el.addClass(self.className).hide().appendTo("body");
+            }
+        };
 
-    self.getBatch = function(page) {
-      return {
-        page: page ? page : 1,
-        size: self.options.batchSize
-      };
+        self.show = function (closable) {
+            self.init();
+            self.$el.show();
+            var zIndex = self.options.zIndex;
+            if (typeof zIndex === "function") {
+                zIndex = Math.max(zIndex(), 10005);
+            } else {
+                // go through all modals and backdrops and make sure we have a higher
+                // z-index to use
+                zIndex = 10005;
+                $(".plone-modal-wrapper,.plone-modal-backdrop").each(
+                    function () {
+                        zIndex = Math.max(
+                            zIndex,
+                            $(this).css("zIndex") || 10005
+                        );
+                    }
+                );
+                zIndex += 1;
+            }
+            self.$el.css("zIndex", zIndex);
+
+            if (closable === undefined) {
+                closable = true;
+            }
+            if (self.options.backdrop) {
+                self.options.backdrop.closeOnClick = closable;
+                self.options.backdrop.closeOnEsc = closable;
+                self.options.backdrop.init();
+                self.options.backdrop.show();
+            }
+        };
+
+        self.hide = function () {
+            self.init();
+            self.$el.hide();
+        };
+
+        return self;
     };
 
-    self.getCurrentPath = function() {
-      var pattern = self.pattern;
-      var currentPath;
-      /* If currentPath is set on the QueryHelper object, use that first.
-       * Then, check on the pattern.
-       * Finally, see if it is a function and call it if it is.
-       */
-      if (self.currentPath) {
-        currentPath = self.currentPath;
-      } else {
-        currentPath = pattern.currentPath;
-      }
-      if (typeof currentPath === 'function') {
-        currentPath = currentPath();
-      }
-      var path = currentPath;
-      if (!path) {
-        if (pattern.basePath) {
-          path = pattern.basePath;
-        } else if (pattern.options.basePath) {
-          path = pattern.options.basePath;
+    var getAuthenticator = function () {
+        var $el = $('input[name="_authenticator"]');
+        if ($el.length === 0) {
+            $el = $('a[href*="_authenticator"]');
+            if ($el.length > 0) {
+                return $el.attr("href").split("_authenticator=")[1];
+            }
+            return "";
         } else {
-          path = '/';
+            return $el.val();
         }
-      }
-      return path;
     };
 
-    self.getCriterias = function(term, searchOptions) {
-      if (searchOptions === undefined) {
-        searchOptions = {};
-      }
-      searchOptions = $.extend({}, {
-        useBaseCriteria: true,
-        additionalCriterias: []
-      }, searchOptions);
-
-      var criterias = [];
-      if (searchOptions.useBaseCriteria) {
-        criterias = self.options.baseCriteria.slice(0);
-      }
-      if (term) {
-        term += '*';
-        criterias.push({
-          i: self.options.searchParam,
-          o: 'plone.app.querystring.operation.string.contains',
-          v: term
-        });
-      }
-      if (searchOptions.searchPath) {
-        criterias.push({
-          i: 'path',
-          o: self.options.pathOperator,
-          v: searchOptions.searchPath + '::' + self.options.pathDepth
-        });
-      } else if (self.pattern.browsing) {
-        criterias.push({
-          i: 'path',
-          o: self.options.pathOperator,
-          v: self.getCurrentPath() + '::' + self.options.pathDepth
-        });
-      }
-      criterias = criterias.concat(searchOptions.additionalCriterias);
-      return criterias;
+    var generateId = function (prefix) {
+        if (prefix === undefined) {
+            prefix = "id";
+        }
+        return (
+            prefix +
+            Math.floor((1 + Math.random()) * 0x10000)
+                .toString(16)
+                .substring(1)
+        );
     };
 
-    self.getQueryData = function(term, page) {
-      var data = {
-        query: JSON.stringify({
-          criteria: self.getCriterias(term),
-          sort_on: self.options.sort_on,
-          sort_order: self.options.sort_order
-        }),
-        attributes: JSON.stringify(self.options.attributes)
-      };
-      if (page) {
-        data.batch = JSON.stringify(self.getBatch(page));
-      }
-      return data;
+    var setId = function ($el, prefix) {
+        if (prefix === undefined) {
+            prefix = "id";
+        }
+        var id = $el.attr("id");
+        if (id === undefined) {
+            id = generateId(prefix);
+        } else {
+            /* hopefully we don't screw anything up here... changing the id
+             * in some cases so we get a decent selector */
+            id = id.replace(/\./g, "-");
+        }
+        $el.attr("id", id);
+        return id;
     };
 
-    self.getUrl = function() {
-      var url = self.options.vocabularyUrl;
-      if (url.indexOf('?') === -1) {
-        url += '?';
-      } else {
-        url += '&';
-      }
-      return url + $.param(self.getQueryData());
+    var getWindow = function () {
+        var win = window;
+        if (win.parent !== window) {
+            win = win.parent;
+        }
+        return win;
     };
 
-    self.selectAjax = function() {
-      return {
-        url: self.options.vocabularyUrl,
-        dataType: 'JSON',
-        quietMillis: 100,
-        data: function(term, page) {
-          return self.getQueryData(term, page);
+    var parseBodyTag = function (txt) {
+        return $(
+            /<body[^>]*>[^]*<\/body>/im
+                .exec(txt)[0]
+                .replace("<body", "<div")
+                .replace("</body>", "</div>")
+        )
+            .eq(0)
+            .html();
+    };
+
+    var featureSupport = {
+        /* Well tested feature support for things we use in mockup.
+         * All gathered from: http://diveintohtml5.info/everything.html
+         * Alternative to using some form of modernizr.
+         */
+        dragAndDrop: function () {
+            return "draggable" in document.createElement("span");
         },
-        results: function(data, page) {
-          var more = (page * 10) < data.total; // whether or not there are more results available
-          // notice we return the value of more so Select2 knows if more results can be loaded
-          return {
-            results: data.results,
-            more: more
-          };
+        fileApi: function () {
+            return typeof FileReader != "undefined"; // jshint ignore:line
+        },
+        history: function () {
+            return !!(window.history && window.history.pushState);
+        },
+    };
+
+    var bool = function (val) {
+        if (typeof val === "string") {
+            val = $.trim(val).toLowerCase();
         }
-      };
+        return (
+            ["false", false, "0", 0, "", undefined, null].indexOf(val) === -1
+        );
     };
 
-    self.search = function(term, operation, value, callback, useBaseCriteria, type) {
-      if (useBaseCriteria === undefined) {
-        useBaseCriteria = true;
-      }
-      if (type === undefined) {
-        type = 'GET';
-      }
-      var criteria = [];
-      if (useBaseCriteria) {
-        criteria = self.options.baseCriteria.slice(0);
-      }
-      criteria.push({
-        i: term,
-        o: operation,
-        v: value
-      });
-      var data = {
-        query: JSON.stringify({
-          criteria: criteria
-        }),
-        attributes: JSON.stringify(self.options.attributes)
-      };
-      $.ajax({
-        url: self.options.vocabularyUrl,
-        dataType: 'JSON',
-        data: data,
-        type: type,
-        success: callback
-      });
+    var escapeHTML = function (val) {
+        return $("<div/>").text(val).html();
     };
 
-    return self;
-  };
-
-  var Loading = function(options) {
-    /*
-     * Options:
-     *   backdrop(pattern): if you want to have the progress indicator work
-     *                      seamlessly with backdrop pattern
-     *   zIndex(integer or function): to override default z-index used
-     */
-    var self = this;
-    self.className = 'plone-loader';
-    var defaults = {
-      backdrop: null,
-      zIndex: 10005 // can be a function
-    };
-    if (!options) {
-      options = {};
-    }
-    self.options = $.extend({}, defaults, options);
-
-    self.init = function() {
-      self.$el = $('.' + self.className);
-      if (self.$el.length === 0) {
-        self.$el = $('<div><div></div></div>');
-        self.$el.addClass(self.className).hide().appendTo('body');
-      }
+    var removeHTML = function (val) {
+        return val.replace(/<[^>]+>/gi, "");
     };
 
-    self.show = function(closable) {
-      self.init();
-      self.$el.show();
-      var zIndex = self.options.zIndex;
-      if (typeof(zIndex) === 'function') {
-        zIndex = Math.max(zIndex(), 10005);
-      } else {
-        // go through all modals and backdrops and make sure we have a higher
-        // z-index to use
-        zIndex = 10005;
-        $('.plone-modal-wrapper,.plone-modal-backdrop').each(function() {
-          zIndex = Math.max(zIndex, $(this).css('zIndex') || 10005);
-        });
-        zIndex += 1;
-      }
-      self.$el.css('zIndex', zIndex);
+    var storage = {
+        // Simple local storage wrapper, which doesn't break down if it's not available.
+        get: function (name) {
+            if (window.localStorage) {
+                var val = window.localStorage[name];
+                return typeof val === "string" ? JSON.parse(val) : undefined;
+            }
+        },
 
-      if (closable === undefined) {
-        closable = true;
-      }
-      if (self.options.backdrop) {
-        self.options.backdrop.closeOnClick = closable;
-        self.options.backdrop.closeOnEsc = closable;
-        self.options.backdrop.init();
-        self.options.backdrop.show();
-      }
+        set: function (name, val) {
+            if (window.localStorage) {
+                window.localStorage[name] = JSON.stringify(val);
+            }
+        },
     };
 
-    self.hide = function() {
-      self.init();
-      self.$el.hide();
+    var createElementFromHTML = function (htmlString) {
+        // From: https://stackoverflow.com/a/494348/1337474
+        var div = document.createElement("div");
+        div.innerHTML = htmlString.trim();
+        return div.firstChild;
     };
 
-    return self;
-  };
-
-  var getAuthenticator = function() {
-    var $el = $('input[name="_authenticator"]');
-    if ($el.length === 0) {
-      $el = $('a[href*="_authenticator"]');
-      if ($el.length > 0) {
-        return $el.attr('href').split('_authenticator=')[1];
-      }
-      return '';
-    } else {
-      return $el.val();
-    }
-  };
-
-  var generateId = function(prefix) {
-    if (prefix === undefined) {
-      prefix = 'id';
-    }
-    return prefix + (Math.floor((1 + Math.random()) * 0x10000)
-      .toString(16).substring(1));
-  };
-
-  var setId = function($el, prefix) {
-    if (prefix === undefined) {
-      prefix = 'id';
-    }
-    var id = $el.attr('id');
-    if (id === undefined) {
-      id = generateId(prefix);
-    } else {
-      /* hopefully we don't screw anything up here... changing the id
-       * in some cases so we get a decent selector */
-      id = id.replace(/\./g, '-');
-    }
-    $el.attr('id', id);
-    return id;
-  };
-
-  var getWindow = function() {
-    var win = window;
-    if (win.parent !== window) {
-      win = win.parent;
-    }
-    return win;
-  };
-
-  var parseBodyTag = function(txt) {
-    return $((/<body[^>]*>[^]*<\/body>/im).exec(txt)[0]
-      .replace('<body', '<div').replace('</body>', '</div>')).eq(0).html();
-  };
-
-  var featureSupport = {
-    /* Well tested feature support for things we use in mockup.
-     * All gathered from: http://diveintohtml5.info/everything.html
-     * Alternative to using some form of modernizr.
-     */
-    dragAndDrop: function() {
-      return 'draggable' in document.createElement('span');
-    },
-    fileApi: function() {
-      return typeof FileReader != 'undefined'; // jshint ignore:line
-    },
-    history: function() {
-      return !!(window.history && window.history.pushState);
-    }
-  };
-
-  var bool = function(val) {
-    if (typeof val === 'string') {
-      val = $.trim(val).toLowerCase();
-    }
-    return ['false', false, '0', 0, '', undefined, null].indexOf(val) === -1;
-  };
-
-  var escapeHTML = function(val) {
-    return $('<div/>').text(val).html();
-  };
-
-  var removeHTML = function(val) {
-    return val.replace(/<[^>]+>/ig, '');
-  };
-
-  var storage = {
-    // Simple local storage wrapper, which doesn't break down if it's not available.
-    get: function (name) {
-        if (window.localStorage) {
-          var val = window.localStorage[name];
-          return typeof(val) === 'string' ? JSON.parse(val) : undefined;
-      }
-    },
-
-    set: function (name, val) {
-      if (window.localStorage) {
-        window.localStorage[name] = JSON.stringify(val);
-      }
-    }
-  };
-
-  var createElementFromHTML = function(htmlString) {
-    // From: https://stackoverflow.com/a/494348/1337474
-    var div = document.createElement('div');
-    div.innerHTML = htmlString.trim();
-    return div.firstChild;
-  };
-
-  return {
-    bool: bool,
-    escapeHTML: escapeHTML,
-    removeHTML: removeHTML,
-    featureSupport: featureSupport,
-    generateId: generateId,
-    getAuthenticator: getAuthenticator,
-    getWindow: getWindow,
-    Loading: Loading,
-    loading: new Loading(),  // provide default loader
-    parseBodyTag: parseBodyTag,
-    QueryHelper: QueryHelper,
-    setId: setId,
-    storage: storage,
-    createElementFromHTML: createElementFromHTML
-  };
+    return {
+        bool: bool,
+        escapeHTML: escapeHTML,
+        removeHTML: removeHTML,
+        featureSupport: featureSupport,
+        generateId: generateId,
+        getAuthenticator: getAuthenticator,
+        getWindow: getWindow,
+        Loading: Loading,
+        loading: new Loading(), // provide default loader
+        parseBodyTag: parseBodyTag,
+        QueryHelper: QueryHelper,
+        setId: setId,
+        storage: storage,
+        createElementFromHTML: createElementFromHTML,
+    };
 });
 
 /* Content loader pattern.
@@ -601,132 +657,132 @@ define('mockup-utils',[
  *
  */
 
-
 define('mockup-patterns-contentloader',[
-  'jquery',
-  'pat-base',
-  'pat-logger',
-  'pat-registry',
-  'mockup-utils',
-  'underscore'
-], function($, Base, logger, Registry, utils, _) {
-  'use strict';
-  var log = logger.getLogger('pat-contentloader');
+    "jquery",
+    "pat-base",
+    "pat-logger",
+    "pat-registry",
+    "mockup-utils",
+    "underscore",
+], function ($, Base, logger, Registry, utils, _) {
+    "use strict";
+    var log = logger.getLogger("pat-contentloader");
 
-  var ContentLoader = Base.extend({
-    name: 'contentloader',
-    trigger: '.pat-contentloader',
-    parser: 'mockup',
-    defaults: {
-      url: null,
-      content: null,
-      trigger: 'click',
-      target: null,
-      template: null,
-      dataType: 'html'
-    },
-    init: function() {
-      var that = this;
-      if(that.options.url === 'el' && that.$el[0].tagName === 'A'){
-        that.options.url = that.$el.attr('href');
-      }
-      that.$el.removeClass('loading-content');
-      that.$el.removeClass('content-load-error');
-      if(that.options.trigger === 'immediate'){
-        that._load();
-      }else{
-        that.$el.on(that.options.trigger, function(e){
-          e.preventDefault();
-          that._load();
-        });
-      }
-    },
-    _load: function(){
-      var that = this;
-      that.$el.addClass('loading-content');
-      if(that.options.url){
-        that.loadRemote();
-      }else{
-        that.loadLocal();
-      }
-    },
-    loadRemote: function(){
-      var that = this;
-      $.ajax({
-        url: that.options.url,
-        dataType: that.options.dataType,
-        success: function(data){
-          var $el;
-          if(that.options.dataType === 'html'){
-            if(data.indexOf('<html') !== -1){
-              data = utils.parseBodyTag(data);
-            }
-            $el = $('<div>' + data + '</div>');  // jQuery starts to search at the first child element.
-          }else if(that.options.dataType.indexOf('json') !== -1){
-            // must have template defined with json
-            if(data.constructor === Array && data.length === 1){
-              // normalize json if it makes sense since some json returns as array with one item
-              data = data[0];
-            }
-            try{
-              $el = $(_.template(that.options.template)(data));
-            }catch(e){
-              that.$el.removeClass('loading-content');
-              that.$el.addClass('content-load-error');
-              log.warn('error rendering template. pat-contentloader will not work');
-              return;
-            }
-          }
-          if(that.options.content !== null){
-            $el = $el.find(that.options.content);
-          }
-          that.loadLocal($el);
+    var ContentLoader = Base.extend({
+        name: "contentloader",
+        trigger: ".pat-contentloader",
+        parser: "mockup",
+        defaults: {
+            url: null,
+            content: null,
+            trigger: "click",
+            target: null,
+            template: null,
+            dataType: "html",
         },
-        error: function(){
-          that.$el.removeClass('loading-content');
-          that.$el.addClass('content-load-error');
-        }
-      });
-    },
-    loadLocal: function($content){
-      var that = this;
-      if(!$content && that.options.content === null){
-        that.$el.removeClass('loading-content');
-        that.$el.addClass('content-load-error');
-        log.warn('No selector configured');
-        return;
-      }
-      var $target = that.$el;
-      if(that.options.target !== null){
-        $target = $(that.options.target);
-        if($target.size() === 0){
-          that.$el.removeClass('loading-content');
-          that.$el.addClass('content-load-error');
-          log.warn('No target nodes found');
-          return;
-        }
-      }
+        init: function () {
+            var that = this;
+            if (that.options.url === "el" && that.$el[0].tagName === "A") {
+                that.options.url = that.$el.attr("href");
+            }
+            that.$el.removeClass("loading-content");
+            that.$el.removeClass("content-load-error");
+            if (that.options.trigger === "immediate") {
+                that._load();
+            } else {
+                that.$el.on(that.options.trigger, function (e) {
+                    e.preventDefault();
+                    that._load();
+                });
+            }
+        },
+        _load: function () {
+            var that = this;
+            that.$el.addClass("loading-content");
+            if (that.options.url) {
+                that.loadRemote();
+            } else {
+                that.loadLocal();
+            }
+        },
+        loadRemote: function () {
+            var that = this;
+            $.ajax({
+                url: that.options.url,
+                dataType: that.options.dataType,
+                success: function (data) {
+                    var $el;
+                    if (that.options.dataType === "html") {
+                        if (data.indexOf("<html") !== -1) {
+                            data = utils.parseBodyTag(data);
+                        }
+                        $el = $("<div>" + data + "</div>"); // jQuery starts to search at the first child element.
+                    } else if (that.options.dataType.indexOf("json") !== -1) {
+                        // must have template defined with json
+                        if (data.constructor === Array && data.length === 1) {
+                            // normalize json if it makes sense since some json returns as array with one item
+                            data = data[0];
+                        }
+                        try {
+                            $el = $(_.template(that.options.template)(data));
+                        } catch (e) {
+                            that.$el.removeClass("loading-content");
+                            that.$el.addClass("content-load-error");
+                            log.warn(
+                                "error rendering template. pat-contentloader will not work"
+                            );
+                            return;
+                        }
+                    }
+                    if (that.options.content !== null) {
+                        $el = $el.find(that.options.content);
+                    }
+                    that.loadLocal($el);
+                },
+                error: function () {
+                    that.$el.removeClass("loading-content");
+                    that.$el.addClass("content-load-error");
+                },
+            });
+        },
+        loadLocal: function ($content) {
+            var that = this;
+            if (!$content && that.options.content === null) {
+                that.$el.removeClass("loading-content");
+                that.$el.addClass("content-load-error");
+                log.warn("No selector configured");
+                return;
+            }
+            var $target = that.$el;
+            if (that.options.target !== null) {
+                $target = $(that.options.target);
+                if ($target.length === 0) {
+                    that.$el.removeClass("loading-content");
+                    that.$el.addClass("content-load-error");
+                    log.warn("No target nodes found");
+                    return;
+                }
+            }
 
-      if(!$content){
-        $content = $(that.options.content).clone();
-      }
-      if ($content.length) {
-        $content.show();
-        $target.replaceWith($content);
-        Registry.scan($content);
-      } else {
-        // empty target node instead of removing it.
-        // allows for subsequent content loader calls to work sucessfully.
-        $target.empty();
-      }
+            if (!$content) {
+                $content = $(that.options.content).clone();
+            }
+            if ($content.length) {
+                $content.show();
+                $target.replaceWith($content);
+                Registry.scan($content);
+            } else {
+                // empty target node instead of removing it.
+                // allows for subsequent content loader calls to work sucessfully.
+                $target.empty();
+            }
 
-      that.$el.removeClass('loading-content');
-      that.emit('loading-done');
-    }
-  });
+            that.$el.removeClass("loading-content");
+            that.emit("loading-done");
+        },
+    });
 
-  return ContentLoader;
-
+    return ContentLoader;
 });
 
 /* Cookie Trigger pattern.
@@ -743,56 +799,55 @@ define('mockup-patterns-contentloader',[
  *    </div>
  */
 
-define('mockup-patterns-cookietrigger',[
-  'pat-base'
-], function (Base) {
-  'use strict';
+define('mockup-patterns-cookietrigger',["pat-base"], function (Base) {
+    "use strict";
 
-  var CookieTrigger = Base.extend({
-    name: 'cookietrigger',
-    trigger: '.pat-cookietrigger',
-    parser: 'mockup',
+    var CookieTrigger = Base.extend({
+        name: "cookietrigger",
+        trigger: ".pat-cookietrigger",
+        parser: "mockup",
 
-    isCookiesEnabled: function() {
-      /* Test whether cookies are enabled by attempting to set a cookie
-       * and then change its value set test cookie.
-       */
-      var c = "areYourCookiesEnabled=0";
-      document.cookie = c;
-      var dc = document.cookie;
-      // cookie not set?  fail
-      if (dc.indexOf(c) === -1) {
-        return 0;
-      }
-      // change test cookie
-      c = "areYourCookiesEnabled=1";
-      document.cookie = c;
-      dc = document.cookie;
-      // cookie not changed?  fail
-      if (dc.indexOf(c) === -1) {
-        return 0;
-      }
-      // delete cookie
-      document.cookie = "areYourCookiesEnabled=; expires=Thu, 01-Jan-70 00:00:01 GMT";
-      return 1;
-    },
+        isCookiesEnabled: function () {
+            /* Test whether cookies are enabled by attempting to set a cookie
+             * and then change its value set test cookie.
+             */
+            var c = "areYourCookiesEnabled=0";
+            document.cookie = c;
+            var dc = document.cookie;
+            // cookie not set?  fail
+            if (dc.indexOf(c) === -1) {
+                return 0;
+            }
+            // change test cookie
+            c = "areYourCookiesEnabled=1";
+            document.cookie = c;
+            dc = document.cookie;
+            // cookie not changed?  fail
+            if (dc.indexOf(c) === -1) {
+                return 0;
+            }
+            // delete cookie
+            document.cookie =
+                "areYourCookiesEnabled=; expires=Thu, 01-Jan-70 00:00:01 GMT";
+            return 1;
+        },
 
-    showIfCookiesDisabled: function() {
-      /* Show the element on which this pattern is defined if cookies are
-       * disabled.
-       */
-      if (this.isCookiesEnabled()) {
-        this.$el.hide();
-      } else {
-        this.$el.show();
-      }
-    },
+        showIfCookiesDisabled: function () {
+            /* Show the element on which this pattern is defined if cookies are
+             * disabled.
+             */
+            if (this.isCookiesEnabled()) {
+                this.$el.hide();
+            } else {
+                this.$el.show();
+            }
+        },
 
-    init: function () {
-      this.showIfCookiesDisabled();
-    },
-  });
-  return CookieTrigger;
+        init: function () {
+            this.showIfCookiesDisabled();
+        },
+    });
+    return CookieTrigger;
 });
 
 /* Formautofocus pattern.
@@ -809,35 +864,29 @@ define('mockup-patterns-cookietrigger',[
  *
  */
 
+define('mockup-patterns-formautofocus',["jquery", "pat-base"], function ($, Base, undefined) {
+    "use strict";
 
-define('mockup-patterns-formautofocus',[
-  'jquery',
-  'pat-base'
-], function($, Base, undefined) {
-  'use strict';
+    var FormAutoFocus = Base.extend({
+        name: "formautofocus",
+        trigger: ".pat-formautofocus",
+        parser: "mockup",
+        defaults: {
+            condition: "div.error",
+            target: "div.error :input:not(.formTabs):visible:first",
+            always: ":input:not(.formTabs):visible:first",
+        },
+        init: function () {
+            var self = this;
+            if ($(self.options.condition, self.$el).length !== 0) {
+                $(self.options.target, self.$el).focus();
+            } else {
+                $(self.options.always, self.$el).focus();
+            }
+        },
+    });
 
-  var FormAutoFocus = Base.extend({
-    name: 'formautofocus',
-    trigger: '.pat-formautofocus',
-    parser: 'mockup',
-    defaults: {
-      condition: 'div.error',
-      target: 'div.error :input:not(.formTabs):visible:first',
-      always: ':input:not(.formTabs):visible:first'
-    },
-    init: function() {
-      var self = this;
-      if ($(self.options.condition, self.$el).size() !== 0) {
-        $(self.options.target, self.$el).focus();
-      } else {
-        $(self.options.always, self.$el).focus();
-      }
-
-    }
-  });
-
-  return FormAutoFocus;
-
+    return FormAutoFocus;
 });
 
 /* i18n integration. This is forked from jarn.jsi18n
@@ -848,115 +897,135 @@ define('mockup-patterns-formautofocus',[
  *
  *  Or, it'll default to "/plonejsi18n"
  */
-define('mockup-i18n',[
-  'jquery'
-], function($) {
-  'use strict';
+define('mockup-i18n',["jquery"], function ($) {
+    "use strict";
 
-  var I18N = function() {
-    var self = this;
-    self.baseUrl = $('body').attr('data-i18ncatalogurl');
-    self.currentLanguage = $('html').attr('lang') || 'en';
+    var I18N = function () {
+        var self = this;
+        self.baseUrl = $("body").attr("data-i18ncatalogurl");
+        self.currentLanguage = $("html").attr("lang") || "en";
 
-    // Fix for country specific languages
-    if (self.currentLanguage.split('-').length > 1) {
-      self.currentLanguage = self.currentLanguage.split('-')[0] + '_' + self.currentLanguage.split('-')[1].toUpperCase();
-    }
-
-    self.storage = null;
-    self.catalogs = {};
-    self.ttl = 24 * 3600 * 1000;
-
-    // Internet Explorer 8 does not know Date.now() which is used in e.g. loadCatalog, so we "define" it
-    if (!Date.now) {
-      Date.now = function() {
-        return new Date().valueOf();
-      };
-    }
-
-    try {
-      if ('localStorage' in window && window.localStorage !== null && 'JSON' in window && window.JSON !== null) {
-        self.storage = window.localStorage;
-      }
-    } catch (e) {}
-
-    self.configure = function(config) {
-      for (var key in config){
-        self[key] = config[key];
-      }
-    };
-
-    self._setCatalog = function (domain, language, catalog) {
-      if (domain in self.catalogs) {
-        self.catalogs[domain][language] = catalog;
-      } else {
-        self.catalogs[domain] = {};
-        self.catalogs[domain][language] = catalog;
-      }
-    };
-
-    self._storeCatalog = function (domain, language, catalog) {
-      var key = domain + '-' + language;
-      if (self.storage !== null && catalog !== null) {
-        self.storage.setItem(key, JSON.stringify(catalog));
-        self.storage.setItem(key + '-updated', Date.now());
-      }
-    };
-
-    self.getUrl = function(domain, language) {
-      return self.baseUrl + '?domain=' + domain + '&language=' + language;
-    };
-
-    self.loadCatalog = function (domain, language) {
-      if (language === undefined) {
-        language = self.currentLanguage;
-      }
-      if (self.storage !== null) {
-        var key = domain + '-' + language;
-        if (key in self.storage) {
-          if ((Date.now() - parseInt(self.storage.getItem(key + '-updated'), 10)) < self.ttl) {
-            var catalog = JSON.parse(self.storage.getItem(key));
-            self._setCatalog(domain, language, catalog);
-            return;
-          }
+        // Fix for country specific languages
+        if (self.currentLanguage.split("-").length > 1) {
+            self.currentLanguage =
+                self.currentLanguage.split("-")[0] +
+                "_" +
+                self.currentLanguage.split("-")[1].toUpperCase();
         }
-      }
-      if (!self.baseUrl) {
-        return;
-      }
-      $.getJSON(self.getUrl(domain, language), function (catalog) {
-        if (catalog === null) {
-          return;
-        }
-        self._setCatalog(domain, language, catalog);
-        self._storeCatalog(domain, language, catalog);
-      });
-    };
 
-    self.MessageFactory = function (domain, language) {
-      language = language || self.currentLanguage;
-      return function translate (msgid, keywords) {
-        var msgstr;
-        if ((domain in self.catalogs) && (language in self.catalogs[domain]) && (msgid in self.catalogs[domain][language])) {
-          msgstr = self.catalogs[domain][language][msgid];
-        } else {
-          msgstr = msgid;
+        self.storage = null;
+        self.catalogs = {};
+        self.ttl = 24 * 3600 * 1000;
+
+        // Internet Explorer 8 does not know Date.now() which is used in e.g. loadCatalog, so we "define" it
+        if (!Date.now) {
+            Date.now = function () {
+                return new Date().valueOf();
+            };
         }
-        if (keywords) {
-          var regexp, keyword;
-          for (keyword in keywords) {
-            if (keywords.hasOwnProperty(keyword)) {
-              regexp = new RegExp('\\$\\{' + keyword + '\\}', 'g');
-              msgstr = msgstr.replace(regexp, keywords[keyword]);
+
+        try {
+            if (
+                "localStorage" in window &&
+                window.localStorage !== null &&
+                "JSON" in window &&
+                window.JSON !== null
+            ) {
+                self.storage = window.localStorage;
             }
-          }
-        }
-        return msgstr;
-      };
-    };
-  };
+        } catch (e) {}
 
-  return I18N;
+        self.configure = function (config) {
+            for (var key in config) {
+                self[key] = config[key];
+            }
+        };
+
+        self._setCatalog = function (domain, language, catalog) {
+            if (domain in self.catalogs) {
+                self.catalogs[domain][language] = catalog;
+            } else {
+                self.catalogs[domain] = {};
+                self.catalogs[domain][language] = catalog;
+            }
+        };
+
+        self._storeCatalog = function (domain, language, catalog) {
+            var key = domain + "-" + language;
+            if (self.storage !== null && catalog !== null) {
+                self.storage.setItem(key, JSON.stringify(catalog));
+                self.storage.setItem(key + "-updated", Date.now());
+            }
+        };
+
+        self.getUrl = function (domain, language) {
+            return self.baseUrl + "?domain=" + domain + "&language=" + language;
+        };
+
+        self.loadCatalog = function (domain, language) {
+            if (language === undefined) {
+                language = self.currentLanguage;
+            }
+            if (self.storage !== null) {
+                var key = domain + "-" + language;
+                if (key in self.storage) {
+                    if (
+                        Date.now() -
+                            parseInt(
+                                self.storage.getItem(key + "-updated"),
+                                10
+                            ) <
+                        self.ttl
+                    ) {
+                        var catalog = JSON.parse(self.storage.getItem(key));
+                        self._setCatalog(domain, language, catalog);
+                        return;
+                    }
+                }
+            }
+            if (!self.baseUrl) {
+                return;
+            }
+            $.getJSON(self.getUrl(domain, language), function (catalog) {
+                if (catalog === null) {
+                    return;
+                }
+                self._setCatalog(domain, language, catalog);
+                self._storeCatalog(domain, language, catalog);
+            });
+        };
+
+        self.MessageFactory = function (domain, language) {
+            language = language || self.currentLanguage;
+            return function translate(msgid, keywords) {
+                var msgstr;
+                if (
+                    domain in self.catalogs &&
+                    language in self.catalogs[domain] &&
+                    msgid in self.catalogs[domain][language]
+                ) {
+                    msgstr = self.catalogs[domain][language][msgid];
+                } else {
+                    msgstr = msgid;
+                }
+                if (keywords) {
+                    var regexp, keyword;
+                    for (keyword in keywords) {
+                        if (keywords.hasOwnProperty(keyword)) {
+                            regexp = new RegExp(
+                                "\\$\\{" + keyword + "\\}",
+                                "g"
+                            );
+                            msgstr = msgstr.replace(regexp, keywords[keyword]);
+                        }
+                    }
+                }
+                return msgstr;
+            };
+        };
+    };
+
+    return I18N;
 });
 
 /* i18n integration.
@@ -968,23 +1037,21 @@ define('mockup-i18n',[
  *  Or, it'll default to "/plonejsi18n"
  */
 
-define('translate',[
-  'mockup-i18n'
-], function(I18N) {
-  'use strict';
+define('translate',["mockup-i18n"], function (I18N) {
+    "use strict";
 
-  // we're creating a singleton here so we can potentially
-  // delay the initialization of the translate catalog
-  // until after the dom is available
-  var _t = null;
-  return function(msgid, keywords) {
-    if (_t === null) {
-      var i18n = new I18N();
-      i18n.loadCatalog('widgets');
-      _t = i18n.MessageFactory('widgets');
-    }
-    return _t(msgid, keywords);
-  };
+    // we're creating a singleton here so we can potentially
+    // delay the initialization of the translate catalog
+    // until after the dom is available
+    var _t = null;
+    return function (msgid, keywords) {
+        if (_t === null) {
+            var i18n = new I18N();
+            i18n.loadCatalog("widgets");
+            _t = i18n.MessageFactory("widgets");
+        }
+        return _t(msgid, keywords);
+    };
 });
 
 /* Formunloadalert pattern.
@@ -1015,78 +1082,75 @@ define('translate',[
  *
  */
 
+define('mockup-patterns-formunloadalert',["jquery", "pat-base", "translate"], function ($, Base, _t) {
+    "use strict";
 
-define('mockup-patterns-formunloadalert',[
-  'jquery',
-  'pat-base',
-  'translate'
-], function ($, Base, _t) {
-  'use strict';
+    var FormUnloadAlert = Base.extend({
+        name: "formunloadalert",
+        trigger: ".pat-formunloadalert",
+        parser: "mockup",
+        _changed: false, // Stores a listing of raised changes by their key
+        _suppressed: false, // whether or not warning should be suppressed
+        defaults: {
+            message: _t(
+                "Discard changes? If you click OK, " +
+                    "any changes you have made will be lost."
+            ),
+            // events on which to check for changes
+            changingEvents: "change keyup paste",
+            // fields on which to check for changes
+            changingFields: "input,select,textarea,fileupload",
+        },
+        init: function () {
+            var self = this;
+            // if this is not a form just return
+            if (!self.$el.is("form")) {
+                return;
+            }
 
-  var FormUnloadAlert = Base.extend({
-    name: 'formunloadalert',
-    trigger: '.pat-formunloadalert',
-    parser: 'mockup',
-    _changed : false,       // Stores a listing of raised changes by their key
-    _suppressed : false,     // whether or not warning should be suppressed
-    defaults: {
-      message :  _t('Discard changes? If you click OK, ' +
-                 'any changes you have made will be lost.'),
-      // events on which to check for changes
-      changingEvents: 'change keyup paste',
-      // fields on which to check for changes
-      changingFields: 'input,select,textarea,fileupload'
-    },
-    init: function () {
-      var self = this;
-      // if this is not a form just return
-      if (!self.$el.is('form')) { return; }
+            $(self.options.changingFields, self.$el).on(
+                self.options.changingEvents,
+                function (evt) {
+                    self._changed = true;
+                }
+            );
 
-      $(self.options.changingFields, self.$el).on(
-        self.options.changingEvents,
-        function (evt) {
-          self._changed = true;
-        }
-      );
+            var $modal = self.$el.parents(".plone-modal");
+            if ($modal.length !== 0) {
+                $modal.data("patternPloneModal").on("hide", function (e) {
+                    var modal = $modal.data("patternPloneModal");
+                    if (modal) {
+                        modal._suppressHide = self._handleUnload.call(self, e);
+                    }
+                });
+            } else {
+                $(window).on("beforeunload", function (e) {
+                    return self._handleUnload(e);
+                });
+            }
 
-      var $modal = self.$el.parents('.plone-modal');
-      if ($modal.size() !== 0) {
-        $modal.data('patternPloneModal').on('hide', function(e) {
-          var modal = $modal.data('patternPloneModal');
-          if (modal) {
-            modal._suppressHide = self._handleUnload.call(self, e);
-          }
-        });
-      } else {
-        $(window).on('beforeunload', function(e) {
-          return self._handleUnload(e);
-        });
-      }
-
-      self.$el.on('submit', function(e) {
-        self._suppressed = true;
-      });
-
-    },
-    _handleUnload : function (e) {
-      var self = this;
-      if (self._suppressed) {
-        self._suppressed = false;
-        return undefined;
-      }
-      if (self._changed) {
-        var msg = self.options.message;
-        self._handleMsg(e,msg);
-        $(window).trigger('messageset');
-        return msg;
-      }
-    },
-    _handleMsg:  function(e,msg) {
-      (e || window.event).returnValue = msg;
-    }
-  });
-  return FormUnloadAlert;
-
+            self.$el.on("submit", function (e) {
+                self._suppressed = true;
+            });
+        },
+        _handleUnload: function (e) {
+            var self = this;
+            if (self._suppressed) {
+                self._suppressed = false;
+                return undefined;
+            }
+            if (self._changed) {
+                var msg = self.options.message;
+                self._handleMsg(e, msg);
+                $(window).trigger("messageset");
+                return msg;
+            }
+        },
+        _handleMsg: function (e, msg) {
+            (e || window.event).returnValue = msg;
+        },
+    });
+    return FormUnloadAlert;
 });
 
 /* Livesearch
@@ -1113,264 +1177,329 @@ define('mockup-patterns-formunloadalert',[
  *
  */
 
-define('mockup-patterns-livesearch',[
-  'jquery',
-  'pat-base',
-  'underscore',
-  'translate'
-], function ($, Base, _, _t) {
-  'use strict';
+define('mockup-patterns-livesearch',["jquery", "pat-base", "underscore", "translate"], function (
+    $,
+    Base,
+    _,
+    _t
+) {
+    "use strict";
 
-  var Livesearch = Base.extend({
-    name: 'livesearch',
-    trigger: '.pat-livesearch',
-    parser: 'mockup',
-    timeout: null,
-    active: false,
-    results: null,
-    selectedItem: -1,
-    resultsClass: 'livesearch-results',
-    defaults: {
-      ajaxUrl: null,
-      defaultSortOn: '',
-      perPage: 7,
-      quietMillis: 350,
-      minimumInputLength: 4,
-      inputSelector: 'input[type="text"]',
-      itemTemplate: '<li class="search-result <%- state %>">' +
-        '<h4 class="title"><a href="<%- url %>"><%- title %></a></h4>' +
-        '<p class="description"><%- description %></p>' +
-      '</li>',
-    },
-    doSearch: function(page){
-      var self = this;
-      self.active = true;
-      self.render();
-      self.$el.addClass('searching');
-      var query = self.$el.serialize();
-      if(page === undefined){
-        page = 1;
-      }
-      var sort_on = function(){
-        var parameters = location.search,
-            sorton_position = parameters.indexOf('sort_on');
-        if(sorton_position === -1){
-          // return default sort
-          var $searchResults = $('#search-results');
-          if($searchResults.length > 0){
-            return $searchResults.attr('data-default-sort');
-          }
-          return self.options.defaultSortOn;
-        }
-        // cut string before sort_on parameter
-        var sort_on = parameters.substring(sorton_position);
-        // cut other parameters
-        sort_on = sort_on.split('&')[0];
-        // get just the value
-        sort_on = sort_on.split('=')[1];
-        return sort_on;
-      }();
-
-      $.ajax({
-        url: self.options.ajaxUrl + '?' + query +
-             '&page=' + page +
-             '&perPage=' + self.options.perPage +
-             '&sort_on=' + sort_on,
-        dataType: 'json'
-      }).done(function(data){
-        self.results = data;
-        self.page = page;
-        // maybe odd here.. but we're checking to see if the user
-        // has typed while a search was being performed. Perhap another search if so
-        if(query !== self.$el.serialize()){
-          self.doSearch();
-        }
-      }).fail(function(){
-        self.results = {
-          items: [{
-            url: '',
-            title: _t('Error'),
-            description: _t('There was an error searching…'),
-            state: 'error',
-            error: false
-          }],
-          total: 1
-        };
-        self.page = 1;
-      }).always(function(){
-        self.active = false;
-        self.selectedItem = -1;
-        self.$el.removeClass('searching');
-        self.render();
-      });
-    },
-    render: function(){
-      var self = this;
-      self.$results.empty();
-
-      /* find a status message */
-
-      if(self.active){
-        self.$results.append($('<li class="searching">' + _t('searching…') + '</li>'));
-      }else if(self.results === null){
-        // no results gathered yet
-        self.$results.append($('<li class="no-results no-search">' + _t('enter search phrase') + '</li>'));
-      } else if(self.results.total === 0){
-        self.$results.append($('<li class="no-results">' + _t('no results found') + '</li>'));
-      } else{
-        self.$results.append($('<li class="results-summary">' + _t('found') +
-                               ' ' + self.results.total + ' ' + _t('results') + '</li>'));
-      }
-
-      if(self.results !== null){
-        var template = _.template(self.options.itemTemplate);
-        _.each(self.results.items, function(item, index){
-          var $el = $(template($.extend({_t: _t}, item)));
-          $el.attr('data-url', item.url).on('click', function(){
-            if(!item.error){
-              window.location = item.url;
+    var Livesearch = Base.extend({
+        name: "livesearch",
+        trigger: ".pat-livesearch",
+        parser: "mockup",
+        timeout: null,
+        active: false,
+        results: null,
+        selectedItem: -1,
+        resultsClass: "livesearch-results",
+        defaults: {
+            ajaxUrl: null,
+            defaultSortOn: "",
+            perPage: 7,
+            quietMillis: 350,
+            minimumInputLength: 4,
+            inputSelector: 'input[type="text"]',
+            itemTemplate:
+                '<li class="search-result <%- state %>">' +
+                '<h4 class="title"><a href="<%- url %>"><%- title %></a></h4>' +
+                '<p class="description"><%- description %></p>' +
+                "</li>",
+        },
+        doSearch: function (page) {
+            var self = this;
+            self.active = true;
+            self.render();
+            self.$el.addClass("searching");
+            var query = self.$el.serialize();
+            if (page === undefined) {
+                page = 1;
             }
-          });
-          if(index === self.selectedItem){
-            $el.addClass('selected');
-          }
-          self.$results.append($el);
-        });
-        var nav = [];
-        if(self.page > 1){
-          var $prev = $('<a href="#" class="prev">' + _t('Previous') + '</a>');
-          $prev.click(function(e){
-            self.disableHiding = true;
-            e.preventDefault();
-            self.doSearch(self.page - 1);
-          });
-          nav.push($prev);
-        }
-        if((self.page * self.options.perPage) < self.results.total){
-          var $next = $('<a href="#" class="next">' + _t('Next') + '</a>');
-          $next.click(function(e){
-            self.disableHiding = true;
-            e.preventDefault();
-            self.doSearch(self.page + 1);
-          });
-          nav.push($next);
-        }
-        if(nav.length > 0){
-          var $li = $('<li class="load-more"><div class="page">' + self.page + '</div></li>');
-          $li.prepend(nav);
-          self.$results.append($li);
-        }
-      }
-      self.position();
-    },
-    position: function(){
-      /* we are positioning directly below the
+            var sort_on = (function () {
+                var parameters = location.search,
+                    sorton_position = parameters.indexOf("sort_on");
+                if (sorton_position === -1) {
+                    // return default sort
+                    var $searchResults = $("#search-results");
+                    if ($searchResults.length > 0) {
+                        return $searchResults.attr("data-default-sort");
+                    }
+                    return self.options.defaultSortOn;
+                }
+                // cut string before sort_on parameter
+                var sort_on = parameters.substring(sorton_position);
+                // cut other parameters
+                sort_on = sort_on.split("&")[0];
+                // get just the value
+                sort_on = sort_on.split("=")[1];
+                return sort_on;
+            })();
+
+            $.ajax({
+                url:
+                    self.options.ajaxUrl +
+                    "?" +
+                    query +
+                    "&page=" +
+                    page +
+                    "&perPage=" +
+                    self.options.perPage +
+                    "&sort_on=" +
+                    sort_on,
+                dataType: "json",
+            })
+                .done(function (data) {
+                    self.results = data;
+                    self.page = page;
+                    // maybe odd here.. but we're checking to see if the user
+                    // has typed while a search was being performed. Perhap another search if so
+                    if (query !== self.$el.serialize()) {
+                        self.doSearch();
+                    }
+                })
+                .fail(function () {
+                    self.results = {
+                        items: [
+                            {
+                                url: "",
+                                title: _t("Error"),
+                                description: _t(
+                                    "There was an error searching…"
+                                ),
+                                state: "error",
+                                error: false,
+                            },
+                        ],
+                        total: 1,
+                    };
+                    self.page = 1;
+                })
+                .always(function () {
+                    self.active = false;
+                    self.selectedItem = -1;
+                    self.$el.removeClass("searching");
+                    self.render();
+                });
+        },
+        render: function () {
+            var self = this;
+            self.$results.empty();
+
+            /* find a status message */
+
+            if (self.active) {
+                self.$results.append(
+                    $('<li class="searching">' + _t("searching…") + "</li>")
+                );
+            } else if (self.results === null) {
+                // no results gathered yet
+                self.$results.append(
+                    $(
+                        '<li class="no-results no-search">' +
+                            _t("enter search phrase") +
+                            "</li>"
+                    )
+                );
+            } else if (self.results.total === 0) {
+                self.$results.append(
+                    $(
+                        '<li class="no-results">' +
+                            _t("no results found") +
+                            "</li>"
+                    )
+                );
+            } else {
+                self.$results.append(
+                    $(
+                        '<li class="results-summary">' +
+                            _t("found") +
+                            " " +
+                            self.results.total +
+                            " " +
+                            _t("results") +
+                            "</li>"
+                    )
+                );
+            }
+
+            if (self.results !== null) {
+                var template = _.template(self.options.itemTemplate);
+                _.each(self.results.items, function (item, index) {
+                    var $el = $(template($.extend({ _t: _t }, item)));
+                    $el.attr("data-url", item.url).on("click", function () {
+                        if (!item.error) {
+                            window.location = item.url;
+                        }
+                    });
+                    if (index === self.selectedItem) {
+                        $el.addClass("selected");
+                    }
+                    self.$results.append($el);
+                });
+                var nav = [];
+                if (self.page > 1) {
+                    var $prev = $(
+                        '<a href="#" class="prev">' + _t("Previous") + "</a>"
+                    );
+                    $prev.click(function (e) {
+                        self.disableHiding = true;
+                        e.preventDefault();
+                        self.doSearch(self.page - 1);
+                    });
+                    nav.push($prev);
+                }
+                if (self.page * self.options.perPage < self.results.total) {
+                    var $next = $(
+                        '<a href="#" class="next">' + _t("Next") + "</a>"
+                    );
+                    $next.click(function (e) {
+                        self.disableHiding = true;
+                        e.preventDefault();
+                        self.doSearch(self.page + 1);
+                    });
+                    nav.push($next);
+                }
+                if (nav.length > 0) {
+                    var $li = $(
+                        '<li class="load-more"><div class="page">' +
+                            self.page +
+                            "</div></li>"
+                    );
+                    $li.prepend(nav);
+                    self.$results.append($li);
+                }
+            }
+            self.position();
+        },
+        position: function () {
+            /* we are positioning directly below the
          input box, same width */
-      var self = this;
+            var self = this;
 
-      self.$el.addClass('livesearch-active');
-      var pos = self.$input.position();
-      self.$results.width(self.$el.outerWidth());
-      self.$results.css({
-        top: pos.top + self.$input.outerHeight(),
-        left: pos.left
-      });
-      self.$results.show();
-    },
-    hide: function(){
-      this.$results.hide();
-      this.$el.removeClass('livesearch-active');
-    },
-    init: function(){
-      var self = this;
+            self.$el.addClass("livesearch-active");
+            var pos = self.$input.position();
+            self.$results.width(self.$el.outerWidth());
+            self.$results.css({
+                top: pos.top + self.$input.outerHeight(),
+                left: pos.left,
+            });
+            self.$results.show();
+        },
+        hide: function () {
+            this.$results.hide();
+            this.$el.removeClass("livesearch-active");
+        },
+        init: function () {
+            var self = this;
 
-      self.$input = self.$el.find(self.options.inputSelector);
-      self.$input.off('focusout').on('focusout', function(){
-        /* we put this in a timer so click events still
+            self.$input = self.$el.find(self.options.inputSelector);
+            self.$input
+                .off("focusout")
+                .on("focusout", function () {
+                    /* we put this in a timer so click events still
            get trigger on search results */
-        setTimeout(function(){
-          /* hack, look above, to handle dealing with clicks
+                    setTimeout(function () {
+                        /* hack, look above, to handle dealing with clicks
              unfocusing element */
-          if(!self.disableHiding){
-            self.hide();
-          }else{
-            self.disableHiding = false;
-            // and refocus elemtn
-            self.$input.focus();
-          }
-        }, 200);
-      }).off('focusin').on('focusin', function(){
-        if(!self.onceFocused){
-          /* Case: field already filled out but no reasons
+                        if (!self.disableHiding) {
+                            self.hide();
+                        } else {
+                            self.disableHiding = false;
+                            // and refocus elemtn
+                            self.$input.focus();
+                        }
+                    }, 200);
+                })
+                .off("focusin")
+                .on("focusin", function () {
+                    if (!self.onceFocused) {
+                        /* Case: field already filled out but no reasons
              present yet, do ajax search and grab some results */
-          self.onceFocused = true;
-          if(self.$input.val().length >= self.options.minimumInputLength){
-            self.doSearch();
-          }
-        } else if(!self.$results.is(':visible')){
-          self.render();
-        }
-      }).attr('autocomplete', 'off').off('keyup').on('keyup', function(e){
-        var code = e.keyCode || e.which;
-        // first off, we're capturing esc presses
-        if(code === 27){
-          self.$input.val('');
-          self.hide();
-          return;
-        }
-        // then, we're capturing up, down and enter key presses
-        if(self.results && self.results.items && self.results.items.length > 0){
-          if(code === 13){
-            /* enter key, check to see if there is a selected item */
-            if(self.selectedItem !== -1){
-              window.location = self.results.items[self.selectedItem].url;
-            }
-            return;
-          } else if(code === 38){
-            /* up key */
-            if(self.selectedItem !== -1){
-              self.selectedItem -= 1;
-              self.render();
-            }
-            return;
-          } else if(code === 40){
-            /* down key */
-            if(self.selectedItem < self.results.items.length){
-              self.selectedItem += 1;
-              self.render();
-            }
-            return;
-          }
-        }
+                        self.onceFocused = true;
+                        if (
+                            self.$input.val().length >=
+                            self.options.minimumInputLength
+                        ) {
+                            self.doSearch();
+                        }
+                    } else if (!self.$results.is(":visible")) {
+                        self.render();
+                    }
+                })
+                .attr("autocomplete", "off")
+                .off("keyup")
+                .on("keyup", function (e) {
+                    var code = e.keyCode || e.which;
+                    // first off, we're capturing esc presses
+                    if (code === 27) {
+                        self.$input.val("");
+                        self.hide();
+                        return;
+                    }
+                    // then, we're capturing up, down and enter key presses
+                    if (
+                        self.results &&
+                        self.results.items &&
+                        self.results.items.length > 0
+                    ) {
+                        if (code === 13) {
+                            /* enter key, check to see if there is a selected item */
+                            if (self.selectedItem !== -1) {
+                                window.location =
+                                    self.results.items[self.selectedItem].url;
+                            }
+                            return;
+                        } else if (code === 38) {
+                            /* up key */
+                            if (self.selectedItem !== -1) {
+                                self.selectedItem -= 1;
+                                self.render();
+                            }
+                            return;
+                        } else if (code === 40) {
+                            /* down key */
+                            if (self.selectedItem < self.results.items.length) {
+                                self.selectedItem += 1;
+                                self.render();
+                            }
+                            return;
+                        }
+                    }
 
-        /* then, we handle timeouts for doing ajax search */
-        if(self.timeout !== null){
-          clearTimeout(self.timeout);
-          self.timeout = null;
-        }
-        if(self.active){
-          return;
-        }
-        if(self.$input.val().length >= self.options.minimumInputLength){
-          self.timeout = setTimeout(function(){
-            self.doSearch();
-          }, self.options.quietMillis);
-        }else{
-          self.results = null;
-          self.render();
-        }
-      });
-      $('#sorting-options a').click(function(e){
-        e.preventDefault();
-        self.onceFocused = false;
-      });
+                    /* then, we handle timeouts for doing ajax search */
+                    if (self.timeout !== null) {
+                        clearTimeout(self.timeout);
+                        self.timeout = null;
+                    }
+                    if (self.active) {
+                        return;
+                    }
+                    if (
+                        self.$input.val().length >=
+                        self.options.minimumInputLength
+                    ) {
+                        self.timeout = setTimeout(function () {
+                            self.doSearch();
+                        }, self.options.quietMillis);
+                    } else {
+                        self.results = null;
+                        self.render();
+                    }
+                });
+            $("#sorting-options a").click(function (e) {
+                e.preventDefault();
+                self.onceFocused = false;
+            });
 
-      /* create result dom */
-      self.$results = $('<ul class="' + self.resultsClass + '"></ul>').hide().insertAfter(self.$input);
-    }
-  });
+            /* create result dom */
+            self.$results = $('<ul class="' + self.resultsClass + '"></ul>')
+                .hide()
+                .insertAfter(self.$input);
+        },
+    });
 
-  return Livesearch;
+    return Livesearch;
 });
 
 /* Mark special links
@@ -1453,79 +1582,90 @@ define('mockup-patterns-livesearch',[
  *
  */
 
-define('mockup-patterns-markspeciallinks',[
-  'pat-base',
-  'jquery'
-], function (Base, $) {
-  'use strict';
+define('mockup-patterns-markspeciallinks',["pat-base", "jquery"], function (Base, $) {
+    "use strict";
 
-  var MarkSpecialLinks = Base.extend({
-    name: 'markspeciallinks',
-    trigger: '.pat-markspeciallinks',
-    parser: 'mockup',
-    defaults: {
-      external_links_open_new_window: false,
-      mark_special_links: true
-    },
-    init: function () {
-      var self = this, $el = self.$el;
+    var MarkSpecialLinks = Base.extend({
+        name: "markspeciallinks",
+        trigger: ".pat-markspeciallinks",
+        parser: "mockup",
+        defaults: {
+            external_links_open_new_window: false,
+            mark_special_links: true,
+        },
+        init: function () {
+            var self = this,
+                $el = self.$el;
 
-      // first make external links open in a new window, afterwards do the
-      // normal plone link wrapping in only the content area
-      var elonw,
-          msl,
-          url,
-          protocols,
-          contentarea,
-          res;
+            // first make external links open in a new window, afterwards do the
+            // normal plone link wrapping in only the content area
+            var elonw, msl, url, protocols, contentarea, res;
 
-      if (typeof self.options.external_links_open_new_window === 'string') {
-          elonw = self.options.external_links_open_new_window.toLowerCase() === 'true';
-      } else if (typeof self.options.external_links_open_new_window === 'boolean') {
-          elonw = self.options.external_links_open_new_window;
-      }
-
-      if (typeof self.options.mark_special_links === 'string') {
-          msl = self.options.mark_special_links.toLowerCase() === 'true';
-      } else if (typeof self.options.mark_special_links === 'boolean') {
-          msl = self.options.mark_special_links;
-      }
-
-      url = window.location.protocol + '//' + window.location.host;
-      protocols = /^(mailto|ftp|news|irc|h323|sip|callto|https|feed|webcal)/;
-      contentarea = $el;
-
-      if (elonw) {
-          // all http links (without the link-plain class), not within this site
-          contentarea.find('a[href^="http"]:not(.link-plain):not([href^="' + url + '"])')
-                     .attr('target', '_blank')
-                     .attr('rel', 'noopener');
-      }
-
-      if (msl) {
-        // All links with an http href (without the link-plain class), not within this site,
-        // and no img children should be wrapped in a link-external span
-        contentarea.find(
-            'a[href^="http:"]:not(.link-plain):not([href^="' + url + '"]):not(:has(img))')
-            .before('<i class="glyphicon link-external"></i>');
-        // All links without an http href (without the link-plain class), not within this site,
-        // and no img children should be wrapped in a link-[protocol] span
-        contentarea.find(
-            'a[href]:not([href^="http:"]):not(.link-plain):not([href^="' + url + '"]):not(:has(img)):not([href^="#"])')
-            .each(function() {
-                // those without a http link may have another interesting protocol
-                // wrap these in a link-[protocol] span
-                res = protocols.exec($(this).attr('href'));
-                if (res) {
-                    var iconclass = 'glyphicon link-' + res[0];
-                    $(this).before('<i class="' + iconclass + '"></i>');
-                }
+            if (
+                typeof self.options.external_links_open_new_window === "string"
+            ) {
+                elonw =
+                    self.options.external_links_open_new_window.toLowerCase() ===
+                    "true";
+            } else if (
+                typeof self.options.external_links_open_new_window === "boolean"
+            ) {
+                elonw = self.options.external_links_open_new_window;
             }
-        );
-      }
-    }
-  });
-  return MarkSpecialLinks;
+
+            if (typeof self.options.mark_special_links === "string") {
+                msl = self.options.mark_special_links.toLowerCase() === "true";
+            } else if (typeof self.options.mark_special_links === "boolean") {
+                msl = self.options.mark_special_links;
+            }
+
+            url = window.location.protocol + "//" + window.location.host;
+            protocols = /^(mailto|ftp|news|irc|h323|sip|callto|https|feed|webcal)/;
+            contentarea = $el;
+
+            if (elonw) {
+                // all http links (without the link-plain class), not within this site
+                contentarea
+                    .find(
+                        'a[href^="http"]:not(.link-plain):not([href^="' +
+                            url +
+                            '"])'
+                    )
+                    .attr("target", "_blank")
+                    .attr("rel", "noopener");
+            }
+
+            if (msl) {
+                // All links with an http href (without the link-plain class), not within this site,
+                // and no img children should be wrapped in a link-external span
+                contentarea
+                    .find(
+                        'a[href^="http:"]:not(.link-plain):not([href^="' +
+                            url +
+                            '"]):not(:has(img))'
+                    )
+                    .before('<i class="glyphicon link-external"></i>');
+                // All links without an http href (without the link-plain class), not within this site,
+                // and no img children should be wrapped in a link-[protocol] span
+                contentarea
+                    .find(
+                        'a[href]:not([href^="http:"]):not(.link-plain):not([href^="' +
+                            url +
+                            '"]):not(:has(img)):not([href^="#"])'
+                    )
+                    .each(function () {
+                        // those without a http link may have another interesting protocol
+                        // wrap these in a link-[protocol] span
+                        res = protocols.exec($(this).attr("href"));
+                        if (res) {
+                            var iconclass = "glyphicon link-" + res[0];
+                            $(this).before('<i class="' + iconclass + '"></i>');
+                        }
+                    });
+            }
+        },
+    });
+    return MarkSpecialLinks;
 });
 
 /* Backdrop pattern.
@@ -1545,77 +1685,73 @@ define('mockup-patterns-markspeciallinks',[
  *
  */
 
+define('mockup-patterns-backdrop',["jquery", "pat-base"], function ($, Base) {
+    "use strict";
 
-define('mockup-patterns-backdrop',[
-  'jquery',
-  'pat-base'
-], function($, Base) {
-  'use strict';
-
-  var Backdrop = Base.extend({
-    name: 'backdrop',
-    trigger: '.pat-backdrop',
-    parser: 'mockup',
-    defaults: {
-      zIndex: null,
-      opacity: 0.8,
-      className: 'plone-backdrop',
-      classActiveName: 'plone-backdrop-active',
-      closeOnEsc: true,
-      closeOnClick: true
-    },
-    init: function() {
-      var self = this;
-      self.$backdrop = $('> .' + self.options.className, self.$el);
-      if (self.$backdrop.size() === 0) {
-        self.$backdrop = $('<div/>')
-            .hide()
-            .appendTo(self.$el)
-            .addClass(self.options.className);
-        if (self.options.zIndex !== null) {
-          self.$backdrop.css('z-index', self.options.zIndex);
-        }
-      }
-      if (self.options.closeOnEsc === true) {
-        $(document).on('keydown', function(e, data) {
-          if (self.$el.is('.' + self.options.classActiveName)) {
-            if (e.keyCode === 27) {  // ESC key pressed
-              self.hide();
+    var Backdrop = Base.extend({
+        name: "backdrop",
+        trigger: ".pat-backdrop",
+        parser: "mockup",
+        defaults: {
+            zIndex: null,
+            opacity: 0.8,
+            className: "plone-backdrop",
+            classActiveName: "plone-backdrop-active",
+            closeOnEsc: true,
+            closeOnClick: true,
+        },
+        init: function () {
+            var self = this;
+            self.$backdrop = $("> ." + self.options.className, self.$el);
+            if (self.$backdrop.length === 0) {
+                self.$backdrop = $("<div/>")
+                    .hide()
+                    .appendTo(self.$el)
+                    .addClass(self.options.className);
+                if (self.options.zIndex !== null) {
+                    self.$backdrop.css("z-index", self.options.zIndex);
+                }
             }
-          }
-        });
-      }
-      if (self.options.closeOnClick === true) {
-        self.$backdrop.on('click', function() {
-          if (self.$el.is('.' + self.options.classActiveName)) {
-            self.hide();
-          }
-        });
-      }
-    },
-    show: function() {
-      var self = this;
-      if (!self.$el.hasClass(self.options.classActiveName)) {
-        self.emit('show');
-        self.$backdrop.css('opacity', '0').show();
-        self.$el.addClass(self.options.classActiveName);
-        self.$backdrop.animate({ opacity: self.options.opacity }, 500);
-        self.emit('shown');
-      }
-    },
-    hide: function() {
-      var self = this;
-      if (self.$el.hasClass(self.options.classActiveName)) {
-        self.emit('hide');
-        self.$backdrop.animate({ opacity: '0' }, 500).hide();
-        self.$el.removeClass(self.options.classActiveName);
-        self.emit('hidden');
-      }
-    }
-  });
+            if (self.options.closeOnEsc === true) {
+                $(document).on("keydown", function (e, data) {
+                    if (self.$el.is("." + self.options.classActiveName)) {
+                        if (e.keyCode === 27) {
+                            // ESC key pressed
+                            self.hide();
+                        }
+                    }
+                });
+            }
+            if (self.options.closeOnClick === true) {
+                self.$backdrop.on("click", function () {
+                    if (self.$el.is("." + self.options.classActiveName)) {
+                        self.hide();
+                    }
+                });
+            }
+        },
+        show: function () {
+            var self = this;
+            if (!self.$el.hasClass(self.options.classActiveName)) {
+                self.emit("show");
+                self.$backdrop.css("opacity", "0").show();
+                self.$el.addClass(self.options.classActiveName);
+                self.$backdrop.animate({ opacity: self.options.opacity }, 500);
+                self.emit("shown");
+            }
+        },
+        hide: function () {
+            var self = this;
+            if (self.$el.hasClass(self.options.classActiveName)) {
+                self.emit("hide");
+                self.$backdrop.animate({ opacity: "0" }, 500).hide();
+                self.$el.removeClass(self.options.classActiveName);
+                self.emit("hidden");
+            }
+        },
+    });
 
-  return Backdrop;
-
+    return Backdrop;
 });
 
 //     Backbone.js 1.1.2
@@ -3229,89 +3365,112 @@ define('mockup-patterns-backdrop',[
 
 /* Pattern router
  */
-define('mockup-router',[
-  'underscore',
-  'backbone'
-], function(_, Backbone) {
-  'use strict';
+define('mockup-router',["underscore", "backbone"], function (_, Backbone) {
+    "use strict";
 
-  var regexEscape = function(s) {
-    return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
-  };
+    var regexEscape = function (s) {
+        return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
+    };
 
-  var Router = Backbone.Router.extend({
-    actions: [],
-    redirects: {},
-    addRoute: function(patternName, id, callback, context, pathExp, expReplace) {
-      if (_.findWhere(this.patterns, {patternName: patternName, id: id}) === undefined) {
-        this.actions.push({patternName: patternName, id: id, callback: callback, context: context, pathExp: pathExp, expReplace: expReplace});
-      }
-      var regex = new RegExp('(' + regexEscape(patternName) + ':' + regexEscape(id) + ')');
-      this.route(regex, 'handleRoute');
-    },
-    addRedirect: function(pathExp, destination) {
-      this.redirects[pathExp] = destination;
-    },
-    handleRoute: function(pattern) {
-      var parts = pattern.split(':');
-      var patternName = parts[0];
-      var id = parts[1];
-      var action = _.findWhere(this.actions, {patternName: patternName, id: id});
-      if (action) {
-        action.callback.call(action.context);
-      }
-    },
-    redirect: function() {
-      var path = window.parent.location.pathname,
-          newPath,
-          regex,
-          hash;
-
-      _.some(this.actions, function(action) {
-        if (action.pathExp) {
-          regex = new RegExp(action.pathExp);
-          if (path.match(regex)) {
-            hash = '!/' + action.patternName + ':' + action.id;
-            var replaceWith = '';
-            if (action.expReplace) {
-              replaceWith = action.expReplace;
+    var Router = Backbone.Router.extend({
+        actions: [],
+        redirects: {},
+        addRoute: function (
+            patternName,
+            id,
+            callback,
+            context,
+            pathExp,
+            expReplace
+        ) {
+            if (
+                _.findWhere(this.patterns, {
+                    patternName: patternName,
+                    id: id,
+                }) === undefined
+            ) {
+                this.actions.push({
+                    patternName: patternName,
+                    id: id,
+                    callback: callback,
+                    context: context,
+                    pathExp: pathExp,
+                    expReplace: expReplace,
+                });
             }
-            newPath = path.replace(regex, replaceWith);
-            return true;
-          }
-        }
-      }, this);
+            var regex = new RegExp(
+                "(" + regexEscape(patternName) + ":" + regexEscape(id) + ")"
+            );
+            this.route(regex, "handleRoute");
+        },
+        addRedirect: function (pathExp, destination) {
+            this.redirects[pathExp] = destination;
+        },
+        handleRoute: function (pattern) {
+            var parts = pattern.split(":");
+            var patternName = parts[0];
+            var id = parts[1];
+            var action = _.findWhere(this.actions, {
+                patternName: patternName,
+                id: id,
+            });
+            if (action) {
+                action.callback.call(action.context);
+            }
+        },
+        redirect: function () {
+            var path = window.parent.location.pathname,
+                newPath,
+                regex,
+                hash;
 
-      if (hash === undefined) {
-        for (var pathExp in this.redirects) {
-          regex = new RegExp(pathExp);
-          if (path.match(regex)) {
-            hash = '!/' + this.redirects[pathExp];
-            newPath = path.replace(regex, '');
-            break;
-          }
-        }
-      }
+            _.some(
+                this.actions,
+                function (action) {
+                    if (action.pathExp) {
+                        regex = new RegExp(action.pathExp);
+                        if (path.match(regex)) {
+                            hash = "!/" + action.patternName + ":" + action.id;
+                            var replaceWith = "";
+                            if (action.expReplace) {
+                                replaceWith = action.expReplace;
+                            }
+                            newPath = path.replace(regex, replaceWith);
+                            return true;
+                        }
+                    }
+                },
+                this
+            );
 
-      if (hash !== undefined) {
-        this._changeLocation.apply(this, [newPath, hash]);
-      }
-    },
-    _changeLocation: function(path, hash) {
-      window.parent.location.hash = hash;
-      window.parent.location.pathname = path;
-    },
-    start: function() {
-      Backbone.history.start();
-    },
-    reset: function() {
-      this.actions = [];
-    }
+            if (hash === undefined) {
+                for (var pathExp in this.redirects) {
+                    regex = new RegExp(pathExp);
+                    if (path.match(regex)) {
+                        hash = "!/" + this.redirects[pathExp];
+                        newPath = path.replace(regex, "");
+                        break;
+                    }
+                }
+            }
 
-  });
+            if (hash !== undefined) {
+                this._changeLocation.apply(this, [newPath, hash]);
+            }
+        },
+        _changeLocation: function (path, hash) {
+            window.parent.location.hash = hash;
+            window.parent.location.pathname = path;
+        },
+        start: function () {
+            Backbone.history.start();
+        },
+        reset: function () {
+            this.actions = [];
+        },
+    });
 
-  return new Router();
-
+    return new Router();
 });
 
 /*!
@@ -4918,861 +5077,1056 @@ define('mockup-router',[
  */
 
 define('mockup-patterns-modal',[
-  'jquery',
-  'underscore',
-  'pat-base',
-  'mockup-patterns-backdrop',
-  'pat-registry',
-  'mockup-router',
-  'mockup-utils',
-  'translate',
-  'jquery.form'
-], function($, _, Base, Backdrop, registry, Router, utils, _t) {
-  'use strict';
+    "jquery",
+    "underscore",
+    "pat-base",
+    "mockup-patterns-backdrop",
+    "pat-registry",
+    "mockup-router",
+    "mockup-utils",
+    "translate",
+    "jquery.form",
+], function ($, _, Base, Backdrop, registry, Router, utils, _t) {
+    "use strict";
 
-  var Modal = Base.extend({
-    name: 'plone-modal',
-    trigger: '.pat-plone-modal',
-    parser: 'mockup',
-    createModal: null,
-    $model: null,
-    defaults: {
-      width: '',
-      height: '',
-      margin: 20,
-      position: 'center middle', // format: '<horizontal> <vertical>' -- allowed values: top, bottom, left, right, center, middle
-      triggers: [],
-      zIndexSelector: '.plone-modal-wrapper,.plone-modal-backdrop',
-      backdrop: 'body', // Element to initiate the Backdrop on.
-      backdropOptions: {
-        zIndex: '1040',
-        opacity: '0.85',
-        className: 'plone-modal-backdrop',
-        classActiveName: 'plone-backdrop-active',
-        closeOnEsc: true,
-        closeOnClick: true
-      },
-      title: null,
-      titleSelector: 'h1:first',
-      buttons: '.formControls > input[type="submit"], .formControls > button',
-      content: '#content',
-      automaticallyAddButtonActions: true,
-      loadLinksWithinModal: true,
-      prependContent: '.portalMessage, #global_statusmessage',
-      onRender: null,
-      templateOptions: {
-        className: 'plone-modal fade',
-        classDialog: 'plone-modal-dialog',
-        classModal: 'plone-modal-content',
-        classHeaderName: 'plone-modal-header',
-        classBodyName: 'plone-modal-body',
-        classFooterName: 'plone-modal-footer',
-        classWrapperName: 'plone-modal-wrapper',
-        classWrapperInnerName: 'modal-wrapper-inner',
-        classActiveName: 'in',
-        classPrependName: '', // String, css class to be applied to the wrapper of the prepended content
-        classContentName: '',  // String, class name to be applied to the content of the modal, useful for modal specific styling
-        template: '' +
-          '<div class="<%= options.className %>">' +
-          '  <div class="<%= options.classDialog %>">' +
-          '    <div class="<%= options.classModal %>">' +
-          '      <div class="<%= options.classHeaderName %>">' +
-          '        <a class="plone-modal-close">&times;</a>' +
-          '        <% if (title) { %><h2 class="plone-modal-title"><%= title %></h2><% } %>' +
-          '      </div>' +
-          '      <div class="<%= options.classBodyName %>">' +
-          '        <div class="<%= options.classPrependName %>"><%= prepend %></div> ' +
-          '        <div class="<%= options.classContentName %>"><%= content %></div>' +
-          '      </div>' +
-          '      <div class="<%= options.classFooterName %>"> ' +
-          '        <% if (buttons) { %><%= buttons %><% } %>' +
-          '      </div>' +
-          '    </div>' +
-          '  </div>' +
-          '</div>'
-      },
-      actions: {},
-      actionOptions: {
-        eventType: 'click',
-        disableAjaxFormSubmit: false,
-        target: null,
-        ajaxUrl: null, // string, or function($el, options) that returns a string
-        modalFunction: null, // String, function name on self to call
-        isForm: false,
-        timeout: 5000,
-        displayInModal: true,
-        reloadWindowOnClose: true,
-        error: '.portalMessage.error, .alert-danger',
-        formFieldError: '.field.error',
-        onSuccess: null,
-        onError: null,
-        onFormError: null,
-        onTimeout: null,
-        redirectOnResponse: false,
-        redirectToUrl: function($action, response, options) {
-          var reg;
-          reg = /<body.*data-view-url=[\"'](.*)[\"'].*/im.exec(response);
-          if (reg && reg.length > 1) {
-            // view url as data attribute on body (Plone 5)
-            return reg[1].split('"')[0];
-          }
-          reg = /<body.*data-base-url=[\"'](.*)[\"'].*/im.exec(response);
-          if (reg && reg.length > 1) {
-            // Base url as data attribute on body (Plone 5)
-            return reg[1].split('"')[0];
-          }
-          reg = /<base.*href=[\"'](.*)[\"'].*/im.exec(response);
-          if (reg && reg.length > 1) {
-              // base tag available (Plone 4)
-              return reg[1];
-          }
-          return '';
-        }
-      },
-      routerOptions: {
-        id: null,
-        pathExp: null
-      },
-      form: function(actions) {
-        var self = this;
-        var $modal = self.$modal;
+    var Modal = Base.extend({
+        name: "plone-modal",
+        trigger: ".pat-plone-modal",
+        parser: "mockup",
+        createModal: null,
+        $model: null,
+        defaults: {
+            width: "",
+            height: "",
+            margin: 20,
+            position: "center middle", // format: '<horizontal> <vertical>' -- allowed values: top, bottom, left, right, center, middle
+            triggers: [],
+            zIndexSelector: ".plone-modal-wrapper,.plone-modal-backdrop",
+            backdrop: "body", // Element to initiate the Backdrop on.
+            backdropOptions: {
+                zIndex: "1040",
+                opacity: "0.85",
+                className: "plone-modal-backdrop",
+                classActiveName: "plone-backdrop-active",
+                closeOnEsc: true,
+                closeOnClick: true,
+            },
+            title: null,
+            titleSelector: "h1:first",
+            buttons:
+                '.formControls > input[type="submit"], .formControls > button',
+            content: "#content",
+            automaticallyAddButtonActions: true,
+            loadLinksWithinModal: true,
+            prependContent: ".portalMessage, #global_statusmessage",
+            onRender: null,
+            templateOptions: {
+                className: "plone-modal fade",
+                classDialog: "plone-modal-dialog",
+                classModal: "plone-modal-content",
+                classHeaderName: "plone-modal-header",
+                classBodyName: "plone-modal-body",
+                classFooterName: "plone-modal-footer",
+                classWrapperName: "plone-modal-wrapper",
+                classWrapperInnerName: "modal-wrapper-inner",
+                classActiveName: "in",
+                classPrependName: "", // String, css class to be applied to the wrapper of the prepended content
+                classContentName: "", // String, class name to be applied to the content of the modal, useful for modal specific styling
+                template:
+                    "" +
+                    '<div class="<%= options.className %>">' +
+                    '  <div class="<%= options.classDialog %>">' +
+                    '    <div class="<%= options.classModal %>">' +
+                    '      <div class="<%= options.classHeaderName %>">' +
+                    '        <a class="plone-modal-close">&times;</a>' +
+                    '        <% if (title) { %><h2 class="plone-modal-title"><%= title %></h2><% } %>' +
+                    '      </div>' +
+                    '      <div class="<%= options.classBodyName %>">' +
+                    '        <div class="<%= options.classPrependName %>"><%= prepend %></div> ' +
+                    '        <div class="<%= options.classContentName %>"><%= content %></div>' +
+                    "      </div>" +
+                    '      <div class="<%= options.classFooterName %>"> ' +
+                    "        <% if (buttons) { %><%= buttons %><% } %>" +
+                    "      </div>" +
+                    "    </div>" +
+                    "  </div>" +
+                    "</div>",
+            },
+            actions: {},
+            actionOptions: {
+                eventType: "click",
+                disableAjaxFormSubmit: false,
+                target: null,
+                ajaxUrl: null, // string, or function($el, options) that returns a string
+                modalFunction: null, // String, function name on self to call
+                isForm: false,
+                timeout: 5000,
+                displayInModal: true,
+                reloadWindowOnClose: true,
+                error: ".portalMessage.error, .statusmessage-error",
+                formFieldError: ".field.error",
+                onSuccess: null,
+                onError: null,
+                onFormError: null,
+                onTimeout: null,
+                redirectOnResponse: false,
+                redirectToUrl: function ($action, response, options) {
+                    var reg;
+                    reg = /<body.*data-view-url=[\"'](.*)[\"'].*/im.exec(
+                        response
+                    );
+                    if (reg && reg.length > 1) {
+                        // view url as data attribute on body (Plone 5)
+                        return reg[1].split('"')[0];
+                    }
+                    reg = /<body.*data-base-url=[\"'](.*)[\"'].*/im.exec(
+                        response
+                    );
+                    if (reg && reg.length > 1) {
+                        // Base url as data attribute on body (Plone 5)
+                        return reg[1].split('"')[0];
+                    }
+                    reg = /<base.*href=[\"'](.*)[\"'].*/im.exec(response);
+                    if (reg && reg.length > 1) {
+                        // base tag available (Plone 4)
+                        return reg[1];
+                    }
+                    return "";
+                },
+            },
+            routerOptions: {
+                id: null,
+                pathExp: null,
+            },
+            form: function (actions) {
+                var self = this;
+                var $modal = self.$modal;
 
-        if (self.options.automaticallyAddButtonActions) {
-          actions[self.options.buttons] = {};
-        }
-        actions.a = {};
-
-        $.each(actions, function(action, options) {
-          var actionKeys = _.union(_.keys(self.options.actionOptions), ['templateOptions']);
-          var actionOptions = $.extend(true, {}, self.options.actionOptions, _.pick(options, actionKeys));
-          options.templateOptions = $.extend(true, options.templateOptions, self.options.templateOptions);
-
-          var patternKeys = _.union(_.keys(self.options.actionOptions), ['actions', 'actionOptions']);
-          var patternOptions = $.extend(true, _.omit(options, patternKeys), self.options);
-
-          $(action, $('.' + options.templateOptions.classBodyName, $modal)).each(function(action) {
-            var $action = $(this);
-            $action.on(actionOptions.eventType, function(e) {
-              e.stopPropagation();
-              e.preventDefault();
-
-              self.loading.show(false);
-
-              // handle event on $action using a function on self
-              if (actionOptions.modalFunction !== null) {
-                self[actionOptions.modalFunction]();
-              // handle event on input/button using jquery.form library
-              } else if ($.nodeName($action[0], 'input') || $.nodeName($action[0], 'button') || options.isForm === true) {
-                self.options.handleFormAction.apply(self, [$action, actionOptions, patternOptions]);
-              // handle event on link with jQuery.ajax
-              } else if (options.ajaxUrl !== null || $.nodeName($action[0], 'a')) {
-                self.options.handleLinkAction.apply(self, [$action, actionOptions, patternOptions]);
-              }
-
-            });
-          });
-        });
-      },
-      handleFormAction: function($action, options, patternOptions) {
-        var self = this;
-
-        // pass action that was clicked when submiting form
-        var extraData = {};
-        extraData[$action.attr('name')] = $action.attr('value');
-
-        var $form;
-
-        if ($.nodeName($action[0], 'form')) {
-          $form = $action;
-        } else {
-          $form = $action.parents('form:not(.disableAutoSubmit)');
-        }
-
-        var url;
-        if (options.ajaxUrl !== null) {
-          if (typeof options.ajaxUrl === 'function') {
-            url = options.ajaxUrl.apply(self, [$action, options]);
-          } else {
-            url = options.ajaxUrl;
-          }
-        } else {
-          url = $action.parents('form').attr('action');
-        }
-
-        if(options.disableAjaxFormSubmit){
-          if($action.attr('name') && $action.attr('value')){
-            $form.append($('<input type="hidden" name="' + $action.attr('name') + '" value="' + $action.attr('value') + '" />'));
-          }
-          $form.trigger('submit');
-          return;
-        }
-        // We want to trigger the form submit event but NOT use the default
-        $form.on('submit', function(e) {
-          e.preventDefault();
-        });
-        $form.trigger('submit');
-
-        self.loading.show(false);
-        $form.ajaxSubmit({
-          timeout: options.timeout,
-          data: extraData,
-          url: url,
-          error: function(xhr, textStatus, errorStatus) {
-            self.loading.hide();
-            if (textStatus === 'timeout' && options.onTimeout) {
-              options.onTimeout.apply(self, xhr, errorStatus);
-            // on "error", "abort", and "parsererror"
-            } else if (options.onError) {
-              if (typeof options.onError === 'string') {
-                window[options.onError](xhr, textStatus, errorStatus);
-              } else {
-                  options.onError(xhr, textStatus, errorStatus);
-              }
-            } else {
-              // window.alert(_t('There was an error submitting the form.'));
-              console.log('error happened', textStatus, ' do something');
-            }
-            self.emit('formActionError', [xhr, textStatus, errorStatus]);
-          },
-          success: function(response, state, xhr, form) {
-            self.loading.hide();
-            // if error is found (NOTE: check for both the portal errors
-            // and the form field-level errors)
-            if ($(options.error, response).size() !== 0 ||
-                $(options.formFieldError, response).size() !== 0) {
-              if (options.onFormError) {
-                if (typeof options.onFormError === 'string') {
-                  window[options.onFormError](self, response, state, xhr, form);
-                } else {
-                  options.onFormError(self, response, state, xhr, form);
+                if (self.options.automaticallyAddButtonActions) {
+                    actions[self.options.buttons] = {};
                 }
-              } else {
-                self.redraw(response, patternOptions);
-              }
-              return;
+                actions.a = {};
+
+                $.each(actions, function (action, options) {
+                    var actionKeys = _.union(
+                        _.keys(self.options.actionOptions),
+                        ["templateOptions"]
+                    );
+                    var actionOptions = $.extend(
+                        true,
+                        {},
+                        self.options.actionOptions,
+                        _.pick(options, actionKeys)
+                    );
+                    options.templateOptions = $.extend(
+                        true,
+                        options.templateOptions,
+                        self.options.templateOptions
+                    );
+
+                    var patternKeys = _.union(
+                        _.keys(self.options.actionOptions),
+                        ["actions", "actionOptions"]
+                    );
+                    var patternOptions = $.extend(
+                        true,
+                        _.omit(options, patternKeys),
+                        self.options
+                    );
+
+                    $(
+                        action,
+                        $("." + options.templateOptions.classBodyName, $modal)
+                    ).each(function (action) {
+                        var $action = $(this);
+                        $action.on(actionOptions.eventType, function (e) {
+                            e.stopPropagation();
+                            e.preventDefault();
+
+                            self.loading.show(false);
+
+                            // handle event on $action using a function on self
+                            if (actionOptions.modalFunction !== null) {
+                                self[actionOptions.modalFunction]();
+                                // handle event on input/button using jquery.form library
+                            } else if (
+                                $.nodeName($action[0], "input") ||
+                                $.nodeName($action[0], "button") ||
+                                options.isForm === true
+                            ) {
+                                self.options.handleFormAction.apply(self, [
+                                    $action,
+                                    actionOptions,
+                                    patternOptions,
+                                ]);
+                                // handle event on link with jQuery.ajax
+                            } else if (
+                                options.ajaxUrl !== null ||
+                                $.nodeName($action[0], "a")
+                            ) {
+                                self.options.handleLinkAction.apply(self, [
+                                    $action,
+                                    actionOptions,
+                                    patternOptions,
+                                ]);
+                            }
+                        });
+                    });
+                });
+            },
+            handleFormAction: function ($action, options, patternOptions) {
+                var self = this;
+
+                // pass action that was clicked when submiting form
+                var extraData = {};
+                extraData[$action.attr("name")] = $action.attr("value");
+
+                var $form;
+
+                if ($.nodeName($action[0], "form")) {
+                    $form = $action;
+                } else {
+                    $form = $action.parents("form:not(.disableAutoSubmit)");
+                }
+
+                var url;
+                if (options.ajaxUrl !== null) {
+                    if (typeof options.ajaxUrl === "function") {
+                        url = options.ajaxUrl.apply(self, [$action, options]);
+                    } else {
+                        url = options.ajaxUrl;
+                    }
+                } else {
+                    url = $action.parents("form").attr("action");
+                }
+
+                if (options.disableAjaxFormSubmit) {
+                    if ($action.attr("name") && $action.attr("value")) {
+                        $form.append(
+                            $(
+                                '<input type="hidden" name="' +
+                                    $action.attr("name") +
+                                    '" value="' +
+                                    $action.attr("value") +
+                                    '" />'
+                            )
+                        );
+                    }
+                    $form.trigger("submit");
+                    return;
+                }
+                // We want to trigger the form submit event but NOT use the default
+                $form.on("submit", function (e) {
+                    e.preventDefault();
+                });
+                $form.trigger("submit");
+
+                self.loading.show(false);
+                $form.ajaxSubmit({
+                    timeout: options.timeout,
+                    data: extraData,
+                    url: url,
+                    error: function (xhr, textStatus, errorStatus) {
+                        self.loading.hide();
+                        if (textStatus === "timeout" && options.onTimeout) {
+                            options.onTimeout.apply(self, xhr, errorStatus);
+                            // on "error", "abort", and "parsererror"
+                        } else if (options.onError) {
+                            if (typeof options.onError === "string") {
+                                window[options.onError](
+                                    xhr,
+                                    textStatus,
+                                    errorStatus
+                                );
+                            } else {
+                                options.onError(xhr, textStatus, errorStatus);
+                            }
+                        } else {
+                            // window.alert(_t('There was an error submitting the form.'));
+                            console.log(
+                                "error happened",
+                                textStatus,
+                                " do something"
+                            );
+                        }
+                        self.emit("formActionError", [
+                            xhr,
+                            textStatus,
+                            errorStatus,
+                        ]);
+                    },
+                    success: function (response, state, xhr, form) {
+                        self.loading.hide();
+                        // if error is found (NOTE: check for both the portal errors
+                        // and the form field-level errors)
+                        if (
+                            $(options.error, response).length !== 0 ||
+                            $(options.formFieldError, response).length !== 0
+                        ) {
+                            if (options.onFormError) {
+                                if (typeof options.onFormError === "string") {
+                                    window[options.onFormError](
+                                        self,
+                                        response,
+                                        state,
+                                        xhr,
+                                        form
+                                    );
+                                } else {
+                                    options.onFormError(
+                                        self,
+                                        response,
+                                        state,
+                                        xhr,
+                                        form
+                                    );
+                                }
+                            } else {
+                                self.redraw(response, patternOptions);
+                            }
+                            return;
+                        }
+
+                        if (options.redirectOnResponse === true) {
+                            if (typeof options.redirectToUrl === "function") {
+                                window.parent.location.href = options.redirectToUrl.apply(
+                                    self,
+                                    [$action, response, options]
+                                );
+                            } else {
+                                window.parent.location.href =
+                                    options.redirectToUrl;
+                            }
+                            return; // cut out right here since we're changing url
+                        }
+
+                        if (options.onSuccess) {
+                            if (typeof options.onSuccess === "string") {
+                                window[options.onSuccess](
+                                    self,
+                                    response,
+                                    state,
+                                    xhr,
+                                    form
+                                );
+                            } else {
+                                options.onSuccess(
+                                    self,
+                                    response,
+                                    state,
+                                    xhr,
+                                    form
+                                );
+                            }
+                        }
+
+                        if (options.displayInModal === true) {
+                            self.redraw(response, patternOptions);
+                        } else {
+                            $action.trigger("destroy.plone-modal.patterns");
+                            // also calls hide
+                            if (options.reloadWindowOnClose) {
+                                self.reloadWindow();
+                            }
+                        }
+                        self.emit("formActionSuccess", [
+                            response,
+                            state,
+                            xhr,
+                            form,
+                        ]);
+                    },
+                });
+            },
+            handleLinkAction: function ($action, options, patternOptions) {
+                var self = this;
+                var url;
+                if ($action.hasClass("pat-plone-modal")) {
+                    // if link is a modal pattern, do not reload the page
+                    return;
+                }
+
+                // Figure out URL
+                if (options.ajaxUrl) {
+                    if (typeof options.ajaxUrl === "function") {
+                        url = options.ajaxUrl.apply(self, [$action, options]);
+                    } else {
+                        url = options.ajaxUrl;
+                    }
+                } else {
+                    url = $action.attr("href");
+                }
+
+                // Non-ajax link (I know it says "ajaxUrl" ...)
+                if (options.displayInModal === false) {
+                    if ($action.attr("target") === "_blank") {
+                        window.open(url, "_blank");
+                        self.loading.hide();
+                    } else {
+                        window.location = url;
+                    }
+                    return;
+                }
+
+                // ajax version
+                $.ajax({
+                    url: url,
+                })
+                    .fail(function (xhr, textStatus, errorStatus) {
+                        if (textStatus === "timeout" && options.onTimeout) {
+                            options.onTimeout(self.$modal, xhr, errorStatus);
+
+                            // on "error", "abort", and "parsererror"
+                        } else if (options.onError) {
+                            options.onError(xhr, textStatus, errorStatus);
+                        } else {
+                            window.alert(
+                                _t("There was an error loading modal.")
+                            );
+                        }
+                        self.emit("linkActionError", [
+                            xhr,
+                            textStatus,
+                            errorStatus,
+                        ]);
+                    })
+                    .done(function (response, state, xhr) {
+                        self.redraw(response, patternOptions);
+                        if (options.onSuccess) {
+                            if (typeof options.onSuccess === "string") {
+                                window[options.onSuccess](
+                                    self,
+                                    response,
+                                    state,
+                                    xhr
+                                );
+                            } else {
+                                options.onSuccess(self, response, state, xhr);
+                            }
+                        }
+
+                        self.emit("linkActionSuccess", [response, state, xhr]);
+                    })
+                    .always(function () {
+                        self.loading.hide();
+                    });
+            },
+            render: function (options) {
+                var self = this;
+
+                self.emit("before-render");
+
+                if (!self.$raw) {
+                    return;
+                }
+                var $raw = self.$raw.clone();
+                // fix for IE9 bug (see http://bugs.jquery.com/ticket/10550)
+                $("input:checked", $raw).each(function () {
+                    if (this.setAttribute) {
+                        this.setAttribute("checked", "checked");
+                    }
+                });
+
+                // Object that will be passed to the template
+                var tplObject = {
+                    title: "",
+                    prepend: "<div />",
+                    content: "",
+                    buttons: '<div class="pattern-modal-buttons"></div>',
+                    options: options.templateOptions,
+                };
+
+                // setup the Title
+                if (options.title === null) {
+                    var $title = $(options.titleSelector, $raw);
+                    tplObject.title = $title.html();
+                    $(options.titleSelector, $raw).remove();
+                } else {
+                    tplObject.title = options.title;
+                }
+
+                // Grab items to to insert into the prepend area
+                if (options.prependContent) {
+                    tplObject.prepend = $("<div />")
+                        .append($(options.prependContent, $raw).clone())
+                        .html();
+                    $(options.prependContent, $raw).remove();
+                }
+
+                // Filter out the content if there is a selector provided
+                if (options.content) {
+                    tplObject.content = $(options.content, $raw).html();
+                } else {
+                    tplObject.content = $raw.html();
+                }
+
+                // Render html
+                self.$modal = $(
+                    _.template(self.options.templateOptions.template)(tplObject)
+                );
+                self.$modalDialog = $(
+                    "> ." + self.options.templateOptions.classDialog,
+                    self.$modal
+                );
+                self.$modalContent = $(
+                    "> ." + self.options.templateOptions.classModal,
+                    self.$modalDialog
+                );
+
+                // In most browsers, when you hit the enter key while a form element is focused
+                // the browser will trigger the form 'submit' event.  Google Chrome also does this,
+                // but not when when the default submit button is hidden with 'display: none'.
+                // The following code will work around this issue:
+                $("form", self.$modal).on("keydown", function (event) {
+                    // ignore keys which are not enter, and ignore enter inside a textarea.
+                    if (
+                        event.keyCode !== 13 ||
+                        event.target.nodeName === "TEXTAREA"
+                    ) {
+                        return;
+                    }
+                    event.preventDefault();
+                    $(
+                        "input[type=submit], button[type=submit], button:not(type)",
+                        this
+                    )
+                        .eq(0)
+                        .trigger("click");
+                });
+
+                // Setup buttons
+                $(options.buttons, self.$modal).each(function () {
+                    var $button = $(this);
+                    $button
+                        .on("click", function (e) {
+                            e.stopPropagation();
+                            e.preventDefault();
+                        })
+                        .clone()
+                        .appendTo($(".pattern-modal-buttons", self.$modal))
+                        .off("click")
+                        .on("click", function (e) {
+                            e.stopPropagation();
+                            e.preventDefault();
+                            $button.trigger("click");
+                        });
+                    $button.hide();
+                });
+
+                self.emit("before-events-setup");
+
+                // Wire up events
+                $(
+                    ".plone-modal-header > a.plone-modal-close, .plone-modal-footer > a.plone-modal-close",
+                    self.$modal
+                )
+                    .off("click")
+                    .on("click", function (e) {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        $(e.target).trigger("destroy.plone-modal.patterns");
+                    });
+
+                // form
+                if (options.form) {
+                    options.form.apply(self, [options.actions]);
+                }
+
+                self.$modal
+                    .addClass(self.options.templateOptions.className)
+                    .on("destroy.plone-modal.patterns", function (e) {
+                        e.stopPropagation();
+                        self.hide();
+                    })
+                    .on("resize.plone-modal.patterns", function (e) {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        self.positionModal();
+                    })
+                    .appendTo(self.$wrapperInner);
+
+                if (self.options.loadLinksWithinModal) {
+                    self.$modal.on("click", function (e) {
+                        e.stopPropagation();
+                        if ($.nodeName(e.target, "a")) {
+                            e.preventDefault();
+                            // TODO: open links inside modal
+                            // and slide modal body
+                        }
+                        self.$modal.trigger("modal-click");
+                    });
+                }
+                self.$modal.data("pattern-" + self.name, self);
+                self.emit("after-render");
+                if (options.onRender) {
+                    if (typeof options.onRender === "string") {
+                        window[options.onRender](self);
+                    } else {
+                        options.onRender(self);
+                    }
+                }
+            },
+        },
+        reloadWindow: function () {
+            window.parent.location.reload();
+        },
+        init: function () {
+            var self = this;
+            self.options.loadLinksWithinModal = $.parseJSON(
+                self.options.loadLinksWithinModal
+            );
+
+            // Router
+            if (self.options.routerOptions.id !== null) {
+                Router.addRoute(
+                    "modal",
+                    self.options.routerOptions.id,
+                    function () {
+                        this.show();
+                    },
+                    self,
+                    self.options.routerOptions.pathExp,
+                    self.options.routerOptions.expReplace
+                );
             }
 
-            if (options.redirectOnResponse === true) {
-              if (typeof options.redirectToUrl === 'function') {
-                window.parent.location.href = options.redirectToUrl.apply(self, [$action, response, options]);
-              } else {
-                window.parent.location.href = options.redirectToUrl;
-              }
-              return; // cut out right here since we're changing url
+            if (self.options.backdropOptions.closeOnEsc === true) {
+                $(document).on("keydown", function (e, data) {
+                    if (
+                        self.$el.is(
+                            "." + self.options.templateOptions.classActiveName
+                        )
+                    ) {
+                        if (e.keyCode === 27) {
+                            // ESC key pressed
+                            self.hide();
+                        }
+                    }
+                });
             }
 
-            if (options.onSuccess) {
-              if (typeof options.onSuccess === 'string') {
-                window[options.onSuccess](self, response, state, xhr, form);
-              } else {
-                  options.onSuccess(self, response, state, xhr, form);
-              }
-            }
-
-            if (options.displayInModal === true) {
-              self.redraw(response, patternOptions);
-            } else {
-              $action.trigger('destroy.plone-modal.patterns');
-              // also calls hide
-              if (options.reloadWindowOnClose) {
-                self.reloadWindow();
-              }
-            }
-            self.emit('formActionSuccess', [response, state, xhr, form]);
-          }
-        });
-      },
-      handleLinkAction: function($action, options, patternOptions) {
-        var self = this;
-        var url;
-        if ($action.hasClass('pat-plone-modal')) {
-          // if link is a modal pattern, do not reload the page
-          return ;
-        }
-
-        // Figure out URL
-        if (options.ajaxUrl) {
-          if (typeof options.ajaxUrl === 'function') {
-            url = options.ajaxUrl.apply(self, [$action, options]);
-          } else {
-            url = options.ajaxUrl;
-          }
-        } else {
-          url = $action.attr('href');
-        }
-
-        // Non-ajax link (I know it says "ajaxUrl" ...)
-        if (options.displayInModal === false) {
-          if($action.attr('target') === '_blank'){
-            window.open(url, '_blank');
-            self.loading.hide();
-          }else{
-            window.location = url;
-          }
-          return;
-        }
-
-        // ajax version
-        $.ajax({
-          url: url
-        }).fail(function(xhr, textStatus, errorStatus) {
-          if (textStatus === 'timeout' && options.onTimeout) {
-            options.onTimeout(self.$modal, xhr, errorStatus);
-
-          // on "error", "abort", and "parsererror"
-          } else if (options.onError) {
-            options.onError(xhr, textStatus, errorStatus);
-          } else {
-            window.alert(_t('There was an error loading modal.'));
-          }
-          self.emit('linkActionError', [xhr, textStatus, errorStatus]);
-        }).done(function(response, state, xhr) {
-          self.redraw(response, patternOptions);
-          if (options.onSuccess) {
-            if (typeof options.onSuccess === 'string') {
-              window[options.onSuccess](self, response, state, xhr);
-            } else {
-                options.onSuccess(self, response, state, xhr);
-            }
-          }
-
-          self.emit('linkActionSuccess', [response, state, xhr]);
-        }).always(function(){
-          self.loading.hide();
-        });
-      },
-      render: function(options) {
-        var self = this;
-
-        self.emit('before-render');
-
-        if (!self.$raw) {
-          return;
-        }
-        var $raw = self.$raw.clone();
-        // fix for IE9 bug (see http://bugs.jquery.com/ticket/10550)
-        $('input:checked', $raw).each(function() {
-          if (this.setAttribute) {
-            this.setAttribute('checked', 'checked');
-          }
-        });
-
-        // Object that will be passed to the template
-        var tplObject = {
-          title: '',
-          prepend: '<div />',
-          content: '',
-          buttons: '<div class="pattern-modal-buttons"></div>',
-          options: options.templateOptions
-        };
-
-        // setup the Title
-        if (options.title === null) {
-          var $title = $(options.titleSelector, $raw);
-          tplObject.title = $title.html();
-          $(options.titleSelector, $raw).remove();
-        } else {
-          tplObject.title = options.title;
-        }
-
-        // Grab items to to insert into the prepend area
-        if (options.prependContent) {
-          tplObject.prepend = $('<div />').append($(options.prependContent, $raw).clone()).html();
-          $(options.prependContent, $raw).remove();
-        }
-
-        // Filter out the content if there is a selector provided
-        if (options.content) {
-          tplObject.content = $(options.content, $raw).html();
-        } else {
-          tplObject.content = $raw.html();
-        }
-
-        // Render html
-        self.$modal = $(_.template(self.options.templateOptions.template)(tplObject));
-        self.$modalDialog = $('> .' + self.options.templateOptions.classDialog, self.$modal);
-        self.$modalContent = $('> .' + self.options.templateOptions.classModal, self.$modalDialog);
-
-        // In most browsers, when you hit the enter key while a form element is focused
-        // the browser will trigger the form 'submit' event.  Google Chrome also does this,
-        // but not when when the default submit button is hidden with 'display: none'.
-        // The following code will work around this issue:
-        $('form', self.$modal).on ('keydown', function (event) {
-          // ignore keys which are not enter, and ignore enter inside a textarea.
-          if (event.keyCode !== 13 || event.target.nodeName === 'TEXTAREA') {
-            return;
-          }
-          event.preventDefault();
-          $('input[type=submit], button[type=submit], button:not(type)', this).eq(0).trigger('click');
-        });
-
-        // Setup buttons
-        $(options.buttons, self.$modal).each(function() {
-          var $button = $(this);
-          $button
-            .on('click', function(e) {
-              e.stopPropagation();
-              e.preventDefault();
-            })
-            .clone()
-            .appendTo($('.pattern-modal-buttons', self.$modal))
-            .off('click').on('click', function(e) {
-              e.stopPropagation();
-              e.preventDefault();
-              $button.trigger('click');
+            $(window.parent).resize(function () {
+                self.positionModal();
             });
-          $button.hide();
-        });
 
-        self.emit('before-events-setup');
+            if (self.options.triggers) {
+                $.each(self.options.triggers, function (i, item) {
+                    var e = item.substring(0, item.indexOf(" "));
+                    var selector = item.substring(
+                        item.indexOf(" "),
+                        item.length
+                    );
+                    $(selector || self.$el).on(e, function (e) {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        self.show();
+                    });
+                });
+            }
 
-        // Wire up events
-        $('.plone-modal-header > a.plone-modal-close, .plone-modal-footer > a.plone-modal-close', self.$modal)
-          .off('click')
-          .on('click', function(e) {
-            e.stopPropagation();
-            e.preventDefault();
-            $(e.target).trigger('destroy.plone-modal.patterns');
-          });
+            if (self.$el.is("a")) {
+                if (self.$el.attr("href") && !self.options.image) {
+                    if (
+                        !self.options.target &&
+                        self.$el.attr("href").substr(0, 1) === "#" &&
+                        self.$el.attr("href").length > 1
+                    ) {
+                        self.options.target = self.$el.attr("href");
+                        self.options.content = "";
+                    }
+                    if (
+                        !self.options.ajaxUrl &&
+                        self.$el.attr("href").substr(0, 1) !== "#"
+                    ) {
+                        self.options.ajaxUrl = function () {
+                            // Resolve ``href`` attribute later, when modal is shown.
+                            return self.$el.attr("href");
+                        };
+                    }
+                }
+                self.$el.on("click", function (e) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    self.show();
+                });
+            }
+            self.initModal();
+        },
 
-        // form
-        if (options.form) {
-          options.form.apply(self, [options.actions]);
-        }
+        createAjaxModal: function () {
+            var self = this;
+            self.emit("before-ajax");
+            self.loading.show();
 
-        self.$modal
-          .addClass(self.options.templateOptions.className)
-          .on('destroy.plone-modal.patterns', function(e) {
-            e.stopPropagation();
-            self.hide();
-          })
-          .on('resize.plone-modal.patterns', function(e) {
-            e.stopPropagation();
-            e.preventDefault();
+            var ajaxUrl = self.options.ajaxUrl;
+            if (typeof ajaxUrl === "function") {
+                ajaxUrl = ajaxUrl.apply(self, [self.options]);
+            }
+
+            self.ajaxXHR = $.ajax({
+                url: ajaxUrl,
+                type: self.options.ajaxType,
+            })
+                .done(function (response, textStatus, xhr) {
+                    self.ajaxXHR = undefined;
+                    self.$raw = $("<div />").append(
+                        $(utils.parseBodyTag(response))
+                    );
+                    self.emit("after-ajax", self, textStatus, xhr);
+                    self._show();
+                })
+                .fail(function (xhr, textStatus, errorStatus) {
+                    var options = self.options.actionOptions;
+                    if (textStatus === "timeout" && options.onTimeout) {
+                        options.onTimeout(self.$modal, xhr, errorStatus);
+                    } else if (options.onError) {
+                        options.onError(xhr, textStatus, errorStatus);
+                    } else {
+                        window.alert(_t("There was an error loading modal."));
+                        self.hide();
+                    }
+                    self.emit("linkActionError", [
+                        xhr,
+                        textStatus,
+                        errorStatus,
+                    ]);
+                })
+                .always(function () {
+                    self.loading.hide();
+                });
+        },
+
+        createTargetModal: function () {
+            var self = this;
+            self.$raw = $(self.options.target).clone();
+            self._show();
+        },
+
+        createBasicModal: function () {
+            var self = this;
+            self.$raw = $("<div/>").html(self.$el.clone());
+            self._show();
+        },
+
+        createHtmlModal: function () {
+            var self = this;
+            var $el = $(self.options.html);
+            self.$raw = $el;
+            self._show();
+        },
+
+        createImageModal: function () {
+            var self = this;
+            self.$wrapper.addClass("image-modal");
+            var src = self.$el.attr("href");
+            var srcset = self.$el.attr("data-modal-srcset") || "";
+            var title = $.trim(self.$el.context.innerText) || "Image";
+            // XXX aria?
+            self.$raw = $(
+                "<div><h1>" +
+                    title +
+                    '</h1><div id="content"><div class="modal-image"><img src="' +
+                    src +
+                    '" srcset="' +
+                    srcset +
+                    '" /></div></div></div>'
+            );
+            self._show();
+        },
+
+        initModal: function () {
+            var self = this;
+            if (self.options.ajaxUrl) {
+                self.createModal = self.createAjaxModal;
+            } else if (self.options.target) {
+                self.createModal = self.createTargetModal;
+            } else if (self.options.html) {
+                self.createModal = self.createHtmlModal;
+            } else if (self.options.image) {
+                self.createModal = self.createImageModal;
+            } else {
+                self.createModal = self.createBasicModal;
+            }
+        },
+
+        findPosition: function (
+            horpos,
+            vertpos,
+            margin,
+            modalWidth,
+            modalHeight,
+            wrapperInnerWidth,
+            wrapperInnerHeight
+        ) {
+            var returnpos = {};
+            var absTop, absBottom, absLeft, absRight;
+            absRight = absLeft = absTop = absLeft = "auto";
+
+            // -- HORIZONTAL POSITION -----------------------------------------------
+            if (horpos === "left") {
+                absLeft = margin + "px";
+                // if the width of the wrapper is smaller than the modal, and thus the
+                // screen is smaller than the modal, force the left to simply be 0
+                if (modalWidth > wrapperInnerWidth) {
+                    absLeft = "0px";
+                }
+                returnpos.left = absLeft;
+            } else if (horpos === "right") {
+                absRight = margin + "px";
+                // if the width of the wrapper is smaller than the modal, and thus the
+                // screen is smaller than the modal, force the right to simply be 0
+                if (modalWidth > wrapperInnerWidth) {
+                    absRight = "0px";
+                }
+                returnpos.right = absRight;
+                returnpos.left = "auto";
+            }
+            // default, no specified location, is to center
+            else {
+                absLeft =
+                    wrapperInnerWidth / 2 - modalWidth / 2 - margin + "px";
+                // if the width of the wrapper is smaller than the modal, and thus the
+                // screen is smaller than the modal, force the left to simply be 0
+                if (modalWidth > wrapperInnerWidth) {
+                    absLeft = "0px";
+                }
+                returnpos.left = absLeft;
+            }
+
+            // -- VERTICAL POSITION -------------------------------------------------
+            if (vertpos === "top") {
+                absTop = margin + "px";
+                // if the height of the wrapper is smaller than the modal, and thus the
+                // screen is smaller than the modal, force the top to simply be 0
+                if (modalHeight > wrapperInnerHeight) {
+                    absTop = "0px";
+                }
+                returnpos.top = absTop;
+            } else if (vertpos === "bottom") {
+                absBottom = margin + "px";
+                // if the height of the wrapper is smaller than the modal, and thus the
+                // screen is smaller than the modal, force the bottom to simply be 0
+                if (modalHeight > wrapperInnerHeight) {
+                    absBottom = "0px";
+                }
+                returnpos.bottom = absBottom;
+                returnpos.top = "auto";
+            } else {
+                // default case, no specified location, is to center
+                absTop =
+                    wrapperInnerHeight / 2 - modalHeight / 2 - margin + "px";
+                // if the height of the wrapper is smaller than the modal, and thus the
+                // screen is smaller than the modal, force the top to simply be 0
+                if (modalHeight > wrapperInnerHeight) {
+                    absTop = "0px";
+                }
+                returnpos.top = absTop;
+            }
+            return returnpos;
+        },
+
+        modalInitialized: function () {
+            var self = this;
+            return self.$modal !== null && self.$modal !== undefined;
+        },
+
+        positionModal: function () {
+            /* re-position modal at any point.
+             *
+             * Uses:
+             *  options.margin
+             *  options.width
+             *  options.height
+             *  options.position
+             */
+            var self = this;
+            // modal isn't initialized
+            if (!self.modalInitialized()) {
+                return;
+            }
+            // clear out any previously set styling
+            self.$modal.removeAttr("style");
+
+            // if backdrop wrapper is set on body, then wrapper should have height of
+            // the window, so we can do scrolling of inner wrapper
+            if (self.$wrapper.parent().is("body")) {
+                self.$wrapper.height($(window.parent).height());
+            }
+
+            var margin =
+                typeof self.options.margin === "function"
+                    ? self.options.margin()
+                    : self.options.margin;
+            self.$modal.css({
+                position: "absolute",
+                padding: margin,
+            });
+            self.$modalDialog.css({
+                margin: "0",
+                padding: "0",
+                width: self.options.width, // defaults to "", which doesn't override other css
+                height: self.options.height, // defaults to "", which doesn't override other css
+            });
+            self.$modalContent.css({
+                width: self.options.width, // defaults to "", which doesn't override other css
+            });
+
+            var posopt = self.options.position.split(" "),
+                horpos = posopt[0],
+                vertpos = posopt[1];
+            var modalWidth = self.$modalDialog.outerWidth(true);
+            var modalHeight = self.$modalDialog.outerHeight(true);
+            var wrapperInnerWidth = self.$wrapperInner.width();
+            var wrapperInnerHeight = self.$wrapperInner.height();
+            var pos = self.findPosition(
+                horpos,
+                vertpos,
+                margin,
+                modalWidth,
+                modalHeight,
+                wrapperInnerWidth,
+                wrapperInnerHeight
+            );
+            for (var key in pos) {
+                self.$modalDialog.css(key, pos[key]);
+            }
+        },
+
+        render: function (options) {
+            var self = this;
+            self.emit("render");
+            self.options.render.apply(self, [options]);
+            self.emit("rendered");
+        },
+
+        show: function () {
+            var self = this;
+            self.backdrop = self.createBackdrop();
+            self.createModal();
+        },
+
+        createBackdrop: function () {
+            var self = this,
+                backdrop = new Backdrop(
+                    self.$el.parents(self.options.backdrop),
+                    self.options.backdropOptions
+                ),
+                zIndex = 1041;
+
+            $(self.options.zIndexSelector).each(function () {
+                zIndex = Math.max(
+                    zIndex,
+                    parseInt($(this).css("zIndex")) + 1 || 1041
+                );
+            });
+
+            self.$wrapper = $("<div/>")
+                .hide()
+                .css({
+                    "z-index": zIndex,
+                    "overflow-y": "auto",
+                    "position": "fixed",
+                    "height": "100%",
+                    "width": "100%",
+                    "bottom": "0",
+                    "left": "0",
+                    "right": "0",
+                    "top": "0",
+                })
+                .addClass(self.options.templateOptions.classWrapperName)
+                .insertBefore(backdrop.$backdrop)
+                .on("click", function (e) {
+                    if (self.options.backdropOptions.closeOnClick) {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        backdrop.hide();
+                    }
+                });
+            backdrop.on("hidden", function (e) {
+                if (
+                    self.$modal !== undefined &&
+                    self.$modal.hasClass(
+                        self.options.templateOptions.classActiveName
+                    )
+                ) {
+                    self.hide();
+                }
+            });
+            self.loading = new utils.Loading({
+                backdrop: backdrop,
+            });
+            self.$wrapperInner = $("<div/>")
+                .addClass(self.options.classWrapperInnerName)
+                .css({
+                    position: "absolute",
+                    bottom: "0",
+                    left: "0",
+                    right: "0",
+                    top: "0",
+                })
+                .appendTo(self.$wrapper);
+            return backdrop;
+        },
+
+        _show: function () {
+            var self = this;
+            self.render.apply(self, [self.options]);
+            self.emit("show");
+            self.backdrop.show();
+            self.$wrapper.show();
+            self.loading.hide();
+            self.$el.addClass(self.options.templateOptions.classActiveName);
+            self.$modal.addClass(self.options.templateOptions.classActiveName);
+            registry.scan(self.$modal);
             self.positionModal();
-          })
-          .appendTo(self.$wrapperInner);
-
-        if (self.options.loadLinksWithinModal) {
-          self.$modal.on('click', function(e) {
-            e.stopPropagation();
-            if ($.nodeName(e.target, 'a')) {
-              e.preventDefault();
-              // TODO: open links inside modal
-              // and slide modal body
+            $(window.parent).on("resize.plone-modal.patterns", function () {
+                self.positionModal();
+            });
+            $("body").addClass("plone-modal-open");
+            self.emit("shown");
+        },
+        hide: function () {
+            var self = this;
+            if (self.ajaxXHR) {
+                self.ajaxXHR.abort();
             }
-            self.$modal.trigger('modal-click');
-          });
-        }
-        self.$modal.data('pattern-' + self.name, self);
-        self.emit('after-render');
-        if (options.onRender) {
-          if (typeof options.onRender === 'string') {
-            window[options.onRender](self);
-          } else {
-              options.onRender(self);
-          }
-        }
-
-      }
-    },
-    reloadWindow: function() {
-      window.parent.location.reload();
-    },
-    init: function() {
-      var self = this;
-      self.options.loadLinksWithinModal = $.parseJSON(self.options.loadLinksWithinModal);
-
-      // Router
-      if (self.options.routerOptions.id !== null) {
-        Router.addRoute('modal', self.options.routerOptions.id, function() {
-          this.show();
-        }, self, self.options.routerOptions.pathExp, self.options.routerOptions.expReplace);
-      }
-
-      if (self.options.backdropOptions.closeOnEsc === true) {
-        $(document).on('keydown', function(e, data) {
-          if (self.$el.is('.' + self.options.templateOptions.classActiveName)) {
-            if (e.keyCode === 27) {  // ESC key pressed
-              self.hide();
+            self.emit("hide");
+            if (self._suppressHide) {
+                if (!window.confirm(self._suppressHide)) {
+                    return;
+                }
             }
-          }
-        });
-      }
+            self.loading.hide();
+            self.$el.removeClass(self.options.templateOptions.classActiveName);
+            if (self.$modal !== undefined) {
+                self.$modal.remove();
+                self.initModal();
+            }
+            self.$wrapper.remove();
+            if ($(".plone-modal", $("body")).length < 1) {
+                self._suppressHide = undefined;
+                self.backdrop.hide();
+                $("body").removeClass("plone-modal-open");
+                $(window.parent).off("resize.plone-modal.patterns");
+            }
+            self.emit("hidden");
+            self.$el.focus();
+        },
 
+        redraw: function (response, options) {
+            var self = this;
+            self.emit("beforeDraw");
+            self.$modal.remove();
+            self.$raw = $("<div />").append($(utils.parseBodyTag(response)));
+            self.render.apply(self, [options || self.options]);
+            self.$modal.addClass(self.options.templateOptions.classActiveName);
+            self.positionModal();
+            registry.scan(self.$modal);
+            self.emit("afterDraw");
+        },
+    });
 
-
-
-      $(window.parent).resize(function() {
-        self.positionModal();
-      });
-
-      if (self.options.triggers) {
-        $.each(self.options.triggers, function(i, item) {
-          var e = item.substring(0, item.indexOf(' '));
-          var selector = item.substring(item.indexOf(' '), item.length);
-          $(selector || self.$el).on(e, function(e) {
-            e.stopPropagation();
-            e.preventDefault();
-            self.show();
-          });
-        });
-      }
-
-      if (self.$el.is('a')) {
-        if (self.$el.attr('href') && !self.options.image) {
-          if (!self.options.target && self.$el.attr('href').substr(0, 1) === '#') {
-            self.options.target = self.$el.attr('href');
-            self.options.content = '';
-          }
-          if (!self.options.ajaxUrl && self.$el.attr('href').substr(0, 1) !== '#') {
-            self.options.ajaxUrl = function () {
-              // Resolve ``href`` attribute later, when modal is shown.
-              return self.$el.attr('href');
-            };
-          }
-        }
-        self.$el.on('click', function(e) {
-          e.stopPropagation();
-          e.preventDefault();
-          self.show();
-        });
-      }
-      self.initModal();
-    },
-
-    createAjaxModal: function() {
-      var self = this;
-      self.emit('before-ajax');
-      self.loading.show();
-
-      var ajaxUrl = self.options.ajaxUrl;
-      if (typeof ajaxUrl === 'function') {
-        ajaxUrl = ajaxUrl.apply(self, [self.options]);
-      }
-
-      self.ajaxXHR = $.ajax({
-        url: ajaxUrl,
-        type: self.options.ajaxType
-      }).done(function(response, textStatus, xhr) {
-        self.ajaxXHR = undefined;
-        self.$raw = $('<div />').append($(utils.parseBodyTag(response)));
-        self.emit('after-ajax', self, textStatus, xhr);
-        self._show();
-      }).fail(function(xhr, textStatus, errorStatus){
-        var options = self.options.actionOptions;
-        if (textStatus === 'timeout' && options.onTimeout) {
-          options.onTimeout(self.$modal, xhr, errorStatus);
-        } else if (options.onError) {
-          options.onError(xhr, textStatus, errorStatus);
-        } else {
-          window.alert(_t('There was an error loading modal.'));
-          self.hide();
-        }
-        self.emit('linkActionError', [xhr, textStatus, errorStatus]);
-      }).always(function(){
-        self.loading.hide();
-      });
-    },
-
-    createTargetModal: function() {
-      var self = this;
-      self.$raw = $(self.options.target).clone();
-      self._show();
-    },
-
-    createBasicModal: function() {
-      var self = this;
-      self.$raw = $('<div/>').html(self.$el.clone());
-      self._show();
-    },
-
-    createHtmlModal: function() {
-      var self = this;
-      var $el = $(self.options.html);
-      self.$raw = $el;
-      self._show();
-    },
-
-    createImageModal: function(){
-      var self = this;
-      self.$wrapper.addClass('image-modal');
-      var src = self.$el.attr('href');
-      var srcset = self.$el.attr('data-modal-srcset') || '';
-      var title = $.trim(self.$el.context.innerText) || 'Image';
-      // XXX aria?
-      self.$raw = $('<div><h1>' + title + '</h1><div id="content"><div class="modal-image"><img src="' + src + '" srcset="' + srcset + '" /></div></div></div>');
-      self._show();
-    },
-
-    initModal: function() {
-      var self = this;
-      if (self.options.ajaxUrl) {
-        self.createModal = self.createAjaxModal;
-      } else if (self.options.target) {
-        self.createModal = self.createTargetModal;
-      } else if (self.options.html) {
-        self.createModal = self.createHtmlModal;
-      } else if (self.options.image){
-        self.createModal = self.createImageModal;
-      } else {
-        self.createModal = self.createBasicModal;
-      }
-    },
-
-    findPosition: function(horpos, vertpos, margin, modalWidth, modalHeight,
-                           wrapperInnerWidth, wrapperInnerHeight) {
-      var returnpos = {};
-      var absTop, absBottom, absLeft, absRight;
-      absRight = absLeft = absTop = absLeft = 'auto';
-
-      // -- HORIZONTAL POSITION -----------------------------------------------
-      if (horpos === 'left') {
-        absLeft = margin + 'px';
-        // if the width of the wrapper is smaller than the modal, and thus the
-        // screen is smaller than the modal, force the left to simply be 0
-        if (modalWidth > wrapperInnerWidth) {
-          absLeft = '0px';
-        }
-        returnpos.left = absLeft;
-      }
-      else if (horpos === 'right') {
-        absRight =  margin + 'px';
-        // if the width of the wrapper is smaller than the modal, and thus the
-        // screen is smaller than the modal, force the right to simply be 0
-        if (modalWidth > wrapperInnerWidth) {
-          absRight = '0px';
-        }
-        returnpos.right = absRight;
-        returnpos.left = 'auto';
-      }
-      // default, no specified location, is to center
-      else {
-        absLeft = ((wrapperInnerWidth / 2) - (modalWidth / 2) - margin) + 'px';
-        // if the width of the wrapper is smaller than the modal, and thus the
-        // screen is smaller than the modal, force the left to simply be 0
-        if (modalWidth > wrapperInnerWidth) {
-          absLeft = '0px';
-        }
-        returnpos.left = absLeft;
-      }
-
-      // -- VERTICAL POSITION -------------------------------------------------
-      if (vertpos === 'top') {
-        absTop = margin + 'px';
-        // if the height of the wrapper is smaller than the modal, and thus the
-        // screen is smaller than the modal, force the top to simply be 0
-        if (modalHeight > wrapperInnerHeight) {
-          absTop = '0px';
-        }
-        returnpos.top = absTop;
-      }
-      else if (vertpos === 'bottom') {
-        absBottom = margin + 'px';
-        // if the height of the wrapper is smaller than the modal, and thus the
-        // screen is smaller than the modal, force the bottom to simply be 0
-        if (modalHeight > wrapperInnerHeight) {
-          absBottom = '0px';
-        }
-        returnpos.bottom = absBottom;
-        returnpos.top = 'auto';
-      }
-      else {
-        // default case, no specified location, is to center
-        absTop = ((wrapperInnerHeight / 2) - (modalHeight / 2) - margin) + 'px';
-        // if the height of the wrapper is smaller than the modal, and thus the
-        // screen is smaller than the modal, force the top to simply be 0
-        if (modalHeight > wrapperInnerHeight) {
-          absTop = '0px';
-        }
-        returnpos.top = absTop;
-      }
-      return returnpos;
-    },
-
-    modalInitialized: function() {
-      var self = this;
-      return self.$modal !== null && self.$modal !== undefined;
-    },
-
-    positionModal: function() {
-      /* re-position modal at any point.
-       *
-       * Uses:
-       *  options.margin
-       *  options.width
-       *  options.height
-       *  options.position
-       */
-      var self = this;
-      // modal isn't initialized
-      if (!self.modalInitialized()) { return; }
-      // clear out any previously set styling
-      self.$modal.removeAttr('style');
-
-      // if backdrop wrapper is set on body, then wrapper should have height of
-      // the window, so we can do scrolling of inner wrapper
-      if (self.$wrapper.parent().is('body')) {
-        self.$wrapper.height($(window.parent).height());
-      }
-
-      var margin = typeof self.options.margin === 'function' ? self.options.margin() : self.options.margin;
-      self.$modal.css({
-        'position': 'absolute',
-        'padding': margin
-      });
-      self.$modalDialog.css({
-        margin: '0',
-        padding: '0',
-        width: self.options.width, // defaults to "", which doesn't override other css
-        height: self.options.height // defaults to "", which doesn't override other css
-      });
-      self.$modalContent.css({
-        width: self.options.width, // defaults to "", which doesn't override other css
-      });
-
-      var posopt = self.options.position.split(' '),
-          horpos = posopt[0],
-          vertpos = posopt[1];
-      var modalWidth = self.$modalDialog.outerWidth(true);
-      var modalHeight = self.$modalDialog.outerHeight(true);
-      var wrapperInnerWidth = self.$wrapperInner.width();
-      var wrapperInnerHeight = self.$wrapperInner.height();
-      var pos = self.findPosition(
-        horpos, vertpos, margin, modalWidth, modalHeight,
-        wrapperInnerWidth, wrapperInnerHeight
-      );
-      for (var key in pos) {
-        self.$modalDialog.css(key, pos[key]);
-      }
-    },
-
-    render: function(options) {
-      var self = this;
-      self.emit('render');
-      self.options.render.apply(self, [options]);
-      self.emit('rendered');
-    },
-
-    show: function() {
-      var self = this;
-      self.backdrop = self.createBackdrop();
-      self.createModal();
-    },
-
-    createBackdrop: function() {
-      var self = this,
-          backdrop = new Backdrop(
-            self.$el.parents(self.options.backdrop),
-            self.options.backdropOptions
-          ),
-          zIndex = 1041;
-
-      $(self.options.zIndexSelector).each(function(){
-        zIndex = Math.max(zIndex, parseInt($(this).css('zIndex')) + 1 || 1041);
-      });
-
-      self.$wrapper = $('<div/>')
-        .hide()
-        .css({
-          'z-index': zIndex,
-          'overflow-y': 'auto',
-          'position': 'fixed',
-          'height': '100%',
-          'width': '100%',
-          'bottom': '0',
-          'left': '0',
-          'right': '0',
-          'top': '0'
-        })
-        .addClass(self.options.templateOptions.classWrapperName)
-        .insertBefore(backdrop.$backdrop)
-        .on('click', function(e) {
-          if (self.options.backdropOptions.closeOnClick) {
-            e.stopPropagation();
-            e.preventDefault();
-            backdrop.hide();
-          }
-        });
-      backdrop.on('hidden', function(e) {
-        if (self.$modal !== undefined && self.$modal.hasClass(self.options.templateOptions.classActiveName)) {
-          self.hide();
-        }
-      });
-      self.loading = new utils.Loading({
-        'backdrop': backdrop
-      });
-      self.$wrapperInner = $('<div/>')
-        .addClass(self.options.classWrapperInnerName)
-        .css({
-          'position': 'absolute',
-          'bottom': '0',
-          'left': '0',
-          'right': '0',
-          'top': '0'
-        })
-        .appendTo(self.$wrapper);
-      return backdrop;
-    },
-
-    _show: function() {
-      var self = this;
-      self.render.apply(self, [ self.options ]);
-      self.emit('show');
-      self.backdrop.show();
-      self.$wrapper.show();
-      self.loading.hide();
-      self.$el.addClass(self.options.templateOptions.classActiveName);
-      self.$modal.addClass(self.options.templateOptions.classActiveName);
-      registry.scan(self.$modal);
-      self.positionModal();
-      $(window.parent).on('resize.plone-modal.patterns', function() {
-        self.positionModal();
-      });
-      $('body').addClass('plone-modal-open');
-      self.emit('shown');
-    },
-    hide: function() {
-      var self = this;
-      if (self.ajaxXHR) {
-        self.ajaxXHR.abort();
-      }
-      self.emit('hide');
-      if (self._suppressHide) {
-        if (!window.confirm(self._suppressHide)) {
-          return;
-        }
-      }
-      self.loading.hide();
-      self.$el.removeClass(self.options.templateOptions.classActiveName);
-      if (self.$modal !== undefined) {
-        self.$modal.remove();
-        self.initModal();
-      }
-      self.$wrapper.remove();
-      if ($('.plone-modal', $('body')).size() < 1) {
-        self._suppressHide = undefined;
-        self.backdrop.hide();
-        $('body').removeClass('plone-modal-open');
-        $(window.parent).off('resize.plone-modal.patterns');
-      }
-      self.emit('hidden');
-    },
-
-    redraw: function(response, options) {
-      var self = this;
-      self.emit('beforeDraw');
-      self.$modal.remove();
-      self.$raw = $('<div />').append($(utils.parseBodyTag(response)));
-      self.render.apply(self, [options || self.options]);
-      self.$modal.addClass(self.options.templateOptions.classActiveName);
-      self.positionModal();
-      registry.scan(self.$modal);
-      self.emit('afterDraw');
-    }
-  });
-
-  return Modal;
+    return Modal;
 });
 
 /* Navigation marker pattern.
@@ -5786,34 +6140,32 @@ define('mockup-patterns-modal',[
  *
  */
 
-define('mockup-patterns-navigationmarker',[
-    'jquery',
-    'pat-base'
-], function ($, Base) {
-
+define('mockup-patterns-navigationmarker',["jquery", "pat-base"], function ($, Base) {
     var Navigation = Base.extend({
-        name: 'navigationmarker',
-        trigger: '.pat-navigationmarker',
-        parser: 'mockup',
+        name: "navigationmarker",
+        trigger: ".pat-navigationmarker",
+        parser: "mockup",
         init: function () {
             var self = this;
-            var href = document.querySelector('head link[rel="canonical"]').href || window.location.href;
+            var href =
+                document.querySelector('head link[rel="canonical"]').href ||
+                window.location.href;
 
-            $('a', this.$el).each(function () {
-                var navlink = this.href.replace('/view', '');
+            $("a", this.$el).each(function () {
+                var navlink = this.href.replace("/view", "");
                 if (href.indexOf(navlink) !== -1) {
                     var parent = $(this).parent();
 
                     // check the input-openers within the path
-                    var check = parent.find('> input');
+                    var check = parent.find("> input");
                     if (check.length) {
                         check[0].checked = true;
                     }
 
                     // set "inPath" to all nav items which are within the current path
                     // check if parts of navlink are in canonical url parts
-                    var hrefParts = href.split('/');
-                    var navParts = navlink.split('/');
+                    var hrefParts = href.split("/");
+                    var navParts = navlink.split("/");
                     var inPath = false;
                     for (var i = 0, size = navParts.length; i < size; i++) {
                         // The last path-part must match.
@@ -5823,16 +6175,16 @@ define('mockup-patterns-navigationmarker',[
                         }
                     }
                     if (inPath) {
-                        parent.addClass('inPath');
+                        parent.addClass("inPath");
                     }
 
                     // set "current" to the current selected nav item, if it is in the navigation structure.
                     if (href === navlink) {
-                        parent.addClass('current');
+                        parent.addClass("current");
                     }
                 }
             });
-        }
+        },
     });
 
     return Navigation;
@@ -5859,58 +6211,53 @@ define('mockup-patterns-navigationmarker',[
  *
  */
 
+define('mockup-patterns-preventdoublesubmit',["jquery", "pat-base", "translate"], function ($, Base, _t) {
+    "use strict";
 
-define('mockup-patterns-preventdoublesubmit',[
-  'jquery',
-  'pat-base',
-  'translate'
-], function($, Base, _t) {
-  'use strict';
+    var PreventDoubleSubmit = Base.extend({
+        name: "preventdoublesubmit",
+        trigger: ".pat-preventdoublesubmit",
+        parser: "mockup",
+        defaults: {
+            message: _t(
+                "You already clicked the submit button. " +
+                    "Do you really want to submit this form again?"
+            ),
+            guardClassName: "submitting",
+            optOutClassName: "allowMultiSubmit",
+        },
+        init: function () {
+            var self = this;
 
-  var PreventDoubleSubmit = Base.extend({
-    name: 'preventdoublesubmit',
-    trigger: '.pat-preventdoublesubmit',
-    parser: 'mockup',
-    defaults: {
-      message : _t('You already clicked the submit button. ' +
-                'Do you really want to submit this form again?'),
-      guardClassName: 'submitting',
-      optOutClassName: 'allowMultiSubmit'
-    },
-    init: function() {
-      var self = this;
+            // if this is not a form just return
+            if (!self.$el.is("form")) {
+                return;
+            }
 
-      // if this is not a form just return
-      if (!self.$el.is('form')) {
-        return;
-      }
+            $(":submit", self.$el).click(function (e) {
+                // mark the button as clicked
+                $(":submit").removeAttr("clicked");
+                $(this).attr("clicked", "clicked");
 
-      $(':submit', self.$el).click(function(e) {
+                // if submitting and no opt-out guardClassName is found
+                // pop up confirmation dialog
+                if (
+                    $(this).hasClass(self.options.guardClassName) &&
+                    !$(this).hasClass(self.options.optOutClassName)
+                ) {
+                    return self._confirm.call(self);
+                }
 
-        // mark the button as clicked
-        $(':submit').removeAttr('clicked');
-        $(this).attr('clicked', 'clicked');
+                $(this).addClass(self.options.guardClassName);
+            });
+        },
 
-        // if submitting and no opt-out guardClassName is found
-        // pop up confirmation dialog
-        if ($(this).hasClass(self.options.guardClassName) &&
-              !$(this).hasClass(self.options.optOutClassName)) {
-          return self._confirm.call(self);
-        }
+        _confirm: function (e) {
+            return window.confirm(this.options.message);
+        },
+    });
 
-        $(this).addClass(self.options.guardClassName);
-      });
-
-    },
-
-    _confirm: function(e) {
-      return window.confirm(this.options.message);
-    }
-
-  });
-
-  return PreventDoubleSubmit;
-
+    return PreventDoubleSubmit;
 });
 
 (function(root) {
@@ -7028,5 +7375,5 @@ require([
   'use strict';
 });
 
-define("/Users/fred/buildouts/coredev-plone5.2/src/plone.staticresources/src/plone/staticresources/static/plone.js", function(){});
+define("/Volumes/WORKSPACE2/buildout.coredev.barceloneta-lts/src/plone.staticresources/src/plone/staticresources/static/plone.js", function(){});
 

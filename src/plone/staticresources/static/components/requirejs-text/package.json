@@ -1,5 +1,5 @@
 {
-    "name": "text",
+    "name": "requirejs-text",
     "version": "2.0.15",
     "description": "An AMD loader plugin for loading text resources.",
     "categories": [

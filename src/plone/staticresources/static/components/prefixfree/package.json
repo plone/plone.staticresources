@@ -1,0 +1,26 @@
+{
+  "name": "prefixfree",
+  "version": "1.0.0",
+  "description": "Break free from CSS prefix hell!",
+  "main": "prefixfree.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/LeaVerou/prefixfree.git"
+  },
+  "keywords": [
+    "CSS",
+    "prefixes"
+  ],
+  "author": "Lea Verou",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/LeaVerou/prefixfree/issues"
+  },
+  "homepage": "https://github.com/LeaVerou/prefixfree"
+}

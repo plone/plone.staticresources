@@ -1,0 +1,53 @@
+{
+  "name": "@stomp/stompjs",
+  "version": "5.4.4",
+  "description": "STOMP client for Javascript and Typescript",
+  "scripts": {
+    "clean": "rm -rf bundles esm5 esm6",
+    "build-tsc": "tsc -m es6 --outDir esm6",
+    "build-webpack": "webpack && webpack --mode=production --output-filename=stomp.umd.min.js",
+    "build": "npm run clean && tsc && npm run build-tsc && npm run build-webpack",
+    "test": "jasmine",
+    "karma": "karma start --single-run",
+    "lint": "tslint 'src/**/*.ts'",
+    "prepublishOnly": "npm run lint && npm run build && npm run karma && npm run test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stomp-js/stompjs.git"
+  },
+  "keywords": [
+    "STOMP",
+    "RabbitMQ",
+    "ActiveMQ",
+    "Websocket",
+    "messaging",
+    "queue",
+    "SockJS"
+  ],
+  "author": "deepak@kreatio.com",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/stomp-js/stompjs/issues"
+  },
+  "homepage": "https://github.com/stomp-js/stompjs#readme",
+  "devDependencies": {
+    "awesome-typescript-loader": "^5.2.0",
+    "jasmine": "^3.1.0",
+    "karma": "^4.0.0",
+    "karma-chrome-launcher": "^3.0.0",
+    "karma-jasmine": "^3.0.1",
+    "karma-summary-reporter": "^1.5.0",
+    "text-encoding": "^0.7.0",
+    "tslint": "^6.0.0",
+    "typescript": "^3.5.1",
+    "webpack": "^4.33.0",
+    "webpack-cli": "^3.3.2",
+    "websocket": "^1.0.26"
+  },
+  "esm5": "./esm5/index.js",
+  "esm6": "./esm6/index.js",
+  "main": "bundles/stomp.umd.js",
+  "typings": "index.d.ts",
+  "sideEffects": false
+}

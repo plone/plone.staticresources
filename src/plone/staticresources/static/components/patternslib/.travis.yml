@@ -1,6 +1,9 @@
+dist: xenial
 language: node_js
 node_js:
-- 0.10
-before_script: travis_retry make stamp-bower
+- lts/*
+before_script: travis_retry make stamp-npm
 script: make check
-sudo: false
+sudo: required
+addons:
+  chrome: beta

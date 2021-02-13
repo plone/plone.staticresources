@@ -141,521 +141,587 @@
  */
 
 define('plone-patterns-toolbar',[
-  'jquery',
-  'pat-base',
-  'pat-registry',
-  'mockup-utils',
-  'translate',
-  'jquery.cookie',
-], function($, Base, Registry, utils, _t) {
-  'use strict';
+    "jquery",
+    "pat-base",
+    "pat-registry",
+    "mockup-utils",
+    "translate",
+    "jquery.cookie",
+], function ($, Base, Registry, utils, _t) {
+    "use strict";
 
-  var Toolbar = Base.extend({
-    name: 'toolbar',
-    trigger: '.pat-toolbar',
-    parser: 'mockup',
-    defaults: {
-      containerSelector: '#edit-zone',
-      classNames: {
-        logo: 'plone-toolbar-logo',
-        left: 'plone-toolbar-left',
-        leftDefault: 'plone-toolbar-left-default',
-        leftExpanded: 'plone-toolbar-left-expanded',
-        top: 'plone-toolbar-top',
-        topDefault: 'plone-toolbar-top-default',
-        topExpanded: 'plone-toolbar-top-expanded',
-        default: 'plone-toolbar-default',
-        expanded: 'plone-toolbar-expanded',
-        active: 'active',
-      },
-      cookieName: 'plone-toolbar',
-      toolbar_width: '120px',
-      submenu_width: '180px',
-      desktop_width: '768px',
-    },
-    pxToInt: function(px) {
-      return parseInt(px.split('px')[0], 10);
-    },
-    setupMobile: function() {
-      var that = this;
-      that.$container.css('right', '-' + that.options.toolbar_width);
-      // make sure we are in expanded mode
-      $('body').addClass(that.options.classNames.leftExpanded);
-      $('body').addClass(that.options.classNames.expanded);
-      $('body').addClass(that.options.classNames.left);
-      $('body').removeClass(that.options.classNames.topExpanded);
-      $('body').removeClass(that.options.classNames.top);
-      $('body').removeClass(that.options.classNames.topDefault);
-      $('body').removeClass(that.options.classNames.default);
-      $('.' + that.options.classNames.logo, that.$container)
-        .off('click')
-        .on('click', function() {
-          var $el = $(that.$el);
-          if ($el.hasClass('open')) {
-            that.$container.css('right', '-' + that.options.toolbar_width);
-            $('html').css('margin-left', '0');
-            $('html').css('margin-right', '0');
-            $el.removeClass('open');
-            $('nav li', that.$container).removeClass(
-              that.options.classNames.active
-            );
-          } else {
-            that.$container.css('right', '0');
-            $el.addClass('open');
-            $('html').css('margin-left', '-' + that.options.toolbar_width);
-            $('html').css('margin-right', that.options.toolbar_width);
-          }
-        });
-      // Remove desktop event binding
-      $('nav > ul > li', that.$container)
-        .has('a .plone-toolbar-caret')
-        .off('click');
-      // Add sub-menu events
-      $('nav li a', that.$container)
-        .has('.plone-toolbar-caret')
-        .off('click')
-        .on('click', function(e) {
-          e.preventDefault();
-          e.stopPropagation();
-          var $el = $(this).parent();
-          if ($el.hasClass(that.options.classNames.active)) {
-            that.$container.css('right', '0');
-            $('html').css('margin-left', '-' + that.options.toolbar_width);
-            $('html').css('margin-right', that.options.toolbar_width);
-            $('nav li', that.$container).removeClass(
-              that.options.classNames.active
-            );
-          } else {
-            $('nav li', that.$container).removeClass(
-              that.options.classNames.active
-            );
-            $el.addClass(that.options.classNames.active);
-            that.$container.css('right', that.options.submenu_width);
-            var margin =
-              that.pxToInt(that.options.toolbar_width) +
-              that.pxToInt(that.options.submenu_width);
-            $('html').css('margin-left', '-' + margin + 'px');
-            $('html').css('margin-right', +margin + 'px');
-          }
-        });
-    },
-    setupDesktop: function() {
-      var that = this;
-      if (that.state.expanded) {
-        $('body').addClass(that.options.classNames.expanded);
-        $('body').addClass(
-          that.state.left
-            ? that.options.classNames.leftExpanded
-            : that.options.classNames.topExpanded
-        );
-        $('body').removeClass(that.options.classNames.default);
-        $('body').removeClass(that.options.classNames.leftDefault);
-        $('body').removeClass(that.options.classNames.topDefault);
-      } else {
-        $('body').addClass(that.options.classNames.default);
-        $('body').addClass(
-          that.state.left
-            ? that.options.classNames.leftDefault
-            : that.options.classNames.topDefault
-        );
-        $('body').removeClass(that.options.classNames.expanded);
-        $('body').removeClass(that.options.classNames.leftExpanded);
-        $('body').removeClass(that.options.classNames.topExpanded);
-      }
-
-      if (!that.state.left) {
-        $('body').addClass(that.options.classNames.top);
-        $('body').addClass(
-          that.state.expanded
-            ? that.options.classNames.topExpanded
-            : that.options.classNames.topDefault
-        );
-        $('body').removeClass(that.options.classNames.left);
-        $('body').removeClass(that.options.classNames.leftDefault);
-        $('body').removeClass(that.options.classNames.leftExpanded);
-      }
-
-      $('.' + that.options.classNames.logo, that.$container)
-        .off('click')
-        .on('click', function() {
-          if (that.state.expanded) {
-            // currently expanded, need to compress
-            that.setState({
-              expanded: false,
-            });
-            $('body').removeClass(that.options.classNames.expanded);
-            $('body').addClass(that.options.classNames.default);
-            $('nav li', that.$container).removeClass(
-              that.options.classNames.active
-            );
-            if (that.state.left) {
-              $('body').addClass(that.options.classNames.leftDefault);
-              $('body').removeClass(that.options.classNames.leftExpanded);
+    var Toolbar = Base.extend({
+        name: "toolbar",
+        trigger: ".pat-toolbar",
+        parser: "mockup",
+        defaults: {
+            containerSelector: "#edit-zone",
+            classNames: {
+                logo: "plone-toolbar-logo",
+                left: "plone-toolbar-left",
+                leftDefault: "plone-toolbar-left-default",
+                leftExpanded: "plone-toolbar-left-expanded",
+                top: "plone-toolbar-top",
+                topDefault: "plone-toolbar-top-default",
+                topExpanded: "plone-toolbar-top-expanded",
+                default: "plone-toolbar-default",
+                expanded: "plone-toolbar-expanded",
+                active: "active",
+            },
+            cookieName: "plone-toolbar",
+            toolbar_width: "120px",
+            submenu_width: "180px",
+            desktop_width: "768px",
+        },
+        pxToInt: function (px) {
+            return parseInt(px.split("px")[0], 10);
+        },
+        setupMobile: function () {
+            var that = this;
+            that.$container.css("right", "-" + that.options.toolbar_width);
+            // make sure we are in expanded mode
+            $("body").addClass(that.options.classNames.leftExpanded);
+            $("body").addClass(that.options.classNames.expanded);
+            $("body").addClass(that.options.classNames.left);
+            $("body").removeClass(that.options.classNames.topExpanded);
+            $("body").removeClass(that.options.classNames.top);
+            $("body").removeClass(that.options.classNames.topDefault);
+            $("body").removeClass(that.options.classNames.default);
+            $("." + that.options.classNames.logo, that.$container)
+                .off("click")
+                .on("click", function () {
+                    var $el = $(that.$el);
+                    if ($el.hasClass("open")) {
+                        that.$container.css(
+                            "right",
+                            "-" + that.options.toolbar_width
+                        );
+                        $("html").css("margin-left", "0");
+                        $("html").css("margin-right", "0");
+                        $el.removeClass("open");
+                        $("nav li", that.$container).removeClass(
+                            that.options.classNames.active
+                        );
+                    } else {
+                        that.$container.css("right", "0");
+                        $el.addClass("open");
+                        $("html").css(
+                            "margin-left",
+                            "-" + that.options.toolbar_width
+                        );
+                        $("html").css(
+                            "margin-right",
+                            that.options.toolbar_width
+                        );
+                    }
+                });
+            // Remove desktop event binding
+            $("nav > ul > li", that.$container)
+                .has("a .plone-toolbar-caret")
+                .off("click");
+            // Add sub-menu events
+            $("nav li a", that.$container)
+                .has(".plone-toolbar-caret")
+                .off("click")
+                .on("click", function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    var $el = $(this).parent();
+                    if ($el.hasClass(that.options.classNames.active)) {
+                        that.$container.css("right", "0");
+                        $("html").css(
+                            "margin-left",
+                            "-" + that.options.toolbar_width
+                        );
+                        $("html").css(
+                            "margin-right",
+                            that.options.toolbar_width
+                        );
+                        $("nav li", that.$container).removeClass(
+                            that.options.classNames.active
+                        );
+                    } else {
+                        $("nav li", that.$container).removeClass(
+                            that.options.classNames.active
+                        );
+                        $el.addClass(that.options.classNames.active);
+                        that.$container.css(
+                            "right",
+                            that.options.submenu_width
+                        );
+                        var margin =
+                            that.pxToInt(that.options.toolbar_width) +
+                            that.pxToInt(that.options.submenu_width);
+                        $("html").css("margin-left", "-" + margin + "px");
+                        $("html").css("margin-right", +margin + "px");
+                    }
+                });
+        },
+        setupDesktop: function () {
+            var that = this;
+            if (that.state.expanded) {
+                $("body").addClass(that.options.classNames.expanded);
+                $("body").addClass(
+                    that.state.left
+                        ? that.options.classNames.leftExpanded
+                        : that.options.classNames.topExpanded
+                );
+                $("body").removeClass(that.options.classNames.default);
+                $("body").removeClass(that.options.classNames.leftDefault);
+                $("body").removeClass(that.options.classNames.topDefault);
             } else {
-              $('body').addClass(that.options.classNames.topDefault);
-              $('body').removeClass(that.options.classNames.topExpanded);
+                $("body").addClass(that.options.classNames.default);
+                $("body").addClass(
+                    that.state.left
+                        ? that.options.classNames.leftDefault
+                        : that.options.classNames.topDefault
+                );
+                $("body").removeClass(that.options.classNames.expanded);
+                $("body").removeClass(that.options.classNames.leftExpanded);
+                $("body").removeClass(that.options.classNames.topExpanded);
             }
-          } else {
-            that.setState({
-              expanded: true,
+
+            if (!that.state.left) {
+                $("body").addClass(that.options.classNames.top);
+                $("body").addClass(
+                    that.state.expanded
+                        ? that.options.classNames.topExpanded
+                        : that.options.classNames.topDefault
+                );
+                $("body").removeClass(that.options.classNames.left);
+                $("body").removeClass(that.options.classNames.leftDefault);
+                $("body").removeClass(that.options.classNames.leftExpanded);
+            }
+
+            $("." + that.options.classNames.logo, that.$container)
+                .off("click")
+                .on("click", function () {
+                    if (that.state.expanded) {
+                        // currently expanded, need to compress
+                        that.setState({
+                            expanded: false,
+                        });
+                        $("body").removeClass(that.options.classNames.expanded);
+                        $("body").addClass(that.options.classNames.default);
+                        $("nav li", that.$container).removeClass(
+                            that.options.classNames.active
+                        );
+                        if (that.state.left) {
+                            $("body").addClass(
+                                that.options.classNames.leftDefault
+                            );
+                            $("body").removeClass(
+                                that.options.classNames.leftExpanded
+                            );
+                        } else {
+                            $("body").addClass(
+                                that.options.classNames.topDefault
+                            );
+                            $("body").removeClass(
+                                that.options.classNames.topExpanded
+                            );
+                        }
+                    } else {
+                        that.setState({
+                            expanded: true,
+                        });
+                        // Switch to expanded
+                        $("body").addClass(that.options.classNames.expanded);
+                        $("body").removeClass(that.options.classNames.default);
+                        $("nav li", that.$container).removeClass(
+                            that.options.classNames.active
+                        );
+                        if (that.state.left) {
+                            $("body").addClass(
+                                that.options.classNames.leftExpanded
+                            );
+                            $("body").removeClass(
+                                that.options.classNames.leftDefault
+                            );
+                        } else {
+                            $("body").addClass(
+                                that.options.classNames.topExpanded
+                            );
+                            $("body").removeClass(
+                                that.options.classNames.topDefault
+                            );
+                        }
+                    }
+                    that.hideElements();
+                });
+
+            $("nav > ul > li li", that.$container)
+                .off("click")
+                .on("click", function (event) {
+                    event.stopImmediatePropagation();
+                });
+
+            // Remove mobile event binding
+            $("nav li a", that.$container)
+                .has(".plone-toolbar-caret")
+                .off("click");
+            // content menu activated
+            $("nav > ul > li", that.$container)
+                .has("a .plone-toolbar-caret")
+                .off("click")
+                .on("click", function (event) {
+                    var $this = $(this);
+                    var active_class = that.options.classNames.active;
+                    event.preventDefault();
+                    event.stopPropagation();
+                    var hasClass = $this.hasClass(active_class);
+                    var $more_subset = $this.parent(
+                        "#plone-toolbar-more-subset"
+                    );
+                    if ($more_subset.length) {
+                        // close only the content menus from the subset, keeping the toolbar more list active
+                        $more_subset
+                            .find("li")
+                            .filter('[id*="contentmenu-"]')
+                            .removeClass(active_class);
+                    } else {
+                        // close existing opened contentmenus
+                        $("." + active_class + "> ul", that.$container).attr(
+                            "aria-hidden",
+                            "true"
+                        );
+                        $("." + active_class, that.$container).removeClass(
+                            active_class
+                        );
+                        // we need to close the more subset as well not just the content-menus
+                        // when we click on the personal bar
+                        $("#plone-toolbar-more-subset").hide();
+                    }
+                    $("nav li > ul", $(this)).css({ "margin-top": "" }); // unset this so we get fly-in affect
+                    if (!hasClass) {
+                        // open current selected if not already open
+                        $this.addClass(active_class);
+                        that.padPulloutContent($this);
+                    }
+                });
+
+            $("body")
+                .off("click.closetoolbarsubmenus")
+                .on("click.closetoolbarsubmenus", function (event) {
+                var $el = that.$container.find(event.target);
+                // we need to check if the target isn't the nav which can be
+                // triggered if we click on the portal-header and plone-toolbar-more-subset
+                // is visible which enlarges the nav. In this case we want to hide the
+                // active lists because the user assumes that he targeted an element outside
+                // the edit-bar
+                if (!$el.length || $el.prop("tagName") === "NAV") {
+                    $("nav > ul > li", that.$container).each(function (
+                        key,
+                        element
+                    ) {
+                        $(element).removeClass(that.options.classNames.active);
+                    });
+                    // we need to close the more subset as well not just the content-menus
+                    // when we click on the body area
+                    $("#plone-toolbar-more-subset").hide();
+                }
             });
-            // Switch to expanded
-            $('body').addClass(that.options.classNames.expanded);
-            $('body').removeClass(that.options.classNames.default);
-            $('nav li', that.$container).removeClass(
-              that.options.classNames.active
+            that.setHeight();
+        },
+        padPulloutContent: function ($li) {
+            if (!this.state.left || !this.isDesktop()) {
+                // only when on left
+                return;
+            }
+            // try to place content as close to the user click as possible
+            var $content = $("> ul", $li);
+            var $inner = $content.find("> *");
+            var $first = $inner.first();
+            var $last = $inner.last();
+            var insideHeight =
+                $last.position().top -
+                $first.position().top +
+                $last.outerHeight();
+            var height = $content.outerHeight();
+
+            // WebKit seems to set top position to very very small float value when zoomed,
+            // so check if the position top is less than 1px rather than 0.
+            var itemLocation =
+                $li.position().top > 1 ? $li.position().top : $li.offset().top; // depends on positioning
+            // margin-top + insideHeight should equal total height
+            $content.css({
+                "margin-top": Math.min(itemLocation, height - insideHeight),
+            });
+            $content.attr("aria-hidden", "false");
+        },
+        isDesktop: function () {
+            return $(window).width() > this.pxToInt(this.options.desktop_width);
+        },
+        _setHeight: function () {
+            var $items = $(".plone-toolbar-main", this.$container);
+            $items.css({ height: "" });
+            var natualHeight = $items.outerHeight();
+            $(".scroll-btn", this.$container).remove();
+
+            $items.css({
+                "padding-top": "",
+            });
+            var height =
+                $(window).height() -
+                $("#personal-bar-container").height() -
+                $(".plone-toolbar-logo").height();
+
+            if (height < natualHeight) {
+                /* add scroll buttons */
+                var $scrollUp = $(
+                    '<li class="scroll-btn up" aria-hidden="true"><a title="' +
+                        _t("scroll up") +
+                        '" href="#"><span class="icon-up"></span><span>&nbsp;</span></a></li>'
+                );
+                var $scrollDown = $(
+                    '<li class="scroll-btn down" aria-hidden="true"><a title="' +
+                        _t("scroll down") +
+                        '" href="#"><span class="icon-down"></span><span>&nbsp;</span></a></li>'
+                );
+                $items.prepend($scrollUp);
+                $items.append($scrollDown);
+                $items.height(height);
+                //set an scroll event listerner to know where we are inside the container
+                $items.scroll(function () {
+                    if ($items.scrollTop() == 0) {
+                        //if we are in the top we hide the arrow to go up
+                        $scrollUp.css("display", "none");
+                    } else {
+                        //else we display it
+                        $scrollUp.css("display", "list-item");
+                    }
+                    if ($items.scrollTop() + $items.height() == natualHeight) {
+                        //if we are in the bottom we hide the arrow to go down
+                        $scrollDown.css("display", "none");
+                    } else {
+                        //else we display it
+                        $scrollDown.css("display", "list-item");
+                    }
+                });
+                //at the beginning we check if we are in the top to hide the arrow to go up
+                if ($items.scrollTop() == 0) {
+                    $scrollUp.css("display", "none");
+                }
+                $scrollUp.click(function (e) {
+                    e.preventDefault();
+                    $items.scrollTop($items.scrollTop() - 50);
+                });
+                $scrollDown.click(function (e) {
+                    e.preventDefault();
+                    $items.scrollTop($items.scrollTop() + 50);
+                });
+            }
+            /* if there is active, make sure to reposition */
+            var $active = $("li.active ul:visible", this.$container);
+            if ($active.length > 0) {
+                this.padPulloutContent($active);
+            }
+        },
+        setHeight: function () {
+            if (!this.state.left || !this.isDesktop()) {
+                // only when on left
+                return;
+            }
+            var that = this;
+            clearTimeout(that.heightTimeout);
+            that.heightTimeout = setTimeout(function () {
+                that._setHeight();
+            }, 50);
+        },
+        setState: function (state) {
+            var that = this;
+            that.state = $.extend({}, that.state, state);
+            /* only cookie configurable attribute is expanded or contracted */
+            $.cookie(
+                that.options.cookieName,
+                JSON.stringify({
+                    expanded: that.state.expanded,
+                }),
+                { path: "/" }
             );
+        },
+        cloneViewsIntoSubset: function ($container, $views, $subset) {
+            var i,
+                $content_view,
+                container = $container[0],
+                length = $views.length - 1;
+
+            var view_should_move = container.offsetTop !== 0;
+            if (view_should_move) {
+                for (i = length; length >= 0; length -= 1) {
+                    $content_view = $views.eq(i);
+                    if ($content_view.is(":hidden")) {
+                        continue;
+                    }
+                    $content_view
+                        .hide()
+                        .clone(true, true)
+                        .appendTo($subset)
+                        .show();
+                    if (container.offsetTop === 0) {
+                        break;
+                    }
+                }
+            }
+        },
+        hideElements: function () {
+            var that = this;
             if (that.state.left) {
-              $('body').addClass(that.options.classNames.leftExpanded);
-              $('body').removeClass(that.options.classNames.leftDefault);
-            } else {
-              $('body').addClass(that.options.classNames.topExpanded);
-              $('body').removeClass(that.options.classNames.topDefault);
+                // only when on top
+                return;
             }
-          }
-          that.hideElements();
-        });
-
-      $('nav > ul > li li', that.$container)
-        .off('click')
-        .on('click', function(event) {
-          event.stopImmediatePropagation();
-        });
-
-      // Remove mobile event binding
-      $('nav li a', that.$container)
-        .has('.plone-toolbar-caret')
-        .off('click');
-      // content menu activated
-      $('nav > ul > li', that.$container)
-        .has('a .plone-toolbar-caret')
-        .off('click')
-        .on('click', function(event) {
-          var $this = $(this);
-          var active_class = that.options.classNames.active;
-          event.preventDefault();
-          event.stopPropagation();
-          var hasClass = $this.hasClass(active_class);
-          var $more_subset = $this.parent('#plone-toolbar-more-subset');
-          if ($more_subset.length) {
-            // close only the content menus from the subset, keeping the toolbar more list active
-            $more_subset
-              .find('li')
-              .filter('[id*="contentmenu-"]')
-              .removeClass(active_class);
-          } else {
-            // close existing opened contentmenus
-            $('.' + active_class + '> ul', that.$container).attr(
-              'aria-hidden',
-              'true'
-            );
-            $('.' + active_class, that.$container).removeClass(active_class);
-            // we need to close the more subset as well not just the content-menus
-            // when we click on the personal bar
-            $('#plone-toolbar-more-subset').hide();
-          }
-          $('nav li > ul', $(this)).css({ 'margin-top': '' }); // unset this so we get fly-in affect
-          if (!hasClass) {
-            // open current selected if not already open
-            $this.addClass(active_class);
-            that.padPulloutContent($this);
-          }
-        });
-
-      $('body').off('click.closetoolbarsubmenus').on('click.closetoolbarsubmenus', function(event) {
-        var $el = that.$container.find(event.target);
-        // we need to check if the target isn't the nav which can be
-        // triggered if we click on the portal-header and plone-toolbar-more-subset
-        // is visible which enlarges the nav. In this case we want to hide the
-        // active lists because the user assumes that he targeted an element outside
-        // the edit-bar
-        if (!$el.length || $el.prop('tagName') === 'NAV') {
-          $('nav > ul > li', that.$container).each(function(key, element) {
-            $(element).removeClass(that.options.classNames.active);
-          });
-          // we need to close the more subset as well not just the content-menus
-          // when we click on the body area
-          $('#plone-toolbar-more-subset').hide();
-        }
-      });
-      that.setHeight();
-    },
-    padPulloutContent: function($li) {
-      if (!this.state.left || !this.isDesktop()) {
-        // only when on left
-        return;
-      }
-      // try to place content as close to the user click as possible
-      var $content = $('> ul', $li);
-      var $inner = $content.find('> *');
-      var $first = $inner.first();
-      var $last = $inner.last();
-      var insideHeight =
-        $last.position().top - $first.position().top + $last.outerHeight();
-      var height = $content.outerHeight();
-
-      // WebKit seems to set top position to very very small float value when zoomed,
-      // so check if the position top is less than 1px rather than 0.
-      var itemLocation =
-        $li.position().top > 1 ? $li.position().top : $li.offset().top; // depends on positioning
-      // margin-top + insideHeight should equal total height
-      $content.css({
-        'margin-top': Math.min(itemLocation, height - insideHeight),
-      });
-      $content.attr('aria-hidden', 'false');
-    },
-    isDesktop: function() {
-      return $(window).width() > this.pxToInt(this.options.desktop_width);
-    },
-    _setHeight: function() {
-      var $items = $('.plone-toolbar-main', this.$container);
-      $items.css({ height: '' });
-      var natualHeight = $items.outerHeight();
-      $('.scroll-btn', this.$container).remove();
-
-      $items.css({
-        'padding-top': '',
-      });
-      var height =
-        $(window).height() -
-        $('#personal-bar-container').height() -
-        $('.plone-toolbar-logo').height();
-
-      if (height < natualHeight) {
-        /* add scroll buttons */
-        var $scrollUp = $(
-          '<li class="scroll-btn up" aria-hidden="true"><a title="' + _t('scroll up') + '" href="#"><span class="icon-up"></span><span>&nbsp;</span></a></li>'
-        );
-        var $scrollDown = $(
-          '<li class="scroll-btn down" aria-hidden="true"><a title="' + _t('scroll down') + '" href="#"><span class="icon-down"></span><span>&nbsp;</span></a></li>'
-        );
-        $items.prepend($scrollUp);
-        $items.append($scrollDown);
-        $items.height(height);
-        //set an scroll event listerner to know where we are inside the container
-        $items.scroll(function(){
-          if($items.scrollTop()==0){
-            //if we are in the top we hide the arrow to go up
-            $scrollUp.css('display', 'none')
-          }else{
-            //else we display it
-            $scrollUp.css('display', 'list-item')
-          }
-          if($items.scrollTop()+$items.height()==natualHeight){
-            //if we are in the bottom we hide the arrow to go down
-            $scrollDown.css('display', 'none')
-          }else{
-            //else we display it
-            $scrollDown.css('display', 'list-item')
-          }
-        })
-        //at the beginning we check if we are in the top to hide the arrow to go up
-        if($items.scrollTop()==0){
-          $scrollUp.css('display', 'none')
-        }
-        $scrollUp.click(function(e) {
-          e.preventDefault();
-          $items.scrollTop($items.scrollTop() - 50);
-        });
-        $scrollDown.click(function(e) {
-          e.preventDefault();
-          $items.scrollTop($items.scrollTop() + 50);
-        });
-      }
-      /* if there is active, make sure to reposition */
-      var $active = $('li.active ul:visible', this.$container);
-      if ($active.size() > 0) {
-        this.padPulloutContent($active);
-      }
-    },
-    setHeight: function() {
-      if (!this.state.left || !this.isDesktop()) {
-        // only when on left
-        return;
-      }
-      var that = this;
-      clearTimeout(that.heightTimeout);
-      that.heightTimeout = setTimeout(function() {
-        that._setHeight();
-      }, 50);
-    },
-    setState: function(state) {
-      var that = this;
-      that.state = $.extend({}, that.state, state);
-      /* only cookie configurable attribute is expanded or contracted */
-      $.cookie(
-        that.options.cookieName,
-        JSON.stringify({
-          expanded: that.state.expanded,
-        }),
-        { path: '/' }
-      );
-    },
-    cloneViewsIntoSubset: function($container, $views, $subset) {
-      var i,
-        $content_view,
-        container = $container[0],
-        length = $views.length - 1;
-
-      var view_should_move = container.offsetTop !== 0;
-      if (view_should_move) {
-        for (i = length; length >= 0; length -= 1) {
-          $content_view = $views.eq(i);
-          if ($content_view.is(':hidden')) {
-            continue;
-          }
-          $content_view
-            .hide()
-            .clone(true, true)
-            .appendTo($subset)
-            .show();
-          if (container.offsetTop === 0) {
-            break;
-          }
-        }
-      }
-    },
-    hideElements: function() {
-      var that = this;
-      if (that.state.left) {
-        // only when on top
-        return;
-      }
-      var w = $('.plone-toolbar-container').width(),
-        wtc = $('.plone-toolbar-logo').width();
-      var $plone_toolbar_main = $('.plone-toolbar-main');
-      var $toolbar_menus = $plone_toolbar_main.find('> li');
-      $toolbar_menus.each(function() {
-        wtc += $(this).width();
-      });
-      var $pers_bar_container = $('#personal-bar-container');
-      $pers_bar_container.find('> li').each(function() {
-        wtc += $(this).width();
-      });
-      var $toolbar_more_options = $('#plone-toolbar-more-options');
-      wtc -= $toolbar_more_options.width();
-      var $content_menus = $toolbar_menus.filter('[id^="plone-contentmenu-"]');
-      var $content_views = $toolbar_menus.filter('[id^="contentview-"]');
-      if (w < wtc) {
-        if (!$toolbar_more_options.length) {
-          (function() {
-            $content_menus.hide();
-            $toolbar_more_options = $(
-              '<li id="plone-toolbar-more-options"><a href="#"><span class="icon-moreOptions" aria-hidden="true"></span><span>' +
-                _t('More') +
-                '</span><span class="plone-toolbar-caret"></span></a></li>'
-            );
-            $plone_toolbar_main.append($toolbar_more_options);
-            var $toolbar_more_subset = $(
-              '<ul id="plone-toolbar-more-subset" style="display: none"></ul>'
-            );
-            $pers_bar_container.after($toolbar_more_subset);
-            // we want only the list items with id that contains plone-contentmenu and not the children links
-            // of these lists therefore we iterate only over the list elements
-            $content_menus.each(function() {
-              $(this)
-                .clone(true, true)
-                .show()
-                .appendTo($toolbar_more_subset);
+            var w = $(".plone-toolbar-container").width(),
+                wtc = $(".plone-toolbar-logo").width();
+            var $plone_toolbar_main = $(".plone-toolbar-main");
+            var $toolbar_menus = $plone_toolbar_main.find("> li");
+            $toolbar_menus.each(function () {
+                wtc += $(this).width();
             });
-
-            that.cloneViewsIntoSubset(
-              $pers_bar_container,
-              $content_views,
-              $toolbar_more_subset
-            );
-            var active_class = that.options.classNames.active;
-            $toolbar_more_options.find('a').on('click', function(event) {
-              // close existing opened contentmenus
-              $('.' + active_class, that.$container).removeClass(active_class);
-
-              var $more_list = $(this).parent();
-              // properly toggle active class for toolbar_more list item
-              $more_list.toggleClass(
-                'active',
-                $toolbar_more_subset.is(':hidden')
-              );
-              $toolbar_more_subset.toggle();
-              event.preventDefault();
+            var $pers_bar_container = $("#personal-bar-container");
+            $pers_bar_container.find("> li").each(function () {
+                wtc += $(this).width();
             });
-          })();
-        }
-      } else {
-        $toolbar_more_options.remove();
-        $('#plone-toolbar-more-subset').remove();
-        $plone_toolbar_main.children().show();
-      }
-      // check if the personal toolbar is not offseted if there isn't enough space
-      // and we already have the plone-toolbar-more-options added to the page.
-      if ($pers_bar_container[0] && $pers_bar_container[0].offsetTop !== 0) {
-        that.cloneViewsIntoSubset(
-          $pers_bar_container,
-          $content_views,
-          $('#plone-toolbar-more-subset')
-        );
-      }
-    },
-    init: function() {
-      var that = this;
-      that.heightTimeout = 0;
-      that.$container = $(that.options.containerSelector);
-      var toolbar_cookie = $.cookie(that.options.cookieName);
-      that.state = {
-        expanded: true,
-        left: $('body').hasClass(that.options.classNames.left),
-      };
-      if (toolbar_cookie) {
-        try {
-          that.state = $.extend({}, that.state, $.parseJSON(toolbar_cookie));
-        } catch (e) {
-          // ignore
-        }
-      }
+            var $toolbar_more_options = $("#plone-toolbar-more-options");
+            wtc -= $toolbar_more_options.width();
+            var $content_menus = $toolbar_menus.filter(
+                '[id^="plone-contentmenu-"]'
+            );
+            var $content_views = $toolbar_menus.filter('[id^="contentview-"]');
+            if (w < wtc) {
+                if (!$toolbar_more_options.length) {
+                    (function () {
+                        $content_menus.hide();
+                        $toolbar_more_options = $(
+                            '<li id="plone-toolbar-more-options"><a href="#"><span class="icon-moreOptions" aria-hidden="true"></span><span>' +
+                                _t("More") +
+                                '</span><span class="plone-toolbar-caret"></span></a></li>'
+                        );
+                        $plone_toolbar_main.append($toolbar_more_options);
+                        var $toolbar_more_subset = $(
+                            '<ul id="plone-toolbar-more-subset" style="display: none"></ul>'
+                        );
+                        $pers_bar_container.after($toolbar_more_subset);
+                        // we want only the list items with id that contains plone-contentmenu and not the children links
+                        // of these lists therefore we iterate only over the list elements
+                        $content_menus.each(function () {
+                            $(this)
+                                .clone(true, true)
+                                .show()
+                                .appendTo($toolbar_more_subset);
+                        });
 
-      if (that.isDesktop()) {
-        that.setupDesktop();
-        if (!that.state.left) {
-          // in case its top lets just hide what is not needed
-          that.hideElements();
-        }
-      } else {
-        that.setupMobile();
-      }
-      that.$el.addClass('initialized');
+                        that.cloneViewsIntoSubset(
+                            $pers_bar_container,
+                            $content_views,
+                            $toolbar_more_subset
+                        );
+                        var active_class = that.options.classNames.active;
+                        $toolbar_more_options
+                            .find("a")
+                            .on("click", function (event) {
+                                // close existing opened contentmenus
+                                $(
+                                    "." + active_class,
+                                    that.$container
+                                ).removeClass(active_class);
 
-      /* folder contents changes the context.
+                                var $more_list = $(this).parent();
+                                // properly toggle active class for toolbar_more list item
+                                $more_list.toggleClass(
+                                    "active",
+                                    $toolbar_more_subset.is(":hidden")
+                                );
+                                $toolbar_more_subset.toggle();
+                                event.preventDefault();
+                            });
+                    })();
+                }
+            } else {
+                $toolbar_more_options.remove();
+                $("#plone-toolbar-more-subset").remove();
+                $plone_toolbar_main.children().show();
+            }
+            // check if the personal toolbar is not offseted if there isn't enough space
+            // and we already have the plone-toolbar-more-options added to the page.
+            if (
+                $pers_bar_container[0] &&
+                $pers_bar_container[0].offsetTop !== 0
+            ) {
+                that.cloneViewsIntoSubset(
+                    $pers_bar_container,
+                    $content_views,
+                    $("#plone-toolbar-more-subset")
+                );
+            }
+        },
+        init: function () {
+            var that = this;
+            that.heightTimeout = 0;
+            that.$container = $(that.options.containerSelector);
+            var toolbar_cookie = $.cookie(that.options.cookieName);
+            that.state = {
+                expanded: true,
+                left: $("body").hasClass(that.options.classNames.left),
+            };
+            if (toolbar_cookie) {
+                try {
+                    that.state = $.extend(
+                        {},
+                        that.state,
+                        $.parseJSON(toolbar_cookie)
+                    );
+                } catch (e) {
+                    // ignore
+                }
+            }
+
+            if (that.isDesktop()) {
+                that.setupDesktop();
+                if (!that.state.left) {
+                    // in case its top lets just hide what is not needed
+                    that.hideElements();
+                }
+            } else {
+                that.setupMobile();
+            }
+            that.$el.addClass("initialized");
+
+            /* folder contents changes the context.
          This is for usability so the menu changes along with
          the folder contents context */
-      $('body')
-        .off('structure-url-changed.toolbar')
-        .on('structure-url-changed.toolbar', function(e, path) {
-          $.ajax({
-            url: $('body').attr('data-portal-url') + path + '/@@render-toolbar',
-          }).done(function(data) {
-            var $newel = $(utils.parseBodyTag(data));
-            var hasedit = $newel.find('#edit-zone').length;
-            $newel = hasedit ? $newel.find('#edit-zone') : $newel;
-            var $replacetoolbar = $('#edit-bar').find('#edit-zone');
-            $replacetoolbar.replaceWith($newel);
-            Registry.scan($newel);
-          });
-        });
+            $("body")
+                .off("structure-url-changed.toolbar")
+                .on("structure-url-changed.toolbar", function (e, path) {
+                    $.ajax({
+                        url:
+                            $("body").attr("data-portal-url") +
+                            path +
+                            "/@@render-toolbar",
+                    }).done(function (data) {
+                        var $newel = $(utils.parseBodyTag(data));
+                        var hasedit = $newel.find('#edit-zone').length;
+                        $newel = hasedit ? $newel.find("#edit-zone") : $newel;
+                        var $replacetoolbar = $('body').find('#edit-zone');
+                        $replacetoolbar.replaceWith($newel);
+                        Registry.scan($newel);
+                    });
+                });
 
-      $(window).on('resize', function() {
-        if (that.isDesktop()) {
-          that.setupDesktop();
-          if (!that.state.left) {
-            // in case its top lets just hide what is not needed
-            that.hideElements();
-          }
-        } else {
-          that.setupMobile();
-        }
-      });
-    },
-  });
+            $(window).on("resize", function () {
+                if (that.isDesktop()) {
+                    that.setupDesktop();
+                    if (!that.state.left) {
+                        // in case its top lets just hide what is not needed
+                        that.hideElements();
+                    }
+                } else {
+                    that.setupMobile();
+                }
+            });
+        },
+    });
 
-  return Toolbar;
+    return Toolbar;
 });
 
 define('plone-patterns-portletmanager',[
@@ -683,7 +749,7 @@ define('plone-patterns-portletmanager',[
     init: function(){
       var that = this;
       var $modal = that.$el.parents('.plone-modal');
-      if($modal.size() === 1){
+      if($modal.length === 1){
         this.isModal = true;
         /* want to do something on exit from modal now */
         var modal = $modal.data('pattern-plone-modal');
@@ -751,15 +817,15 @@ define('plone-patterns-portletmanager',[
       var that = this;
 
       var $message = $('#portlet-message');
-      if($message.size() === 0){
-        $message = $('<div class="portalMessage info" id="portlet-message" style="opacity: 0"></div>');
+      if($message.length === 0){
+        $message = $('<div class="alert alert-info" role="alert" id="portlet-message" style="opacity: 0"></div>');
         if(that.isModal){
           $('.plone-modal-body:visible').prepend($message);
         }else{
           $('#content-core').prepend($message);
         }
       }
-      $message.html('<strong>' + _t("Info") + '</strong>' + msg);
+      $message.html('<strong class="mr-1">' + _t("Info") + '</strong>' + msg);
       clearTimeout(that.messageTimeout);
       $message.fadeTo(500, 1);
       that.messageTimeout = window.setTimeout(function(){
@@ -791,7 +857,7 @@ define('plone-patterns-portletmanager',[
            create the portlet without an actual form.
            If element is found here, we can short circuit and
            continue on. */
-        if($el.size() === 1){
+        if($el.length === 1){
           /* hacky, trying to prevent modal parts from flickering here */
           $el = $el.clone();
           pattern.on('shown', function(){
@@ -887,6 +953,9 @@ define('plone-patterns-portletmanager',[
   return ManagePortlets;
 });
 
+!function(t,e){"object"==typeof exports&&"undefined"!=typeof module?module.exports=e():"function"==typeof define&&define.amd?define('sortable',e):(t=t||self).Sortable=e()}(this,function(){function t(){return(t=Object.assign||function(t){for(var e=1;e<arguments.length;e++){var n=arguments[e];for(var o in n)Object.prototype.hasOwnProperty.call(n,o)&&(t[o]=n[o])}return t}).apply(this,arguments)}function e(t){if("undefined"!=typeof window&&window.navigator)return!!navigator.userAgent.match(t)}var n=e(/(?:Trident.*rv[ :]?11\.|msie|iemobile|Windows Phone)/i),o=e(/Edge/i),i=e(/firefox/i),r=e(/safari/i)&&!e(/chrome/i)&&!e(/android/i),a=e(/iP(ad|od|hone)/i),l=e(/chrome/i)&&e(/android/i),s={capture:!1,passive:!1};function c(t,e,o){t.addEventListener(e,o,!n&&s)}function u(t,e,o){t.removeEventListener(e,o,!n&&s)}function d(t,e){if(e){if(">"===e[0]&&(e=e.substring(1)),t)try{if(t.matches)return t.matches(e);if(t.msMatchesSelector)return t.msMatchesSelector(e);if(t.webkitMatchesSelector)return t.webkitMatchesSelector(e)}catch(t){return!1}return!1}}function h(t){return t.host&&t!==document&&t.host.nodeType?t.host:t.parentNode}function f(t,e,n,o){if(t){n=n||document;do{if(null!=e&&(">"===e[0]?t.parentNode===n&&d(t,e):d(t,e))||o&&t===n)return t;if(t===n)break}while(t=h(t))}return null}var p,g=/\s+/g;function v(t,e,n){if(t&&e)if(t.classList)t.classList[n?"add":"remove"](e);else{var o=(" "+t.className+" ").replace(g," ").replace(" "+e+" "," ");t.className=(o+(n?" "+e:"")).replace(g," ")}}function m(t,e,n){var o=t&&t.style;if(o){if(void 0===n)return document.defaultView&&document.defaultView.getComputedStyle?n=document.defaultView.getComputedStyle(t,""):t.currentStyle&&(n=t.currentStyle),void 0===e?n:n[e];e in o||-1!==e.indexOf("webkit")||(e="-webkit-"+e),o[e]=n+("string"==typeof n?"":"px")}}function b(t,e){var n="";if("string"==typeof t)n=t;else do{var o=m(t,"transform");o&&"none"!==o&&(n=o+" "+n)}while(!e&&(t=t.parentNode));var i=window.DOMMatrix||window.WebKitCSSMatrix||window.CSSMatrix||window.MSCSSMatrix;return i&&new i(n)}function w(t,e,n){if(t){var o=t.getElementsByTagName(e),i=0,r=o.length;if(n)for(;i<r;i++)n(o[i],i);return o}return[]}function E(){return document.scrollingElement||document.documentElement}function y(t,e,o,i,r){if(t.getBoundingClientRect||t===window){var a,l,s,c,u,d,h;if(t!==window&&t!==E()?(l=(a=t.getBoundingClientRect()).top,s=a.left,c=a.bottom,u=a.right,d=a.height,h=a.width):(l=0,s=0,c=window.innerHeight,u=window.innerWidth,d=window.innerHeight,h=window.innerWidth),(e||o)&&t!==window&&(r=r||t.parentNode,!n))do{if(r&&r.getBoundingClientRect&&("none"!==m(r,"transform")||o&&"static"!==m(r,"position"))){var f=r.getBoundingClientRect();l-=f.top+parseInt(m(r,"border-top-width")),s-=f.left+parseInt(m(r,"border-left-width")),c=l+a.height,u=s+a.width;break}}while(r=r.parentNode);if(i&&t!==window){var p=b(r||t),g=p&&p.a,v=p&&p.d;p&&(c=(l/=v)+(d/=v),u=(s/=g)+(h/=g))}return{top:l,left:s,bottom:c,right:u,width:h,height:d}}}function D(t,e,n){for(var o=x(t,!0),i=y(t)[e];o;){var r=y(o)[n];if(!("top"===n||"left"===n?i>=r:i<=r))return o;if(o===E())break;o=x(o,!1)}return!1}function _(t,e,n){for(var o=0,i=0,r=t.children;i<r.length;){if("none"!==r[i].style.display&&r[i]!==It.ghost&&r[i]!==It.dragged&&f(r[i],n.draggable,t,!1)){if(o===e)return r[i];o++}i++}return null}function S(t,e){for(var n=t.lastElementChild;n&&(n===It.ghost||"none"===m(n,"display")||e&&!d(n,e));)n=n.previousElementSibling;return n||null}function C(t,e){var n=0;if(!t||!t.parentNode)return-1;for(;t=t.previousElementSibling;)"TEMPLATE"===t.nodeName.toUpperCase()||t===It.clone||e&&!d(t,e)||n++;return n}function T(t){var e=0,n=0,o=E();if(t)do{var i=b(t);e+=t.scrollLeft*i.a,n+=t.scrollTop*i.d}while(t!==o&&(t=t.parentNode));return[e,n]}function x(t,e){if(!t||!t.getBoundingClientRect)return E();var n=t,o=!1;do{if(n.clientWidth<n.scrollWidth||n.clientHeight<n.scrollHeight){var i=m(n);if(n.clientWidth<n.scrollWidth&&("auto"==i.overflowX||"scroll"==i.overflowX)||n.clientHeight<n.scrollHeight&&("auto"==i.overflowY||"scroll"==i.overflowY)){if(!n.getBoundingClientRect||n===document.body)return E();if(o||e)return n;o=!0}}}while(n=n.parentNode);return E()}function M(t,e){return Math.round(t.top)===Math.round(e.top)&&Math.round(t.left)===Math.round(e.left)&&Math.round(t.height)===Math.round(e.height)&&Math.round(t.width)===Math.round(e.width)}function N(t,e){return function(){if(!p){var n=arguments,o=this;1===n.length?t.call(o,n[0]):t.apply(o,n),p=setTimeout(function(){p=void 0},e)}}}function O(t,e,n){t.scrollLeft+=e,t.scrollTop+=n}function A(t){var e=window.Polymer,n=window.jQuery||window.Zepto;return e&&e.dom?e.dom(t).cloneNode(!0):n?n(t).clone(!0)[0]:t.cloneNode(!0)}function I(t,e){m(t,"position","absolute"),m(t,"top",e.top),m(t,"left",e.left),m(t,"width",e.width),m(t,"height",e.height)}function P(t){m(t,"position",""),m(t,"top",""),m(t,"left",""),m(t,"width",""),m(t,"height","")}var k="Sortable"+(new Date).getTime(),R=[],X={initializeByDefault:!0},Y={mount:function(t){for(var e in X)X.hasOwnProperty(e)&&!(e in t)&&(t[e]=X[e]);R.push(t)},pluginEvent:function(e,n,o){var i=this;this.eventCanceled=!1,o.cancel=function(){i.eventCanceled=!0};var r=e+"Global";R.forEach(function(i){n[i.pluginName]&&(n[i.pluginName][r]&&n[i.pluginName][r](t({sortable:n},o)),n.options[i.pluginName]&&n[i.pluginName][e]&&n[i.pluginName][e](t({sortable:n},o)))})},initializePlugins:function(t,e,n,o){for(var i in R.forEach(function(o){var i=o.pluginName;if(t.options[i]||o.initializeByDefault){var r=new o(t,e,t.options);r.sortable=t,r.options=t.options,t[i]=r,Object.assign(n,r.defaults)}}),t.options)if(t.options.hasOwnProperty(i)){var r=this.modifyOption(t,i,t.options[i]);void 0!==r&&(t.options[i]=r)}},getEventProperties:function(t,e){var n={};return R.forEach(function(o){"function"==typeof o.eventProperties&&Object.assign(n,o.eventProperties.call(e[o.pluginName],t))}),n},modifyOption:function(t,e,n){var o;return R.forEach(function(i){t[i.pluginName]&&i.optionListeners&&"function"==typeof i.optionListeners[e]&&(o=i.optionListeners[e].call(t[i.pluginName],n))}),o}};function B(e){var i=e.sortable,r=e.rootEl,a=e.name,l=e.targetEl,s=e.cloneEl,c=e.toEl,u=e.fromEl,d=e.oldIndex,h=e.newIndex,f=e.oldDraggableIndex,p=e.newDraggableIndex,g=e.originalEvent,v=e.putSortable,m=e.extraEventProperties;if(i=i||r&&r[k]){var b,w=i.options,E="on"+a.charAt(0).toUpperCase()+a.substr(1);!window.CustomEvent||n||o?(b=document.createEvent("Event")).initEvent(a,!0,!0):b=new CustomEvent(a,{bubbles:!0,cancelable:!0}),b.to=c||r,b.from=u||r,b.item=l||r,b.clone=s,b.oldIndex=d,b.newIndex=h,b.oldDraggableIndex=f,b.newDraggableIndex=p,b.originalEvent=g,b.pullMode=v?v.lastPutMode:void 0;var y=t({},m,Y.getEventProperties(a,i));for(var D in y)b[D]=y[D];r&&r.dispatchEvent(b),w[E]&&w[E].call(i,b)}}var H=function(e,n,o){var i=void 0===o?{}:o,r=i.evt,a=function(t,e){if(null==t)return{};var n,o,i={},r=Object.keys(t);for(o=0;o<r.length;o++)e.indexOf(n=r[o])>=0||(i[n]=t[n]);return i}(i,["evt"]);Y.pluginEvent.bind(It)(e,n,t({dragEl:L,parentEl:j,ghostEl:K,rootEl:W,nextEl:z,lastDownEl:G,cloneEl:U,cloneHidden:q,dragStarted:lt,putSortable:tt,activeSortable:It.active,originalEvent:r,oldIndex:V,oldDraggableIndex:Q,newIndex:Z,newDraggableIndex:$,hideGhostForTarget:xt,unhideGhostForTarget:Mt,cloneNowHidden:function(){q=!0},cloneNowShown:function(){q=!1},dispatchSortableEvent:function(t){F({sortable:n,name:t,originalEvent:r})}},a))};function F(e){B(t({putSortable:tt,cloneEl:U,targetEl:L,rootEl:W,oldIndex:V,oldDraggableIndex:Q,newIndex:Z,newDraggableIndex:$},e))}var L,j,K,W,z,G,U,q,V,Z,Q,$,J,tt,et,nt,ot,it,rt,at,lt,st,ct,ut,dt,ht=!1,ft=!1,pt=[],gt=!1,vt=!1,mt=[],bt=!1,wt=[],Et="undefined"!=typeof document,yt=a,Dt=o||n?"cssFloat":"float",_t=Et&&!l&&!a&&"draggable"in document.createElement("div"),St=function(){if(Et){if(n)return!1;var t=document.createElement("x");return t.style.cssText="pointer-events:auto","auto"===t.style.pointerEvents}}(),Ct=function(t,e){var n=m(t),o=parseInt(n.width)-parseInt(n.paddingLeft)-parseInt(n.paddingRight)-parseInt(n.borderLeftWidth)-parseInt(n.borderRightWidth),i=_(t,0,e),r=_(t,1,e),a=i&&m(i),l=r&&m(r),s=a&&parseInt(a.marginLeft)+parseInt(a.marginRight)+y(i).width,c=l&&parseInt(l.marginLeft)+parseInt(l.marginRight)+y(r).width;return"flex"===n.display?"column"===n.flexDirection||"column-reverse"===n.flexDirection?"vertical":"horizontal":"grid"===n.display?n.gridTemplateColumns.split(" ").length<=1?"vertical":"horizontal":i&&a.float&&"none"!==a.float?!r||"both"!==l.clear&&l.clear!==("left"===a.float?"left":"right")?"horizontal":"vertical":i&&("block"===a.display||"flex"===a.display||"table"===a.display||"grid"===a.display||s>=o&&"none"===n[Dt]||r&&"none"===n[Dt]&&s+c>o)?"vertical":"horizontal"},Tt=function(t){function e(t,n){return function(o,i,r,a){if(null==t&&(n||o.options.group.name&&i.options.group.name&&o.options.group.name===i.options.group.name))return!0;if(null==t||!1===t)return!1;if(n&&"clone"===t)return t;if("function"==typeof t)return e(t(o,i,r,a),n)(o,i,r,a);var l=(n?o:i).options.group.name;return!0===t||"string"==typeof t&&t===l||t.join&&t.indexOf(l)>-1}}var n={},o=t.group;o&&"object"==typeof o||(o={name:o}),n.name=o.name,n.checkPull=e(o.pull,!0),n.checkPut=e(o.put),n.revertClone=o.revertClone,t.group=n},xt=function(){!St&&K&&m(K,"display","none")},Mt=function(){!St&&K&&m(K,"display","")};Et&&document.addEventListener("click",function(t){if(ft)return t.preventDefault(),t.stopPropagation&&t.stopPropagation(),t.stopImmediatePropagation&&t.stopImmediatePropagation(),ft=!1,!1},!0);var Nt,Ot=function(t){if(L){var e=(i=(t=t.touches?t.touches[0]:t).clientX,r=t.clientY,pt.some(function(t){if(!S(t)){var e=y(t),n=t[k].options.emptyInsertThreshold;return n&&i>=e.left-n&&i<=e.right+n&&r>=e.top-n&&r<=e.bottom+n?a=t:void 0}}),a);if(e){var n={};for(var o in t)t.hasOwnProperty(o)&&(n[o]=t[o]);n.target=n.rootEl=e,n.preventDefault=void 0,n.stopPropagation=void 0,e[k]._onDragOver(n)}}var i,r,a},At=function(t){L&&L.parentNode[k]._isOutsideThisEl(t.target)};function It(e,n){if(!e||!e.nodeType||1!==e.nodeType)throw"Sortable: `el` must be an HTMLElement, not "+{}.toString.call(e);this.el=e,this.options=n=Object.assign({},n),e[k]=this;var o,i,r={group:null,sort:!0,disabled:!1,store:null,handle:null,draggable:/^[uo]l$/i.test(e.nodeName)?">li":">*",swapThreshold:1,invertSwap:!1,invertedSwapThreshold:null,removeCloneOnHide:!0,direction:function(){return Ct(e,this.options)},ghostClass:"sortable-ghost",chosenClass:"sortable-chosen",dragClass:"sortable-drag",ignore:"a, img",filter:null,preventOnFilter:!0,animation:0,easing:null,setData:function(t,e){t.setData("Text",e.textContent)},dropBubble:!1,dragoverBubble:!1,dataIdAttr:"data-id",delay:0,delayOnTouchOnly:!1,touchStartThreshold:(Number.parseInt?Number:window).parseInt(window.devicePixelRatio,10)||1,forceFallback:!1,fallbackClass:"sortable-fallback",fallbackOnBody:!1,fallbackTolerance:0,fallbackOffset:{x:0,y:0},supportPointer:!1!==It.supportPointer&&"PointerEvent"in window,emptyInsertThreshold:5};for(var a in Y.initializePlugins(this,e,r),r)!(a in n)&&(n[a]=r[a]);for(var l in Tt(n),this)"_"===l.charAt(0)&&"function"==typeof this[l]&&(this[l]=this[l].bind(this));this.nativeDraggable=!n.forceFallback&&_t,this.nativeDraggable&&(this.options.touchStartThreshold=1),n.supportPointer?c(e,"pointerdown",this._onTapStart):(c(e,"mousedown",this._onTapStart),c(e,"touchstart",this._onTapStart)),this.nativeDraggable&&(c(e,"dragover",this),c(e,"dragenter",this)),pt.push(this.el),n.store&&n.store.get&&this.sort(n.store.get(this)||[]),Object.assign(this,(i=[],{captureAnimationState:function(){i=[],this.options.animation&&[].slice.call(this.el.children).forEach(function(e){if("none"!==m(e,"display")&&void 0!==e){i.push({target:e,rect:y(e)});var n=t({},i[i.length-1].rect);if(e.thisAnimationDuration){var o=b(e,!0);o&&(n.top-=o.f,n.left-=o.e)}e.fromRect=n}})},addAnimationState:function(t){i.push(t)},removeAnimationState:function(t){i.splice(function(t,e){for(var n in t)if(t.hasOwnProperty(n))for(var o in e)if(e.hasOwnProperty(o)&&e[o]===t[n][o])return Number(n);return-1}(i,{target:t}),1)},animateAll:function(t){var e=this;if(!this.options.animation)return clearTimeout(o),void("function"==typeof t&&t());var n=!1,r=0;i.forEach(function(t){var o=0,i=t.target,a=i.fromRect,l=y(i),s=i.prevFromRect,c=i.prevToRect,u=t.rect,d=b(i,!0);d&&(l.top-=d.f,l.left-=d.e),i.toRect=l,i.thisAnimationDuration&&M(s,l)&&!M(a,l)&&(u.top-l.top)/(u.left-l.left)==(a.top-l.top)/(a.left-l.left)&&(o=function(t,e,n,o){return Math.sqrt(Math.pow(e.top-t.top,2)+Math.pow(e.left-t.left,2))/Math.sqrt(Math.pow(e.top-n.top,2)+Math.pow(e.left-n.left,2))*o.animation}(u,s,c,e.options)),M(l,a)||(i.prevFromRect=a,i.prevToRect=l,o||(o=e.options.animation),e.animate(i,u,l,o)),o&&(n=!0,r=Math.max(r,o),clearTimeout(i.animationResetTimer),i.animationResetTimer=setTimeout(function(){i.animationTime=0,i.prevFromRect=null,i.fromRect=null,i.prevToRect=null,i.thisAnimationDuration=null},o),i.thisAnimationDuration=o)}),clearTimeout(o),n?o=setTimeout(function(){"function"==typeof t&&t()},r):"function"==typeof t&&t(),i=[]},animate:function(t,e,n,o){if(o){m(t,"transition",""),m(t,"transform","");var i=b(this.el),r=(e.left-n.left)/(i&&i.a||1),a=(e.top-n.top)/(i&&i.d||1);t.animatingX=!!r,t.animatingY=!!a,m(t,"transform","translate3d("+r+"px,"+a+"px,0)"),this.forRepaintDummy=function(t){return t.offsetWidth}(t),m(t,"transition","transform "+o+"ms"+(this.options.easing?" "+this.options.easing:"")),m(t,"transform","translate3d(0,0,0)"),"number"==typeof t.animated&&clearTimeout(t.animated),t.animated=setTimeout(function(){m(t,"transition",""),m(t,"transform",""),t.animated=!1,t.animatingX=!1,t.animatingY=!1},o)}}}))}function Pt(t,e,i,r,a,l,s,c){var u,d,h=t[k],f=h.options.onMove;return!window.CustomEvent||n||o?(u=document.createEvent("Event")).initEvent("move",!0,!0):u=new CustomEvent("move",{bubbles:!0,cancelable:!0}),u.to=e,u.from=t,u.dragged=i,u.draggedRect=r,u.related=a||e,u.relatedRect=l||y(e),u.willInsertAfter=c,u.originalEvent=s,t.dispatchEvent(u),f&&(d=f.call(h,u,s)),d}function kt(t){t.draggable=!1}function Rt(){bt=!1}function Xt(t){for(var e=t.tagName+t.className+t.src+t.href+t.textContent,n=e.length,o=0;n--;)o+=e.charCodeAt(n);return o.toString(36)}function Yt(t){return setTimeout(t,0)}function Bt(t){return clearTimeout(t)}It.prototype={constructor:It,_isOutsideThisEl:function(t){this.el.contains(t)||t===this.el||(st=null)},_getDirection:function(t,e){return"function"==typeof this.options.direction?this.options.direction.call(this,t,e,L):this.options.direction},_onTapStart:function(t){if(t.cancelable){var e=this,n=this.el,o=this.options,i=o.preventOnFilter,a=t.type,l=t.touches&&t.touches[0]||t.pointerType&&"touch"===t.pointerType&&t,s=(l||t).target,c=t.target.shadowRoot&&(t.path&&t.path[0]||t.composedPath&&t.composedPath()[0])||s,u=o.filter;if(function(t){wt.length=0;for(var e=t.getElementsByTagName("input"),n=e.length;n--;){var o=e[n];o.checked&&wt.push(o)}}(n),!L&&!(/mousedown|pointerdown/.test(a)&&0!==t.button||o.disabled)&&!c.isContentEditable&&(this.nativeDraggable||!r||!s||"SELECT"!==s.tagName.toUpperCase())&&!((s=f(s,o.draggable,n,!1))&&s.animated||G===s)){if(V=C(s),Q=C(s,o.draggable),"function"==typeof u){if(u.call(this,t,s,this))return F({sortable:e,rootEl:c,name:"filter",targetEl:s,toEl:n,fromEl:n}),H("filter",e,{evt:t}),void(i&&t.cancelable&&t.preventDefault())}else if(u&&(u=u.split(",").some(function(o){if(o=f(c,o.trim(),n,!1))return F({sortable:e,rootEl:o,name:"filter",targetEl:s,fromEl:n,toEl:n}),H("filter",e,{evt:t}),!0})))return void(i&&t.cancelable&&t.preventDefault());o.handle&&!f(c,o.handle,n,!1)||this._prepareDragStart(t,l,s)}}},_prepareDragStart:function(t,e,r){var a,l=this,s=l.el,u=l.options,d=s.ownerDocument;if(r&&!L&&r.parentNode===s){var h=y(r);if(W=s,j=(L=r).parentNode,z=L.nextSibling,G=r,J=u.group,It.dragged=L,rt=(et={target:L,clientX:(e||t).clientX,clientY:(e||t).clientY}).clientX-h.left,at=et.clientY-h.top,this._lastX=(e||t).clientX,this._lastY=(e||t).clientY,L.style["will-change"]="all",a=function(){H("delayEnded",l,{evt:t}),It.eventCanceled?l._onDrop():(l._disableDelayedDragEvents(),!i&&l.nativeDraggable&&(L.draggable=!0),l._triggerDragStart(t,e),F({sortable:l,name:"choose",originalEvent:t}),v(L,u.chosenClass,!0))},u.ignore.split(",").forEach(function(t){w(L,t.trim(),kt)}),c(d,"dragover",Ot),c(d,"mousemove",Ot),c(d,"touchmove",Ot),c(d,"mouseup",l._onDrop),c(d,"touchend",l._onDrop),c(d,"touchcancel",l._onDrop),i&&this.nativeDraggable&&(this.options.touchStartThreshold=4,L.draggable=!0),H("delayStart",this,{evt:t}),!u.delay||u.delayOnTouchOnly&&!e||this.nativeDraggable&&(o||n))a();else{if(It.eventCanceled)return void this._onDrop();c(d,"mouseup",l._disableDelayedDrag),c(d,"touchend",l._disableDelayedDrag),c(d,"touchcancel",l._disableDelayedDrag),c(d,"mousemove",l._delayedDragTouchMoveHandler),c(d,"touchmove",l._delayedDragTouchMoveHandler),u.supportPointer&&c(d,"pointermove",l._delayedDragTouchMoveHandler),l._dragStartTimer=setTimeout(a,u.delay)}}},_delayedDragTouchMoveHandler:function(t){var e=t.touches?t.touches[0]:t;Math.max(Math.abs(e.clientX-this._lastX),Math.abs(e.clientY-this._lastY))>=Math.floor(this.options.touchStartThreshold/(this.nativeDraggable&&window.devicePixelRatio||1))&&this._disableDelayedDrag()},_disableDelayedDrag:function(){L&&kt(L),clearTimeout(this._dragStartTimer),this._disableDelayedDragEvents()},_disableDelayedDragEvents:function(){var t=this.el.ownerDocument;u(t,"mouseup",this._disableDelayedDrag),u(t,"touchend",this._disableDelayedDrag),u(t,"touchcancel",this._disableDelayedDrag),u(t,"mousemove",this._delayedDragTouchMoveHandler),u(t,"touchmove",this._delayedDragTouchMoveHandler),u(t,"pointermove",this._delayedDragTouchMoveHandler)},_triggerDragStart:function(t,e){e=e||"touch"==t.pointerType&&t,!this.nativeDraggable||e?c(document,this.options.supportPointer?"pointermove":e?"touchmove":"mousemove",this._onTouchMove):(c(L,"dragend",this),c(W,"dragstart",this._onDragStart));try{document.selection?Yt(function(){document.selection.empty()}):window.getSelection().removeAllRanges()}catch(t){}},_dragStarted:function(t,e){if(ht=!1,W&&L){H("dragStarted",this,{evt:e}),this.nativeDraggable&&c(document,"dragover",At);var n=this.options;!t&&v(L,n.dragClass,!1),v(L,n.ghostClass,!0),It.active=this,t&&this._appendGhost(),F({sortable:this,name:"start",originalEvent:e})}else this._nulling()},_emulateDragOver:function(){if(nt){this._lastX=nt.clientX,this._lastY=nt.clientY,xt();for(var t=document.elementFromPoint(nt.clientX,nt.clientY),e=t;t&&t.shadowRoot&&(t=t.shadowRoot.elementFromPoint(nt.clientX,nt.clientY))!==e;)e=t;if(L.parentNode[k]._isOutsideThisEl(t),e)do{if(e[k]&&e[k]._onDragOver({clientX:nt.clientX,clientY:nt.clientY,target:t,rootEl:e})&&!this.options.dragoverBubble)break;t=e}while(e=e.parentNode);Mt()}},_onTouchMove:function(t){if(et){var e=this.options,n=e.fallbackTolerance,o=e.fallbackOffset,i=t.touches?t.touches[0]:t,r=K&&b(K,!0),a=K&&r&&r.a,l=K&&r&&r.d,s=yt&&dt&&T(dt),c=(i.clientX-et.clientX+o.x)/(a||1)+(s?s[0]-mt[0]:0)/(a||1),u=(i.clientY-et.clientY+o.y)/(l||1)+(s?s[1]-mt[1]:0)/(l||1);if(!It.active&&!ht){if(n&&Math.max(Math.abs(i.clientX-this._lastX),Math.abs(i.clientY-this._lastY))<n)return;this._onDragStart(t,!0)}if(K){r?(r.e+=c-(ot||0),r.f+=u-(it||0)):r={a:1,b:0,c:0,d:1,e:c,f:u};var d="matrix("+r.a+","+r.b+","+r.c+","+r.d+","+r.e+","+r.f+")";m(K,"webkitTransform",d),m(K,"mozTransform",d),m(K,"msTransform",d),m(K,"transform",d),ot=c,it=u,nt=i}t.cancelable&&t.preventDefault()}},_appendGhost:function(){if(!K){var t=this.options.fallbackOnBody?document.body:W,e=y(L,!0,yt,!0,t),n=this.options;if(yt){for(dt=t;"static"===m(dt,"position")&&"none"===m(dt,"transform")&&dt!==document;)dt=dt.parentNode;dt!==document.body&&dt!==document.documentElement?(dt===document&&(dt=E()),e.top+=dt.scrollTop,e.left+=dt.scrollLeft):dt=E(),mt=T(dt)}v(K=L.cloneNode(!0),n.ghostClass,!1),v(K,n.fallbackClass,!0),v(K,n.dragClass,!0),m(K,"transition",""),m(K,"transform",""),m(K,"box-sizing","border-box"),m(K,"margin",0),m(K,"top",e.top),m(K,"left",e.left),m(K,"width",e.width),m(K,"height",e.height),m(K,"opacity","0.8"),m(K,"position",yt?"absolute":"fixed"),m(K,"zIndex","100000"),m(K,"pointerEvents","none"),It.ghost=K,t.appendChild(K),m(K,"transform-origin",rt/parseInt(K.style.width)*100+"% "+at/parseInt(K.style.height)*100+"%")}},_onDragStart:function(t,e){var n=this,o=t.dataTransfer,i=n.options;H("dragStart",this,{evt:t}),It.eventCanceled?this._onDrop():(H("setupClone",this),It.eventCanceled||((U=A(L)).draggable=!1,U.style["will-change"]="",this._hideClone(),v(U,this.options.chosenClass,!1),It.clone=U),n.cloneId=Yt(function(){H("clone",n),It.eventCanceled||(n.options.removeCloneOnHide||W.insertBefore(U,L),n._hideClone(),F({sortable:n,name:"clone"}))}),!e&&v(L,i.dragClass,!0),e?(ft=!0,n._loopId=setInterval(n._emulateDragOver,50)):(u(document,"mouseup",n._onDrop),u(document,"touchend",n._onDrop),u(document,"touchcancel",n._onDrop),o&&(o.effectAllowed="move",i.setData&&i.setData.call(n,o,L)),c(document,"drop",n),m(L,"transform","translateZ(0)")),ht=!0,n._dragStartId=Yt(n._dragStarted.bind(n,e,t)),c(document,"selectstart",n),lt=!0,r&&m(document.body,"user-select","none"))},_onDragOver:function(e){var n,o,i,r,a=this.el,l=e.target,s=this.options,c=s.group,u=It.active,d=J===c,h=s.sort,p=tt||u,g=this,b=!1;if(!bt){if(void 0!==e.preventDefault&&e.cancelable&&e.preventDefault(),l=f(l,s.draggable,a,!0),B("dragOver"),It.eventCanceled)return b;if(L.contains(e.target)||l.animated&&l.animatingX&&l.animatingY||g._ignoreWhileAnimating===l)return U(!1);if(ft=!1,u&&!s.disabled&&(d?h||(i=!W.contains(L)):tt===this||(this.lastPutMode=J.checkPull(this,u,L,e))&&c.checkPut(this,u,L,e))){if(r="vertical"===this._getDirection(e,l),n=y(L),B("dragOverValid"),It.eventCanceled)return b;if(i)return j=W,G(),this._hideClone(),B("revert"),It.eventCanceled||(z?W.insertBefore(L,z):W.appendChild(L)),U(!0);var w=S(a,s.draggable);if(!w||function(t,e,n){var o=y(S(n.el,n.options.draggable));return e?t.clientX>o.right+10||t.clientX<=o.right&&t.clientY>o.bottom&&t.clientX>=o.left:t.clientX>o.right&&t.clientY>o.top||t.clientX<=o.right&&t.clientY>o.bottom+10}(e,r,this)&&!w.animated){if(w===L)return U(!1);if(w&&a===e.target&&(l=w),l&&(o=y(l)),!1!==Pt(W,a,L,n,l,o,e,!!l))return G(),a.appendChild(L),j=a,q(),U(!0)}else if(l.parentNode===a){o=y(l);var E,_,T,x=L.parentNode!==a,M=!function(t,e,n){var o=n?t.left:t.top,i=n?e.left:e.top;return o===i||(n?t.right:t.bottom)===(n?e.right:e.bottom)||o+(n?t.width:t.height)/2===i+(n?e.width:e.height)/2}(L.animated&&L.toRect||n,l.animated&&l.toRect||o,r),N=r?"top":"left",A=D(l,"top","top")||D(L,"top","top"),I=A?A.scrollTop:void 0;if(st!==l&&(_=o[N],gt=!1,vt=!M&&s.invertSwap||x),0!==(E=function(t,e,n,o,i,r,a,l){var s=o?t.clientY:t.clientX,c=o?n.height:n.width,u=o?n.top:n.left,d=o?n.bottom:n.right,h=!1;if(!a)if(l&&ut<c*i){if(!gt&&(1===ct?s>u+c*r/2:s<d-c*r/2)&&(gt=!0),gt)h=!0;else if(1===ct?s<u+ut:s>d-ut)return-ct}else if(s>u+c*(1-i)/2&&s<d-c*(1-i)/2)return function(t){return C(L)<C(t)?1:-1}(e);return(h=h||a)&&(s<u+c*r/2||s>d-c*r/2)?s>u+c/2?1:-1:0}(e,l,o,r,M?1:s.swapThreshold,null==s.invertedSwapThreshold?s.swapThreshold:s.invertedSwapThreshold,vt,st===l))){var P=C(L);do{T=j.children[P-=E]}while(T&&("none"===m(T,"display")||T===K))}if(0===E||T===l)return U(!1);st=l,ct=E;var R=l.nextElementSibling,X=!1,Y=Pt(W,a,L,n,l,o,e,X=1===E);if(!1!==Y)return 1!==Y&&-1!==Y||(X=1===Y),bt=!0,setTimeout(Rt,30),G(),X&&!R?a.appendChild(L):l.parentNode.insertBefore(L,X?R:l),A&&O(A,0,I-A.scrollTop),j=L.parentNode,void 0===_||vt||(ut=Math.abs(_-y(l)[N])),q(),U(!0)}if(a.contains(L))return U(!1)}return!1}function B(s,c){H(s,g,t({evt:e,isOwner:d,axis:r?"vertical":"horizontal",revert:i,dragRect:n,targetRect:o,canSort:h,fromSortable:p,target:l,completed:U,onMove:function(t,o){return Pt(W,a,L,n,t,y(t),e,o)},changed:q},c))}function G(){B("dragOverAnimationCapture"),g.captureAnimationState(),g!==p&&p.captureAnimationState()}function U(t){return B("dragOverCompleted",{insertion:t}),t&&(d?u._hideClone():u._showClone(g),g!==p&&(v(L,tt?tt.options.ghostClass:u.options.ghostClass,!1),v(L,s.ghostClass,!0)),tt!==g&&g!==It.active?tt=g:g===It.active&&tt&&(tt=null),p===g&&(g._ignoreWhileAnimating=l),g.animateAll(function(){B("dragOverAnimationComplete"),g._ignoreWhileAnimating=null}),g!==p&&(p.animateAll(),p._ignoreWhileAnimating=null)),(l===L&&!L.animated||l===a&&!l.animated)&&(st=null),s.dragoverBubble||e.rootEl||l===document||(L.parentNode[k]._isOutsideThisEl(e.target),!t&&Ot(e)),!s.dragoverBubble&&e.stopPropagation&&e.stopPropagation(),b=!0}function q(){Z=C(L),$=C(L,s.draggable),F({sortable:g,name:"change",toEl:a,newIndex:Z,newDraggableIndex:$,originalEvent:e})}},_ignoreWhileAnimating:null,_offMoveEvents:function(){u(document,"mousemove",this._onTouchMove),u(document,"touchmove",this._onTouchMove),u(document,"pointermove",this._onTouchMove),u(document,"dragover",Ot),u(document,"mousemove",Ot),u(document,"touchmove",Ot)},_offUpEvents:function(){var t=this.el.ownerDocument;u(t,"mouseup",this._onDrop),u(t,"touchend",this._onDrop),u(t,"pointerup",this._onDrop),u(t,"touchcancel",this._onDrop),u(document,"selectstart",this)},_onDrop:function(t){var e=this.el,n=this.options;Z=C(L),$=C(L,n.draggable),H("drop",this,{evt:t}),j=L&&L.parentNode,Z=C(L),$=C(L,n.draggable),It.eventCanceled||(ht=!1,vt=!1,gt=!1,clearInterval(this._loopId),clearTimeout(this._dragStartTimer),Bt(this.cloneId),Bt(this._dragStartId),this.nativeDraggable&&(u(document,"drop",this),u(e,"dragstart",this._onDragStart)),this._offMoveEvents(),this._offUpEvents(),r&&m(document.body,"user-select",""),m(L,"transform",""),t&&(lt&&(t.cancelable&&t.preventDefault(),!n.dropBubble&&t.stopPropagation()),K&&K.parentNode&&K.parentNode.removeChild(K),(W===j||tt&&"clone"!==tt.lastPutMode)&&U&&U.parentNode&&U.parentNode.removeChild(U),L&&(this.nativeDraggable&&u(L,"dragend",this),kt(L),L.style["will-change"]="",lt&&!ht&&v(L,tt?tt.options.ghostClass:this.options.ghostClass,!1),v(L,this.options.chosenClass,!1),F({sortable:this,name:"unchoose",toEl:j,newIndex:null,newDraggableIndex:null,originalEvent:t}),W!==j?(Z>=0&&(F({rootEl:j,name:"add",toEl:j,fromEl:W,originalEvent:t}),F({sortable:this,name:"remove",toEl:j,originalEvent:t}),F({rootEl:j,name:"sort",toEl:j,fromEl:W,originalEvent:t}),F({sortable:this,name:"sort",toEl:j,originalEvent:t})),tt&&tt.save()):Z!==V&&Z>=0&&(F({sortable:this,name:"update",toEl:j,originalEvent:t}),F({sortable:this,name:"sort",toEl:j,originalEvent:t})),It.active&&(null!=Z&&-1!==Z||(Z=V,$=Q),F({sortable:this,name:"end",toEl:j,originalEvent:t}),this.save())))),this._nulling()},_nulling:function(){H("nulling",this),W=L=j=K=z=U=G=q=et=nt=lt=Z=$=V=Q=st=ct=tt=J=It.dragged=It.ghost=It.clone=It.active=null,wt.forEach(function(t){t.checked=!0}),wt.length=ot=it=0},handleEvent:function(t){switch(t.type){case"drop":case"dragend":this._onDrop(t);break;case"dragenter":case"dragover":L&&(this._onDragOver(t),function(t){t.dataTransfer&&(t.dataTransfer.dropEffect="move"),t.cancelable&&t.preventDefault()}(t));break;case"selectstart":t.preventDefault()}},toArray:function(){for(var t,e=[],n=this.el.children,o=0,i=n.length,r=this.options;o<i;o++)f(t=n[o],r.draggable,this.el,!1)&&e.push(t.getAttribute(r.dataIdAttr)||Xt(t));return e},sort:function(t){var e={},n=this.el;this.toArray().forEach(function(t,o){var i=n.children[o];f(i,this.options.draggable,n,!1)&&(e[t]=i)},this),t.forEach(function(t){e[t]&&(n.removeChild(e[t]),n.appendChild(e[t]))})},save:function(){var t=this.options.store;t&&t.set&&t.set(this)},closest:function(t,e){return f(t,e||this.options.draggable,this.el,!1)},option:function(t,e){var n=this.options;if(void 0===e)return n[t];var o=Y.modifyOption(this,t,e);n[t]=void 0!==o?o:e,"group"===t&&Tt(n)},destroy:function(){H("destroy",this);var t=this.el;t[k]=null,u(t,"mousedown",this._onTapStart),u(t,"touchstart",this._onTapStart),u(t,"pointerdown",this._onTapStart),this.nativeDraggable&&(u(t,"dragover",this),u(t,"dragenter",this)),Array.prototype.forEach.call(t.querySelectorAll("[draggable]"),function(t){t.removeAttribute("draggable")}),this._onDrop(),this._disableDelayedDragEvents(),pt.splice(pt.indexOf(this.el),1),this.el=t=null},_hideClone:function(){if(!q){if(H("hideClone",this),It.eventCanceled)return;m(U,"display","none"),this.options.removeCloneOnHide&&U.parentNode&&U.parentNode.removeChild(U),q=!0}},_showClone:function(t){if("clone"===t.lastPutMode){if(q){if(H("showClone",this),It.eventCanceled)return;L.parentNode!=W||this.options.group.revertClone?z?W.insertBefore(U,z):W.appendChild(U):W.insertBefore(U,L),this.options.group.revertClone&&this.animate(L,U),m(U,"display",""),q=!1}}else this._hideClone()}},Et&&c(document,"touchmove",function(t){(It.active||ht)&&t.cancelable&&t.preventDefault()}),It.utils={on:c,off:u,css:m,find:w,is:function(t,e){return!!f(t,e,t,!1)},extend:function(t,e){if(t&&e)for(var n in e)e.hasOwnProperty(n)&&(t[n]=e[n]);return t},throttle:N,closest:f,toggleClass:v,clone:A,index:C,nextTick:Yt,cancelNextTick:Bt,detectDirection:Ct,getChild:_},It.get=function(t){return t[k]},It.mount=function(){var e=[].slice.call(arguments);e[0].constructor===Array&&(e=e[0]),e.forEach(function(e){if(!e.prototype||!e.prototype.constructor)throw"Sortable: Mounted plugin must be a constructor function, not "+{}.toString.call(e);e.utils&&(It.utils=t({},It.utils,e.utils)),Y.mount(e)})},It.create=function(t,e){return new It(t,e)},It.version="1.12.0";var Ht,Ft,Lt,jt,Kt,Wt=[],zt=[],Gt=!1,Ut=!1,qt=!1;function Vt(t,e){zt.forEach(function(n,o){var i=e.children[n.sortableIndex+(t?Number(o):0)];i?e.insertBefore(n,i):e.appendChild(n)})}function Zt(){Wt.forEach(function(t){t!==Lt&&t.parentNode&&t.parentNode.removeChild(t)})}var Qt=function(t){var e=t.originalEvent,n=t.putSortable,o=t.dragEl,i=t.dispatchSortableEvent,r=t.unhideGhostForTarget;if(e){var a=n||t.activeSortable;(0,t.hideGhostForTarget)();var l=e.changedTouches&&e.changedTouches.length?e.changedTouches[0]:e,s=document.elementFromPoint(l.clientX,l.clientY);r(),a&&!a.el.contains(s)&&(i("spill"),this.onSpill({dragEl:o,putSortable:n}))}};function $t(){}function Jt(){}$t.prototype={startIndex:null,dragStart:function(t){this.startIndex=t.oldDraggableIndex},onSpill:function(t){var e=t.dragEl,n=t.putSortable;this.sortable.captureAnimationState(),n&&n.captureAnimationState();var o=_(this.sortable.el,this.startIndex,this.options);o?this.sortable.el.insertBefore(e,o):this.sortable.el.appendChild(e),this.sortable.animateAll(),n&&n.animateAll()},drop:Qt},Object.assign($t,{pluginName:"revertOnSpill"}),Jt.prototype={onSpill:function(t){var e=t.dragEl,n=t.putSortable||this.sortable;n.captureAnimationState(),e.parentNode&&e.parentNode.removeChild(e),n.animateAll()},drop:Qt},Object.assign(Jt,{pluginName:"removeOnSpill"});var te,ee,ne,oe,ie,re,ae=[],le=!1;function se(){ae.forEach(function(t){clearInterval(t.pid)}),ae=[]}function ce(){clearInterval(re)}var ue=N(function(t,e,n,o){if(e.scroll){var i,r=(t.touches?t.touches[0]:t).clientX,a=(t.touches?t.touches[0]:t).clientY,l=e.scrollSensitivity,s=e.scrollSpeed,c=E(),u=!1;ee!==n&&(ee=n,se(),i=e.scrollFn,!0===(te=e.scroll)&&(te=x(n,!0)));var d=0,h=te;do{var f=h,p=y(f),g=p.top,v=p.bottom,b=p.left,w=p.right,D=p.width,_=p.height,S=void 0,C=void 0,T=f.scrollWidth,M=f.scrollHeight,N=m(f),A=f.scrollLeft,I=f.scrollTop;f===c?(S=D<T&&("auto"===N.overflowX||"scroll"===N.overflowX||"visible"===N.overflowX),C=_<M&&("auto"===N.overflowY||"scroll"===N.overflowY||"visible"===N.overflowY)):(S=D<T&&("auto"===N.overflowX||"scroll"===N.overflowX),C=_<M&&("auto"===N.overflowY||"scroll"===N.overflowY));var P=S&&(Math.abs(w-r)<=l&&A+D<T)-(Math.abs(b-r)<=l&&!!A),R=C&&(Math.abs(v-a)<=l&&I+_<M)-(Math.abs(g-a)<=l&&!!I);if(!ae[d])for(var X=0;X<=d;X++)ae[X]||(ae[X]={});ae[d].vx==P&&ae[d].vy==R&&ae[d].el===f||(ae[d].el=f,ae[d].vx=P,ae[d].vy=R,clearInterval(ae[d].pid),0==P&&0==R||(u=!0,ae[d].pid=setInterval(function(){o&&0===this.layer&&It.active._onTouchMove(ie);var e=ae[this.layer].vy?ae[this.layer].vy*s:0,n=ae[this.layer].vx?ae[this.layer].vx*s:0;"function"==typeof i&&"continue"!==i.call(It.dragged.parentNode[k],n,e,t,ie,ae[this.layer].el)||O(ae[this.layer].el,n,e)}.bind({layer:d}),24))),d++}while(e.bubbleScroll&&h!==c&&(h=x(h,!1)));le=u}},30);return It.mount(new function(){function t(){for(var t in this.defaults={scroll:!0,scrollSensitivity:30,scrollSpeed:10,bubbleScroll:!0},this)"_"===t.charAt(0)&&"function"==typeof this[t]&&(this[t]=this[t].bind(this))}return t.prototype={dragStarted:function(t){var e=t.originalEvent;this.sortable.nativeDraggable?c(document,"dragover",this._handleAutoScroll):c(document,this.options.supportPointer?"pointermove":e.touches?"touchmove":"mousemove",this._handleFallbackAutoScroll)},dragOverCompleted:function(t){var e=t.originalEvent;this.options.dragOverBubble||e.rootEl||this._handleAutoScroll(e)},drop:function(){this.sortable.nativeDraggable?u(document,"dragover",this._handleAutoScroll):(u(document,"pointermove",this._handleFallbackAutoScroll),u(document,"touchmove",this._handleFallbackAutoScroll),u(document,"mousemove",this._handleFallbackAutoScroll)),ce(),se(),clearTimeout(p),p=void 0},nulling:function(){ie=ee=te=le=re=ne=oe=null,ae.length=0},_handleFallbackAutoScroll:function(t){this._handleAutoScroll(t,!0)},_handleAutoScroll:function(t,e){var i=this,a=(t.touches?t.touches[0]:t).clientX,l=(t.touches?t.touches[0]:t).clientY,s=document.elementFromPoint(a,l);if(ie=t,e||o||n||r){ue(t,this.options,s,e);var c=x(s,!0);!le||re&&a===ne&&l===oe||(re&&ce(),re=setInterval(function(){var n=x(document.elementFromPoint(a,l),!0);n!==c&&(c=n,se()),ue(t,i.options,n,e)},10),ne=a,oe=l)}else{if(!this.options.bubbleScroll||x(s,!0)===E())return void se();ue(t,this.options,x(s,!1),!1)}}},Object.assign(t,{pluginName:"scroll",initializeByDefault:!0})}),It.mount(Jt,$t),It.mount(new function(){function t(){this.defaults={swapClass:"sortable-swap-highlight"}}return t.prototype={dragStart:function(t){Nt=t.dragEl},dragOverValid:function(t){var e=t.completed,n=t.target,o=t.changed,i=t.cancel;if(t.activeSortable.options.swap){var r=this.options;if(n&&n!==this.sortable.el){var a=Nt;!1!==(0,t.onMove)(n)?(v(n,r.swapClass,!0),Nt=n):Nt=null,a&&a!==Nt&&v(a,r.swapClass,!1)}o(),e(!0),i()}},drop:function(t){var e,n,o,i,r,a,l=t.activeSortable,s=t.putSortable,c=t.dragEl,u=s||this.sortable,d=this.options;Nt&&v(Nt,d.swapClass,!1),Nt&&(d.swap||s&&s.options.swap)&&c!==Nt&&(u.captureAnimationState(),u!==l&&l.captureAnimationState(),a=(n=Nt).parentNode,(r=(e=c).parentNode)&&a&&!r.isEqualNode(n)&&!a.isEqualNode(e)&&(o=C(e),i=C(n),r.isEqualNode(a)&&o<i&&i++,r.insertBefore(n,r.children[o]),a.insertBefore(e,a.children[i])),u.animateAll(),u!==l&&l.animateAll())},nulling:function(){Nt=null}},Object.assign(t,{pluginName:"swap",eventProperties:function(){return{swapItem:Nt}}})}),It.mount(new function(){function t(t){for(var e in this)"_"===e.charAt(0)&&"function"==typeof this[e]&&(this[e]=this[e].bind(this));t.options.supportPointer?c(document,"pointerup",this._deselectMultiDrag):(c(document,"mouseup",this._deselectMultiDrag),c(document,"touchend",this._deselectMultiDrag)),c(document,"keydown",this._checkKeyDown),c(document,"keyup",this._checkKeyUp),this.defaults={selectedClass:"sortable-selected",multiDragKey:null,setData:function(e,n){var o="";Wt.length&&Ft===t?Wt.forEach(function(t,e){o+=(e?", ":"")+t.textContent}):o=n.textContent,e.setData("Text",o)}}}return t.prototype={multiDragKeyDown:!1,isMultiDrag:!1,delayStartGlobal:function(t){Lt=t.dragEl},delayEnded:function(){this.isMultiDrag=~Wt.indexOf(Lt)},setupClone:function(t){var e=t.sortable,n=t.cancel;if(this.isMultiDrag){for(var o=0;o<Wt.length;o++)zt.push(A(Wt[o])),zt[o].sortableIndex=Wt[o].sortableIndex,zt[o].draggable=!1,zt[o].style["will-change"]="",v(zt[o],this.options.selectedClass,!1),Wt[o]===Lt&&v(zt[o],this.options.chosenClass,!1);e._hideClone(),n()}},clone:function(t){var e=t.dispatchSortableEvent,n=t.cancel;this.isMultiDrag&&(this.options.removeCloneOnHide||Wt.length&&Ft===t.sortable&&(Vt(!0,t.rootEl),e("clone"),n()))},showClone:function(t){var e=t.cloneNowShown,n=t.cancel;this.isMultiDrag&&(Vt(!1,t.rootEl),zt.forEach(function(t){m(t,"display","")}),e(),Kt=!1,n())},hideClone:function(t){var e=this,n=t.cloneNowHidden,o=t.cancel;this.isMultiDrag&&(zt.forEach(function(t){m(t,"display","none"),e.options.removeCloneOnHide&&t.parentNode&&t.parentNode.removeChild(t)}),n(),Kt=!0,o())},dragStartGlobal:function(t){!this.isMultiDrag&&Ft&&Ft.multiDrag._deselectMultiDrag(),Wt.forEach(function(t){t.sortableIndex=C(t)}),Wt=Wt.sort(function(t,e){return t.sortableIndex-e.sortableIndex}),qt=!0},dragStarted:function(t){var e=this,n=t.sortable;if(this.isMultiDrag){if(this.options.sort&&(n.captureAnimationState(),this.options.animation)){Wt.forEach(function(t){t!==Lt&&m(t,"position","absolute")});var o=y(Lt,!1,!0,!0);Wt.forEach(function(t){t!==Lt&&I(t,o)}),Ut=!0,Gt=!0}n.animateAll(function(){Ut=!1,Gt=!1,e.options.animation&&Wt.forEach(function(t){P(t)}),e.options.sort&&Zt()})}},dragOver:function(t){var e=t.completed,n=t.cancel;Ut&&~Wt.indexOf(t.target)&&(e(!1),n())},revert:function(t){var e=t.fromSortable,n=t.rootEl,o=t.sortable,i=t.dragRect;Wt.length>1&&(Wt.forEach(function(t){o.addAnimationState({target:t,rect:Ut?y(t):i}),P(t),t.fromRect=i,e.removeAnimationState(t)}),Ut=!1,function(t,e){Wt.forEach(function(n,o){var i=e.children[n.sortableIndex+(t?Number(o):0)];i?e.insertBefore(n,i):e.appendChild(n)})}(!this.options.removeCloneOnHide,n))},dragOverCompleted:function(t){var e=t.sortable,n=t.isOwner,o=t.activeSortable,i=t.parentEl,r=t.putSortable,a=this.options;if(t.insertion){if(n&&o._hideClone(),Gt=!1,a.animation&&Wt.length>1&&(Ut||!n&&!o.options.sort&&!r)){var l=y(Lt,!1,!0,!0);Wt.forEach(function(t){t!==Lt&&(I(t,l),i.appendChild(t))}),Ut=!0}if(!n)if(Ut||Zt(),Wt.length>1){var s=Kt;o._showClone(e),o.options.animation&&!Kt&&s&&zt.forEach(function(t){o.addAnimationState({target:t,rect:jt}),t.fromRect=jt,t.thisAnimationDuration=null})}else o._showClone(e)}},dragOverAnimationCapture:function(t){var e=t.dragRect,n=t.isOwner,o=t.activeSortable;if(Wt.forEach(function(t){t.thisAnimationDuration=null}),o.options.animation&&!n&&o.multiDrag.isMultiDrag){jt=Object.assign({},e);var i=b(Lt,!0);jt.top-=i.f,jt.left-=i.e}},dragOverAnimationComplete:function(){Ut&&(Ut=!1,Zt())},drop:function(t){var e=t.originalEvent,n=t.rootEl,o=t.parentEl,i=t.sortable,r=t.dispatchSortableEvent,a=t.oldIndex,l=t.putSortable,s=l||this.sortable;if(e){var c=this.options,u=o.children;if(!qt)if(c.multiDragKey&&!this.multiDragKeyDown&&this._deselectMultiDrag(),v(Lt,c.selectedClass,!~Wt.indexOf(Lt)),~Wt.indexOf(Lt))Wt.splice(Wt.indexOf(Lt),1),Ht=null,B({sortable:i,rootEl:n,name:"deselect",targetEl:Lt,originalEvt:e});else{if(Wt.push(Lt),B({sortable:i,rootEl:n,name:"select",targetEl:Lt,originalEvt:e}),e.shiftKey&&Ht&&i.el.contains(Ht)){var d,h,f=C(Ht),p=C(Lt);if(~f&&~p&&f!==p)for(p>f?(h=f,d=p):(h=p,d=f+1);h<d;h++)~Wt.indexOf(u[h])||(v(u[h],c.selectedClass,!0),Wt.push(u[h]),B({sortable:i,rootEl:n,name:"select",targetEl:u[h],originalEvt:e}))}else Ht=Lt;Ft=s}if(qt&&this.isMultiDrag){if((o[k].options.sort||o!==n)&&Wt.length>1){var g=y(Lt),m=C(Lt,":not(."+this.options.selectedClass+")");if(!Gt&&c.animation&&(Lt.thisAnimationDuration=null),s.captureAnimationState(),!Gt&&(c.animation&&(Lt.fromRect=g,Wt.forEach(function(t){if(t.thisAnimationDuration=null,t!==Lt){var e=Ut?y(t):g;t.fromRect=e,s.addAnimationState({target:t,rect:e})}})),Zt(),Wt.forEach(function(t){u[m]?o.insertBefore(t,u[m]):o.appendChild(t),m++}),a===C(Lt))){var b=!1;Wt.forEach(function(t){t.sortableIndex===C(t)||(b=!0)}),b&&r("update")}Wt.forEach(function(t){P(t)}),s.animateAll()}Ft=s}(n===o||l&&"clone"!==l.lastPutMode)&&zt.forEach(function(t){t.parentNode&&t.parentNode.removeChild(t)})}},nullingGlobal:function(){this.isMultiDrag=qt=!1,zt.length=0},destroyGlobal:function(){this._deselectMultiDrag(),u(document,"pointerup",this._deselectMultiDrag),u(document,"mouseup",this._deselectMultiDrag),u(document,"touchend",this._deselectMultiDrag),u(document,"keydown",this._checkKeyDown),u(document,"keyup",this._checkKeyUp)},_deselectMultiDrag:function(t){if(!(void 0!==qt&&qt||Ft!==this.sortable||t&&f(t.target,this.options.draggable,this.sortable.el,!1)||t&&0!==t.button))for(;Wt.length;){var e=Wt[0];v(e,this.options.selectedClass,!1),Wt.shift(),B({sortable:this.sortable,rootEl:this.sortable.el,name:"deselect",targetEl:e,originalEvt:t})}},_checkKeyDown:function(t){t.key===this.options.multiDragKey&&(this.multiDragKeyDown=!0)},_checkKeyUp:function(t){t.key===this.options.multiDragKey&&(this.multiDragKeyDown=!1)}},Object.assign(t,{pluginName:"multiDrag",utils:{select:function(t){var e=t.parentNode[k];e&&e.options.multiDrag&&!~Wt.indexOf(t)&&(Ft&&Ft!==e&&(Ft.multiDrag._deselectMultiDrag(),Ft=e),v(t,e.options.selectedClass,!0),Wt.push(t))},deselect:function(t){var e=t.parentNode[k],n=Wt.indexOf(t);e&&e.options.multiDrag&&~n&&(v(t,e.options.selectedClass,!1),Wt.splice(n,1))}},eventProperties:function(){var t=this,e=[],n=[];return Wt.forEach(function(o){var i;e.push({multiDragElement:o,index:o.sortableIndex}),i=Ut&&o!==Lt?-1:Ut?C(o,":not(."+t.options.selectedClass+")"):C(o),n.push({multiDragElement:o,index:i})}),{items:[].concat(Wt),clones:[].concat(zt),oldIndicies:e,newIndicies:n}},optionListeners:{multiDragKey:function(t){return"ctrl"===(t=t.toLowerCase())?t="Control":t.length>1&&(t=t.charAt(0).toUpperCase()+t.substr(1)),t}}})}),It});
+//# sourceMappingURL=sortable.umd.js.map
+;
 (function(root) {
 define("select2", [], function() {
   return (function() {
@@ -4691,346 +4760,357 @@ the specific language governing permissions and limitations under the Apache Lic
  *
  */
 
+define('mockup-patterns-select2',["jquery", "pat-base", "mockup-utils", "sortable", "select2"], function (
+    $,
+    Base,
+    utils,
+    Sortable
+) {
+    "use strict";
 
-define('mockup-patterns-select2',[
-  'jquery',
-  'pat-base',
-  'mockup-utils',
-  'select2',
-  'jquery.event.drag',
-  'jquery.event.drop'
-], function($, Base, utils) {
-  'use strict';
+    var Select2 = Base.extend({
+        name: "select2",
+        trigger: ".pat-select2",
+        parser: "mockup",
+        defaults: {
+            separator: ",",
+        },
+        initializeValues: function () {
+            var self = this;
+            // Init Selection ---------------------------------------------
+            if (self.options.initialValues) {
+                self.options.id = function (term) {
+                    return term.id;
+                };
+                self.options.initSelection = function ($el, callback) {
+                    var data = [],
+                        value = $el.val(),
+                        seldefaults = self.options.initialValues;
 
-  var Select2 = Base.extend({
-    name: 'select2',
-    trigger: '.pat-select2',
-    parser: 'mockup',
-    defaults: {
-      separator: ','
-    },
-    initializeValues: function() {
-      var self = this;
-      // Init Selection ---------------------------------------------
-      if (self.options.initialValues) {
-        self.options.id = function(term) {
-          return term.id;
-        };
-        self.options.initSelection = function ($el, callback) {
-          var data = [],
-              value = $el.val(),
-              seldefaults = self.options.initialValues;
+                    // Create the initSelection value that contains the default selection,
+                    // but in a javascript object
+                    if (
+                        typeof self.options.initialValues === "string" &&
+                        self.options.initialValues !== ""
+                    ) {
+                        // if default selection value starts with a '{', then treat the value as
+                        // a JSON object that needs to be parsed
+                        if (self.options.initialValues[0] === "{") {
+                            seldefaults = JSON.parse(
+                                self.options.initialValues
+                            );
+                        }
+                        // otherwise, treat the value as a list, separated by the defaults.separator value of
+                        // strings in the format "id:text", and convert it to an object
+                        else {
+                            seldefaults = {};
+                            $(
+                                self.options.initialValues.split(
+                                    self.options.separator
+                                )
+                            ).each(function () {
+                                var selection = this.split(":");
+                                var id = $.trim(selection[0]);
+                                var text = $.trim(selection[1]);
+                                seldefaults[id] = text;
+                            });
+                        }
+                    }
 
-          // Create the initSelection value that contains the default selection,
-          // but in a javascript object
-          if (typeof(self.options.initialValues) === 'string' && self.options.initialValues !== '') {
-            // if default selection value starts with a '{', then treat the value as
-            // a JSON object that needs to be parsed
-            if (self.options.initialValues[0] === '{') {
-              seldefaults = JSON.parse(self.options.initialValues);
+                    $(value.split(self.options.separator)).each(function () {
+                        var text = this;
+                        if (seldefaults[this]) {
+                            text = seldefaults[this];
+                        }
+                        data.push({
+                            id: utils.removeHTML(this),
+                            text: utils.removeHTML(text),
+                        });
+                    });
+                    callback(data);
+                };
             }
-            // otherwise, treat the value as a list, separated by the defaults.separator value of
-            // strings in the format "id:text", and convert it to an object
-            else {
-              seldefaults = {};
-              $(self.options.initialValues.split(self.options.separator)).each(function() {
-                var selection = this.split(':');
-                var id = $.trim(selection[0]);
-                var text = $.trim(selection[1]);
-                seldefaults[id] = text;
-              });
-            }
-          }
-
-          $(value.split(self.options.separator)).each(function() {
-            var text = this;
-            if (seldefaults[this]) {
-              text = seldefaults[this];
-            }
-            data.push({id: utils.removeHTML(this), text: utils.removeHTML(text)});
-          });
-          callback(data);
-        };
-      }
-    },
-    initializeTags: function() {
-      var self = this;
-      if (self.options.tags && typeof(self.options.tags) === 'string') {
-        if (self.options.tags.substr(0, 1) === '[') {
-          self.options.tags = JSON.parse(self.options.tags);
-        } else {
-          self.options.tags = self.options.tags.split(self.options.separator);
-        }
-      }
-
-      if (self.options.tags && !self.options.allowNewItems) {
-        self.options.data = $.map (self.options.tags, function (value, i) {
-          return { id: value, text: value };
-        });
-        self.options.multiple = true;
-        delete self.options.tags;
-      }
-    },
-    initializeOrdering: function() {
-      var self = this;
-      if (self.options.orderable) {
-        var formatSelection = function(data, $container) {
-          return data ? data.text : undefined;
-        };
-        if (self.options.formatSelection) {
-          formatSelection = self.options.formatSelection;
-        }
-
-        self.options.formatSelection = function(data, $container) {
-          $container.parents('li')
-            .drag('start', function(e, dd) {
-              $(this).addClass('select2-choice-dragging');
-              self.$el.select2('onSortStart');
-              $.drop({
-                tolerance: function(event, proxy, target) {
-                  var test = event.pageY > (target.top + target.height / 2);
-                  $.data(target.elem, 'drop+reorder', test ? 'insertAfter' : 'insertBefore' );
-                  return this.contains(target, [event.pageX, event.pageY]);
+        },
+        initializeTags: function () {
+            var self = this;
+            if (self.options.tags && typeof self.options.tags === "string") {
+                if (self.options.tags.substr(0, 1) === "[") {
+                    self.options.tags = JSON.parse(self.options.tags);
+                } else {
+                    self.options.tags = self.options.tags.split(
+                        self.options.separator
+                    );
                 }
-              });
-              return $( this ).clone().
-                addClass('dragging').
-                css({opacity: 0.75, position: 'absolute'}).
-                appendTo(document.body);
-            })
-            .drag(function(e, dd) {
-              /*jshint eqeqeq:false */
-              $( dd.proxy ).css({
-                top: dd.offsetY,
-                left: dd.offsetX
-              });
-              var drop = dd.drop[0],
-                  method = $.data(drop || {}, 'drop+reorder');
-
-              /* XXX Cannot use triple equals here */
-              if (drop && (drop != dd.current || method != dd.method)) {
-                $(this)[method](drop);
-                dd.current = drop;
-                dd.method = method;
-                dd.update();
-              }
-            })
-            .drag('end', function(e, dd) {
-              $(this).removeClass('select2-choice-dragging');
-              self.$el.select2('onSortEnd');
-              $( dd.proxy ).remove();
-            })
-            .drop('init', function(e, dd ) {
-              /*jshint eqeqeq:false */
-              /* XXX Cannot use triple equals here */
-              return (this == dd.drag) ? false: true;
-            });
-          return formatSelection(data, $container);
-        };
-      }
-    },
-    initializeSelect2: function() {
-      var self = this;
-      self.options.formatResultCssClass = function(ob){
-        if(ob.id){
-          return 'select2-option-' + ob.id.toLowerCase().replace(/[ \:\)\(\[\]\{\}\_\+\=\&\*\%\#]/g, '-');
-        }
-      };
-
-      function callback(action, e) {
-        if (!!action) {
-          if (self.options.debug) {
-            console.debug('callback', action, e)
-          }
-          if (typeof action === 'string') {
-            action = window[action];
-          }
-          return action(e);
-        } else {
-          return action;
-        }
-      }
-
-      self.$el.select2(self.options);
-      self.$el.on('select2-selected', function(e) {
-          callback(self.options.onSelected, e);
-      });
-      self.$el.on('select2-selecting', function(e) {
-          callback(self.options.onSelecting, e);
-      });
-      self.$el.on('select2-deselecting', function(e) {
-          callback(self.options.onDeselecting, e);
-      });
-      self.$el.on('select2-deselected', function(e) {
-          callback(self.options.onDeselected, e);
-      });
-      self.$select2 = self.$el.parent().find('.select2-container');
-      self.$el.parent().off('close.plone-modal.patterns');
-      if (self.options.orderable) {
-        self.$select2.addClass('select2-orderable');
-      }
-    },
-    opened: function () {
-      var self = this;
-      var isOpen = $('.select2-dropdown-open', self.$el.parent()).length === 1;
-      return isOpen;
-    },
-    init: function() {
-      var self = this;
-
-      self.options.allowNewItems = self.options.hasOwnProperty ('allowNewItems') ?
-            JSON.parse(self.options.allowNewItems) : true;
-
-      if (self.options.ajax || self.options.vocabularyUrl) {
-        if (self.options.vocabularyUrl) {
-          self.options.multiple = self.options.multiple === undefined ? true : self.options.multiple;
-          self.options.ajax = self.options.ajax || {};
-          self.options.ajax.url = self.options.vocabularyUrl;
-          // XXX removing the following function does'nt break tests. dead code?
-          self.options.initSelection = function ($el, callback) {
-            var data = [], value = $el.val();
-            $(value.split(self.options.separator)).each(function () {
-              var val = utils.removeHTML(this);
-              data.push({id: val, text: val});
-            });
-            callback(data);
-          };
-        }
-
-        var queryTerm = '';
-        self.options.ajax = $.extend({
-          quietMillis: 300,
-          data: function (term, page) {
-            queryTerm = term;
-            return {
-              query: term,
-              'page_limit': 10,
-              page: page
-            };
-          },
-          results: function (data, page) {
-            var results = data.results;
-            if (self.options.vocabularyUrl) {
-              var dataIds = [];
-              $.each(data.results, function(i, item) {
-                dataIds.push(item.id);
-              });
-              results = [];
-
-              var haveResult = queryTerm === '' || $.inArray(queryTerm, dataIds) >= 0;
-              if (self.options.allowNewItems && !haveResult) {
-                queryTerm = utils.removeHTML(queryTerm);
-                results.push({id: queryTerm, text: queryTerm});
-              }
-
-              $.each(data.results, function(i, item) {
-                results.push(item);
-              });
             }
-            return { results: results };
-          }
-        }, self.options.ajax);
-      } else if (self.options.multiple && self.$el.is('select')) {
-        // Multiselects need to be converted to input[type=hidden]
-        // for Select2
-        var vals = self.$el.val() || [];
-        var options = $.map(self.$el.find('option'), function (o) { return {text: $(o).html(), id: o.value}; });
-        var $hidden = $('<input type="hidden" />');
-        $hidden.val(vals.join(self.options.separator));
-        $hidden.attr('class', self.$el.attr('class'));
-        $hidden.attr('name', self.$el.attr('name'));
-        $hidden.attr('id', self.$el.attr('id'));
-        self.$orig = self.$el;
-        self.$el.replaceWith($hidden);
-        self.$el = $hidden;
-        self.options.data = options;
-      }
 
-      self.initializeValues();
-      self.initializeTags();
-      self.initializeOrdering();
-      self.initializeSelect2();
-    }
-  });
+            if (self.options.tags && !self.options.allowNewItems) {
+                self.options.data = $.map(self.options.tags, function (
+                    value,
+                    i
+                ) {
+                    return { id: value, text: value };
+                });
+                self.options.multiple = true;
+                delete self.options.tags;
+            }
+        },
+        initializeOrdering: function () {
+            var self = this;
+            if (!self.options.orderable) {
+                return;
+            }
+            this.$el.on(
+                "change",
+                function (e) {
+                    var sortable_el = this.$select2[0].querySelector(
+                        ".select2-choices"
+                    );
+                    var sortable = new Sortable(sortable_el, {
+                        draggable: "li",
+                        dragClass: "select2-choice-dragging",
+                        chosenClass: "dragging",
+                        onStart: function (e) {
+                            self.$el.select2("onSortStart");
+                        }.bind(this),
+                        onEnd: function (e) {
+                            this.$el.select2("onSortEnd");
+                        }.bind(this),
+                    });
+                }.bind(this)
+            );
+        },
+        initializeSelect2: function () {
+            var self = this;
+            self.options.formatResultCssClass = function (ob) {
+                if (ob.id) {
+                    return (
+                        "select2-option-" +
+                        ob.id
+                            .toLowerCase()
+                            .replace(/[ \:\)\(\[\]\{\}\_\+\=\&\*\%\#]/g, "-")
+                    );
+                }
+            };
 
-  return Select2;
+            function callback(action, e) {
+                if (action) {
+                    if (self.options.debug) {
+                        console.debug("callback", action, e);
+                    }
+                    if (typeof action === "string") {
+                        action = window[action];
+                    }
+                    return action(e);
+                } else {
+                    return action;
+                }
+            }
 
+            self.$el.select2(self.options);
+            self.$el.on("select2-selected", function (e) {
+                callback(self.options.onSelected, e);
+            });
+            self.$el.on("select2-selecting", function (e) {
+                callback(self.options.onSelecting, e);
+            });
+            self.$el.on("select2-deselecting", function (e) {
+                callback(self.options.onDeselecting, e);
+            });
+            self.$el.on("select2-deselected", function (e) {
+                callback(self.options.onDeselected, e);
+            });
+            self.$select2 = self.$el.parent().find(".select2-container");
+            self.$el.parent().off("close.plone-modal.patterns");
+            if (self.options.orderable) {
+                self.$select2.addClass("select2-orderable");
+            }
+        },
+        opened: function () {
+            var self = this;
+            var isOpen =
+                $(".select2-dropdown-open", self.$el.parent()).length === 1;
+            return isOpen;
+        },
+        init: function () {
+            var self = this;
+
+            self.options.allowNewItems = self.options.hasOwnProperty(
+                "allowNewItems"
+            )
+                ? JSON.parse(self.options.allowNewItems)
+                : true;
+
+            if (self.options.ajax || self.options.vocabularyUrl) {
+                if (self.options.vocabularyUrl) {
+                    self.options.multiple =
+                        self.options.multiple === undefined
+                            ? true
+                            : self.options.multiple;
+                    self.options.ajax = self.options.ajax || {};
+                    self.options.ajax.url = self.options.vocabularyUrl;
+                    // XXX removing the following function does'nt break tests. dead code?
+                    self.options.initSelection = function ($el, callback) {
+                        var data = [],
+                            value = $el.val();
+                        $(value.split(self.options.separator)).each(
+                            function () {
+                                var val = utils.removeHTML(this);
+                                data.push({ id: val, text: val });
+                            }
+                        );
+                        callback(data);
+                    };
+                }
+
+                var queryTerm = "";
+                self.options.ajax = $.extend(
+                    {
+                        quietMillis: 300,
+                        data: function (term, page) {
+                            queryTerm = term;
+                            return {
+                                query: term,
+                                page_limit: 10,
+                                page: page,
+                            };
+                        },
+                        results: function (data, page) {
+                            var results = data.results;
+                            if (self.options.vocabularyUrl) {
+                                var dataIds = [];
+                                $.each(data.results, function (i, item) {
+                                    dataIds.push(item.id);
+                                });
+                                results = [];
+
+                                var haveResult =
+                                    queryTerm === "" ||
+                                    $.inArray(queryTerm, dataIds) >= 0;
+                                if (self.options.allowNewItems && !haveResult) {
+                                    queryTerm = utils.removeHTML(queryTerm);
+                                    results.push({
+                                        id: queryTerm,
+                                        text: queryTerm,
+                                    });
+                                }
+
+                                $.each(data.results, function (i, item) {
+                                    results.push(item);
+                                });
+                            }
+                            return { results: results };
+                        },
+                    },
+                    self.options.ajax
+                );
+            } else if (self.options.multiple && self.$el.is("select")) {
+                // Multiselects need to be converted to input[type=hidden]
+                // for Select2
+                var vals = self.$el.val() || [];
+                var options = $.map(self.$el.find("option"), function (o) {
+                    return { text: $(o).html(), id: o.value };
+                });
+                var $hidden = $('<input type="hidden" />');
+                $hidden.val(vals.join(self.options.separator));
+                $hidden.attr("class", self.$el.attr("class"));
+                $hidden.attr("name", self.$el.attr("name"));
+                $hidden.attr("id", self.$el.attr("id"));
+                self.$orig = self.$el;
+                self.$el.replaceWith($hidden);
+                self.$el = $hidden;
+                self.options.data = options;
+            }
+
+            self.initializeValues();
+            self.initializeTags();
+            self.initializeOrdering();
+            self.initializeSelect2();
+        },
+    });
+
+    return Select2;
 });
 
-define('mockup-ui-url/views/base',[
-  'jquery',
-  'underscore',
-  'backbone',
-  'translate'
-], function($, _, Backbone, _t) {
-  'use strict';
+define('mockup-ui-url/views/base',["jquery", "underscore", "backbone", "translate"], function (
+    $,
+    _,
+    Backbone,
+    _t
+) {
+    "use strict";
 
-  var BaseView = Backbone.View.extend({
-    isUIView: true,
-    eventPrefix: 'ui',
-    template: null,
-    idPrefix: 'base-',
-    appendInContainer: true,
-    initialize: function(options) {
-      this.options = options;
-      for (var key in this.options) {
-        this[key] = this.options[key];
-      }
-      this.options._t = _t;
-    },
-    render: function() {
-      this.applyTemplate();
+    var BaseView = Backbone.View.extend({
+        isUIView: true,
+        eventPrefix: "ui",
+        template: null,
+        idPrefix: "base-",
+        appendInContainer: true,
+        initialize: function (options) {
+            this.options = options;
+            for (var key in this.options) {
+                this[key] = this.options[key];
+            }
+            this.options._t = _t;
+        },
+        render: function () {
+            this.applyTemplate();
 
-      this.trigger('render', this);
-      this.afterRender();
+            this.trigger("render", this);
+            this.afterRender();
 
-      if (this.options.id) {
-        // apply id to element
-        this.$el.attr('id', this.idPrefix + this.options.id);
-      }
-      return this;
-    },
-    afterRender: function() {
+            if (this.options.id) {
+                // apply id to element
+                this.$el.attr("id", this.idPrefix + this.options.id);
+            }
+            return this;
+        },
+        afterRender: function () {},
+        serializedModel: function () {
+            return this.options;
+        },
+        applyTemplate: function () {
+            if (this.template !== null) {
+                var data = $.extend(
+                    { _t: _t },
+                    this.options,
+                    this.serializedModel()
+                );
+                var template = this.template;
+                if (typeof template === "string") {
+                    template = _.template(template);
+                }
+                this.$el.html(template(data));
+            }
+        },
+        propagateEvent: function (eventName) {
+            if (eventName.indexOf(":") > 0) {
+                var eventId = eventName.split(":")[0];
+                if (this.eventPrefix !== "") {
+                    if (
+                        eventId === this.eventPrefix ||
+                        eventId === this.eventPrefix + "." + this.id
+                    ) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        },
+        uiEventTrigger: function (name) {
+            var args = [].slice.call(arguments, 0);
 
-    },
-    serializedModel: function() {
-      return this.options;
-    },
-    applyTemplate: function() {
-      if (this.template !== null) {
-        var data = $.extend({_t: _t}, this.options, this.serializedModel());
-        var template = this.template;
-        if(typeof(template) === 'string'){
-          template = _.template(template);
-        }
-        this.$el.html(template(data));
-      }
-    },
-    propagateEvent: function(eventName) {
-      if (eventName.indexOf(':') > 0) {
-        var eventId = eventName.split(':')[0];
-        if (this.eventPrefix !== '') {
-          if (eventId === this.eventPrefix ||
-              eventId === this.eventPrefix + '.' + this.id) { return true; }
-        }
-      }
-      return false;
-    },
-    uiEventTrigger: function(name) {
-      var args = [].slice.call(arguments, 0);
+            if (this.eventPrefix !== "") {
+                args[0] = this.eventPrefix + ":" + name;
+                Backbone.View.prototype.trigger.apply(this, args);
+                if (this.id) {
+                    args[0] = this.eventPrefix + "." + this.id + ":" + name;
+                    Backbone.View.prototype.trigger.apply(this, args);
+                }
+            }
+        },
+    });
 
-      if (this.eventPrefix !== '') {
-        args[0] = this.eventPrefix + ':' + name;
-        Backbone.View.prototype.trigger.apply(this, args);
-        if (this.id) {
-          args[0] =  this.eventPrefix + '.' + this.id + ':' + name;
-          Backbone.View.prototype.trigger.apply(this, args);
-        }
-      }
-    }
-  });
-
-  return BaseView;
+    return BaseView;
 });
 
 /* Tooltip pattern.
@@ -5077,566 +5157,713 @@ define('mockup-ui-url/views/base',[
  *
  */
 
-define('mockup-patterns-tooltip',[
-  'jquery',
-  'pat-base'
-], function($, Base, undefined) {
-  'use strict';
+define('mockup-patterns-tooltip',["jquery", "pat-base"], function ($, Base, undefined) {
+    "use strict";
 
-  //This is pulled almost directly from the Bootstrap Tooltip
-  //extension. We rename it just to differentiate from the pattern.
-  var bootstrapTooltip = function (element, options) {
-    this.type       =
-    this.options    =
-    this.enabled    =
-    this.timeout    =
-    this.hoverState =
-    this.$element   = null
+    //This is pulled almost directly from the Bootstrap Tooltip
+    //extension. We rename it just to differentiate from the pattern.
+    var bootstrapTooltip = function (element, options) {
+        this.type = this.options = this.enabled = this.timeout = this.hoverState = this.$element = null;
 
-    this.init('tooltip', element, options)
-  }
+        this.init("tooltip", element, options);
+    };
 
-  bootstrapTooltip.VERSION  = '3.2.0'
+    bootstrapTooltip.VERSION = "3.2.0";
 
-  bootstrapTooltip.DEFAULTS = {
-    animation: true,
-    placement: 'auto',
-    selector: false,
-    template: '<div class="tooltip mockup-tooltip" role="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>',
-    trigger: 'hover focus',
-    title: '',
-    delay: 0,
-    html: true,  // TODO: fix bug, where this setting overwrites whatever is set in options
-    container: false,
-    viewport: {
-      selector: 'body',
-      padding: 0
-    }
-  }
+    bootstrapTooltip.DEFAULTS = {
+        animation: true,
+        placement: "auto",
+        selector: false,
+        template:
+            '<div class="tooltip mockup-tooltip" role="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>',
+        trigger: "hover focus",
+        title: "",
+        delay: 0,
+        html: true, // TODO: fix bug, where this setting overwrites whatever is set in options
+        container: false,
+        viewport: {
+            selector: "body",
+            padding: 0,
+        },
+    };
 
-  bootstrapTooltip.prototype.init = function (type, element, options) {
-    this.enabled   = true
-    this.type      = type
-    this.$element  = $(element)
-    this.options   = this.getOptions(options)
-    this.$viewport = this.options.viewport && $(this.options.viewport.selector || this.options.viewport)
+    bootstrapTooltip.prototype.init = function (type, element, options) {
+        this.enabled = true;
+        this.type = type;
+        this.$element = $(element);
+        this.options = this.getOptions(options);
+        this.$viewport =
+            this.options.viewport &&
+            $(this.options.viewport.selector || this.options.viewport);
 
-    var triggers = this.options.trigger.split(' ')
+        var triggers = this.options.trigger.split(" ");
 
-    for (var i = triggers.length; i--;) {
-      var trigger = triggers[i]
+        for (var i = triggers.length; i--; ) {
+            var trigger = triggers[i];
 
-      if (trigger == 'click') {
-        this.$element.on('click.' + this.type, this.options.selector, $.proxy(this.toggle, this))
-      } else if (trigger != 'manual') {
-        var eventIn  = trigger == 'hover' ? 'mouseenter' : 'focusin'
-        var eventOut = trigger == 'hover' ? 'mouseleave' : 'focusout'
+            if (trigger == "click") {
+                this.$element.on(
+                    "click." + this.type,
+                    this.options.selector,
+                    $.proxy(this.toggle, this)
+                );
+            } else if (trigger != "manual") {
+                var eventIn = trigger == "hover" ? "mouseenter" : "focusin";
+                var eventOut = trigger == "hover" ? "mouseleave" : "focusout";
 
-        this.$element.on(eventIn  + '.' + this.type, this.options.selector, $.proxy(this.enter, this))
-        this.$element.on(eventOut + '.' + this.type, this.options.selector, $.proxy(this.leave, this))
-      }
-    }
-
-    this.options.selector ?
-      (this._options = $.extend({}, this.options, { trigger: 'manual', selector: '' })) :
-      this.fixTitle()
-  }
-
-  bootstrapTooltip.prototype.getDefaults = function () {
-    return bootstrapTooltip.DEFAULTS
-  }
-
-  bootstrapTooltip.prototype.getOptions = function (options) {
-    options = $.extend({}, this.getDefaults(), this.$element.data(), options)
-
-    if (options.delay && typeof options.delay == 'number') {
-      options.delay = {
-        show: options.delay,
-        hide: options.delay
-      }
-    }
-
-    return options
-  }
-
-  bootstrapTooltip.prototype.getDelegateOptions = function () {
-    var options  = {}
-    var defaults = this.getDefaults()
-
-    this._options && $.each(this._options, function (key, value) {
-      if (defaults[key] != value) options[key] = value
-    })
-
-    return options
-  }
-
-  bootstrapTooltip.prototype.enter = function (obj) {
-    var self = obj instanceof this.constructor ?
-      obj : $(obj.currentTarget).data('bs.' + this.type)
-
-    if (!self) {
-      self = new this.constructor(obj.currentTarget, this.getDelegateOptions())
-      $(obj.currentTarget).data('bs.' + this.type, self)
-    }
-
-    self.leaving = false;
-
-    clearTimeout(self.timeout)
-
-    self.hoverState = 'in'
-
-    if (!self.options.delay || !self.options.delay.show) return self.show()
-
-    self.timeout = setTimeout(function () {
-      if (self.hoverState == 'in') self.show()
-    }, self.options.delay.show)
-  }
-
-  bootstrapTooltip.prototype.leave = function (obj) {
-    var self = obj instanceof this.constructor ?
-      obj : $(obj.currentTarget).data('bs.' + this.type)
-    self.leaving = true;
-
-    if (!self) {
-      self = new this.constructor(obj.currentTarget, this.getDelegateOptions())
-      $(obj.currentTarget).data('bs.' + this.type, self)
-    }
-
-    clearTimeout(self.timeout)
-
-    self.hoverState = 'out'
-
-    if (!self.options.delay || !self.options.delay.hide) return self.hide()
-
-    self.timeout = setTimeout(function () {
-      if (self.hoverState == 'out') self.hide()
-    }, self.options.delay.hide)
-  }
-
-  bootstrapTooltip.prototype.show = function () {
-    var e = $.Event('show.bs.' + this.type)
-
-    if (this.hasContent() && this.enabled) {
-      this.$element.trigger(e)
-      var inDom = $.contains(document.documentElement, this.$element[0])
-      if (e.isDefaultPrevented() || !inDom) return
-
-      var $tip = this.tip()
-
-      var tipId = this.getUID(this.type)
-      var self = this;
-      this.setContent().then(function() {
-      $tip.attr('id', tipId)
-      self.$element.attr('aria-describedby', tipId)
-
-      if (self.options.animation) $tip.addClass('fade')
-
-      var placement = typeof self.options.placement == 'function' ?
-        self.options.placement.call(self, $tip[0], self.$element[0]) :
-        self.options.placement
-
-      var autoToken = /\s?auto?\s?/i
-      var autoPlace = autoToken.test(placement)
-      if (autoPlace) placement = placement.replace(autoToken, '') || 'top'
-
-      $tip
-        .detach()
-        .css({ top: 0, left: 0, display: 'block' })
-        .addClass(placement)
-        .data('bs.' + self.type, self)
-
-      self.options.container ? $tip.appendTo(self.options.container) : $tip.insertAfter(self.$element)
-
-      var pos          = self.getPosition()
-      var actualWidth  = $tip[0].offsetWidth
-      var actualHeight = $tip[0].offsetHeight
-
-      if (autoPlace) {
-        var orgPlacement = placement
-        var $parent      = self.$element.parent()
-        var parentDim    = self.getPosition($parent)
-
-        placement = placement == 'bottom' && pos.top   + pos.height       + actualHeight - parentDim.scroll > parentDim.height ? 'top'    :
-                    placement == 'top'    && pos.top   - parentDim.scroll - actualHeight < 0                                   ? 'bottom' :
-                    placement == 'right'  && pos.right + actualWidth      > parentDim.width                                    ? 'left'   :
-                    placement == 'left'   && pos.left  - actualWidth      < parentDim.left                                     ? 'right'  :
-                    placement
-
-        $tip
-          .removeClass(orgPlacement)
-          .addClass(placement)
-      }
-
-      var calculatedOffset = self.getCalculatedOffset(placement, pos, actualWidth, actualHeight)
-
-      self.applyPlacement(calculatedOffset, placement)
-
-      var complete = function () {
-        self.$element.trigger('shown.bs.' + self.type);
-        self.hoverState = null;
-        if (self.leaving) {  // prevent a race condition bug when user has leaved before complete
-          self.leave(self);
+                this.$element.on(
+                    eventIn + "." + this.type,
+                    this.options.selector,
+                    $.proxy(this.enter, this)
+                );
+                this.$element.on(
+                    eventOut + "." + this.type,
+                    this.options.selector,
+                    $.proxy(this.leave, this)
+                );
+            }
         }
-      }
 
-      $.support.transition && self.$tip.hasClass('fade') ?
-        $tip
-          .one('bsTransitionEnd', complete)
-          .emulateTransitionEnd(150) :
-        complete()
-      })
-    }
-  };
+        this.options.selector
+            ? (this._options = $.extend({}, this.options, {
+                  trigger: "manual",
+                  selector: "",
+              }))
+            : this.fixTitle();
+    };
 
-  bootstrapTooltip.prototype.applyPlacement = function (offset, placement) {
-    var $tip   = this.tip()
-    var width  = $tip[0].offsetWidth
-    var height = $tip[0].offsetHeight
+    bootstrapTooltip.prototype.getDefaults = function () {
+        return bootstrapTooltip.DEFAULTS;
+    };
 
-    // manually read margins because getBoundingClientRect includes difference
-    var marginTop = parseInt($tip.css('margin-top'), 10)
-    var marginLeft = parseInt($tip.css('margin-left'), 10)
+    bootstrapTooltip.prototype.getOptions = function (options) {
+        options = $.extend(
+            {},
+            this.getDefaults(),
+            this.$element.data(),
+            options
+        );
 
-    // we must check for NaN for ie 8/9
-    if (isNaN(marginTop))  marginTop  = 0
-    if (isNaN(marginLeft)) marginLeft = 0
+        if (options.delay && typeof options.delay == "number") {
+            options.delay = {
+                show: options.delay,
+                hide: options.delay,
+            };
+        }
 
-    offset.top  = offset.top  + marginTop
-    offset.left = offset.left + marginLeft
+        return options;
+    };
 
-    // $.fn.offset doesn't round pixel values
-    // so we use setOffset directly with our own function B-0
-    $.offset.setOffset($tip[0], $.extend({
-      using: function (props) {
-        $tip.css({
-          top: Math.round(props.top),
-          left: Math.round(props.left)
-        })
-      }
-    }, offset), 0)
+    bootstrapTooltip.prototype.getDelegateOptions = function () {
+        var options = {};
+        var defaults = this.getDefaults();
 
-    $tip.addClass('in')
+        this._options &&
+            $.each(this._options, function (key, value) {
+                if (defaults[key] != value) options[key] = value;
+            });
 
-    // check to see if placing tip in new offset caused the tip to resize itself
-    var actualWidth  = $tip[0].offsetWidth
-    var actualHeight = $tip[0].offsetHeight
+        return options;
+    };
 
-    if (placement == 'top' && actualHeight != height) {
-      offset.top = offset.top + height - actualHeight
-    }
+    bootstrapTooltip.prototype.enter = function (obj) {
+        var self =
+            obj instanceof this.constructor
+                ? obj
+                : $(obj.currentTarget).data("bs." + this.type);
 
-    var delta = this.getViewportAdjustedDelta(placement, offset, actualWidth, actualHeight)
+        if (!self) {
+            self = new this.constructor(
+                obj.currentTarget,
+                this.getDelegateOptions()
+            );
+            $(obj.currentTarget).data("bs." + this.type, self);
+        }
 
-    if (delta.left) offset.left += delta.left
-    else offset.top += delta.top
+        self.leaving = false;
 
-    var arrowDelta          = delta.left ? delta.left * 2 - width + actualWidth : delta.top * 2 - height + actualHeight
-    var arrowPosition       = delta.left ? 'left'        : 'top'
-    var arrowOffsetPosition = delta.left ? 'offsetWidth' : 'offsetHeight'
+        clearTimeout(self.timeout);
 
-    $tip.offset(offset)
-    this.replaceArrow(arrowDelta, $tip[0][arrowOffsetPosition], arrowPosition)
-  }
+        self.hoverState = "in";
 
-  bootstrapTooltip.prototype.replaceArrow = function (delta, dimension, position) {
-    this.arrow().css(position, delta ? (50 * (1 - delta / dimension) + '%') : '')
-  }
+        if (!self.options.delay || !self.options.delay.show) return self.show();
 
-  bootstrapTooltip.prototype.setContent = function () {
-    var $tip  = this.tip();
-    var type = this.options.html ? 'html' : 'text';
-    var selector = this.options.patTooltip ? this.options.patTooltip.contentSelector : null;
+        self.timeout = setTimeout(function () {
+            if (self.hoverState == "in") self.show();
+        }, self.options.delay.show);
+    };
 
-    function setContent(content) {
-      if (type === 'html' && !!selector) {
-        content = $(content).find(selector).html();
-      }
-      $tip.find('.tooltip-inner')[type](content);
-    }
-    function removeClasses() {
-      $tip.removeClass('fade in top bottom left right')
-    }
-    var title = this.getTitle();
-    var url = this.getUrl();
-      if (!!url) {
-        removeClasses();
-        return $.get(url).then(function(content) {
-          setContent(content);
-        });
-      } else {
-        removeClasses();
-        setContent(title);
-        return new Promise(function(resolve, reject) {
-          resolve(title)
-        });
-      }
+    bootstrapTooltip.prototype.leave = function (obj) {
+        var self =
+            obj instanceof this.constructor
+                ? obj
+                : $(obj.currentTarget).data("bs." + this.type);
+        self.leaving = true;
 
-  };
+        if (!self) {
+            self = new this.constructor(
+                obj.currentTarget,
+                this.getDelegateOptions()
+            );
+            $(obj.currentTarget).data("bs." + this.type, self);
+        }
 
-  bootstrapTooltip.prototype.getUrl = function () {
-    return this.options.patTooltip ? this.options.patTooltip.ajaxUrl : null;
-  };
+        clearTimeout(self.timeout);
 
-  bootstrapTooltip.prototype.hide = function () {
-    var that = this
-    var $tip = this.tip()
-    var e    = $.Event('hide.bs.' + this.type)
+        self.hoverState = "out";
 
-    this.$element.removeAttr('aria-describedby')
+        if (!self.options.delay || !self.options.delay.hide) return self.hide();
 
-    function complete() {
-      if (that.hoverState != 'in') $tip.detach()
-      that.$element.trigger('hidden.bs.' + that.type)
-    }
+        self.timeout = setTimeout(function () {
+            if (self.hoverState == "out") self.hide();
+        }, self.options.delay.hide);
+    };
 
-    this.$element.trigger(e)
+    bootstrapTooltip.prototype.show = function () {
+        var e = $.Event("show.bs." + this.type);
 
-    if (e.isDefaultPrevented()) return
+        if (this.hasContent() && this.enabled) {
+            this.$element.trigger(e);
+            var inDom = $.contains(document.documentElement, this.$element[0]);
+            if (e.isDefaultPrevented() || !inDom) return;
 
-    $tip.removeClass('in')
+            var $tip = this.tip();
 
-    $.support.transition && this.$tip.hasClass('fade') ?
-      $tip
-        .one('bsTransitionEnd', complete)
-        .emulateTransitionEnd(150) :
-      complete()
+            var tipId = this.getUID(this.type);
+            var self = this;
+            this.setContent().then(function () {
+                $tip.attr("id", tipId);
+                self.$element.attr("aria-describedby", tipId);
 
-    this.hoverState = null
+                if (self.options.animation) $tip.addClass("fade");
 
-    return this
-  }
+                var placement =
+                    typeof self.options.placement == "function"
+                        ? self.options.placement.call(
+                              self,
+                              $tip[0],
+                              self.$element[0]
+                          )
+                        : self.options.placement;
 
-  bootstrapTooltip.prototype.fixTitle = function () {
-    var $e = this.$element
-    if ($e.attr('title') || typeof ($e.attr('data-original-title')) != 'string') {
-      $e.attr('data-original-title', $e.attr('title') || '').attr('title', '')
-    }
-  }
+                var autoToken = /\s?auto?\s?/i;
+                var autoPlace = autoToken.test(placement);
+                if (autoPlace)
+                    placement = placement.replace(autoToken, "") || "top";
 
-  bootstrapTooltip.prototype.hasContent = function () {
-    return this.getTitle() || this.getUrl();
-  };
+                $tip.detach()
+                    .css({ top: 0, left: 0, display: "block" })
+                    .addClass(placement)
+                    .data("bs." + self.type, self);
 
-  bootstrapTooltip.prototype.getPosition = function ($element) {
-    $element   = $element || this.$element
-    var el     = $element[0]
-    var isBody = el.tagName == 'BODY'
-    return $.extend({}, (typeof el.getBoundingClientRect == 'function') ? el.getBoundingClientRect() : null, {
-      scroll: isBody ? document.documentElement.scrollTop || document.body.scrollTop : $element.scrollTop(),
-      width:  isBody ? $(window).width()  : $element.outerWidth(),
-      height: isBody ? $(window).height() : $element.outerHeight()
-    }, isBody ? { top: 0, left: 0 } : $element.offset())
-  }
+                self.options.container
+                    ? $tip.appendTo(self.options.container)
+                    : $tip.insertAfter(self.$element);
 
-  bootstrapTooltip.prototype.getCalculatedOffset = function (placement, pos, actualWidth, actualHeight) {
-    return placement == 'bottom' ? { top: pos.top + pos.height,   left: pos.left + pos.width / 2 - actualWidth / 2  } :
-           placement == 'top'    ? { top: pos.top - actualHeight, left: pos.left + pos.width / 2 - actualWidth / 2  } :
-           placement == 'left'   ? { top: pos.top + pos.height / 2 - actualHeight / 2, left: pos.left - actualWidth } :
-        /* placement == 'right' */ { top: pos.top + pos.height / 2 - actualHeight / 2, left: pos.left + pos.width   }
+                var pos = self.getPosition();
+                var actualWidth = $tip[0].offsetWidth;
+                var actualHeight = $tip[0].offsetHeight;
 
-  }
+                if (autoPlace) {
+                    var orgPlacement = placement;
+                    var $parent = self.$element.parent();
+                    var parentDim = self.getPosition($parent);
 
-  bootstrapTooltip.prototype.getViewportAdjustedDelta = function (placement, pos, actualWidth, actualHeight) {
-    var delta = { top: 0, left: 0 }
-    if (!this.$viewport) return delta
+                    placement =
+                        placement == "bottom" &&
+                        pos.top + pos.height + actualHeight - parentDim.scroll >
+                            parentDim.height
+                            ? "top"
+                            : placement == "top" &&
+                              pos.top - parentDim.scroll - actualHeight < 0
+                            ? "bottom"
+                            : placement == "right" &&
+                              pos.right + actualWidth > parentDim.width
+                            ? "left"
+                            : placement == "left" &&
+                              pos.left - actualWidth < parentDim.left
+                            ? "right"
+                            : placement;
 
-    var viewportPadding = this.options.viewport && this.options.viewport.padding || 0
-    var viewportDimensions = this.getPosition(this.$viewport)
+                    $tip.removeClass(orgPlacement).addClass(placement);
+                }
 
-    if (/right|left/.test(placement)) {
-      var topEdgeOffset    = pos.top - viewportPadding - viewportDimensions.scroll
-      var bottomEdgeOffset = pos.top + viewportPadding - viewportDimensions.scroll + actualHeight
-      if (topEdgeOffset < viewportDimensions.top) { // top overflow
-        delta.top = viewportDimensions.top - topEdgeOffset
-      } else if (bottomEdgeOffset > viewportDimensions.top + viewportDimensions.height) { // bottom overflow
-        delta.top = viewportDimensions.top + viewportDimensions.height - bottomEdgeOffset
-      }
-    } else {
-      var leftEdgeOffset  = pos.left - viewportPadding
-      var rightEdgeOffset = pos.left + viewportPadding + actualWidth
-      if (leftEdgeOffset < viewportDimensions.left) { // left overflow
-        delta.left = viewportDimensions.left - leftEdgeOffset
-      } else if (rightEdgeOffset > viewportDimensions.width) { // right overflow
-        delta.left = viewportDimensions.left + viewportDimensions.width - rightEdgeOffset
-      }
-    }
+                var calculatedOffset = self.getCalculatedOffset(
+                    placement,
+                    pos,
+                    actualWidth,
+                    actualHeight
+                );
 
-    return delta
-  }
+                self.applyPlacement(calculatedOffset, placement);
 
-  bootstrapTooltip.prototype.getTitle = function () {
-    var title
-    var $e = this.$element
-    var o  = this.options
-    title = $e.attr('data-original-title')
-      || (typeof o.title == 'function' ? o.title.call($e[0]) :  o.title)
+                var complete = function () {
+                    self.$element.trigger("shown.bs." + self.type);
+                    self.hoverState = null;
+                    if (self.leaving) {
+                        // prevent a race condition bug when user has leaved before complete
+                        self.leave(self);
+                    }
+                };
 
-    return title
-  }
+                $.support.transition && self.$tip.hasClass("fade")
+                    ? $tip
+                          .one("bsTransitionEnd", complete)
+                          .emulateTransitionEnd(150)
+                    : complete();
+            });
+        }
+    };
 
-  bootstrapTooltip.prototype.getUID = function (prefix) {
-    do prefix += ~~(Math.random() * 1000000)
-    while (document.getElementById(prefix))
-    return prefix
-  }
+    bootstrapTooltip.prototype.applyPlacement = function (offset, placement) {
+        var $tip = this.tip();
+        var width = $tip[0].offsetWidth;
+        var height = $tip[0].offsetHeight;
 
-  bootstrapTooltip.prototype.tip = function () {
-    if (!!this.$tip) {
-      return this.$tip;
-    }
-    var $tip = this.$tip || $(this.options.template);
-    if (this.options.patTooltip) {
+        // manually read margins because getBoundingClientRect includes difference
+        var marginTop = parseInt($tip.css("margin-top"), 10);
+        var marginLeft = parseInt($tip.css("margin-left"), 10);
 
-    if (this.options.patTooltip.style) {
-      $tip.css(this.options.patTooltip.style)
-    }
-    if (this.options.patTooltip['class']) {
-      $tip.addClass(this.options.patTooltip['class'])
-    }
-    if (this.options.patTooltip.innerStyle) {
-      $tip.find('.tooltip-inner').css(this.options.patTooltip.innerStyle)
-    }
-    }
-    this.$tip = $tip;
-    return $tip;
-  }
+        // we must check for NaN for ie 8/9
+        if (isNaN(marginTop)) marginTop = 0;
+        if (isNaN(marginLeft)) marginLeft = 0;
 
-  bootstrapTooltip.prototype.arrow = function () {
-    return (this.$arrow = this.$arrow || this.tip().find('.tooltip-arrow'))
-  }
+        offset.top = offset.top + marginTop;
+        offset.left = offset.left + marginLeft;
 
-  bootstrapTooltip.prototype.validate = function () {
-    if (!this.$element[0].parentNode) {
-      this.hide()
-      this.$element = null
-      this.options  = null
-    }
-  }
+        // $.fn.offset doesn't round pixel values
+        // so we use setOffset directly with our own function B-0
+        $.offset.setOffset(
+            $tip[0],
+            $.extend(
+                {
+                    using: function (props) {
+                        $tip.css({
+                            top: Math.round(props.top),
+                            left: Math.round(props.left),
+                        });
+                    },
+                },
+                offset
+            ),
+            0
+        );
 
-  bootstrapTooltip.prototype.enable = function () {
-    this.enabled = true
-  }
+        $tip.addClass("in");
 
-  bootstrapTooltip.prototype.disable = function () {
-    this.enabled = false
-  }
+        // check to see if placing tip in new offset caused the tip to resize itself
+        var actualWidth = $tip[0].offsetWidth;
+        var actualHeight = $tip[0].offsetHeight;
 
-  bootstrapTooltip.prototype.toggleEnabled = function () {
-    this.enabled = !this.enabled
-  }
+        if (placement == "top" && actualHeight != height) {
+            offset.top = offset.top + height - actualHeight;
+        }
 
-  bootstrapTooltip.prototype.toggle = function (e) {
-    var self = this
-    if (e) {
-      self = $(e.currentTarget).data('bs.' + this.type)
-      if (!self) {
-        self = new this.constructor(e.currentTarget, this.getDelegateOptions())
-        $(e.currentTarget).data('bs.' + this.type, self)
-      }
-    }
+        var delta = this.getViewportAdjustedDelta(
+            placement,
+            offset,
+            actualWidth,
+            actualHeight
+        );
 
-    self.tip().hasClass('in') ? self.leave(self) : self.enter(self)
-  }
+        if (delta.left) offset.left += delta.left;
+        else offset.top += delta.top;
 
-  bootstrapTooltip.prototype.destroy = function () {
-    clearTimeout(this.timeout)
-    this.hide().$element.off('.' + this.type).removeData('bs.' + this.type)
-  }
+        var arrowDelta = delta.left
+            ? delta.left * 2 - width + actualWidth
+            : delta.top * 2 - height + actualHeight;
+        var arrowPosition = delta.left ? "left" : "top";
+        var arrowOffsetPosition = delta.left ? "offsetWidth" : "offsetHeight";
 
-  var Tooltip = Base.extend({
-    name: 'tooltip',
-    trigger: '.pat-tooltip',
-    parser: 'mockup',
-    defaults: {
-      html: false,
-      placement: 'top'
-    },
-    init: function() {
-        if (this.options.html === 'true' || this.options.html === true) {
-          // TODO: fix the parser!
-          this.options.html = true;
+        $tip.offset(offset);
+        this.replaceArrow(
+            arrowDelta,
+            $tip[0][arrowOffsetPosition],
+            arrowPosition
+        );
+    };
+
+    bootstrapTooltip.prototype.replaceArrow = function (
+        delta,
+        dimension,
+        position
+    ) {
+        this.arrow().css(
+            position,
+            delta ? 50 * (1 - delta / dimension) + "%" : ""
+        );
+    };
+
+    bootstrapTooltip.prototype.setContent = function () {
+        var $tip = this.tip();
+        var type = this.options.html ? "html" : "text";
+        var selector = this.options.patTooltip
+            ? this.options.patTooltip.contentSelector
+            : null;
+
+        function setContent(content) {
+            if (type === "html" && !!selector) {
+                content = $(content).find(selector).html();
+            }
+            $tip.find(".tooltip-inner")[type](content);
+        }
+        function removeClasses() {
+            $tip.removeClass("fade in top bottom left right");
+        }
+        var title = this.getTitle();
+        var url = this.getUrl();
+        if (url) {
+            removeClasses();
+            return $.get(url).then(function (content) {
+                setContent(content);
+            });
         } else {
-          this.options.html = false;
+            removeClasses();
+            setContent(title);
+            return new Promise(function (resolve, reject) {
+                resolve(title);
+            });
         }
-        this.data = new bootstrapTooltip(this.$el[0], this.options);
-      },
-  });
+    };
 
-  return Tooltip;
+    bootstrapTooltip.prototype.getUrl = function () {
+        return this.options.patTooltip ? this.options.patTooltip.ajaxUrl : null;
+    };
 
+    bootstrapTooltip.prototype.hide = function () {
+        var that = this;
+        var $tip = this.tip();
+        var e = $.Event("hide.bs." + this.type);
+
+        this.$element.removeAttr("aria-describedby");
+
+        function complete() {
+            if (that.hoverState != "in") $tip.detach();
+            that.$element.trigger("hidden.bs." + that.type);
+        }
+
+        this.$element.trigger(e);
+
+        if (e.isDefaultPrevented()) return;
+
+        $tip.removeClass("in");
+
+        $.support.transition && this.$tip.hasClass("fade")
+            ? $tip.one("bsTransitionEnd", complete).emulateTransitionEnd(150)
+            : complete();
+
+        this.hoverState = null;
+
+        return this;
+    };
+
+    bootstrapTooltip.prototype.fixTitle = function () {
+        var $e = this.$element;
+        if (
+            $e.attr("title") ||
+            typeof $e.attr("data-original-title") != "string"
+        ) {
+            $e.attr("data-original-title", $e.attr("title") || "").attr(
+                "title",
+                ""
+            );
+        }
+    };
+
+    bootstrapTooltip.prototype.hasContent = function () {
+        return this.getTitle() || this.getUrl();
+    };
+
+    bootstrapTooltip.prototype.getPosition = function ($element) {
+        $element = $element || this.$element;
+        var el = $element[0];
+        var isBody = el.tagName == "BODY";
+        return $.extend(
+            {},
+            typeof el.getBoundingClientRect == "function"
+                ? el.getBoundingClientRect()
+                : null,
+            {
+                scroll: isBody
+                    ? document.documentElement.scrollTop ||
+                      document.body.scrollTop
+                    : $element.scrollTop(),
+                width: isBody ? $(window).width() : $element.outerWidth(),
+                height: isBody ? $(window).height() : $element.outerHeight(),
+            },
+            isBody ? { top: 0, left: 0 } : $element.offset()
+        );
+    };
+
+    bootstrapTooltip.prototype.getCalculatedOffset = function (
+        placement,
+        pos,
+        actualWidth,
+        actualHeight
+    ) {
+        return placement == "bottom"
+            ? {
+                  top: pos.top + pos.height,
+                  left: pos.left + pos.width / 2 - actualWidth / 2,
+              }
+            : placement == "top"
+            ? {
+                  top: pos.top - actualHeight,
+                  left: pos.left + pos.width / 2 - actualWidth / 2,
+              }
+            : placement == "left"
+            ? {
+                  top: pos.top + pos.height / 2 - actualHeight / 2,
+                  left: pos.left - actualWidth,
+              }
+            : /* placement == 'right' */ {
+                  top: pos.top + pos.height / 2 - actualHeight / 2,
+                  left: pos.left + pos.width,
+              };
+    };
+
+    bootstrapTooltip.prototype.getViewportAdjustedDelta = function (
+        placement,
+        pos,
+        actualWidth,
+        actualHeight
+    ) {
+        var delta = { top: 0, left: 0 };
+        if (!this.$viewport) return delta;
+
+        var viewportPadding =
+            (this.options.viewport && this.options.viewport.padding) || 0;
+        var viewportDimensions = this.getPosition(this.$viewport);
+
+        if (/right|left/.test(placement)) {
+            var topEdgeOffset =
+                pos.top - viewportPadding - viewportDimensions.scroll;
+            var bottomEdgeOffset =
+                pos.top +
+                viewportPadding -
+                viewportDimensions.scroll +
+                actualHeight;
+            if (topEdgeOffset < viewportDimensions.top) {
+                // top overflow
+                delta.top = viewportDimensions.top - topEdgeOffset;
+            } else if (
+                bottomEdgeOffset >
+                viewportDimensions.top + viewportDimensions.height
+            ) {
+                // bottom overflow
+                delta.top =
+                    viewportDimensions.top +
+                    viewportDimensions.height -
+                    bottomEdgeOffset;
+            }
+        } else {
+            var leftEdgeOffset = pos.left - viewportPadding;
+            var rightEdgeOffset = pos.left + viewportPadding + actualWidth;
+            if (leftEdgeOffset < viewportDimensions.left) {
+                // left overflow
+                delta.left = viewportDimensions.left - leftEdgeOffset;
+            } else if (rightEdgeOffset > viewportDimensions.width) {
+                // right overflow
+                delta.left =
+                    viewportDimensions.left +
+                    viewportDimensions.width -
+                    rightEdgeOffset;
+            }
+        }
+
+        return delta;
+    };
+
+    bootstrapTooltip.prototype.getTitle = function () {
+        var title;
+        var $e = this.$element;
+        var o = this.options;
+        title =
+            $e.attr("data-original-title") ||
+            (typeof o.title == "function" ? o.title.call($e[0]) : o.title);
+
+        return title;
+    };
+
+    bootstrapTooltip.prototype.getUID = function (prefix) {
+        do prefix += ~~(Math.random() * 1000000);
+        while (document.getElementById(prefix));
+        return prefix;
+    };
+
+    bootstrapTooltip.prototype.tip = function () {
+        if (this.$tip) {
+            return this.$tip;
+        }
+        var $tip = this.$tip || $(this.options.template);
+        if (this.options.patTooltip) {
+            if (this.options.patTooltip.style) {
+                $tip.css(this.options.patTooltip.style);
+            }
+            if (this.options.patTooltip["class"]) {
+                $tip.addClass(this.options.patTooltip["class"]);
+            }
+            if (this.options.patTooltip.innerStyle) {
+                $tip.find(".tooltip-inner").css(
+                    this.options.patTooltip.innerStyle
+                );
+            }
+        }
+        this.$tip = $tip;
+        return $tip;
+    };
+
+    bootstrapTooltip.prototype.arrow = function () {
+        return (this.$arrow = this.$arrow || this.tip().find(".tooltip-arrow"));
+    };
+
+    bootstrapTooltip.prototype.validate = function () {
+        if (!this.$element[0].parentNode) {
+            this.hide();
+            this.$element = null;
+            this.options = null;
+        }
+    };
+
+    bootstrapTooltip.prototype.enable = function () {
+        this.enabled = true;
+    };
+
+    bootstrapTooltip.prototype.disable = function () {
+        this.enabled = false;
+    };
+
+    bootstrapTooltip.prototype.toggleEnabled = function () {
+        this.enabled = !this.enabled;
+    };
+
+    bootstrapTooltip.prototype.toggle = function (e) {
+        var self = this;
+        if (e) {
+            self = $(e.currentTarget).data("bs." + this.type);
+            if (!self) {
+                self = new this.constructor(
+                    e.currentTarget,
+                    this.getDelegateOptions()
+                );
+                $(e.currentTarget).data("bs." + this.type, self);
+            }
+        }
+
+        self.tip().hasClass("in") ? self.leave(self) : self.enter(self);
+    };
+
+    bootstrapTooltip.prototype.destroy = function () {
+        clearTimeout(this.timeout);
+        this.hide()
+            .$element.off("." + this.type)
+            .removeData("bs." + this.type);
+    };
+
+    var Tooltip = Base.extend({
+        name: "tooltip",
+        trigger: ".pat-tooltip",
+        parser: "mockup",
+        defaults: {
+            html: false,
+            placement: "top",
+        },
+        init: function () {
+            if (this.options.html === "true" || this.options.html === true) {
+                // TODO: fix the parser!
+                this.options.html = true;
+            } else {
+                this.options.html = false;
+            }
+            this.data = new bootstrapTooltip(this.$el[0], this.options);
+        },
+    });
+
+    return Tooltip;
 });
 
 define('mockup-ui-url/views/button',[
-  'underscore',
-  'mockup-ui-url/views/base',
-  'mockup-patterns-tooltip'
-], function(_, BaseView, Tooltip) {
-  'use strict';
+    "underscore",
+    "mockup-ui-url/views/base",
+    "mockup-patterns-tooltip",
+], function (_, BaseView, Tooltip) {
+    "use strict";
 
-  var ButtonView = BaseView.extend({
-    tagName: 'a',
-    className: 'btn',
-    eventPrefix: 'button',
-    context: 'default',
-    idPrefix: 'btn-',
-    attributes: {
-      'href': '#'
-    },
-    extraClasses: [],
-    tooltip: null,
-    template: '<% if (icon) { %><span class="glyphicon glyphicon-<%= icon %>"></span><% } %> <%= title %>',
-    events: {
-      'click': 'handleClick'
-    },
-    initialize: function(options) {
-      if (!options.id) {
-        var title = options.title || '';
-        options.id = title !== '' ? title.toLowerCase().replace(' ', '-') : this.cid;
-      }
-      BaseView.prototype.initialize.apply(this, [options]);
-
-      this.on('render', function() {
-        this.$el.attr('title', this.options.title || '');
-        this.$el.attr('aria-label', this.options.title || this.options.tooltip || '');
-        if (this.context !== null) {
-          this.$el.addClass('btn-' + this.context);
-        }
-        _.each(this.extraClasses, function(klass){
-          this.$el.addClass(klass);
-        }.bind(this));
-
-        if (this.tooltip !== null) {
-
-          this.$el.attr('title', this.tooltip);
-          var tooltipPattern = new Tooltip(this.$el);
-          // XXX since tooltip triggers hidden
-          // suppress so it plays nice with modals, backdrops, etc
-          this.$el.on('hidden', function(e) {
-            if (e.type === 'hidden') {
-              e.stopPropagation();
+    var ButtonView = BaseView.extend({
+        tagName: "a",
+        className: "btn",
+        eventPrefix: "button",
+        context: "default",
+        idPrefix: "btn-",
+        attributes: {
+            href: "#",
+        },
+        extraClasses: [],
+        tooltip: null,
+        template:
+            '<% if (icon) { %><span class="glyphicon glyphicon-<%= icon %>"></span><% } %> <%= title %>',
+        events: {
+            click: "handleClick",
+        },
+        initialize: function (options) {
+            if (!options.id) {
+                var title = options.title || "";
+                options.id =
+                    title !== "" ? title.toLowerCase().replace(" ", "-") : this.cid; // prettier-ignore
             }
-          });
-        }
-      }, this);
-    },
-    handleClick: function(e) {
-      e.preventDefault();
-      if (!this.$el.is('.disabled')) {
-        this.uiEventTrigger('click', this, e);
-      }
-    },
-    serializedModel: function() {
-      return _.extend({'icon': '', 'title': ''}, this.options);
-    },
-    disable: function() {
-      this.$el.addClass('disabled');
-    },
-    enable: function() {
-      this.$el.removeClass('disabled');
-    }
-  });
+            BaseView.prototype.initialize.apply(this, [options]);
 
-  return ButtonView;
+            this.on(
+                "render",
+                function () {
+                    this.$el.attr("title", this.options.title || "");
+                    this.$el.attr(
+                        "aria-label",
+                        this.options.title || this.options.tooltip || ""
+                    );
+                    if (this.context !== null) {
+                        this.$el.addClass("btn-" + this.context);
+                    }
+                    _.each(
+                        this.extraClasses,
+                        function (klass) {
+                            this.$el.addClass(klass);
+                        }.bind(this)
+                    );
+
+                    if (this.tooltip !== null) {
+                        this.$el.attr("title", this.tooltip);
+                        var tooltipPattern = new Tooltip(this.$el);
+                        // XXX since tooltip triggers hidden
+                        // suppress so it plays nice with modals, backdrops, etc
+                        this.$el.on("hidden", function (e) {
+                            if (e.type === "hidden") {
+                                e.stopPropagation();
+                            }
+                        });
+                    }
+                },
+                this
+            );
+        },
+        handleClick: function (e) {
+            e.preventDefault();
+            if (!this.$el.is(".disabled")) {
+                this.uiEventTrigger("click", this, e);
+            }
+        },
+        serializedModel: function () {
+            return _.extend({ icon: "", title: "" }, this.options);
+        },
+        disable: function () {
+            this.$el.addClass("disabled");
+        },
+        enable: function () {
+            this.$el.removeClass("disabled");
+        },
+    });
+
+    return ButtonView;
 });
 
 /**
@@ -6162,680 +6389,766 @@ define('text!mockup-patterns-relateditems-url/templates/toolbar.xml',[],function
  */
 
 define('mockup-patterns-relateditems',[
-  'jquery',
-  'underscore',
-  'pat-base',
-  'mockup-patterns-select2',
-  'mockup-ui-url/views/button',
-  'mockup-utils',
-  'pat-registry',
-  'translate',
-  'text!mockup-patterns-relateditems-url/templates/breadcrumb.xml',
-  'text!mockup-patterns-relateditems-url/templates/favorite.xml',
-  'text!mockup-patterns-relateditems-url/templates/recentlyused.xml',
-  'text!mockup-patterns-relateditems-url/templates/result.xml',
-  'text!mockup-patterns-relateditems-url/templates/selection.xml',
-  'text!mockup-patterns-relateditems-url/templates/toolbar.xml',
-  'bootstrap-dropdown'
-], function($, _, Base, Select2, ButtonView, utils, registry, _t,
-            BreadcrumbTemplate,
-            FavoriteTemplate,
-            RecentlyUsedTemplate,
-            ResultTemplate,
-            SelectionTemplate,
-            ToolbarTemplate
+    "jquery",
+    "underscore",
+    "pat-base",
+    "mockup-patterns-select2",
+    "mockup-ui-url/views/button",
+    "mockup-utils",
+    "pat-registry",
+    "translate",
+    "text!mockup-patterns-relateditems-url/templates/breadcrumb.xml",
+    "text!mockup-patterns-relateditems-url/templates/favorite.xml",
+    "text!mockup-patterns-relateditems-url/templates/recentlyused.xml",
+    "text!mockup-patterns-relateditems-url/templates/result.xml",
+    "text!mockup-patterns-relateditems-url/templates/selection.xml",
+    "text!mockup-patterns-relateditems-url/templates/toolbar.xml",
+    "bootstrap-dropdown",
+], function (
+    $,
+    _,
+    Base,
+    Select2,
+    ButtonView,
+    utils,
+    registry,
+    _t,
+    BreadcrumbTemplate,
+    FavoriteTemplate,
+    RecentlyUsedTemplate,
+    ResultTemplate,
+    SelectionTemplate,
+    ToolbarTemplate
 ) {
-  'use strict';
+    "use strict";
 
-  var KEY = {
-    LEFT: 37,
-    RIGHT: 39
-  };
+    var KEY = {
+        LEFT: 37,
+        RIGHT: 39,
+    };
 
-  var RelatedItems = Base.extend({
-    name: 'relateditems',
-    trigger: '.pat-relateditems',
-    parser: 'mockup',
-    currentPath: undefined,
-    selectedUIDs: [],
-    openAfterInit: undefined,
-    defaults: {
-      // main option
-      vocabularyUrl: null,  // must be set to work
+    var RelatedItems = Base.extend({
+        name: "relateditems",
+        trigger: ".pat-relateditems",
+        parser: "mockup",
+        currentPath: undefined,
+        selectedUIDs: [],
+        openAfterInit: undefined,
+        defaults: {
+            // main option
+            vocabularyUrl: null, // must be set to work
 
-      // more options
-      attributes: ['UID', 'Title', 'portal_type', 'path', 'getURL', 'getIcon', 'is_folderish', 'review_state'],  // used by utils.QueryHelper
-      basePath: '',
-      pageSize: 10,
-      browsing: undefined,
-      closeOnSelect: true,
-      contextPath: undefined,
-      dropdownCssClass: 'pattern-relateditems-dropdown',
-      favorites: [],
-      recentlyUsed: false,
-      recentlyUsedMaxItems: 20,
-      recentlyUsedKey: 'relateditems_recentlyused',
-      maximumSelectionSize: -1,
-      minimumInputLength: 0,
-      mode: 'auto', // possible values are 'auto', 'search' and 'browse'.
-      orderable: true,  // mockup-patterns-select2
-      pathOperator: 'plone.app.querystring.operation.string.path',
-      rootPath: '/',
-      rootUrl: '',  // default to be relative.
-      scanSelection: false,  // False, to no unnecessarily use CPU time on this.
-      selectableTypes: null, // null means everything is selectable, otherwise a list of strings to match types that are selectable
-      separator: ',',
-      sortOn: null,
-      sortOrder: 'ascending',
-      tokenSeparators: [',', ' '],
-      upload: false,
-      uploadAllowView: undefined,
-      width: '100%',
+            // more options
+            attributes: [
+                "UID",
+                "Title",
+                "portal_type",
+                "path",
+                "getURL",
+                "getIcon",
+                "is_folderish",
+                "review_state",
+            ], // used by utils.QueryHelper
+            basePath: "",
+            pageSize: 10,
+            browsing: undefined,
+            closeOnSelect: true,
+            contextPath: undefined,
+            dropdownCssClass: "pattern-relateditems-dropdown",
+            favorites: [],
+            recentlyUsed: false,
+            recentlyUsedMaxItems: 20,
+            recentlyUsedKey: "relateditems_recentlyused",
+            maximumSelectionSize: -1,
+            minimumInputLength: 0,
+            mode: "auto", // possible values are 'auto', 'search' and 'browse'.
+            orderable: true, // mockup-patterns-select2
+            pathOperator: "plone.app.querystring.operation.string.path",
+            rootPath: "/",
+            rootUrl: "", // default to be relative.
+            scanSelection: false, // False, to no unnecessarily use CPU time on this.
+            selectableTypes: null, // null means everything is selectable, otherwise a list of strings to match types that are selectable
+            separator: ",",
+            sortOn: null,
+            sortOrder: "ascending",
+            tokenSeparators: [",", " "],
+            upload: false,
+            uploadAllowView: undefined,
+            width: "100%",
 
-      // templates
-      breadcrumbTemplate: BreadcrumbTemplate,
-      breadcrumbTemplateSelector: null,
-      favoriteTemplate: FavoriteTemplate,
-      favoriteTemplateSelector: null,
-      recentlyusedTemplate: RecentlyUsedTemplate,
-      recentlyusedTemplateSelector: null,
-      resultTemplate: ResultTemplate,
-      resultTemplateSelector: null,
-      selectionTemplate: SelectionTemplate,
-      selectionTemplateSelector: null,
-      toolbarTemplate: ToolbarTemplate,
-      toolbarTemplateSelector: null,
+            // templates
+            breadcrumbTemplate: BreadcrumbTemplate,
+            breadcrumbTemplateSelector: null,
+            favoriteTemplate: FavoriteTemplate,
+            favoriteTemplateSelector: null,
+            recentlyusedTemplate: RecentlyUsedTemplate,
+            recentlyusedTemplateSelector: null,
+            resultTemplate: ResultTemplate,
+            resultTemplateSelector: null,
+            selectionTemplate: SelectionTemplate,
+            selectionTemplateSelector: null,
+            toolbarTemplate: ToolbarTemplate,
+            toolbarTemplateSelector: null,
 
-      // needed
-      multiple: true,
+            // needed
+            multiple: true,
+        },
 
-    },
-
-    recentlyUsed: function (filterSelectable) {
-      var ret = utils.storage.get(this.options.recentlyUsedKey) || [];
-      // hard-limit to 1000 entries
-      ret = ret.slice(ret.length-1000, ret.length);
-      if (filterSelectable) {
-        // Filter out only selectable items.
-        // This is used only to create the list of items to be displayed.
-        // the list to be stored is unfiltered and can be reused among
-        // different instances of this widget with different settings.
-        ret.filter(this.isSelectable.bind(this));
-      }
-      // max is applied AFTER filtering selectable items.
-      var max = parseInt(this.options.recentlyUsedMaxItems, 10);
-      if (max) {
-        // return the slice from the end, as we want to display newest items first.
-        ret = ret.slice(ret.length-max, ret.length);
-      }
-      return ret;
-    },
-
-    applyTemplate: function(tpl, item) {
-      var self = this;
-      var template;
-      if (self.options[tpl + 'TemplateSelector']) {
-        template = $(self.options[tpl + 'TemplateSelector']).html();
-        if (!template) {
-          template = self.options[tpl + 'Template'];
-        }
-      } else {
-        template = self.options[tpl + 'Template'];
-      }
-      // let's give all the options possible to the template generation
-      var options = $.extend(true, {}, self.options, item, {
-        'browsing': self.browsing,
-        'open_folder': _t('Open folder'),
-        'current_directory': _t('current directory:'),
-        'one_level_up': _t('Go one level up')
-      });
-      options._item = item;
-      return _.template(template)(options);
-    },
-
-    setAjax: function () {
-      var ajax = {
-
-        url: this.options.vocabularyUrl,
-        dataType: 'JSON',
-        quietMillis: 500,
-
-        data: function (term, page) {
-
-          var criterias = [];
-          if (term) {
-            term = '*' + term + '*';
-            criterias.push({
-              i: 'SearchableText',
-              o: 'plone.app.querystring.operation.string.contains',
-              v: term
-            });
-          }
-
-          // We don't restrict for selectable types while browsing...
-          if (!this.browsing && this.options.selectableTypes) {
-            criterias.push({
-              i: 'portal_type',
-              o: 'plone.app.querystring.operation.selection.any',
-              v: this.options.selectableTypes
-            });
-          }
-
-          criterias.push({
-            i: 'path',
-            o: this.options.pathOperator,
-            v: this.options.rootPath + this.currentPath + (this.browsing ? '::1' : '')
-          });
-
-          var sort_on = this.options.sortOn;
-          var sort_order = sort_on ? this.options.sortOrder : null;
-          if (this.browsing && sort_on === null) {
-            sort_on = 'getObjPositionInParent';
-            sort_order = 'ascending';
-          }
-
-          var data = {
-            query: JSON.stringify({
-              criteria: criterias,
-              sort_on: sort_on,
-              sort_order: sort_order
-            }),
-            attributes: JSON.stringify(this.options.attributes),
-            batch: JSON.stringify({
-              page: page ? page : 1,
-              size: this.options.pageSize
-            })
-          };
-          return data;
-        }.bind(this),
-
-        results: function (data, page) {
-
-          var more = (page * this.options.pageSize) < data.total;
-          var results = data.results;
-
-          this.selectedUIDs = (this.$el.select2('data') || []).map(function (el) {
-            // populate current selection. Reuse in formatResult
-            return el.UID;
-          });
-
-          // Filter out items:
-          // While browsing: always include folderish items
-          // Browsing and searching: Only include selectable items which are not already selected, and all folders
-          // even if they're selected, as we need them available for browsing/selecting their children
-          results = results.filter(
-            function (item) {
-              if (
-                (this.browsing && item.is_folderish) ||
-                (this.isSelectable(item) && this.selectedUIDs.indexOf(item.UID) === -1)
-              ) {
-                return true;
-              }
-              return false;
-            }.bind(this)
-          );
-
-          // Extend ``data`` with a ``oneLevelUp`` item when browsing
-          var path = this.currentPath.split('/');
-          if (page === 1 &&           // Show level up only on top.
-            this.browsing  &&         // only level up when browsing
-            path.length > 1 &&        // do not try to level up one level under root.
-            this.currentPath !== '/'  // do not try to level up beyond root
-          ) {
-            results = [{
-              'oneLevelUp': true,
-              'Title': _t('One level up'),
-              'path': path.slice(0, path.length - 1).join('/') || '/',
-              'currentPath': this.currentPath,
-              'is_folderish': true,
-              'selectable': false
-            }].concat(results);
-          }
-          return {
-            results: results,
-            more: more
-          };
-        }.bind(this)
-
-      };
-      this.options.ajax = ajax;
-    },
-
-    renderToolbar: function () {
-      var self = this;
-      var path = self.currentPath;
-      var html;
-
-      var paths = path.split('/');
-      var itemPath = '';
-      var itemsHtml = '';
-      _.each(paths, function(node) {
-        if (node !== '') {
-          var item = {};
-          item.path = itemPath = itemPath + '/' + node;
-          item.text = node;
-          itemsHtml = itemsHtml + self.applyTemplate('breadcrumb', item);
-        }
-      });
-
-      // favorites
-      var favoritesHtml = '';
-      _.each(self.options.favorites, function (item) {
-        var item_copy = _.clone(item);
-        item_copy.path = item_copy.path.substr(self.options.rootPath.length) || '/';
-        favoritesHtml = favoritesHtml + self.applyTemplate('favorite', item_copy);
-      });
-
-      var recentlyUsedHtml = '';
-      if (self.options.recentlyUsed) {
-        var recentlyUsed = self.recentlyUsed(true);  // filter out only those items which can actually be selected
-        _.each(recentlyUsed.reverse(), function (item) {  // reverse to get newest first.
-          recentlyUsedHtml = recentlyUsedHtml + self.applyTemplate('recentlyused', item);
-        });
-      }
-
-      html = self.applyTemplate('toolbar', {
-        items: itemsHtml,
-        favItems: favoritesHtml,
-        favText: _t('Favorites'),
-        searchText: _t('Current path:'),
-        searchModeText: _t('Search'),
-        browseModeText: _t('Browse'),
-        recentlyUsedItems: recentlyUsedHtml,
-        recentlyUsedText: _t('Recently Used'),
-      });
-
-      self.$toolbar.html(html);
-
-      $('.dropdown-toggle', self.$toolbar).dropdown();
-
-      // unbind mouseup event from select2 to override the behavior:
-      $(".pattern-relateditems-dropdown").unbind("mouseup");
-      $(".pattern-relateditems-dropdown").bind("mouseup", function(e) {
-          e.stopPropagation();
-      });
-
-      $('button.mode.search', self.$toolbar).on('click', function(e) {
-        e.preventDefault();
-        if (self.browsing) {
-          $('button.mode.search', self.$toolbar).toggleClass('btn-primary btn-default');
-          $('button.mode.browse', self.$toolbar).toggleClass('btn-primary btn-default');
-          self.browsing = false;
-          if (self.$el.select2('data').length > 0) {
-            // Have to call after initialization
-            self.openAfterInit = true;
-          }
-          if (!self.openAfterInit) {
-            self.$el.select2('close');
-            self.$el.select2('open');
-          }
-        } else {
-          // just open result list
-          self.$el.select2('close');
-          self.$el.select2('open');
-        }
-      });
-
-      $('button.mode.browse', self.$toolbar).on('click', function(e) {
-        e.preventDefault();
-        if (!self.browsing) {
-          $('button.mode.search', self.$toolbar).toggleClass('btn-primary btn-default');
-          $('button.mode.browse', self.$toolbar).toggleClass('btn-primary btn-default');
-          self.browsing = true;
-          if (self.$el.select2('data').length > 0) {
-            // Have to call after initialization
-            self.openAfterInit = true;
-          }
-          if (!self.openAfterInit) {
-            self.$el.select2('close');
-            self.$el.select2('open');
-          }
-        } else {
-          // just open result list
-          self.$el.select2('close');
-          self.$el.select2('open');
-        }
-      });
-
-      $('a.crumb', self.$toolbar).on('click', function(e) {
-        e.preventDefault();
-        self.browseTo($(this).attr('href'));
-      });
-
-      $('a.fav', self.$toolbar).on('click', function(e) {
-        e.preventDefault();
-        self.browseTo($(this).attr('href'));
-      });
-
-      if (self.options.recentlyUsed) {
-        $('.pattern-relateditems-recentlyused-select', self.$toolbar).on('click', function(event) {
-          event.preventDefault();
-          var uid = $(this).data('uid');
-          var item = self.recentlyUsed().filter(function (it) { return it.UID === uid; });
-          if (item.length > 0) {
-            item = item[0];
-          } else {
-            return;
-          }
-          self.selectItem(item);
-          if (self.options.maximumSelectionSize > 0) {
-            var items = self.$el.select2('data');
-            if (items.length >= self.options.maximumSelectionSize) {
-              return;
+        recentlyUsed: function (filterSelectable) {
+            var ret = utils.storage.get(this.options.recentlyUsedKey) || [];
+            // hard-limit to 1000 entries
+            ret = ret.slice(ret.length - 1000, ret.length);
+            if (filterSelectable) {
+                // Filter out only selectable items.
+                // This is used only to create the list of items to be displayed.
+                // the list to be stored is unfiltered and can be reused among
+                // different instances of this widget with different settings.
+                ret.filter(this.isSelectable.bind(this));
             }
-          }
-        });
-      }
+            // max is applied AFTER filtering selectable items.
+            var max = parseInt(this.options.recentlyUsedMaxItems, 10);
+            if (max) {
+                // return the slice from the end, as we want to display newest items first.
+                ret = ret.slice(ret.length - max, ret.length);
+            }
+            return ret;
+        },
 
-      function initUploadView(UploadView, disabled) {
-        var uploadButtonId = 'upload-' + utils.generateId();
-        var uploadButton = new ButtonView({
-          id:  uploadButtonId,
-          title: _t('Upload'),
-          tooltip: _t('Upload files'),
-          icon: 'upload',
-        });
-        if (disabled) {
-          uploadButton.disable();
-        }
-        $('.controls', self.$toolbar).prepend(uploadButton.render().el);
-        self.uploadView = new UploadView({
-          triggerView: uploadButton,
-          app: self
-        });
-        $('#btn-' +  uploadButtonId, self.$toolbar).append(self.uploadView.render().el);
-      }
-
-      // upload
-      if (self.options.upload && utils.featureSupport.dragAndDrop() && utils.featureSupport.fileApi()) {
-
-        require(['mockup-patterns-relateditems-upload'], function (UploadView) {
-          if (self.options.uploadAllowView) {
-            // Check, if uploads are allowed in current context
-            $.ajax({
-              url: self.options.uploadAllowView,
-              // url: self.currentUrl() + self.options.uploadAllowView,  // not working yet
-              dataType: 'JSON',
-              data: {
-                path: self.options.rootPath + self.currentPath
-              },
-              type: 'GET',
-              success: function (result) {
-                initUploadView(UploadView, !result.allowUpload);
-              }
-            });
-          } else {
-            // just initialize upload view without checking, if uploads are allowed.
-            initUploadView(UploadView);
-          }
-        });
-
-      }
-
-    },
-
-    browseTo: function (path) {
-      var self = this;
-      self.emit('before-browse');
-      self.currentPath = path;
-      self.$el.select2('close');
-      self.renderToolbar();
-      self.$el.select2('open');
-      self.emit('after-browse');
-    },
-
-    selectItem: function(item) {
-      var self = this;
-      self.emit('selecting');
-      var data = self.$el.select2('data');
-      data.push(item);
-      self.$el.select2('data', data, true);
-
-      if (self.options.recentlyUsed) {
-        // add to recently added items
-        var recentlyUsed = self.recentlyUsed();  // do not filter for selectable but get all. append to that list the new item.
-        var alreadyPresent = recentlyUsed.filter(function (it) { return it.UID === item.UID; });
-        if (alreadyPresent.length > 0) {
-          recentlyUsed.splice(recentlyUsed.indexOf(alreadyPresent[0]), 1);
-        }
-        recentlyUsed.push(item);
-        utils.storage.set(self.options.recentlyUsedKey, recentlyUsed);
-      }
-
-      self.emit('selected');
-    },
-
-    deselectItem: function(item) {
-      var self = this;
-      self.emit('deselecting');
-      var data = self.$el.select2('data');
-      _.each(data, function(obj, i) {
-        if (obj.UID === item.UID) {
-          data.splice(i, 1);
-        }
-      });
-      self.$el.select2('data', data, true);
-      self.emit('deselected');
-    },
-
-    isSelectable: function(item) {
-      var self = this;
-      if (item.selectable === false) {
-        return false;
-      }
-      if (self.options.selectableTypes === null) {
-        return true;
-      } else {
-        return self.options.selectableTypes.indexOf(item.portal_type) !== -1;
-      }
-    },
-
-    init: function() {
-      var self = this;
-
-      self.browsing = self.options.mode !== 'search';
-
-      // Remove trailing slash
-      self.options.rootPath = self.options.rootPath.replace(/\/$/, '');
-      // Substract rootPath from basePath with is the relative currentPath. Has a leading slash. Or use '/'
-      self.currentPath = self.options.basePath.substr(self.options.rootPath.length) || '/';
-
-      self.setAjax();
-
-      self.$el.wrap('<div class="pattern-relateditems-container" />');
-      self.$container = self.$el.parents('.pattern-relateditems-container');
-      self.$container.width(self.options.width);
-
-      Select2.prototype.initializeValues.call(self);
-      Select2.prototype.initializeTags.call(self);
-
-      self.options.formatSelection = function(item) {
-
-        item = $.extend(true, {
-            'Title': '',
-            'getIcon': '',
-            'getURL': '',
-            'path': '',
-            'portal_type': '',
-            'review_state': ''
-        }, item);
-
-        // activate petterns on the result set.
-        var $selection = $(self.applyTemplate('selection', item));
-        if (self.options.scanSelection) {
-          registry.scan($selection);
-        }
-        if (self.options.maximumSelectionSize == 1){
-          // If this related field accepts only 1 item, the breadcrumbs should
-          // reflect the location for this particular item
-          var itemPath = item.path;
-          var path_split = itemPath.split('/');
-          path_split = path_split.slice(0,-1);  // Remove last part of path, we always want the parent path
-          itemPath = path_split.join('/');
-          self.currentPath = itemPath;
-          self.renderToolbar();
-        }
-        return $selection;
-      };
-
-      Select2.prototype.initializeOrdering.call(self);
-
-
-
-      self.options.formatResult = function(item) {
-        item.selectable = self.isSelectable(item);
-
-        item = $.extend(true, {
-            'Title': '',
-            'getIcon': '',
-            'getURL': '',
-            'is_folderish': false,
-            'oneLevelUp': false,
-            'path': '',
-            'portal_type': '',
-            'review_state': '',
-            'selectable': false,
-        }, item);
-
-        if (self.selectedUIDs.indexOf(item.UID) !== -1) {
-            // do not allow already selected items to be selected again.
-            item.selectable = false;
-        }
-
-        var result = $(self.applyTemplate('result', item));
-
-        $('.pattern-relateditems-result-select', result).on('click', function(event) {
-          event.preventDefault();
-          // event.stopPropagation();
-          if ($(this).is('.selectable')) {
-            var $parent = $(this).parents('.pattern-relateditems-result');
-            if ($parent.is('.pattern-relateditems-active')) {
-              $parent.removeClass('pattern-relateditems-active');
-              self.deselectItem(item);
-            } else {
-              if (self.options.maximumSelectionSize > 0) {
-                var items = self.$el.select2('data');
-                if (items.length >= self.options.maximumSelectionSize) {
-                  self.$el.select2('close');
+        applyTemplate: function (tpl, item) {
+            var self = this;
+            var template;
+            if (self.options[tpl + "TemplateSelector"]) {
+                template = $(self.options[tpl + "TemplateSelector"]).html();
+                if (!template) {
+                    template = self.options[tpl + "Template"];
                 }
-              }
-              self.selectItem(item);
-              $parent.addClass('pattern-relateditems-active');
-              if (self.options.closeOnSelect) {
-                self.$el.select2('close');
-              }
+            } else {
+                template = self.options[tpl + "Template"];
             }
-          }
-        });
+            // let's give all the options possible to the template generation
+            var options = $.extend(true, {}, self.options, item, {
+                browsing: self.browsing,
+                open_folder: _t("Open folder"),
+                current_directory: _t("current directory:"),
+                one_level_up: _t("Go one level up"),
+            });
+            options._item = item;
+            return _.template(template)(options);
+        },
 
-        $('.pattern-relateditems-result-browse', result).on('click', function(event) {
-          event.preventDefault();
-          event.stopPropagation();
-          var path = $(this).data('path');
-          self.browseTo(path);
-        });
+        setAjax: function () {
+            var ajax = {
+                url: this.options.vocabularyUrl,
+                dataType: "JSON",
+                quietMillis: 500,
 
-        return $(result);
-      };
+                data: function (term, page) {
+                    var criterias = [];
+                    if (term) {
+                        term = "*" + term + "*";
+                        criterias.push({
+                            i: "SearchableText",
+                            o:
+                                "plone.app.querystring.operation.string.contains",
+                            v: term,
+                        });
+                    }
 
-      self.options.initSelection = function(element, callback) {
-        var value = $(element).val();
-        if (value !== '') {
-          var ids = value.split(self.options.separator);
-          var query = new utils.QueryHelper(
-            $.extend(true, {}, self.options, {
-              pattern: self
-            })
-          );
-          query.search(
-            'UID', 'plone.app.querystring.operation.list.contains', ids,
-            function(data) {
-              var results = data.results.reduce(function(prev, item) {
-                prev[item.UID] = item;
-                return prev;
-              }, {});
+                    // We don't restrict for selectable types while browsing...
+                    if (!this.browsing && this.options.selectableTypes) {
+                        criterias.push({
+                            i: "portal_type",
+                            o: "plone.app.querystring.operation.selection.any",
+                            v: this.options.selectableTypes,
+                        });
+                    }
 
-              try {
-                callback(
-                  ids
-                  .map(function(uid) {
-                    return results[uid];
-                  })
-                  .filter(function(item) {
-                    return item !== undefined;
-                  })
+                    criterias.push({
+                        i: "path",
+                        o: this.options.pathOperator,
+                        v:
+                            this.options.rootPath +
+                            this.currentPath +
+                            (this.browsing ? "::1" : ""),
+                    });
+
+                    var sort_on = this.options.sortOn;
+                    var sort_order = sort_on ? this.options.sortOrder : null;
+                    if (this.browsing && sort_on === null) {
+                        sort_on = "getObjPositionInParent";
+                        sort_order = "ascending";
+                    }
+
+                    var data = {
+                        query: JSON.stringify({
+                            criteria: criterias,
+                            sort_on: sort_on,
+                            sort_order: sort_order,
+                        }),
+                        attributes: JSON.stringify(this.options.attributes),
+                        batch: JSON.stringify({
+                            page: page ? page : 1,
+                            size: this.options.pageSize,
+                        }),
+                    };
+                    return data;
+                }.bind(this),
+
+                results: function (data, page) {
+                    var more = page * this.options.pageSize < data.total;
+                    var results = data.results;
+
+                    this.selectedUIDs = (this.$el.select2("data") || []).map(
+                        function (el) {
+                            // populate current selection. Reuse in formatResult
+                            return el.UID;
+                        }
+                    );
+
+                    // Filter out items:
+                    // While browsing: always include folderish items
+                    // Browsing and searching: Only include selectable items which are not already selected, and all folders
+                    // even if they're selected, as we need them available for browsing/selecting their children
+                    results = results.filter(
+                        function (item) {
+                            if (
+                                (this.browsing && item.is_folderish) ||
+                                (this.isSelectable(item) &&
+                                    this.selectedUIDs.indexOf(item.UID) === -1)
+                            ) {
+                                return true;
+                            }
+                            return false;
+                        }.bind(this)
+                    );
+
+                    // Extend ``data`` with a ``oneLevelUp`` item when browsing
+                    var path = this.currentPath.split("/");
+                    if (
+                        page === 1 && // Show level up only on top.
+                        this.browsing && // only level up when browsing
+                        path.length > 1 && // do not try to level up one level under root.
+                        this.currentPath !== "/" // do not try to level up beyond root
+                    ) {
+                        results = [
+                            {
+                                oneLevelUp: true,
+                                Title: _t("One level up"),
+                                path:
+                                    path.slice(0, path.length - 1).join("/") ||
+                                    "/",
+                                currentPath: this.currentPath,
+                                is_folderish: true,
+                                selectable: false,
+                            },
+                        ].concat(results);
+                    }
+                    return {
+                        results: results,
+                        more: more,
+                    };
+                }.bind(this),
+            };
+            this.options.ajax = ajax;
+        },
+
+        renderToolbar: function () {
+            var self = this;
+            var path = self.currentPath;
+            var html;
+
+            var paths = path.split("/");
+            var itemPath = "";
+            var itemsHtml = "";
+            _.each(paths, function (node) {
+                if (node !== "") {
+                    var item = {};
+                    item.path = itemPath = itemPath + "/" + node;
+                    item.text = node;
+                    itemsHtml =
+                        itemsHtml + self.applyTemplate("breadcrumb", item);
+                }
+            });
+
+            // favorites
+            var favoritesHtml = "";
+            _.each(self.options.favorites, function (item) {
+                var item_copy = _.clone(item);
+                item_copy.path =
+                    item_copy.path.substr(self.options.rootPath.length) || "/";
+                favoritesHtml =
+                    favoritesHtml + self.applyTemplate("favorite", item_copy);
+            });
+
+            var recentlyUsedHtml = "";
+            if (self.options.recentlyUsed) {
+                var recentlyUsed = self.recentlyUsed(true); // filter out only those items which can actually be selected
+                _.each(recentlyUsed.reverse(), function (item) {
+                    // reverse to get newest first.
+                    recentlyUsedHtml =
+                        recentlyUsedHtml +
+                        self.applyTemplate("recentlyused", item);
+                });
+            }
+
+            html = self.applyTemplate("toolbar", {
+                items: itemsHtml,
+                favItems: favoritesHtml,
+                favText: _t("Favorites"),
+                searchText: _t("Current path:"),
+                searchModeText: _t("Search"),
+                browseModeText: _t("Browse"),
+                recentlyUsedItems: recentlyUsedHtml,
+                recentlyUsedText: _t("Recently Used"),
+            });
+
+            self.$toolbar.html(html);
+
+            $(".dropdown-toggle", self.$toolbar).dropdown();
+
+            // unbind mouseup event from select2 to override the behavior:
+            $(".pattern-relateditems-dropdown").unbind("mouseup");
+            $(".pattern-relateditems-dropdown").bind("mouseup", function (e) {
+                e.stopPropagation();
+            });
+
+            $("button.mode.search", self.$toolbar).on("click", function (e) {
+                e.preventDefault();
+                if (self.browsing) {
+                    $("button.mode.search", self.$toolbar).toggleClass(
+                        "btn-primary btn-default"
+                    );
+                    $("button.mode.browse", self.$toolbar).toggleClass(
+                        "btn-primary btn-default"
+                    );
+                    self.browsing = false;
+                    if (self.$el.select2("data").length > 0) {
+                        // Have to call after initialization
+                        self.openAfterInit = true;
+                    }
+                    if (!self.openAfterInit) {
+                        self.$el.select2("close");
+                        self.$el.select2("open");
+                    }
+                } else {
+                    // just open result list
+                    self.$el.select2("close");
+                    self.$el.select2("open");
+                }
+            });
+
+            $("button.mode.browse", self.$toolbar).on("click", function (e) {
+                e.preventDefault();
+                if (!self.browsing) {
+                    $("button.mode.search", self.$toolbar).toggleClass(
+                        "btn-primary btn-default"
+                    );
+                    $("button.mode.browse", self.$toolbar).toggleClass(
+                        "btn-primary btn-default"
+                    );
+                    self.browsing = true;
+                    if (self.$el.select2("data").length > 0) {
+                        // Have to call after initialization
+                        self.openAfterInit = true;
+                    }
+                    if (!self.openAfterInit) {
+                        self.$el.select2("close");
+                        self.$el.select2("open");
+                    }
+                } else {
+                    // just open result list
+                    self.$el.select2("close");
+                    self.$el.select2("open");
+                }
+            });
+
+            $("a.crumb", self.$toolbar).on("click", function (e) {
+                e.preventDefault();
+                self.browseTo($(this).attr("href"));
+            });
+
+            $("a.fav", self.$toolbar).on("click", function (e) {
+                e.preventDefault();
+                self.browseTo($(this).attr("href"));
+            });
+
+            if (self.options.recentlyUsed) {
+                $(
+                    ".pattern-relateditems-recentlyused-select",
+                    self.$toolbar
+                ).on("click", function (event) {
+                    event.preventDefault();
+                    var uid = $(this).data("uid");
+                    var item = self.recentlyUsed().filter(function (it) {
+                        return it.UID === uid;
+                    });
+                    if (item.length > 0) {
+                        item = item[0];
+                    } else {
+                        return;
+                    }
+                    self.selectItem(item);
+                    if (self.options.maximumSelectionSize > 0) {
+                        var items = self.$el.select2("data");
+                        if (items.length >= self.options.maximumSelectionSize) {
+                            return;
+                        }
+                    }
+                });
+            }
+
+            function initUploadView(UploadView, disabled) {
+                var uploadButtonId = "upload-" + utils.generateId();
+                var uploadButton = new ButtonView({
+                    id: uploadButtonId,
+                    title: _t("Upload"),
+                    tooltip: _t("Upload files"),
+                    icon: "upload",
+                });
+                if (disabled) {
+                    uploadButton.disable();
+                }
+                $(".controls", self.$toolbar).prepend(uploadButton.render().el);
+                self.uploadView = new UploadView({
+                    triggerView: uploadButton,
+                    app: self,
+                });
+                $("#btn-" + uploadButtonId, self.$toolbar).append(
+                    self.uploadView.render().el
                 );
-              } catch (e) {
-                // Select2 3.5.4 throws an error in some cases in
-                // updateSelection, ``this.selection.find(".select2-search-choice").remove();``
-                // No idea why, hard to track.
-              }
+            }
 
-              if (self.openAfterInit) {
-                // open after initialization
-                self.$el.select2('open');
-                self.openAfterInit = undefined;
-              }
+            // upload
+            if (
+                self.options.upload &&
+                utils.featureSupport.dragAndDrop() &&
+                utils.featureSupport.fileApi()
+            ) {
+                require(["mockup-patterns-relateditems-upload"], function (
+                    UploadView
+                ) {
+                    if (self.options.uploadAllowView) {
+                        // Check, if uploads are allowed in current context
+                        $.ajax({
+                            url: self.options.uploadAllowView,
+                            // url: self.currentUrl() + self.options.uploadAllowView,  // not working yet
+                            dataType: "JSON",
+                            data: {
+                                path: self.options.rootPath + self.currentPath,
+                            },
+                            type: "GET",
+                            success: function (result) {
+                                initUploadView(UploadView, !result.allowUpload);
+                            },
+                        });
+                    } else {
+                        // just initialize upload view without checking, if uploads are allowed.
+                        initUploadView(UploadView);
+                    }
+                });
+            }
+        },
 
-            },
-            false
-          );
-        }
-      };
+        browseTo: function (path) {
+            var self = this;
+            self.emit("before-browse");
+            self.currentPath = path;
+            self.$el.select2("close");
+            self.renderToolbar();
+            self.$el.select2("open");
+            self.emit("after-browse");
+        },
 
-      self.options.tokenizer = function (input) {
-        if (this.options.mode === 'auto') {
-          this.browsing = input ? false : true;
-        }
-      }.bind(this);
+        selectItem: function (item) {
+            var self = this;
+            self.emit("selecting");
+            var data = self.$el.select2("data");
+            data.push(item);
+            self.$el.select2("data", data, true);
 
-      self.options.id = function(item) {
-        return item.UID;
-      };
+            if (self.options.recentlyUsed) {
+                // add to recently added items
+                var recentlyUsed = self.recentlyUsed(); // do not filter for selectable but get all. append to that list the new item.
+                var alreadyPresent = recentlyUsed.filter(function (it) {
+                    return it.UID === item.UID;
+                });
+                if (alreadyPresent.length > 0) {
+                    recentlyUsed.splice(
+                        recentlyUsed.indexOf(alreadyPresent[0]),
+                        1
+                    );
+                }
+                recentlyUsed.push(item);
+                utils.storage.set(self.options.recentlyUsedKey, recentlyUsed);
+            }
 
-      Select2.prototype.initializeSelect2.call(self);
+            self.emit("selected");
+        },
 
-      self.$toolbar = $('<div class="toolbar ui-offset-parent" />');
-      self.$container.prepend(self.$toolbar);
-      self.$el.on('select2-selecting', function(event) {
-        if (!self.isSelectable(event.choice)) {
-          event.preventDefault();
-        }
-      });
-      self.renderToolbar();
+        deselectItem: function (item) {
+            var self = this;
+            self.emit("deselecting");
+            var data = self.$el.select2("data");
+            _.each(data, function (obj, i) {
+                if (obj.UID === item.UID) {
+                    data.splice(i, 1);
+                }
+            });
+            self.$el.select2("data", data, true);
+            self.emit("deselected");
+        },
 
-      $(document).on('keyup', self.$el, function(event) {
-        var isOpen = Select2.prototype.opened.call(self);
+        isSelectable: function (item) {
+            var self = this;
+            if (item.selectable === false) {
+                return false;
+            }
+            if (self.options.selectableTypes === null) {
+                return true;
+            } else {
+                return (
+                    self.options.selectableTypes.indexOf(item.portal_type) !==
+                    -1
+                );
+            }
+        },
 
-        if (!isOpen) {
-          return;
-        }
+        init: function () {
+            var self = this;
 
-        if ((event.which === KEY.LEFT) || (event.which === KEY.RIGHT)) {
-          event.stopPropagation();
+            self.browsing = self.options.mode !== "search";
 
-          var selectorContext =
-            event.which === KEY.LEFT
-              ? '.pattern-relateditems-result.one-level-up'
-              : '.select2-highlighted';
+            // Remove trailing slash
+            self.options.rootPath = self.options.rootPath.replace(/\/$/, "");
+            // Substract rootPath from basePath with is the relative currentPath. Has a leading slash. Or use '/'
+            self.currentPath =
+                self.options.basePath.substr(self.options.rootPath.length) ||
+                "/";
 
-          var browsableItemSelector = '.pattern-relateditems-result-browse';
-          var browsableItem = $(browsableItemSelector, selectorContext);
+            self.setAjax();
 
-          if (browsableItem.length !== 1) {
-            return;
-          }
+            self.$el.wrap('<div class="pattern-relateditems-container" />');
+            self.$container = self.$el.parents(
+                ".pattern-relateditems-container"
+            );
+            self.$container.width(self.options.width);
 
-          var path = browsableItem.data('path');
+            Select2.prototype.initializeValues.call(self);
+            Select2.prototype.initializeTags.call(self);
 
-          self.browseTo(path);
-        }
-      });
-    }
-  });
+            self.options.formatSelection = function (item) {
+                item = $.extend(
+                    true,
+                    {
+                        Title: "",
+                        getIcon: "",
+                        getURL: "",
+                        path: "",
+                        portal_type: "",
+                        review_state: "",
+                    },
+                    item
+                );
 
-  return RelatedItems;
+                // activate petterns on the result set.
+                var $selection = $(self.applyTemplate("selection", item));
+                if (self.options.scanSelection) {
+                    registry.scan($selection);
+                }
+                if (self.options.maximumSelectionSize == 1) {
+                    // If this related field accepts only 1 item, the breadcrumbs should
+                    // reflect the location for this particular item
+                    var itemPath = item.path;
+                    var path_split = itemPath.split("/");
+                    path_split = path_split.slice(0, -1); // Remove last part of path, we always want the parent path
+                    itemPath = path_split.join("/");
+                    self.currentPath = itemPath;
+                    self.renderToolbar();
+                }
+                return $selection;
+            };
 
+            Select2.prototype.initializeOrdering.call(self);
+
+            self.options.formatResult = function (item) {
+                item.selectable = self.isSelectable(item);
+
+                item = $.extend(
+                    true,
+                    {
+                        Title: "",
+                        getIcon: "",
+                        getURL: "",
+                        is_folderish: false,
+                        oneLevelUp: false,
+                        path: "",
+                        portal_type: "",
+                        review_state: "",
+                        selectable: false,
+                    },
+                    item
+                );
+
+                if (self.selectedUIDs.indexOf(item.UID) !== -1) {
+                    // do not allow already selected items to be selected again.
+                    item.selectable = false;
+                }
+
+                var result = $(self.applyTemplate("result", item));
+
+                $(".pattern-relateditems-result-select", result).on(
+                    "click",
+                    function (event) {
+                        event.preventDefault();
+                        // event.stopPropagation();
+                        if ($(this).is(".selectable")) {
+                            var $parent = $(this).parents(
+                                ".pattern-relateditems-result"
+                            );
+                            if ($parent.is(".pattern-relateditems-active")) {
+                                $parent.removeClass(
+                                    "pattern-relateditems-active"
+                                );
+                                self.deselectItem(item);
+                            } else {
+                                if (self.options.maximumSelectionSize > 0) {
+                                    var items = self.$el.select2("data");
+                                    if (
+                                        items.length >=
+                                        self.options.maximumSelectionSize
+                                    ) {
+                                        self.$el.select2("close");
+                                    }
+                                }
+                                self.selectItem(item);
+                                $parent.addClass("pattern-relateditems-active");
+                                if (self.options.closeOnSelect) {
+                                    self.$el.select2("close");
+                                }
+                            }
+                        }
+                    }
+                );
+
+                $(".pattern-relateditems-result-browse", result).on(
+                    "click",
+                    function (event) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        var path = $(this).data("path");
+                        self.browseTo(path);
+                    }
+                );
+
+                return $(result);
+            };
+
+            self.options.initSelection = function (element, callback) {
+                var value = $(element).val();
+                if (value !== "") {
+                    var ids = value.split(self.options.separator);
+                    var query = new utils.QueryHelper(
+                        $.extend(true, {}, self.options, {
+                            pattern: self,
+                        })
+                    );
+                    query.search(
+                        "UID",
+                        "plone.app.querystring.operation.list.contains",
+                        ids,
+                        function (data) {
+                            var results = data.results.reduce(function (
+                                prev,
+                                item
+                            ) {
+                                prev[item.UID] = item;
+                                return prev;
+                            },
+                            {});
+
+                            try {
+                                callback(
+                                    ids
+                                        .map(function (uid) {
+                                            return results[uid];
+                                        })
+                                        .filter(function (item) {
+                                            return item !== undefined;
+                                        })
+                                );
+                            } catch (e) {
+                                // Select2 3.5.4 throws an error in some cases in
+                                // updateSelection, ``this.selection.find(".select2-search-choice").remove();``
+                                // No idea why, hard to track.
+                            }
+
+                            if (self.openAfterInit) {
+                                // open after initialization
+                                self.$el.select2("open");
+                                self.openAfterInit = undefined;
+                            }
+                        },
+                        false
+                    );
+                }
+            };
+
+            self.options.tokenizer = function (input) {
+                if (this.options.mode === "auto") {
+                    this.browsing = input ? false : true;
+                }
+            }.bind(this);
+
+            self.options.id = function (item) {
+                return item.UID;
+            };
+
+            Select2.prototype.initializeSelect2.call(self);
+
+            self.$toolbar = $('<div class="toolbar ui-offset-parent" />');
+            self.$container.prepend(self.$toolbar);
+            self.$el.on("select2-selecting", function (event) {
+                if (!self.isSelectable(event.choice)) {
+                    event.preventDefault();
+                }
+            });
+            self.renderToolbar();
+
+            $(document).on("keyup", self.$el, function (event) {
+                var isOpen = Select2.prototype.opened.call(self);
+
+                if (!isOpen) {
+                    return;
+                }
+
+                if (event.which === KEY.LEFT || event.which === KEY.RIGHT) {
+                    event.stopPropagation();
+
+                    var selectorContext =
+                        event.which === KEY.LEFT
+                            ? ".pattern-relateditems-result.one-level-up"
+                            : ".select2-highlighted";
+
+                    var browsableItemSelector =
+                        ".pattern-relateditems-result-browse";
+                    var browsableItem = $(
+                        browsableItemSelector,
+                        selectorContext
+                    );
+
+                    if (browsableItem.length !== 1) {
+                        return;
+                    }
+
+                    var path = browsableItem.data("path");
+
+                    self.browseTo(path);
+                }
+            });
+        },
+    });
+
+    return RelatedItems;
 });
 
 /* Querystring pattern.
@@ -6881,894 +7194,972 @@ define('mockup-patterns-relateditems',[
  *
  */
 
-
 define('mockup-patterns-querystring',[
-  'jquery',
-  'pat-base',
-  'mockup-patterns-select2',
-  'mockup-patterns-pickadate',
-  'mockup-patterns-relateditems',
-  'select2',
-  'translate',
-  'underscore'
-], function($, Base, Select2, PickADate, relatedItems, undefined, _t, _) {
-  'use strict';
+    "jquery",
+    "pat-base",
+    "mockup-patterns-select2",
+    "mockup-patterns-pickadate",
+    "mockup-patterns-relateditems",
+    "select2",
+    "translate",
+    "underscore",
+], function ($, Base, Select2, PickADate, relatedItems, undefined, _t, _) {
+    "use strict";
 
-  var Criteria = function() { this.init.apply(this, arguments); };
-  Criteria.prototype = {
-    defaults: {
-      indexWidth: '20em',
-      remove: '',
-      classBetweenDtName: 'querystring-criteria-betweendt',
-      classWrapperName: 'querystring-criteria-wrapper',
-      classIndexName: 'querystring-criteria-index',
-      classOperatorName: 'querystring-criteria-operator',
-      classValueName: 'querystring-criteria-value',
-      classRemoveName: 'querystring-criteria-remove',
-      classResultsName: 'querystring-criteria-results',
-      classClearName: 'querystring-criteria-clear',
-      classDepthName: 'querystring-criteria-depth'
-    },
-    init: function($el, options, indexes, index, operator, value, baseUrl, patternDateOptions, patternAjaxSelectOptions, patternRelateditemsOptions) {
-      var self = this;
+    var Criteria = function () {
+        this.init.apply(this, arguments);
+    };
+    Criteria.prototype = {
+        defaults: {
+            indexWidth: "20em",
+            remove: "",
+            classBetweenDtName: "querystring-criteria-betweendt",
+            classWrapperName: "querystring-criteria-wrapper",
+            classIndexName: "querystring-criteria-index",
+            classOperatorName: "querystring-criteria-operator",
+            classValueName: "querystring-criteria-value",
+            classRemoveName: "querystring-criteria-remove",
+            classResultsName: "querystring-criteria-results",
+            classClearName: "querystring-criteria-clear",
+            classDepthName: "querystring-criteria-depth",
+        },
+        init: function (
+            $el,
+            options,
+            indexes,
+            index,
+            operator,
+            value,
+            baseUrl,
+            patternDateOptions,
+            patternAjaxSelectOptions,
+            patternRelateditemsOptions
+        ) {
+            var self = this;
 
-      self.options = $.extend(true, {}, self.defaults, options);
-      self.indexes = indexes;
-      self.indexGroups = {};
-      self.baseUrl = baseUrl;
-      self.advanced = false;
-      self.initial = value;
-      // create wrapper criteria and append it to DOM
-      self.$wrapper = $('<div/>')
-              .addClass(self.options.classWrapperName)
-              .appendTo($el);
+            self.options = $.extend(true, {}, self.defaults, options);
+            self.indexes = indexes;
+            self.indexGroups = {};
+            self.baseUrl = baseUrl;
+            self.advanced = false;
+            self.initial = value;
+            // create wrapper criteria and append it to DOM
+            self.$wrapper = $("<div/>")
+                .addClass(self.options.classWrapperName)
+                .appendTo($el);
 
-      // Sub widgets options
-      self.patternDateOptions = patternDateOptions || {};
-      self.patternAjaxSelectOptions = patternAjaxSelectOptions || {};
-      self.patternRelateditemsOptions = patternRelateditemsOptions || {};
-      // Defaults
-      self.patternAjaxSelectOptions = $.extend({'width': '250px'}, self.patternAjaxSelectOptions);
-      self.patternRelateditemsOptions = $.extend({
-        'vocabularyUrl': self.baseUrl + '@@getVocabulary?name=plone.app.vocabularies.Catalog&field=relatedItems',
-        'width': '400px'
-      }, self.patternRelateditemsOptions);
-      // Force set
-      self.patternRelateditemsOptions['maximumSelectionSize'] = 1;
+            // Sub widgets options
+            self.patternDateOptions = patternDateOptions || {};
+            self.patternAjaxSelectOptions = patternAjaxSelectOptions || {};
+            self.patternRelateditemsOptions = patternRelateditemsOptions || {};
+            // Defaults
+            self.patternAjaxSelectOptions = $.extend(
+                { width: "250px" },
+                self.patternAjaxSelectOptions
+            );
+            self.patternRelateditemsOptions = $.extend(
+                {
+                    vocabularyUrl:
+                        self.baseUrl +
+                        "@@getVocabulary?name=plone.app.vocabularies.Catalog&field=relatedItems",
+                    width: "400px",
+                },
+                self.patternRelateditemsOptions
+            );
+            // Force set
+            self.patternRelateditemsOptions["maximumSelectionSize"] = 1;
 
-      // Remove button
-      self.$remove = $('<div>' + self.options.remove + '</div>')
-        .addClass(self.options.classRemoveName)
-        .appendTo(self.$wrapper)
-        .on('click', function(e) {
-          self.remove();
-        });
+            // Remove button
+            self.$remove = $("<div>" + self.options.remove + "</div>")
+                .addClass(self.options.classRemoveName)
+                .appendTo(self.$wrapper)
+                .on("click", function (e) {
+                    self.remove();
+                });
 
-      // Index selection
-      self.$index = $('<select><option></option></select>')
-          .attr('placeholder', _t('Select criteria'));
+            // Index selection
+            self.$index = $("<select><option></option></select>").attr(
+                "placeholder",
+                _t("Select criteria")
+            );
 
-      // list of indexes
-      $.each(self.indexes, function(value, options) {
-        if (options.enabled) {
-          if (!self.indexGroups[options.group]) {
-            self.indexGroups[options.group] = $('<optgroup/>')
-                .attr('label', options.group)
-                .appendTo(self.$index);
-          }
-          self.indexGroups[options.group].append(
-            $('<option/>')
-              .attr('value', value)
-              .html(options.title)
-          );
-        }
-      });
-
-      // attach index select to DOM
-      self.$wrapper.append(
-        $('<div/>')
-          .addClass(self.options.classIndexName)
-          .append(self.$index)
-      );
-
-      // add blink (select2)
-      self.$index
-        .patternSelect2({
-          width: self.options.indexWidth,
-          placeholder: _t('Select criteria')
-        })
-        .on('change', function(e) {
-          self.removeValue();
-          self.createOperator(e.val);
-          self.createClear();
-          self.trigger('index-changed');
-        });
-
-      if (typeof index !== 'undefined') {
-        self.$index.select2('val', index);
-        self.createOperator(index, operator, value);
-        self.createClear();
-      }
-
-      self.trigger('create-criteria');
-    },
-    appendOperators: function(index) {
-      var self = this;
-
-      self.$operator = $('<select/>');
-
-      if (self.indexes[index]) {
-        _.each(self.indexes[index].operations, function(value) {
-          var options = self.indexes[index].operators[value];
-          $('<option/>')
-              .attr('value', value)
-              .html(options.title)
-              .appendTo(self.$operator);
-        });
-      }
-
-      // attach operators select to DOM
-      self.$wrapper.append(
-        $('<div/>')
-          .addClass(self.options.classOperatorName)
-          .append(self.$operator)
-      );
-
-      // add blink (select2)
-      self.$operator
-        .patternSelect2({ width: '10em' })
-        .on('change', function(e) {
-          self.createValue(index);
-          self.createClear();
-          self.trigger('operator-changed');
-        });
-    },
-    convertPathOperators: function(oval) {
-      var self = this;
-
-      if( self.advanced ) {
-        return oval;
-      }
-      //This allows us to use the same query operation for multiple dropdown options.
-      oval = oval
-        .replace('advanced', 'relativePath')
-        .replace('path', 'relativePath');
-      return oval;
-    },
-    createPathOperators: function() {
-      var self = this;
-
-      if( self.advanced ) {
-        self.resetPathOperators();
-        return;
-      }
-      var newOperator = "plone.app.querystring.operation.string.advanced";
-
-      if( typeof self.indexes.path.operators[newOperator] === 'undefined' ) {
-        self.indexes.path.operations.push(newOperator);
-        self.indexes.path.operators[newOperator] = {
-          title: 'Advanced',
-          widget: 'AdvancedPathWidget',
-          description: 'Enter a custom path string',
-          operation: 'plone.app.querystring.queryparser._relativePath'
-        };
-      }
-
-      $.each(self.indexes.path.operators, function(key, value) {
-        var options = value;
-        if( key.indexOf('absolute') > 0 ) {
-          options.title = "Custom";
-        }
-        else if( key.indexOf('relative') > 0 ) {
-          options.title = "Parent (../)";
-        }
-        else if( key.indexOf('advanced') > 0 ) {
-          options.title = "Advanced Mode";
-        }
-        else {
-          options.title = "Current (./)";
-          options.widget = "RelativePathWidget";
-        }
-      });
-    },
-    resetPathOperators: function() {
-      var self = this;
-      $.each(self.indexes.path.operators, function(key, value) {
-        var options = value;
-        if( key.indexOf('absolute') > 0 ) {
-          options.title = "Absolute Path";
-        }
-        else if( key.indexOf('relative') > 0 ) {
-          options.title = "Relative Path";
-        }
-        else if( key.indexOf('advanced') > 0 ) {
-          options.title = "Simple Mode";
-        }
-        else {
-          options.title = "Navigation Path";
-          options.widget = "ReferenceWidget";
-        }
-      });
-
-      return;
-    },
-    createOperator: function(index, operator, value) {
-      var self = this;
-
-      self.removeOperator();
-      self.createPathOperators();
-
-      // We must test if we have a "simple" path or an "advanced" one and change the widgets accordingly
-      if (index === 'path' && value && value !== '.::1' && value !== '..::1' && !value.match(/^[0-9a-f\-]{32,36}::-?[0-9]+$/)) {
-        self.advanced = true;
-        self.resetPathOperators();
-      }
-
-      self.appendOperators(index);
-
-      if (typeof operator === 'undefined') {
-        operator = self.$operator.select2('val');
-      }
-
-      self.$operator.select2('val', operator);
-      self.createValue(index, value);
-
-      self.trigger('create-operator');
-    },
-    createValue: function(index, value) {
-      var self = this,
-          widget = self.indexes[index].operators[self.$operator.val()].widget,
-          $wrapper = $('<div/>')
-            .addClass(self.options.classValueName)
-            .appendTo(self.$wrapper);
-
-      self.removeValue();
-
-      var createDepthSelect = function(selected) {
-        var select =
-          "<div class='depth-select-box'>" +
-            "<label for='depth-select'>Depth</label>" +
-            "<select name='depth-select' class='"+self.options.classDepthName+"'>" +
-              "<option value='-1' selected='selected'>Unlimited</option>";
-
-              for(var i = 0; i <= 10; i+=1) {
-                select += "<option value="+i+" ";
-                if( ""+i === selected ) {
-                  select += "selected='selected' ";
+            // list of indexes
+            $.each(self.indexes, function (value, options) {
+                if (options.enabled) {
+                    if (!self.indexGroups[options.group]) {
+                        self.indexGroups[options.group] = $("<optgroup/>")
+                            .attr("label", options.group)
+                            .appendTo(self.$index);
+                    }
+                    self.indexGroups[options.group].append(
+                        $("<option/>").attr("value", value).html(options.title)
+                    );
                 }
-                select += ">" + i + "</option>";
-              }
-            select += "</select>" +
-          "</div>";
+            });
 
-          return $(select).change(function() {
-            self.trigger('depth-changed');
-          });
-      };
+            // attach index select to DOM
+            self.$wrapper.append(
+                $("<div/>")
+                    .addClass(self.options.classIndexName)
+                    .append(self.$index)
+            );
 
-      if (widget === 'StringWidget') {
-        self.$value = $('<input type="text"/>')
-                .addClass(self.options.classValueName + '-' + widget)
-                .val(value)
-                .appendTo($wrapper)
-                .change(function() {
-                  self.trigger('value-changed');
+            // add blink (select2)
+            self.$index
+                .patternSelect2({
+                    width: self.options.indexWidth,
+                    placeholder: _t("Select criteria"),
+                })
+                .on("change", function (e) {
+                    self.removeValue();
+                    self.createOperator(e.val);
+                    self.createClear();
+                    self.trigger("index-changed");
                 });
 
-      } else if (widget === 'DateWidget') {
-        self.$value = $('<input type="text"/>')
-                .addClass(self.options.classValueName + '-' + widget)
-                .attr('data-pat-pickadate', JSON.stringify(self.patternDateOptions))  // have to pass as attributes otherwise time bool will overwritten to an object by the mockupParser
-                .val(value)
-                .appendTo($wrapper)
-                .patternPickadate()
-                .on('updated.pickadate.patterns', function() {
-                  self.trigger('value-changed');
+            if (typeof index !== "undefined") {
+                self.$index.select2("val", index);
+                self.createOperator(index, operator, value);
+                self.createClear();
+            }
+
+            self.trigger("create-criteria");
+        },
+        appendOperators: function (index) {
+            var self = this;
+
+            self.$operator = $("<select/>");
+
+            if (self.indexes[index]) {
+                _.each(self.indexes[index].operations, function (value) {
+                    var options = self.indexes[index].operators[value];
+                    $("<option/>")
+                        .attr("value", value)
+                        .html(options.title)
+                        .appendTo(self.$operator);
                 });
+            }
 
+            // attach operators select to DOM
+            self.$wrapper.append(
+                $("<div/>")
+                    .addClass(self.options.classOperatorName)
+                    .append(self.$operator)
+            );
 
-      } else if (widget === 'DateRangeWidget') {
-        var startwrap = $('<span/>').appendTo($wrapper);
-        var val1 = "";
-        var val2 = "";
+            // add blink (select2)
+            self.$operator
+                .patternSelect2({ width: "10em" })
+                .on("change", function (e) {
+                    self.createValue(index);
+                    self.createClear();
+                    self.trigger("operator-changed");
+                });
+        },
+        convertPathOperators: function (oval) {
+            var self = this;
 
-        if (value) {
-          val1 = value[0]?value[0]:"";
-          val2 = value[1]?value[1]:"";
-        }
+            if (self.advanced) {
+                return oval;
+            }
+            //This allows us to use the same query operation for multiple dropdown options.
+            oval = oval
+                .replace("advanced", "relativePath")
+                .replace("path", "relativePath");
+            return oval;
+        },
+        createPathOperators: function () {
+            var self = this;
 
-        var startdt = $('<input type="text"/>')
-          .addClass(self.options.classValueName + '-' + widget)
-          .addClass(self.options.classValueName + '-' + widget + '-start')
-          .attr('data-pat-pickadate', JSON.stringify(self.patternDateOptions))
-          .val(val1)
-          .appendTo(startwrap)
-          .patternPickadate()
-          .on('updated.pickadate.patterns', function() {
-            self.trigger('value-changed');
-          });
-        $wrapper.append(
-          $('<span/>')
-            .html(_t('to'))
-            .addClass(self.options.classBetweenDtName)
-        );
-        var endwrap = $('<span/>').appendTo($wrapper);
-        var enddt = $('<input type="text"/>')
-                        .addClass(self.options.classValueName + '-' + widget)
-                        .addClass(self.options.classValueName + '-' + widget + '-end')
-                        .attr('data-pat-pickadate', JSON.stringify(self.patternDateOptions))
-                        .val(val2)
-                        .appendTo(endwrap)
-                        .patternPickadate()
-                        .on('updated.pickadate.patterns', function() {
-                          self.trigger('value-changed');
+            if (self.advanced) {
+                self.resetPathOperators();
+                return;
+            }
+            var newOperator = "plone.app.querystring.operation.string.advanced";
+
+            if (
+                typeof self.indexes.path.operators[newOperator] === "undefined"
+            ) {
+                self.indexes.path.operations.push(newOperator);
+                self.indexes.path.operators[newOperator] = {
+                    title: "Advanced",
+                    widget: "AdvancedPathWidget",
+                    description: "Enter a custom path string",
+                    operation:
+                        "plone.app.querystring.queryparser._relativePath",
+                };
+            }
+
+            $.each(self.indexes.path.operators, function (key, value) {
+                var options = value;
+                if (key.indexOf("absolute") > 0) {
+                    options.title = "Custom";
+                } else if (key.indexOf("relative") > 0) {
+                    options.title = "Parent (../)";
+                } else if (key.indexOf("advanced") > 0) {
+                    options.title = "Advanced Mode";
+                } else {
+                    options.title = "Current (./)";
+                    options.widget = "RelativePathWidget";
+                }
+            });
+        },
+        resetPathOperators: function () {
+            var self = this;
+            $.each(self.indexes.path.operators, function (key, value) {
+                var options = value;
+                if (key.indexOf("absolute") > 0) {
+                    options.title = "Absolute Path";
+                } else if (key.indexOf("relative") > 0) {
+                    options.title = "Relative Path";
+                } else if (key.indexOf("advanced") > 0) {
+                    options.title = "Simple Mode";
+                } else {
+                    options.title = "Navigation Path";
+                    options.widget = "ReferenceWidget";
+                }
+            });
+
+            return;
+        },
+        createOperator: function (index, operator, value) {
+            var self = this;
+
+            self.removeOperator();
+            self.createPathOperators();
+
+            // We must test if we have a "simple" path or an "advanced" one and change the widgets accordingly
+            if (
+                index === "path" &&
+                value &&
+                value !== ".::1" &&
+                value !== "..::1" &&
+                !value.match(/^[0-9a-f\-]{32,36}::-?[0-9]+$/)
+            ) {
+                self.advanced = true;
+                self.resetPathOperators();
+            }
+
+            self.appendOperators(index);
+
+            if (typeof operator === "undefined") {
+                operator = self.$operator.select2("val");
+            }
+
+            self.$operator.select2("val", operator);
+            self.createValue(index, value);
+
+            self.trigger("create-operator");
+        },
+        createValue: function (index, value) {
+            var self = this,
+                widget =
+                    self.indexes[index].operators[self.$operator.val()].widget,
+                $wrapper = $("<div/>")
+                    .addClass(self.options.classValueName)
+                    .appendTo(self.$wrapper);
+
+            self.removeValue();
+
+            var createDepthSelect = function (selected) {
+                var select =
+                    "<div class='depth-select-box'>" +
+                    "<label for='depth-select'>Depth</label>" +
+                    "<select name='depth-select' class='" +
+                    self.options.classDepthName +
+                    "'>" +
+                    "<option value='-1' selected='selected'>Unlimited</option>";
+
+                for (var i = 0; i <= 10; i += 1) {
+                    select += "<option value=" + i + " ";
+                    if ("" + i === selected) {
+                        select += "selected='selected' ";
+                    }
+                    select += ">" + i + "</option>";
+                }
+                select += "</select>" + "</div>";
+
+                return $(select).change(function () {
+                    self.trigger("depth-changed");
+                });
+            };
+
+            if (widget === "StringWidget") {
+                self.$value = $('<input type="text"/>')
+                    .addClass(self.options.classValueName + "-" + widget)
+                    .val(value)
+                    .appendTo($wrapper)
+                    .change(function () {
+                        self.trigger("value-changed");
+                    });
+            } else if (widget === "DateWidget") {
+                self.$value = $('<input type="text"/>')
+                    .addClass(self.options.classValueName + "-" + widget)
+                    .attr(
+                        "data-pat-pickadate",
+                        JSON.stringify(self.patternDateOptions)
+                    ) // have to pass as attributes otherwise time bool will overwritten to an object by the mockupParser
+                    .val(value)
+                    .appendTo($wrapper)
+                    .patternPickadate()
+                    .on("updated.pickadate.patterns", function () {
+                        self.trigger("value-changed");
+                    });
+            } else if (widget === "DateRangeWidget") {
+                var startwrap = $("<span/>").appendTo($wrapper);
+                var val1 = "";
+                var val2 = "";
+
+                if (value) {
+                    val1 = value[0] ? value[0] : "";
+                    val2 = value[1] ? value[1] : "";
+                }
+
+                var startdt = $('<input type="text"/>')
+                    .addClass(self.options.classValueName + "-" + widget)
+                    .addClass(
+                        self.options.classValueName + "-" + widget + "-start"
+                    )
+                    .attr(
+                        "data-pat-pickadate",
+                        JSON.stringify(self.patternDateOptions)
+                    )
+                    .val(val1)
+                    .appendTo(startwrap)
+                    .patternPickadate()
+                    .on("updated.pickadate.patterns", function () {
+                        self.trigger("value-changed");
+                    });
+                $wrapper.append(
+                    $("<span/>")
+                        .html(_t("to"))
+                        .addClass(self.options.classBetweenDtName)
+                );
+                var endwrap = $("<span/>").appendTo($wrapper);
+                var enddt = $('<input type="text"/>')
+                    .addClass(self.options.classValueName + "-" + widget)
+                    .addClass(
+                        self.options.classValueName + "-" + widget + "-end"
+                    )
+                    .attr(
+                        "data-pat-pickadate",
+                        JSON.stringify(self.patternDateOptions)
+                    )
+                    .val(val2)
+                    .appendTo(endwrap)
+                    .patternPickadate()
+                    .on("updated.pickadate.patterns", function () {
+                        self.trigger("value-changed");
+                    });
+                self.$value = [startdt, enddt];
+            } else if (widget === "RelativeDateWidget") {
+                self.$value = $('<input type="text"/>')
+                    .after($("<span/>").html(_t("days")))
+                    .addClass(self.options.classValueName + "-" + widget)
+                    .val(value)
+                    .appendTo($wrapper)
+                    .change(function () {
+                        self.trigger("value-changed");
+                    });
+            } else if (widget === "AdvancedPathWidget") {
+                if (self.advanced) {
+                    self.advanced = false;
+                } else {
+                    self.advanced = true;
+                }
+                self.createPathOperators();
+                self.removeOperator();
+                self.appendOperators(index);
+                self.createValue(index);
+            } else if (widget === "RelativePathWidget") {
+                if (self.advanced) {
+                    self.$value = $('<input type="text"/>')
+                        .addClass(self.options.classValueName + "-" + widget)
+                        .appendTo($wrapper)
+                        .val(value)
+                        .change(function () {
+                            self.trigger("value-changed");
                         });
-        self.$value = [startdt, enddt];
+                } else {
+                    //These 2 hard-coded values correspond to the "Current (./)" and "Parent (../)" options
+                    //under the location index.
+                    if (!value) {
+                        value = ".::1";
+                        if (self.$operator.val().indexOf("relativePath") > 0) {
+                            value = "..::1";
+                        }
+                    } else {
+                        if (value === ".::1") {
+                            self.$operator.select2(
+                                "val",
+                                "plone.app.querystring.operation.string.path"
+                            );
+                        }
+                    }
+                    self.$value = $('<input type="hidden"/>')
+                        .addClass(self.options.classValueName + "-" + widget)
+                        .appendTo($wrapper)
+                        .val(value);
+                }
+            } else if (widget === "ReferenceWidget") {
+                if (self.advanced) {
+                    self.$value = $('<input type="text"/>')
+                        .addClass(self.options.classValueName + "-" + widget)
+                        .val(value)
+                        .appendTo($wrapper)
+                        .change(function () {
+                            self.trigger("value-changed");
+                        });
+                } else {
+                    var pathAndDepth = ["", -1];
+                    if (typeof value !== "undefined") {
+                        pathAndDepth = value.split("::");
+                    }
+                    self.$value = $('<input type="text"/>')
+                        .addClass(self.options.classValueName + "-" + widget)
+                        .appendTo($wrapper)
+                        .val(pathAndDepth[0])
+                        .patternRelateditems(self.patternRelateditemsOptions)
+                        .change(function () {
+                            self.trigger("value-changed");
+                        });
+                    self.$value
+                        .parent()
+                        .after(createDepthSelect(pathAndDepth[1]));
+                    self.$value
+                        .parents("." + self.options.classValueName)
+                        .addClass("break-line");
+                }
+            } else if (widget === "MultipleSelectionWidget") {
+                self.$value = $("<select/>")
+                    .prop("multiple", true)
+                    .addClass(self.options.classValueName + "-" + widget)
+                    .appendTo($wrapper)
+                    .change(function () {
+                        self.trigger("value-changed");
+                    });
+                if (self.indexes[index]) {
+                    $.each(self.indexes[index].values, function (
+                        value,
+                        options
+                    ) {
+                        $("<option/>")
+                            .attr("value", value)
+                            .html(options.title)
+                            .appendTo(self.$value);
+                    });
+                }
+                self.$value.patternSelect2(self.patternAjaxSelectOptions);
+            }
 
-      } else if (widget === 'RelativeDateWidget') {
-        self.$value = $('<input type="text"/>')
-                .after($('<span/>').html(_t('days')))
-                .addClass(self.options.classValueName + '-' + widget)
-                .val(value)
-                .appendTo($wrapper)
-                .change(function() {
-                  self.trigger('value-changed');
+            if (
+                typeof value !== "undefined" &&
+                typeof self.$value !== "undefined"
+            ) {
+                if ($.isArray(self.$value)) {
+                    $.each(value, function (i, v) {
+                        self.$value[i].select2("val", v);
+                    });
+                } else {
+                    var trimmedValue = value;
+                    if (
+                        typeof value === "string" &&
+                        widget !== "RelativePathWidget"
+                    ) {
+                        trimmedValue = value.replace(/::-?[0-9]+/, "");
+                    }
+                    self.$value.select2("val", trimmedValue);
+                }
+            }
+
+            self.trigger("create-value");
+        },
+        createClear: function () {
+            var self = this;
+            self.removeClear();
+            self.$clear = $("<div/>")
+                .addClass(self.options.classClearName)
+                .appendTo(self.$wrapper);
+        },
+        remove: function () {
+            var self = this;
+            self.trigger("remove");
+            self.$remove.remove();
+            self.$index.parent().remove();
+            self.removeOperator();
+            self.removeValue();
+            self.removeClear();
+            self.$wrapper.remove();
+        },
+        removeClear: function () {
+            var self = this;
+            self.trigger("remove-clear");
+            if (self.$clear) {
+                self.$clear.remove();
+            }
+        },
+        removeOperator: function () {
+            var self = this;
+            self.trigger("remove-operator");
+            if (self.$operator) {
+                self.$operator.parent().remove();
+            }
+        },
+        removeValue: function () {
+            var self = this;
+            self.trigger("remove-value");
+            if (self.$value) {
+                if ($.isArray(self.$value)) {
+                    // date ranges have 2 values
+                    self.$value[0]
+                        .parents(".querystring-criteria-value")
+                        .remove();
+                } else {
+                    self.$value.parents(".querystring-criteria-value").remove();
+                }
+            }
+        },
+        // builds the parameters to go into the http querystring for requesting
+        // results from the query builder
+        buildQueryPart: function () {
+            var self = this;
+
+            // index
+            var ival = self.$index.select2("val");
+            if (ival === "") {
+                // no index selected, no query
+                return "";
+            }
+            var istr = "query.i:records=" + ival;
+
+            // operator
+            if (typeof self.$operator === "undefined") {
+                // no operator, no query
+                return "";
+            }
+            var oval = self.$operator.val();
+
+            if (ival === "path") {
+                if (oval.indexOf("advanced") > 0) {
+                    return "";
+                }
+                oval = self.convertPathOperators(oval);
+            }
+
+            var ostr = "query.o:records=" + oval;
+
+            // value(s)
+            var vstrbase = "query.v:records=",
+                vstrlistbase = "query.v:records:list=",
+                vstr = [];
+            if (typeof self.$value === "undefined") {
+                vstr.push(vstrbase);
+            } else if ($.isArray(self.$value)) {
+                // handles only datepickers from the 'between' operator right now
+                $.each(self.$value, function (i, v) {
+                    vstr.push(vstrlistbase + $(this).val());
+                });
+            } else if ($.isArray(self.$value.val())) {
+                // handles multible values
+                $.each(self.$value.val(), function (i, v) {
+                    vstr.push(vstrlistbase + v);
+                });
+            } else {
+                var str = vstrbase + self.$value.val();
+                if (ival === "path" && self.$value.val() !== "") {
+                    str += self.getDepthString();
+                } else if (typeof self.initial !== "undefined") {
+                    str = vstrbase + self.initial;
+                    //Sometimes the RelatedItemsWidget won't be loaded by this point.
+                    //This only should happen on the initial page load.
+                    delete self.initial;
+                }
+                vstr.push(str);
+            }
+
+            return istr + "&" + ostr + "&" + vstr.join("&");
+        },
+        getJSONListStr: function () {
+            var self = this;
+
+            // index
+            var ival = self.$index.select2("val");
+            if (ival === "") {
+                // no index selected, no query
+                return "";
+            }
+
+            // operator
+            if (typeof self.$operator === "undefined") {
+                // no operator, no query
+                return "";
+            }
+            var oval = self.$operator.val();
+
+            if (ival === "path") {
+                if (oval.indexOf("advanced") > 0) {
+                    //The advanced function is just a placeholder,
+                    //We don't want to send an actual query
+                    return "";
+                }
+                oval = self.convertPathOperators(oval);
+            }
+            // value(s)
+            var varr = [];
+            if ($.isArray(self.$value)) {
+                // handles only datepickers from the 'between' operator right now
+                $.each(self.$value, function (i, v) {
+                    varr.push($(this).val());
+                });
+            } else if (typeof self.$value !== "undefined") {
+                var value = self.$value.val();
+                if (ival === "path" && value) {
+                    var depth = self.getDepthString();
+                    if (depth) {
+                        value += depth;
+                    }
+                }
+                varr.push(value);
+            }
+            var vval;
+            if (varr.length > 1) {
+                vval = '["' + varr.join('","') + '"]';
+            } else if (varr.length === 1) {
+                vval = JSON.stringify(varr[0]);
+            } else {
+                vval = '""';
+            }
+
+            if (typeof self.indexes[ival].operators[oval] === "undefined") {
+                return;
+            }
+
+            return '{"i":"' + ival + '", "o":"' + oval + '", "v":' + vval + "}";
+        },
+        getDepthString: function () {
+            var self = this,
+                out = "",
+                depth = $("." + self.options.classDepthName).val();
+
+            if (depth !== "" && typeof depth !== "undefined") {
+                out += "::" + depth;
+            }
+            return out;
+        },
+        trigger: function (name) {
+            this.$wrapper.trigger(name + "-criteria.querystring.patterns", [
+                this,
+            ]);
+        },
+        on: function (name, callback) {
+            this.$wrapper.on(name + "-criteria.querystring.patterns", callback);
+        },
+    };
+
+    var QueryString = Base.extend({
+        name: "querystring",
+        trigger: ".pat-querystring",
+        parser: "mockup",
+        defaults: {
+            indexes: [],
+            classWrapperName: "querystring-wrapper",
+            criteria: {},
+            indexOptionsUrl: null,
+            previewURL: "portal_factory/@@querybuilder_html_results", // base url to use to request preview information from
+            previewCountURL: "portal_factory/@@querybuildernumberofresults",
+            patternDateOptions: {},
+            patternAjaxSelectOptions: {},
+            patternRelateditemsOptions: {},
+            classSortLabelName: "querystring-sort-label",
+            classSortReverseName: "querystring-sortreverse",
+            classSortReverseLabelName: "querystring-sortreverse-label",
+            classPreviewCountWrapperName: "querystring-previewcount-wrapper",
+            classPreviewResultsWrapperName:
+                "querystring-previewresults-wrapper",
+            classPreviewWrapperName: "querystring-preview-wrapper",
+            classPreviewName: "querystring-preview",
+            classPreviewTitleName: "querystring-preview-title",
+            classPreviewDescriptionName: "querystring-preview-description",
+            classSortWrapperName: "querystring-sort-wrapper",
+            showPreviews: true,
+        },
+        init: function () {
+            var self = this;
+
+            // hide input element
+            self.$el.hide();
+
+            // create wrapper for out criteria
+            self.$wrapper = $("<div/>");
+            self.$el.after(self.$wrapper);
+
+            // initialization can be detailed if by ajax
+            self.initialized = false;
+
+            if (self.options.indexOptionsUrl) {
+                $.ajax({
+                    url: self.options.indexOptionsUrl,
+                    success: function (data) {
+                        self.options.indexes = data.indexes;
+                        self.options["sortable_indexes"] =
+                            data["sortable_indexes"]; // jshint ignore:line
+                        self._init();
+                    },
+                    error: function (xhr) {
+                        // XXX handle this...
+                    },
+                });
+            } else {
+                self._init();
+            }
+        },
+        _init: function () {
+            var self = this;
+            self.$criteriaWrapper = $("<div/>")
+                .addClass(self.options.classWrapperName)
+                .appendTo(self.$wrapper);
+
+            self.$sortWrapper = $("<div/>")
+                .addClass(self.options.classSortWrapperName)
+                .appendTo(self.$wrapper);
+
+            if (self.options.showPreviews === "false") {
+                self.options.showPreviews = false;
+            }
+            if (self.options.showPreviews) {
+                self.$previewWrapper = $("<div/>")
+                    .addClass(self.options.classPreviewWrapperName)
+                    .appendTo(self.$wrapper);
+
+                // preview title and description
+                $("<div/>")
+                    .addClass(self.options.classPreviewTitleName)
+                    .html(_t("Preview"))
+                    .appendTo(self.$previewWrapper);
+                $("<div/>")
+                    .addClass(self.options.classPreviewDescriptionName)
+                    .html(_t("Preview of at most 10 items"))
+                    .appendTo(self.$previewWrapper);
+            }
+
+            self.criterias = [];
+
+            // create populated criterias
+            if (self.$el.val()) {
+                $.each(JSON.parse(self.$el.val()), function (i, item) {
+                    self.createCriteria(item.i, item.o, item.v);
+                });
+            }
+
+            // add empty criteria which enables users to create new cr
+            self.createCriteria();
+
+            // add sort/order fields
+            self.createSort();
+
+            // add criteria preview pane to see results from criteria query
+            if (self.options.showPreviews) {
+                self.refreshPreviewEvent();
+            }
+            self.$el.trigger("initialized");
+            self.initialized = true;
+        },
+        createCriteria: function (index, operator, value) {
+            var self = this,
+                baseUrl = self.options.indexOptionsUrl.replace(/(@@.*)/g, ""),
+                criteria = new Criteria(
+                    self.$criteriaWrapper,
+                    self.options.criteria,
+                    self.options.indexes,
+                    index,
+                    operator,
+                    value,
+                    baseUrl,
+                    self.options.patternDateOptions,
+                    self.options.patternAjaxSelectOptions,
+                    self.options.patternRelateditemsOptions
+                );
+
+            criteria.on("remove", function (e) {
+                if (self.criterias[self.criterias.length - 1] === criteria) {
+                    self.createCriteria();
+                }
+            });
+
+            criteria.on("index-changed", function (e) {
+                if (self.criterias[self.criterias.length - 1] === criteria) {
+                    self.createCriteria();
+                }
+            });
+
+            //This prevents multiple requests from going off after making a single change
+            var _doupdates = function () {
+                self.refreshPreviewEvent();
+                self.updateValue();
+            };
+            var _updateTimeout = -1;
+            var doupdates = function () {
+                clearTimeout(_updateTimeout);
+                _updateTimeout = setTimeout(_doupdates, 100);
+            };
+
+            criteria.on("remove", function (e, criteria) {
+                if (self.criterias.indexOf(criteria) !== -1) {
+                    self.criterias.splice(self.criterias.indexOf(criteria), 1);
+                }
+                doupdates(e, criteria);
+            });
+            criteria.on("remove-clear", doupdates);
+            criteria.on("remove-operator", doupdates);
+            criteria.on("remove-value", doupdates);
+            criteria.on("index-changed", doupdates);
+            criteria.on("operator-changed", doupdates);
+            criteria.on("create-criteria", doupdates);
+            criteria.on("create-operator", doupdates);
+            criteria.on("create-value", doupdates);
+            criteria.on("value-changed", doupdates);
+            criteria.on("depth-changed", doupdates);
+
+            self.criterias.push(criteria);
+        },
+        createSort: function () {
+            var self = this;
+
+            // elements that may exist already on the page
+            // XXX do this in a way so it'll work with other forms will work
+            // as long as they provide sort_on and sort_reversed fields in z3c form
+            var existingSortOn = $('[id$="-sort_on"]').filter(
+                '[id^="formfield-"]'
+            );
+            var existingSortOrder = $('[id$="-sort_reversed"]').filter(
+                '[id^="formfield-"]'
+            );
+
+            $("<span/>")
+                .addClass(self.options.classSortLabelName)
+                .html(_t("Sort on"))
+                .appendTo(self.$sortWrapper);
+            self.$sortOn = $("<select/>")
+                .attr("name", "sort_on")
+                .appendTo(self.$sortWrapper)
+                .change(function () {
+                    self.refreshPreviewEvent.call(self);
+                    $('[id$="sort_on"]', existingSortOn).val($(this).val());
                 });
 
-      } else if (widget === 'AdvancedPathWidget') {
-        if( self.advanced ) {
-          self.advanced = false;
-        }
-        else {
-          self.advanced = true;
-        }
-        self.createPathOperators();
-        self.removeOperator();
-        self.appendOperators(index);
-        self.createValue(index);
-      } else if (widget === 'RelativePathWidget') {
-        if( self.advanced ) {
-          self.$value = $('<input type="text"/>')
-            .addClass(self.options.classValueName + '-' + widget)
-            .appendTo($wrapper)
-            .val(value)
-            .change(function() {
-              self.trigger('value-changed');
-            });
-        }else{
-          //These 2 hard-coded values correspond to the "Current (./)" and "Parent (../)" options
-          //under the location index.
-          if(!value){
-            value = ".::1";
-            if ( self.$operator.val().indexOf('relativePath') > 0 ) {
-              value = "..::1";
+            self.$sortOn.append(
+                $('<option value="">' + _t("No sorting") + "</option>")
+            ); // default no sorting
+            for (var key in self.options["sortable_indexes"]) {
+                // jshint ignore:line
+                self.$sortOn.append(
+                    $("<option/>")
+                        .attr("value", key)
+                        .html(self.options.indexes[key].title)
+                );
             }
-          }else{
-            if(value === '.::1'){
-              self.$operator.select2('val', 'plone.app.querystring.operation.string.path');
-            }
-          }
-          self.$value = $('<input type="hidden"/>')
-          .addClass(self.options.classValueName + '-' + widget)
-          .appendTo($wrapper)
-          .val(value);
-        }
-      } else if (widget === 'ReferenceWidget') {
-        if( self.advanced ) {
-          self.$value = $('<input type="text"/>')
-            .addClass(self.options.classValueName + '-' + widget)
-            .val(value)
-            .appendTo($wrapper)
-            .change(function() {
-              self.trigger('value-changed');
-            });
-        }else{
-          var pathAndDepth = ['', -1];
-          if( typeof value !== 'undefined' ) {
-              pathAndDepth = value.split('::');
-          }
-          self.$value = $('<input type="text"/>')
-          .addClass(self.options.classValueName + '-' + widget)
-          .appendTo($wrapper)
-          .val(pathAndDepth[0])
-          .patternRelateditems(self.patternRelateditemsOptions)
-          .change(function() {
-            self.trigger('value-changed');
-          });
-          self.$value.parent().after(createDepthSelect(pathAndDepth[1]));
-          self.$value.parents('.' + self.options.classValueName).addClass('break-line');
-        }
-      } else if (widget === 'MultipleSelectionWidget') {
-        self.$value = $('<select/>').prop('multiple', true)
-                .addClass(self.options.classValueName + '-' + widget)
-                .appendTo($wrapper)
-                .change(function() {
-                  self.trigger('value-changed');
+            self.$sortOn.patternSelect2({ width: "150px" });
+
+            self.$sortOrder = $('<input type="checkbox" />')
+                .attr("name", "sort_reversed:boolean")
+                .change(function () {
+                    self.refreshPreviewEvent.call(self);
+                    if ($(this).prop("checked")) {
+                        $(
+                            '.option input[type="checkbox"]',
+                            existingSortOrder
+                        ).prop("checked", true);
+                    } else {
+                        $(
+                            '.option input[type="checkbox"]',
+                            existingSortOrder
+                        ).prop("checked", false);
+                    }
                 });
-        if (self.indexes[index]) {
-          $.each(self.indexes[index].values, function(value, options) {
-            $('<option/>')
-                .attr('value', value)
-                .html(options.title)
-                .appendTo(self.$value);
-          });
-        }
-        self.$value.patternSelect2(self.patternAjaxSelectOptions);
-      }
 
-      if (typeof value !== 'undefined' && typeof self.$value !== 'undefined') {
-        if ($.isArray(self.$value)) {
-          $.each(value, function( i, v ) {
-            self.$value[i].select2('val', v);
-          });
-        }
-        else {
-          var trimmedValue = value;
-          if( typeof value === "string" && widget !== 'RelativePathWidget') {
-            trimmedValue = value.replace(/::-?[0-9]+/, '');
-          }
-          self.$value.select2('val', trimmedValue);
-        }
-      }
+            $("<span/>")
+                .addClass(self.options.classSortReverseName)
+                .appendTo(self.$sortWrapper)
+                .append(self.$sortOrder)
+                .append(
+                    $("<span/>")
+                        .html(_t("Reversed Order"))
+                        .addClass(self.options.classSortReverseLabelName)
+                );
 
-      self.trigger('create-value');
+            // if the form already contains the sort fields, hide them! Their values
+            // will be synced back and forth between the querystring's form elements
+            if (existingSortOn.length >= 1 && existingSortOrder.length >= 1) {
+                var reversed = $(
+                    '.option input[type="checkbox"]',
+                    existingSortOrder
+                ).prop("checked");
+                var sortOn = $('[id$="-sort_on"]', existingSortOn).val();
+                if (reversed) {
+                    self.$sortOrder.prop("checked", true);
+                }
+                self.$sortOn.select2("val", sortOn);
+                $(existingSortOn).hide();
+                $(existingSortOrder).hide();
+            }
+        },
+        refreshPreviewEvent: function (value) {
+            var self = this;
 
-    },
-    createClear: function() {
-      var self = this;
-      self.removeClear();
-      self.$clear = $('<div/>')
-        .addClass(self.options.classClearName)
-        .appendTo(self.$wrapper);
-    },
-    remove: function() {
-      var self = this;
-      self.trigger('remove');
-      self.$remove.remove();
-      self.$index.parent().remove();
-      self.removeOperator();
-      self.removeValue();
-      self.removeClear();
-      self.$wrapper.remove();
-    },
-    removeClear: function() {
-      var self = this;
-      self.trigger('remove-clear');
-      if (self.$clear) {
-        self.$clear.remove();
-      }
-    },
-    removeOperator: function() {
-      var self = this;
-      self.trigger('remove-operator');
-      if (self.$operator) {
-        self.$operator.parent().remove();
-      }
-    },
-    removeValue: function() {
-      var self = this;
-      self.trigger('remove-value');
-      if (self.$value) {
-        if ($.isArray(self.$value)) { // date ranges have 2 values
-          self.$value[0].parents('.querystring-criteria-value').remove();
-        }
-        else {
-          self.$value.parents('.querystring-criteria-value').remove();
-        }
-      }
-    },
-    // builds the parameters to go into the http querystring for requesting
-    // results from the query builder
-    buildQueryPart: function() {
-      var self = this;
+            if (!self.options.showPreviews) {
+                return; // cut out of this if there are no previews available
+            }
 
-      // index
-      var ival = self.$index.select2('val');
-      if (ival === '') { // no index selected, no query
-        return '';
-      }
-      var istr = 'query.i:records=' + ival;
+            /* TEMPORARY */
+            //if (typeof self._tmpcnt === 'undefined') { self._tmpcnt = 0; }
+            //self._tmpcnt++;
+            /* /TEMPORARY */
 
-      // operator
-      if (typeof self.$operator === 'undefined') { // no operator, no query
-        return '';
-      }
-      var oval = self.$operator.val();
-
-      if( ival === "path" ) {
-        if( oval.indexOf('advanced') > 0 ) {
-          return '';
-        }
-        oval = self.convertPathOperators(oval);
-      }
-
-      var ostr = 'query.o:records=' + oval;
-
-      // value(s)
-      var vstrbase = 'query.v:records=',
-          vstrlistbase = 'query.v:records:list=',
-          vstr = [];
-      if (typeof self.$value === 'undefined') {
-        vstr.push(vstrbase);
-      }
-      else if ($.isArray(self.$value)) { // handles only datepickers from the 'between' operator right now
-        $.each(self.$value, function(i, v) {
-          vstr.push(vstrlistbase + $(this).val());
-        });
-      }
-      else if ($.isArray(self.$value.val())) { // handles multible values
-        $.each(self.$value.val(), function(i, v) {
-          vstr.push(vstrlistbase + v);
-        });
-      }
-      else {
-        var str = vstrbase + self.$value.val();
-        if( ival === "path" && self.$value.val() !== '') {
-          str += self.getDepthString();
-        }
-        else if( typeof self.initial !== 'undefined' ) {
-          str = vstrbase + self.initial;
-          //Sometimes the RelatedItemsWidget won't be loaded by this point.
-          //This only should happen on the initial page load.
-          delete self.initial;
-        }
-        vstr.push(str);
-      }
-
-      return istr + '&' + ostr + '&' + vstr.join('&');
-    },
-    getJSONListStr: function() {
-      var self = this;
-
-      // index
-      var ival = self.$index.select2('val');
-      if (ival === '') { // no index selected, no query
-        return '';
-      }
-
-      // operator
-      if (typeof self.$operator === 'undefined') { // no operator, no query
-        return '';
-      }
-      var oval = self.$operator.val();
-
-      if( ival === "path" ) {
-        if( oval.indexOf('advanced') > 0 ) {
-          //The advanced function is just a placeholder,
-          //We don't want to send an actual query
-          return '';
-        }
-        oval = self.convertPathOperators(oval);
-      }
-      // value(s)
-      var varr = [];
-      if ($.isArray(self.$value)) { // handles only datepickers from the 'between' operator right now
-        $.each(self.$value, function(i, v) {
-          varr.push($(this).val());
-        });
-      }
-      else if (typeof self.$value !== 'undefined') {
-        var value = self.$value.val();
-        if(ival === 'path' && value) {
-          var depth = self.getDepthString();
-          if(depth){
-            value += depth;
-          }
-        }
-        varr.push(value);
-      }
-      var vval;
-      if (varr.length > 1) {
-        vval = '["' + varr.join('","') + '"]';
-      }
-      else if (varr.length === 1) {
-        vval = JSON.stringify(varr[0]);
-      }
-      else {
-        vval = '""';
-      }
-
-      if( typeof self.indexes[ival].operators[oval] === 'undefined' ) {
-        return;
-      }
-
-      return '{"i":"' + ival + '", "o":"' + oval + '", "v":' + vval + '}';
-    },
-    getDepthString: function() {
-      var self = this,
-          out = "",
-          depth = $('.'+self.options.classDepthName).val();
-
-      if( depth !== "" && typeof depth !== 'undefined' ) {
-        out += '::' + depth;
-      }
-      return out;
-    },
-    trigger: function(name) {
-      this.$wrapper.trigger(name + '-criteria.querystring.patterns', [ this ]);
-    },
-    on: function(name, callback) {
-      this.$wrapper.on(name + '-criteria.querystring.patterns', callback);
-    }
-  };
-
-  var QueryString = Base.extend({
-    name: 'querystring',
-    trigger: '.pat-querystring',
-    parser: 'mockup',
-    defaults: {
-      indexes: [],
-      classWrapperName: 'querystring-wrapper',
-      criteria: {},
-      indexOptionsUrl: null,
-      previewURL: 'portal_factory/@@querybuilder_html_results', // base url to use to request preview information from
-      previewCountURL: 'portal_factory/@@querybuildernumberofresults',
-      patternDateOptions: {},
-      patternAjaxSelectOptions: {},
-      patternRelateditemsOptions: {},
-      classSortLabelName: 'querystring-sort-label',
-      classSortReverseName: 'querystring-sortreverse',
-      classSortReverseLabelName: 'querystring-sortreverse-label',
-      classPreviewCountWrapperName: 'querystring-previewcount-wrapper',
-      classPreviewResultsWrapperName: 'querystring-previewresults-wrapper',
-      classPreviewWrapperName: 'querystring-preview-wrapper',
-      classPreviewName: 'querystring-preview',
-      classPreviewTitleName: 'querystring-preview-title',
-      classPreviewDescriptionName: 'querystring-preview-description',
-      classSortWrapperName: 'querystring-sort-wrapper',
-      showPreviews: true
-    },
-    init: function() {
-      var self = this;
-
-      // hide input element
-      self.$el.hide();
-
-      // create wrapper for out criteria
-      self.$wrapper = $('<div/>');
-      self.$el.after(self.$wrapper);
-
-      // initialization can be detailed if by ajax
-      self.initialized = false;
-
-      if (self.options.indexOptionsUrl) {
-        $.ajax({
-          url: self.options.indexOptionsUrl,
-          success: function(data) {
-            self.options.indexes = data.indexes;
-            self.options['sortable_indexes'] = data['sortable_indexes']; // jshint ignore:line
-            self._init();
-          },
-          error: function(xhr) {
-            // XXX handle this...
-          }
-        });
-      } else {
-        self._init();
-      }
-    },
-    _init: function() {
-      var self = this;
-      self.$criteriaWrapper = $('<div/>')
-        .addClass(self.options.classWrapperName)
-        .appendTo(self.$wrapper);
-
-      self.$sortWrapper = $('<div/>')
-        .addClass(self.options.classSortWrapperName)
-        .appendTo(self.$wrapper);
-
-      if (self.options.showPreviews === 'false') {
-        self.options.showPreviews = false;
-      }
-      if (self.options.showPreviews) {
-        self.$previewWrapper = $('<div/>')
-          .addClass(self.options.classPreviewWrapperName)
-          .appendTo(self.$wrapper);
-
-        // preview title and description
-        $('<div/>')
-          .addClass(self.options.classPreviewTitleName)
-          .html(_t('Preview'))
-          .appendTo(self.$previewWrapper);
-        $('<div/>')
-          .addClass(self.options.classPreviewDescriptionName)
-          .html(_t('Preview of at most 10 items'))
-          .appendTo(self.$previewWrapper);
-      }
-
-      self.criterias = [];
-
-      // create populated criterias
-      if (self.$el.val()) {
-        $.each(JSON.parse(self.$el.val()), function(i, item) {
-          self.createCriteria(item.i, item.o, item.v);
-        });
-      }
-
-      // add empty criteria which enables users to create new cr
-      self.createCriteria();
-
-      // add sort/order fields
-      self.createSort();
-
-      // add criteria preview pane to see results from criteria query
-      if (self.options.showPreviews) {
-        self.refreshPreviewEvent();
-      }
-      self.$el.trigger('initialized');
-      self.initialized = true;
-    },
-    createCriteria: function(index, operator, value) {
-      var self = this,
-          baseUrl = self.options.indexOptionsUrl.replace(/(@@.*)/g, ''),
-          criteria = new Criteria(self.$criteriaWrapper, self.options.criteria,
-            self.options.indexes, index, operator, value, baseUrl,
-            self.options.patternDateOptions, self.options.patternAjaxSelectOptions, self.options.patternRelateditemsOptions
-          );
-
-      criteria.on('remove', function(e) {
-        if (self.criterias[self.criterias.length - 1] === criteria) {
-          self.createCriteria();
-        }
-      });
-
-      criteria.on('index-changed', function(e) {
-        if (self.criterias[self.criterias.length - 1] === criteria) {
-          self.createCriteria();
-        }
-      });
-
-      //This prevents multiple requests from going off after making a single change
-      var _doupdates = function(){
-        self.refreshPreviewEvent();
-        self.updateValue();
-      };
-      var _updateTimeout = -1;
-      var doupdates = function() {
-        clearTimeout(_updateTimeout);
-        _updateTimeout = setTimeout(_doupdates, 100);
-      };
-
-      criteria.on('remove', function(e, criteria) {
-        if (self.criterias.indexOf(criteria) !== -1) {
-          self.criterias.splice(self.criterias.indexOf(criteria), 1);
-        }
-        doupdates(e, criteria);
-      });
-      criteria.on('remove-clear', doupdates);
-      criteria.on('remove-operator', doupdates);
-      criteria.on('remove-value', doupdates);
-      criteria.on('index-changed', doupdates);
-      criteria.on('operator-changed', doupdates);
-      criteria.on('create-criteria', doupdates);
-      criteria.on('create-operator', doupdates);
-      criteria.on('create-value', doupdates);
-      criteria.on('value-changed', doupdates);
-      criteria.on('depth-changed', doupdates);
-
-      self.criterias.push(criteria);
-    },
-    createSort: function() {
-      var self = this;
-
-      // elements that may exist already on the page
-      // XXX do this in a way so it'll work with other forms will work
-      // as long as they provide sort_on and sort_reversed fields in z3c form
-      var existingSortOn = $('[id$="-sort_on"]').filter('[id^="formfield-"]');
-      var existingSortOrder = $('[id$="-sort_reversed"]').filter('[id^="formfield-"]');
-
-      $('<span/>')
-        .addClass(self.options.classSortLabelName)
-        .html(_t('Sort on'))
-        .appendTo(self.$sortWrapper);
-      self.$sortOn = $('<select/>')
-        .attr('name', 'sort_on')
-        .appendTo(self.$sortWrapper)
-        .change(function() {
-          self.refreshPreviewEvent.call(self);
-          $('[id$="sort_on"]', existingSortOn).val($(this).val());
-        });
-
-      self.$sortOn.append($('<option value="">' + _t('No sorting') + '</option>')); // default no sorting
-      for (var key in self.options['sortable_indexes']) { // jshint ignore:line
-        self.$sortOn.append(
-          $('<option/>')
-            .attr('value', key)
-            .html(self.options.indexes[key].title)
-        );
-      }
-      self.$sortOn.patternSelect2({width: '150px'});
-
-      self.$sortOrder = $('<input type="checkbox" />')
-        .attr('name', 'sort_reversed:boolean')
-        .change(function() {
-          self.refreshPreviewEvent.call(self);
-          if ($(this).prop('checked')) {
-            $('.option input[type="checkbox"]', existingSortOrder).prop('checked', true);
-          } else {
-            $('.option input[type="checkbox"]', existingSortOrder).prop('checked', false);
-          }
-        });
-
-      $('<span/>')
-        .addClass(self.options.classSortReverseName)
-        .appendTo(self.$sortWrapper)
-        .append(self.$sortOrder)
-        .append(
-          $('<span/>')
-            .html(_t('Reversed Order'))
-            .addClass(self.options.classSortReverseLabelName)
-        );
-
-      // if the form already contains the sort fields, hide them! Their values
-      // will be synced back and forth between the querystring's form elements
-      if (existingSortOn.length >= 1 && existingSortOrder.length >= 1) {
-        var reversed = $('.option input[type="checkbox"]', existingSortOrder).prop('checked');
-        var sortOn = $('[id$="-sort_on"]', existingSortOn).val();
-        if (reversed) {
-          self.$sortOrder.prop('checked', true);
-        }
-        self.$sortOn.select2('val', sortOn);
-        $(existingSortOn).hide();
-        $(existingSortOrder).hide();
-      }
-    },
-    refreshPreviewEvent: function(value) {
-      var self = this;
-
-      if (!self.options.showPreviews) {
-        return; // cut out of this if there are no previews available
-      }
-
-      /* TEMPORARY */
-      //if (typeof self._tmpcnt === 'undefined') { self._tmpcnt = 0; }
-      //self._tmpcnt++;
-      /* /TEMPORARY */
-
-      if (typeof self._previewXhr !== 'undefined') {
-        self._previewXhr.abort();
-      }
-      /*
+            if (typeof self._previewXhr !== "undefined") {
+                self._previewXhr.abort();
+            }
+            /*
       if (typeof self._count_xhr !== 'undefined') {
         self._count_xhr.abort();
       }
       */
-      if (typeof self.$previewPane !== 'undefined') {
-        self.$previewPane.remove();
-      }
+            if (typeof self.$previewPane !== "undefined") {
+                self.$previewPane.remove();
+            }
 
-      var query = [], querypart;
-      $.each(self.criterias, function(i, criteria) {
-        var querypart = criteria.buildQueryPart();
-        if (querypart !== '') {
-          query.push(querypart);
-        }
-      });
+            var query = [],
+                querypart;
+            $.each(self.criterias, function (i, criteria) {
+                var querypart = criteria.buildQueryPart();
+                if (querypart !== "") {
+                    query.push(querypart);
+                }
+            });
 
-      self.$previewPane = $('<div/>')
-        .addClass(self.options.classPreviewName)
-        .appendTo(self.$previewWrapper);
+            self.$previewPane = $("<div/>")
+                .addClass(self.options.classPreviewName)
+                .appendTo(self.$previewWrapper);
 
-      if (query.length <= 0) {
-        $('<div/>')
-          .addClass(self.options.classPreviewCountWrapperName)
-          .html('No results to preview')
-          .prependTo(self.$previewPane);
-        return; // no query means nothing to send out requests for
-      }
+            if (query.length <= 0) {
+                $("<div/>")
+                    .addClass(self.options.classPreviewCountWrapperName)
+                    .html("No results to preview")
+                    .prependTo(self.$previewPane);
+                return; // no query means nothing to send out requests for
+            }
 
-      query.push('sort_on=' + self.$sortOn.val());
-      if (self.$sortOrder.prop('checked')) {
-        query.push('sort_order=reverse');
-      }
+            query.push("sort_on=" + self.$sortOn.val());
+            if (self.$sortOrder.prop("checked")) {
+                query.push("sort_order=reverse");
+            }
 
-      /* TEMPORARY */
-      //self.$previewPane.html(
-      //    'refreshed ' + self._tmpcnt + ' times<br />'
-      //    + (query.length > 1 ? query.join('<br />&') : query));
-      /* /TEMPORARY */
+            /* TEMPORARY */
+            //self.$previewPane.html(
+            //    'refreshed ' + self._tmpcnt + ' times<br />'
+            //    + (query.length > 1 ? query.join('<br />&') : query));
+            /* /TEMPORARY */
 
-      /*
+            /*
       self._count_xhr = $.get(self.options.previewCountURL + '?' + query.join('&'))
           .done(function(data, stat) {
             $('<div/>')
@@ -7777,789 +8168,856 @@ define('mockup-patterns-querystring',[
               .prependTo(self.$previewPane);
           });
       */
-      self._previewXhr = $.get(self.options.previewURL + '?' + query.join('&'))
-          .done(function(data, stat) {
-            $('<div/>')
-              .addClass(self.options.classPreviewResultsWrapperName)
-              .html(data)
-              .appendTo(self.$previewPane);
-          });
-    },
-    updateValue: function() {
-      // updating the original input with json data in the form:
-      // [
-      //    {i:'index', o:'operator', v:'value'}
-      // ]
+            self._previewXhr = $.get(
+                self.options.previewURL + "?" + query.join("&")
+            ).done(function (data, stat) {
+                $("<div/>")
+                    .addClass(self.options.classPreviewResultsWrapperName)
+                    .html(data)
+                    .appendTo(self.$previewPane);
+            });
+        },
+        updateValue: function () {
+            // updating the original input with json data in the form:
+            // [
+            //    {i:'index', o:'operator', v:'value'}
+            // ]
 
-      var self = this;
+            var self = this;
 
-      var criteriastrs = [];
-      $.each(self.criterias, function(i, criteria) {
-        var jsonstr = criteria.getJSONListStr();
-        if (jsonstr !== '') {
-          criteriastrs.push(jsonstr);
-        }
-      });
-      var existing = self.$el.val();
-      var val = '[' + criteriastrs.join(',') + ']';
-      self.$el.val(val);
-      self.$el.trigger('change');
-    }
-  });
+            var criteriastrs = [];
+            $.each(self.criterias, function (i, criteria) {
+                var jsonstr = criteria.getJSONListStr();
+                if (jsonstr !== "") {
+                    criteriastrs.push(jsonstr);
+                }
+            });
+            var existing = self.$el.val();
+            var val = "[" + criteriastrs.join(",") + "]";
+            self.$el.val(val);
+            self.$el.trigger("change");
+        },
+    });
 
-  return QueryString;
-
+    return QueryString;
 });
 
-define('mockup-ui-url/views/container',[
-  'jquery',
-  'underscore',
-  'mockup-ui-url/views/base'
-], function($, _, BaseView) {
-  'use strict';
+define('mockup-ui-url/views/container',["jquery", "underscore", "mockup-ui-url/views/base"], function (
+    $,
+    _,
+    BaseView
+) {
+    "use strict";
 
-  var Container = BaseView.extend({
-    id: '',
-    items: [],
-    itemContainer: null,
-    isOffsetParent: true,
-    idPrefix: 'container-',
-    render: function() {
-      if (this.options.id) {
-        this.$el.attr('id', this.idPrefix + this.options.id);
-      }
-
-      this.applyTemplate();
-
-      this.renderItems();
-      this.bindEvents();
-
-      if (this.isOffsetParent) {
-        this.$el.addClass('ui-offset-parent');
-      }
-
-      this.trigger('render', this);
-
-      this.afterRender();
-
-      this.$el.data('component', this);
-      return this;
-    },
-    renderItems: function() {
-      var $container;
-
-      if (this.itemContainer !== null) {
-        $container = $(this.itemContainer, this.$el);
-        if ($container.length === 0) {
-          throw 'Item Container element not found.';
-        }
-      } else {
-        $container = this.$el;
-      }
-      _.each(this.items, function(view) {
-        if (view.appendInContainer === true) {
-          $container.append(view.render().$el);
-        } else {
-          view.render();
-        }
-      }, this);
-    },
-    bindEvents: function() {
-      var self = this;
-      _.each(this.items, function(view) {
-        view.on('all', function() {
-          var slice = [].slice;
-          var eventName = arguments[0];
-          var eventTarget;
-          var newName = self.id !== '' ? self.id + '.' + eventName : eventName;
-          if (arguments.length > 1) {
-            eventTarget = arguments[1];
-          }
-          if (newName !== eventName) {
-            var newArgs = slice.call(arguments, 0);
-            newArgs[0] = newName;
-            self.trigger.apply(self, newArgs);
-          }
-          if (eventTarget !== undefined && eventTarget.isUIView === true) {
-            if (eventTarget.propagateEvent(eventName) === true) {
-              self.trigger.apply(self, arguments);
+    var Container = BaseView.extend({
+        id: "",
+        items: [],
+        itemContainer: null,
+        isOffsetParent: true,
+        idPrefix: "container-",
+        render: function () {
+            if (this.options.id) {
+                this.$el.attr("id", this.idPrefix + this.options.id);
             }
-          }
-        });
-      });
-    },
-    get: function(id) {
-      // Remove the recursive part because it was confusing if two children had the
-      // same id
-      return _.findWhere(this.items, {'id': id});
-    },
-    add: function(item) {
-      if (item.id !== undefined && this.get(item.id)) {
-        throw 'Another item with the same `id` already exists.';
-      }
-      this.items.push(item);
-    }
-  });
 
-  return Container;
+            this.applyTemplate();
+
+            this.renderItems();
+            this.bindEvents();
+
+            if (this.isOffsetParent) {
+                this.$el.addClass("ui-offset-parent");
+            }
+
+            this.trigger("render", this);
+
+            this.afterRender();
+
+            this.$el.data("component", this);
+            return this;
+        },
+        renderItems: function () {
+            var $container;
+
+            if (this.itemContainer !== null) {
+                $container = $(this.itemContainer, this.$el);
+                if ($container.length === 0) {
+                    throw "Item Container element not found.";
+                }
+            } else {
+                $container = this.$el;
+            }
+            _.each(
+                this.items,
+                function (view) {
+                    if (view.appendInContainer === true) {
+                        $container.append(view.render().$el);
+                    } else {
+                        view.render();
+                    }
+                },
+                this
+            );
+        },
+        bindEvents: function () {
+            var self = this;
+            _.each(this.items, function (view) {
+                view.on("all", function () {
+                    var slice = [].slice;
+                    var eventName = arguments[0];
+                    var eventTarget;
+                    var newName =
+                        self.id !== "" ? self.id + "." + eventName : eventName;
+                    if (arguments.length > 1) {
+                        eventTarget = arguments[1];
+                    }
+                    if (newName !== eventName) {
+                        var newArgs = slice.call(arguments, 0);
+                        newArgs[0] = newName;
+                        self.trigger.apply(self, newArgs);
+                    }
+                    if (
+                        eventTarget !== undefined &&
+                        eventTarget.isUIView === true
+                    ) {
+                        if (eventTarget.propagateEvent(eventName) === true) {
+                            self.trigger.apply(self, arguments);
+                        }
+                    }
+                });
+            });
+        },
+        get: function (id) {
+            // Remove the recursive part because it was confusing if two children had the
+            // same id
+            return _.findWhere(this.items, { id: id });
+        },
+        add: function (item) {
+            if (item.id !== undefined && this.get(item.id)) {
+                throw "Another item with the same `id` already exists.";
+            }
+            this.items.push(item);
+        },
+    });
+
+    return Container;
 });
 
-define('mockup-ui-url/views/toolbar',[
-  'mockup-ui-url/views/container'
-], function(ContainerView) {
-  'use strict';
+define('mockup-ui-url/views/toolbar',["mockup-ui-url/views/container"], function (ContainerView) {
+    "use strict";
 
-  var Toolbar = ContainerView.extend({
-    tagName: 'div',
-    className: 'navbar',
-    idPrefix: 'toolbar-'
-  });
+    var Toolbar = ContainerView.extend({
+        tagName: "div",
+        className: "navbar",
+        idPrefix: "toolbar-",
+    });
 
-  return Toolbar;
+    return Toolbar;
 });
 
-define('mockup-ui-url/views/buttongroup',[
-  'underscore',
-  'mockup-ui-url/views/container'
-], function(_, ContainerView) {
-  'use strict';
+define('mockup-ui-url/views/buttongroup',["underscore", "mockup-ui-url/views/container"], function (
+    _,
+    ContainerView
+) {
+    "use strict";
 
-  var ButtonGroup = ContainerView.extend({
-    tagName: 'div',
-    className: 'btn-group',
-    idPrefix: 'btngroup-',
-    disable: function() {
-      _.each(this.items, function(button) {
-        button.disable();
-      });
-    },
-    enable: function() {
-      _.each(this.items, function(button) {
-        button.enable();
-      });
-    }
-  });
+    var ButtonGroup = ContainerView.extend({
+        tagName: "div",
+        className: "btn-group",
+        idPrefix: "btngroup-",
+        disable: function () {
+            _.each(this.items, function (button) {
+                button.disable();
+            });
+        },
+        enable: function () {
+            _.each(this.items, function (button) {
+                button.enable();
+            });
+        },
+    });
 
-  return ButtonGroup;
+    return ButtonGroup;
 });
 
-define('mockup-patterns-structure-url/js/navigation',[
-  'backbone',
-  'mockup-utils',
-], function(Backbone, utils) {
-  'use strict';
+define('mockup-patterns-structure-url/js/navigation',["backbone", "mockup-utils"], function (Backbone, utils) {
+    "use strict";
 
-  // use a more primative class than Backbone.Model?
-  var Navigation = Backbone.Model.extend({
-    initialize: function(options) {
-      this.options = options;
-      this.app = options.app;
-      this.model = options.model;
-    },
-    folderClicked: function(e) {
-      e.preventDefault();
-      // handler for folder, go down path and show in contents window.
-      var self = this;
-      self.app.setCurrentPath(self.model.attributes.path);
-      // also switch to fix page in batch
-      self.app.collection.goTo(self.app.collection.information.firstPage);
-    },
-  });
+    // use a more primative class than Backbone.Model?
+    var Navigation = Backbone.Model.extend({
+        initialize: function (options) {
+            this.options = options;
+            this.app = options.app;
+            this.model = options.model;
+        },
+        folderClicked: function (e) {
+            e.preventDefault();
+            // handler for folder, go down path and show in contents window.
+            var self = this;
+            self.app.setCurrentPath(self.model.attributes.path);
+            // also switch to fix page in batch
+            self.app.collection.goTo(self.app.collection.information.firstPage);
+        },
+    });
 
-  return Navigation;
+    return Navigation;
 });
 
-define('mockup-patterns-structure-url/js/models/result',['backbone'], function(Backbone) {
-  'use strict';
+define('mockup-patterns-structure-url/js/models/result',["backbone"], function (Backbone) {
+    "use strict";
 
-  var Result = Backbone.Model.extend({
-    defaults: function() {
-      return {
-        'is_folderish': false,
-        'review_state': '',
-        'getURL': ''
-      };
-    },
-    uid: function() {
-      return this.attributes.UID;
-    }
-  });
+    var Result = Backbone.Model.extend({
+        defaults: function () {
+            return {
+                is_folderish: false,
+                review_state: "",
+                getURL: "",
+            };
+        },
+        uid: function () {
+            return this.attributes.UID;
+        },
+    });
 
-  return Result;
+    return Result;
 });
 
 define('mockup-patterns-structure-url/js/actions',[
-  'jquery',
-  'underscore',
-  'backbone',
-  'mockup-patterns-structure-url/js/models/result',
-  'mockup-utils',
-  'translate',
-], function($, _, Backbone, Result, utils, _t) {
-  'use strict';
+    "jquery",
+    "underscore",
+    "backbone",
+    "mockup-patterns-structure-url/js/models/result",
+    "mockup-utils",
+    "translate",
+], function ($, _, Backbone, Result, utils, _t) {
+    "use strict";
 
-  // use a more primative class than Backbone.Model?
-  var Actions = Backbone.Model.extend({
-    initialize: function(options) {
-      this.options = options;
-      this.app = options.app;
-      this.model = options.model;
-      this.selectedCollection = this.app.selectedCollection;
-    },
-    selectAll: function(e) {
-      // This implementation is very specific to the default collection
-      // with the reliance on its queryParser and queryHelper.  Custom
-      // collection (Backbone.Paginator.requestPager implementation)
-      // will have to come up with their own action for this.
-      e.preventDefault();
-      var self = this;
-      var page = 1;
-      var count = 0;
-      var getPage = function() {
-        self.app.loading.show();
-        $.ajax({
-          url: self.app.collection.url,
-          type: 'GET',
-          dataType: 'json',
-          data: {
-            query: self.app.collection.queryParser({
-              searchPath: self.model.attributes.path
-            }),
-            batch: JSON.stringify({
-              page: page,
-              size: 100
-            }),
-            attributes: JSON.stringify(
-              self.app.collection.queryHelper.options.attributes)
-          }
-        }).done(function(data) {
-          var items = self.app.collection.parse(data, count);
-          count += items.length;
-          _.each(items, function(item) {
-            self.app.selectedCollection.add(new Result(item));
-          });
-          page += 1;
-          if (data.total > count) {
+    // use a more primative class than Backbone.Model?
+    var Actions = Backbone.Model.extend({
+        initialize: function (options) {
+            this.options = options;
+            this.app = options.app;
+            this.model = options.model;
+            this.selectedCollection = this.app.selectedCollection;
+        },
+        selectAll: function (e) {
+            // This implementation is very specific to the default collection
+            // with the reliance on its queryParser and queryHelper.  Custom
+            // collection (Backbone.Paginator.requestPager implementation)
+            // will have to come up with their own action for this.
+            e.preventDefault();
+            var self = this;
+            var page = 1;
+            var count = 0;
+            var getPage = function () {
+                self.app.loading.show();
+                $.ajax({
+                    url: self.app.collection.url,
+                    type: "GET",
+                    dataType: "json",
+                    data: {
+                        query: self.app.collection.queryParser({
+                            searchPath: self.model.attributes.path,
+                        }),
+                        batch: JSON.stringify({
+                            page: page,
+                            size: 100,
+                        }),
+                        attributes: JSON.stringify(
+                            self.app.collection.queryHelper.options.attributes
+                        ),
+                    },
+                }).done(function (data) {
+                    var items = self.app.collection.parse(data, count);
+                    count += items.length;
+                    _.each(items, function (item) {
+                        self.app.selectedCollection.add(new Result(item));
+                    });
+                    page += 1;
+                    if (data.total > count) {
+                        getPage();
+                    } else {
+                        self.app.loading.hide();
+                        self.app.tableView.render();
+                    }
+                });
+            };
             getPage();
-          } else {
-            self.app.loading.hide();
-            self.app.tableView.render();
-          }
-        });
-      };
-      getPage();
-    },
-
-    doAction: function(buttonName, successMsg, failMsg) {
-      var self = this;
-      $.ajax({
-        url: self.app.buttons.get(buttonName).options.url,
-        data: {
-          selection: JSON.stringify([self.model.attributes.UID]),
-          folder: self.model.attributes.path,
-          _authenticator: utils.getAuthenticator()
         },
-        dataType: 'json',
-        type: 'POST'
-      }).done(function(data) {
-        var msg;
-        if (data.status === 'success') {
-          msg = _t(successMsg + ' "' + self.model.attributes.Title + '"');
-          self.app.collection.pager();
-          self.app.updateButtons();
-        } else {
-          msg = _t('Error ' + failMsg + ' "' + self.model.attributes.Title + '"');
-        }
-        self.app.clearStatus();
-        self.app.setStatus({ text: msg, type: data.status || 'warning' });
-      });
-    },
 
-    cutClicked: function(e) {
-      var self = this;
-      e.preventDefault();
-      self.doAction('cut', _t('Cut'), _t('cutting'));
-    },
-    copyClicked: function(e) {
-      var self = this;
-      e.preventDefault();
-      self.doAction('copy', _t('Copied'), _t('copying'));
-    },
-    pasteClicked: function(e) {
-      var self = this;
-      e.preventDefault();
-      self.doAction('paste', _t('Pasted into'), _t('Error pasting into'));
-    },
-    moveTopClicked: function(e) {
-      e.preventDefault();
-      this.app.moveItem(this.model.attributes.id, 'top');
-    },
-    moveBottomClicked: function(e) {
-      e.preventDefault();
-      this.app.moveItem(this.model.attributes.id, 'bottom');
-    },
-    setDefaultPageClicked: function(e) {
-      e.preventDefault();
-      var self = this;
-      $.ajax({
-        url: self.app.getAjaxUrl(self.app.setDefaultPageUrl),
-        type: 'POST',
-        data: {
-          '_authenticator': $('[name="_authenticator"]').val(),
-          'id': this.model.attributes.id
+        doAction: function (buttonName, successMsg, failMsg) {
+            var self = this;
+            $.ajax({
+                url: self.app.buttons.get(buttonName).options.url,
+                data: {
+                    selection: JSON.stringify([self.model.attributes.UID]),
+                    folder: self.model.attributes.path,
+                    _authenticator: utils.getAuthenticator(),
+                },
+                dataType: "json",
+                type: "POST",
+            }).done(function (data) {
+                var msg;
+                if (data.status === "success") {
+                    msg = _t(
+                        successMsg + ' "' + self.model.attributes.Title + '"'
+                    );
+                    self.app.collection.pager();
+                    self.app.updateButtons();
+                } else {
+                    msg = _t(
+                        "Error " +
+                            failMsg +
+                            ' "' +
+                            self.model.attributes.Title +
+                            '"'
+                    );
+                }
+                self.app.clearStatus();
+                self.app.setStatus({
+                    text: msg,
+                    type: data.status || "warning",
+                });
+            });
         },
-        success: function(data) {
-          self.app.ajaxSuccessResponse.apply(self.app, [data]);
-        },
-        error: function(data) {
-          self.app.ajaxErrorResponse.apply(self.app, [data]);
-        }
-      });
-    },
-  });
 
-  return Actions;
+        cutClicked: function (e) {
+            var self = this;
+            e.preventDefault();
+            self.doAction("cut", _t("Cut"), _t("cutting"));
+        },
+        copyClicked: function (e) {
+            var self = this;
+            e.preventDefault();
+            self.doAction("copy", _t("Copied"), _t("copying"));
+        },
+        pasteClicked: function (e) {
+            var self = this;
+            e.preventDefault();
+            self.doAction("paste", _t("Pasted into"), _t("Error pasting into"));
+        },
+        moveTopClicked: function (e) {
+            e.preventDefault();
+            this.app.moveItem(this.model.attributes.id, "top");
+        },
+        moveBottomClicked: function (e) {
+            e.preventDefault();
+            this.app.moveItem(this.model.attributes.id, "bottom");
+        },
+        setDefaultPageClicked: function (e) {
+            e.preventDefault();
+            var self = this;
+            $.ajax({
+                url: self.app.getAjaxUrl(self.app.setDefaultPageUrl),
+                type: "POST",
+                data: {
+                    _authenticator: $('[name="_authenticator"]').val(),
+                    id: this.model.attributes.id,
+                },
+                success: function (data) {
+                    self.app.ajaxSuccessResponse.apply(self.app, [data]);
+                },
+                error: function (data) {
+                    self.app.ajaxErrorResponse.apply(self.app, [data]);
+                },
+            });
+        },
+    });
+
+    return Actions;
 });
 
-define('mockup-patterns-structure-url/js/actionmenu',['underscore', 'translate'], function(_, _t) {
-  'use strict';
+define('mockup-patterns-structure-url/js/actionmenu',["underscore", "translate"], function (_, _t) {
+    "use strict";
 
-  var menuOptions = {
-    'openItem': {
-      'url':      '#',
-      'title':    _t('Open'),
-      'category': 'button',
-      'iconCSS':  'glyphicon glyphicon-eye-open',
-      'css': '',
-      'modal':    false
-    },
-    'editItem': {
-      'url':      '#',
-      'title':    _t('Edit'),
-      'category': 'button',
-      'iconCSS':  'glyphicon glyphicon-pencil',
-      'css': '',
-      'modal':    false
-    },
-    'cutItem': {
-      'library':  'mockup-patterns-structure-url/js/actions',
-      'method':   'cutClicked',
-      'url':      '#',
-      'title':    _t('Cut'),
-      'category': 'dropdown',
-      'iconCSS':  'glyphicon glyphicon-scissors',
-      'css': '',
-      'modal':    false
-    },
-    'copyItem': {
-      'library':  'mockup-patterns-structure-url/js/actions',
-      'method':   'copyClicked',
-      'url':      '#',
-      'title':    _t('Copy'),
-      'category': 'dropdown',
-      'iconCSS':  'glyphicon glyphicon-duplicate',
-      'css': '',
-      'modal':    false
-    },
-    'pasteItem': {
-      'library':  'mockup-patterns-structure-url/js/actions',
-      'method':   'pasteClicked',
-      'url':      '#',
-      'title':    _t('Paste'),
-      'category': 'dropdown',
-      'iconCSS':  'glyphicon glyphicon-open-file',
-      'css': '',
-      'modal':    false
-    },
-    'move-top': {
-      'library':  'mockup-patterns-structure-url/js/actions',
-      'method':   'moveTopClicked',
-      'url':      '#',
-      'title':    _t('Move to top of folder'),
-      'category': 'dropdown',
-      'iconCSS':  'glyphicon glyphicon-step-backward rright',
-      'css': '',
-      'modal':    false
-    },
-    'move-bottom': {
-      'library':  'mockup-patterns-structure-url/js/actions',
-      'method':   'moveBottomClicked',
-      'url':      '#',
-      'title':    _t('Move to bottom of folder'),
-      'category': 'dropdown',
-      'iconCSS':  'glyphicon glyphicon-step-backward rleft',
-      'css': '',
-      'modal':    false
-    },
-    'set-default-page': {
-      'library':  'mockup-patterns-structure-url/js/actions',
-      'method':   'setDefaultPageClicked',
-      'url':      '#',
-      'title':    _t('Set as default page'),
-      'category': 'dropdown',
-      'iconCSS':  'glyphicon glyphicon-ok-circle',
-      'css': '',
-      'modal':    false
-    },
-    'selectAll': {
-      'library':  'mockup-patterns-structure-url/js/actions',
-      'method':   'selectAll',
-      'url':      '#',
-      'title':    _t('Select all contained items'),
-      'category': 'dropdown',
-      'iconCSS':  'glyphicon glyphicon-check',
-      'css': '',
-      'modal':    false
-    }
-  };
+    var menuOptions = {
+        "openItem": {
+            url: "#",
+            title: _t("Open"),
+            category: "button",
+            iconCSS: "glyphicon glyphicon-eye-open",
+            css: "",
+            modal: false,
+        },
+        "editItem": {
+            url: "#",
+            title: _t("Edit"),
+            category: "button",
+            iconCSS: "glyphicon glyphicon-pencil",
+            css: "",
+            modal: false,
+        },
+        "cutItem": {
+            library: "mockup-patterns-structure-url/js/actions",
+            method: "cutClicked",
+            url: "#",
+            title: _t("Cut"),
+            category: "dropdown",
+            iconCSS: "glyphicon glyphicon-scissors",
+            css: "",
+            modal: false,
+        },
+        "copyItem": {
+            library: "mockup-patterns-structure-url/js/actions",
+            method: "copyClicked",
+            url: "#",
+            title: _t("Copy"),
+            category: "dropdown",
+            iconCSS: "glyphicon glyphicon-duplicate",
+            css: "",
+            modal: false,
+        },
+        "pasteItem": {
+            library: "mockup-patterns-structure-url/js/actions",
+            method: "pasteClicked",
+            url: "#",
+            title: _t("Paste"),
+            category: "dropdown",
+            iconCSS: "glyphicon glyphicon-open-file",
+            css: "",
+            modal: false,
+        },
+        "move-top": {
+            library: "mockup-patterns-structure-url/js/actions",
+            method: "moveTopClicked",
+            url: "#",
+            title: _t("Move to top of folder"),
+            category: "dropdown",
+            iconCSS: "glyphicon glyphicon-step-backward rright",
+            css: "",
+            modal: false,
+        },
+        "move-bottom": {
+            library: "mockup-patterns-structure-url/js/actions",
+            method: "moveBottomClicked",
+            url: "#",
+            title: _t("Move to bottom of folder"),
+            category: "dropdown",
+            iconCSS: "glyphicon glyphicon-step-backward rleft",
+            css: "",
+            modal: false,
+        },
+        "set-default-page": {
+            library: "mockup-patterns-structure-url/js/actions",
+            method: "setDefaultPageClicked",
+            url: "#",
+            title: _t("Set as default page"),
+            category: "dropdown",
+            iconCSS: "glyphicon glyphicon-ok-circle",
+            css: "",
+            modal: false,
+        },
+        "selectAll": {
+            library: "mockup-patterns-structure-url/js/actions",
+            method: "selectAll",
+            url: "#",
+            title: _t("Select all contained items"),
+            category: "dropdown",
+            iconCSS: "glyphicon glyphicon-check",
+            css: "",
+            modal: false,
+        },
+    };
 
-  var ActionMenu = function(menu) {
-    // If an explicit menu was specified as an option to AppView, this
-    // constructor will not override that.
-    if (menu.menuOptions !== null) {
-      return menu.menuOptions;
-    }
+    var ActionMenu = function (menu) {
+        // If an explicit menu was specified as an option to AppView, this
+        // constructor will not override that.
+        if (menu.menuOptions !== null) {
+            return menu.menuOptions;
+        }
 
-    var model = menu.model.attributes;
-    var app = menu.app;
+        var model = menu.model.attributes;
+        var app = menu.app;
 
-    var result = _.clone(menuOptions);
-    if ( !(app.pasteAllowed() && model.is_folderish)) {
-      delete result.pasteItem;
-    }
-    if (app.inQueryMode() || menu.options.canMove === false) {
-      delete result['move-top'];
-      delete result['move-bottom'];
-    }
-    if (app.defaultPageTypes.indexOf(model.portal_type) == -1 || !app.setDefaultPageUrl) {
-      delete result['set-default-page'];
-    }
+        var result = _.clone(menuOptions);
+        if (!(app.pasteAllowed() && model.is_folderish)) {
+            delete result.pasteItem;
+        }
+        if (app.inQueryMode() || menu.options.canMove === false) {
+            delete result["move-top"];
+            delete result["move-bottom"];
+        }
+        if (
+            app.defaultPageTypes.indexOf(model.portal_type) == -1 ||
+            !app.setDefaultPageUrl
+        ) {
+            delete result["set-default-page"];
+        }
 
-    if (!model.is_folderish) {
-      delete result.selectAll;
-    }
+        if (!model.is_folderish) {
+            delete result.selectAll;
+        }
 
-    var typeToViewAction = app.options.typeToViewAction;
-    var viewAction = typeToViewAction && typeToViewAction[model.portal_type] || '';
-    result.openItem.url = model.getURL + viewAction;
-    result.editItem.url = model.getURL + '/edit';
+        var typeToViewAction = app.options.typeToViewAction;
+        var viewAction =
+            (typeToViewAction && typeToViewAction[model.portal_type]) || "";
+        result.openItem.url = model.getURL + viewAction;
+        result.editItem.url = model.getURL + "/edit";
 
-    return result;
-  };
+        return result;
+    };
 
-  return ActionMenu;
+    return ActionMenu;
 });
 
 
 define('text!mockup-patterns-structure-url/templates/actionmenu.xml',[],function () { return '<% _.each(menuOptions.button, function(menuOption){ %>\n<a class="action <%- menuOption.name %> <%- menuOption.idx %> pat-tooltip <%- menuOption.css %>"\n    href="<%- menuOption.url %>"\n    title="<%- _t(menuOption.title) %>"\n    aria-label="<%- _t(menuOption.title) %>">\n  <% if (menuOption.iconCSS) { %>\n  <span class="<%- menuOption.iconCSS %>"></span>\n  <% } else { %>\n  <%- _t(menuOption.title) %>\n  <% } %>\n</a>&nbsp;\n<% }); %>\n\n\n<% if (menuOptions.dropdown) { %>\n<a class="dropdown-toggle"\n    data-toggle="dropdown"\n    href="#"\n    aria-haspopup="true"\n    aria-expanded="true"\n    id="<%- id %>"\n    title=\'<%- _t("Actions") %>\'>\n  <span class="glyphicon glyphicon-cog"></span><span class="caret"></span>\n</a>\n<ul class="dropdown-menu pull-right" aria-labelledby="<%- id %>">\n  <% if (header) { %>\n    <li class="dropdown-header"><%- header %></li>\n    <li class="divider"></li>\n  <% } %>\n\n  <% _.each(menuOptions.dropdown, function(menuOption){ %>\n  <li>\n    <a class="action <%- menuOption.name %> <%- menuOption.idx %> <%- menuOption.css %>"\n        href="<%- menuOption.url %>">\n      <% if (menuOption.iconCSS) { %>\n      <span class="<%- menuOption.iconCSS %>"></span>\n      <% } %>\n      <%- _t(menuOption.title) %>\n    </a>\n  </li>\n  <% }); %>\n</ul>\n<% } %>\n';});
 
 define('mockup-patterns-structure-url/js/views/actionmenu',[
-  'jquery',
-  'underscore',
-  'mockup-ui-url/views/base',
-  'mockup-utils',
-  'mockup-patterns-structure-url/js/models/result',
-  'mockup-patterns-structure-url/js/actions',
-  'mockup-patterns-structure-url/js/actionmenu',
-  'text!mockup-patterns-structure-url/templates/actionmenu.xml',
-  'pat-registry',
-  'translate',
-  'mockup-patterns-modal',
-  'mockup-patterns-tooltip',
-  'bootstrap-dropdown'
-], function($, _, BaseView, utils, Result, Actions, ActionMenu, ActionMenuTemplate, registry, _t) {
-  'use strict';
+    "jquery",
+    "underscore",
+    "mockup-ui-url/views/base",
+    "mockup-utils",
+    "mockup-patterns-structure-url/js/models/result",
+    "mockup-patterns-structure-url/js/actions",
+    "mockup-patterns-structure-url/js/actionmenu",
+    "text!mockup-patterns-structure-url/templates/actionmenu.xml",
+    "pat-registry",
+    "translate",
+    "mockup-patterns-modal",
+    "mockup-patterns-tooltip",
+    "bootstrap-dropdown",
+], function (
+    $,
+    _,
+    BaseView,
+    utils,
+    Result,
+    Actions,
+    ActionMenu,
+    ActionMenuTemplate,
+    registry,
+    _t
+) {
+    "use strict";
 
-  var ActionMenuView = BaseView.extend({
-    className: 'btn-group actionmenu',
-    template: _.template(ActionMenuTemplate),
+    var ActionMenuView = BaseView.extend({
+        className: "btn-group actionmenu",
+        template: _.template(ActionMenuTemplate),
 
-    // Static menu options
-    menuOptions: null,
-    // Dynamic menu options
-    menuGenerator: 'mockup-patterns-structure-url/js/actionmenu',
+        // Static menu options
+        menuOptions: null,
+        // Dynamic menu options
+        menuGenerator: "mockup-patterns-structure-url/js/actionmenu",
 
-    eventConstructor: function(definition) {
-      var self = this;
-      var libName = definition.library,
-          method = definition.method;
+        eventConstructor: function (definition) {
+            var self = this;
+            var libName = definition.library,
+                method = definition.method;
 
-      if (!((typeof libName === 'string') && (typeof method === 'string'))) {
-        return false;
-      }
+            if (!(typeof libName === "string" && typeof method === "string")) {
+                return false;
+            }
 
-      var doEvent = function(e) {
-        var libCls = require(libName);
-        var lib = new libCls(self);
-        return lib[method] && lib[method](e);
-      };
-      return doEvent;
-    },
+            var doEvent = function (e) {
+                var libCls = require(libName);
+                var lib = new libCls(self);
+                return lib[method] && lib[method](e);
+            };
+            return doEvent;
+        },
 
-    events: function() {
-      /* Backbone.view.events
-       * Specify a set of DOM events, which will bound to methods on the view.
-       */
-      var self = this;
-      var result = {};
-      var menuOptionsCategorized = {};
-      _.each(self.menuOptions, function(menuOption, key) {
-          // set a unique identifier to uniquely bind the events.
-          var idx = utils.generateId();
-          menuOption.idx = idx;
-          menuOption.name = key;  // we want to add the action's key as class name to the output.
+        events: function () {
+            /* Backbone.view.events
+             * Specify a set of DOM events, which will bound to methods on the view.
+             */
+            var self = this;
+            var result = {};
+            var menuOptionsCategorized = {};
+            _.each(self.menuOptions, function (menuOption, key) {
+                // set a unique identifier to uniquely bind the events.
+                var idx = utils.generateId();
+                menuOption.idx = idx;
+                menuOption.name = key; // we want to add the action's key as class name to the output.
 
-          var category = menuOption.category || 'dropdown';
-          if (menuOptionsCategorized[category] === undefined) {
-              menuOptionsCategorized[category] = [];
-          }
-          menuOptionsCategorized[category].push(menuOption);
-          menuOption.css = menuOption.css || '';
-          if (menuOption.modal === true) {
-            // add standard pat-plone-modal.
-            // If you want another modal implementation, don't use modal=true but set the css option on action items.
-            menuOption.css += ' pat-plone-modal';
-          }
+                var category = menuOption.category || "dropdown";
+                if (menuOptionsCategorized[category] === undefined) {
+                    menuOptionsCategorized[category] = [];
+                }
+                menuOptionsCategorized[category].push(menuOption);
+                menuOption.css = menuOption.css || "";
+                if (menuOption.modal === true) {
+                    // add standard pat-plone-modal.
+                    // If you want another modal implementation, don't use modal=true but set the css option on action items.
+                    menuOption.css += " pat-plone-modal";
+                }
 
-          // Create event handler and add it to the results object.
-          var e = self.eventConstructor(menuOption);
-          if (e) {
-            result['click a.' + idx] = e;
-          }
-      });
+                // Create event handler and add it to the results object.
+                var e = self.eventConstructor(menuOption);
+                if (e) {
+                    result["click a." + idx] = e;
+                }
+            });
 
-      // Abusing the loop above to also initialize menuOptionsCategorized
-      self.menuOptionsCategorized = menuOptionsCategorized;
-      return result;
-    },
+            // Abusing the loop above to also initialize menuOptionsCategorized
+            self.menuOptionsCategorized = menuOptionsCategorized;
+            return result;
+        },
 
-    initialize: function(options) {
-      var self = this;
-      BaseView.prototype.initialize.apply(self, [options]);
-      self.options = options;
-      self.selectedCollection = self.app.selectedCollection;
+        initialize: function (options) {
+            var self = this;
+            BaseView.prototype.initialize.apply(self, [options]);
+            self.options = options;
+            self.selectedCollection = self.app.selectedCollection;
 
-      // Then acquire the constructor method if specified, and
-      var menuGenerator = self.options.menuGenerator || self.menuGenerator;
-      if (menuGenerator) {
-        var menuGen = require(menuGenerator);
-        // override those options here.  All definition done here so
-        // that self.events() will return the right things.
-        var menuOptions = menuGen(self);
-        if (typeof menuOptions === 'object') {
-          // Only assign this if we got the right basic type.
-          self.menuOptions = menuOptions;
-          // Should warn otherwise.
-        }
-      }
-    },
-    render: function() {
-      var self = this;
-      self.$el.empty();
+            // Then acquire the constructor method if specified, and
+            var menuGenerator =
+                self.options.menuGenerator || self.menuGenerator;
+            if (menuGenerator) {
+                var menuGen = require(menuGenerator);
+                // override those options here.  All definition done here so
+                // that self.events() will return the right things.
+                var menuOptions = menuGen(self);
+                if (typeof menuOptions === "object") {
+                    // Only assign this if we got the right basic type.
+                    self.menuOptions = menuOptions;
+                    // Should warn otherwise.
+                }
+            }
+        },
+        render: function () {
+            var self = this;
+            self.$el.empty();
 
-      var data = this.model.toJSON();
-      data.header = self.options.header || null;
-      data.menuOptions = self.menuOptionsCategorized;
-      self.$el.html(self.template($.extend({
-        _t: _t,
-        id: utils.generateId()
-      }, data)));
+            var data = this.model.toJSON();
+            data.header = self.options.header || null;
+            data.menuOptions = self.menuOptionsCategorized;
+            self.$el.html(
+                self.template(
+                    $.extend(
+                        {
+                            _t: _t,
+                            id: utils.generateId(),
+                        },
+                        data
+                    )
+                )
+            );
 
-      if (data.menuOptions.dropdown) {
-        self.$dropdown = self.$('.dropdown-toggle');
-        self.$dropdown.dropdown();
-      }
+            if (data.menuOptions.dropdown) {
+                self.$dropdown = self.$(".dropdown-toggle");
+                self.$dropdown.dropdown();
+            }
 
-      if (self.options.className) {
-        self.$el.addClass(self.options.className);
-      }
+            if (self.options.className) {
+                self.$el.addClass(self.options.className);
+            }
 
-      registry.scan(this.$el);
+            registry.scan(this.$el);
 
-      return this;
-    }
-  });
+            return this;
+        },
+    });
 
-  return ActionMenuView;
+    return ActionMenuView;
 });
 
 
 define('text!mockup-patterns-structure-url/templates/tablerow.xml',[],function () { return '<td class="selection" data-order="<%- attributes[\'_sort\'] %>"><label for="select<%- attributes[\'_sort\'] %>InputCheckbox" class="hiddenStructure" aria-label="<%- _t(\'Select\') %>"><%- _t(\'Select\') %></label><input id="select<%- attributes[\'_sort\'] %>InputCheckbox" <% if(selected){ %> checked="checked" <% } %> type="checkbox"/></td>\n\n<td class="title">\n  <div class="pull-left">\n    <a href="<%- viewURL %>"\n        class="manage state-<%- review_state %> contenttype-<%- contenttype %>"\n        title="<%- portal_type %>">\n        <% if(attributes["getMimeIcon"] && contenttype == \'file\'){ %>\n           <img class="mime-icon" src="<%- getMimeIcon %>"> <% } %>\n      <% if(Title){ %>\n        <%- Title %>\n      <% } else { %>\n        <em><%- id %></em>\n      <% } %>\n    </a>\n    <% if(expired){ %>\n      <span class="plone-item-expired"><%- _t(\'Expired\') %></span>\n    <% } %>\n    <% if(ineffective){ %>\n      <span class="plone-item-ineffective"><%- _t(\'Before publishing date\') %></span>\n    <% } %>\n    <% if(activeColumns.indexOf(\'Description\') !== -1 && _.has(availableColumns, \'Description\') && Description) { %>\n    <p class="Description">\n      <small>\n        <%- Description %>\n      </small>\n    </p>\n    <% } %>\n  </div>\n  <% if(attributes["getIcon"] && thumb_scale) { %>\n    <img class="thumb-<%- thumb_scale %> pull-right" src="<%- getURL %>/@@images/image/<%- thumb_scale %>">\n  <% } %>\n</td>\n\n<% _.each(activeColumns, function(column) { %>\n  <% if(column !== \'Description\' && _.has(availableColumns, column)) { %>\n    <td class="<%- column %>" data-order="<%- attributes[column] %>"><%- attributes[column] %></td>\n  <% } %>\n<% }); %>\n\n<td class="actionmenu-container"></td>\n';});
 
 define('mockup-patterns-structure-url/js/views/tablerow',[
-  'jquery',
-  'underscore',
-  'backbone',
-  'mockup-patterns-structure-url/js/navigation',
-  'mockup-patterns-structure-url/js/views/actionmenu',
-  'text!mockup-patterns-structure-url/templates/tablerow.xml',
-  'mockup-utils',
-  'translate',
-  'moment'
-], function($, _, Backbone, Nav, ActionMenuView, TableRowTemplate, utils, _t,
-            moment) {
-  'use strict';
+    "jquery",
+    "underscore",
+    "backbone",
+    "mockup-patterns-structure-url/js/navigation",
+    "mockup-patterns-structure-url/js/views/actionmenu",
+    "text!mockup-patterns-structure-url/templates/tablerow.xml",
+    "mockup-utils",
+    "translate",
+    "moment",
+], function (
+    $,
+    _,
+    Backbone,
+    Nav,
+    ActionMenuView,
+    TableRowTemplate,
+    utils,
+    _t,
+    moment
+) {
+    "use strict";
 
-  var TableRowView = Backbone.View.extend({
-    tagName: 'tr',
-    className: 'itemRow',
-    template: _.template(TableRowTemplate),
-    events: {
-      'change input': 'itemSelected',
-      'click td.title a.manage': 'itemClicked'
-    },
-    initialize: function(options) {
-      this.options = options;
-      this.app = options.app;
-      this.selectedCollection = this.app.selectedCollection;
-      this.table = this.options.table;
-      this.now = moment();
-    },
+    var TableRowView = Backbone.View.extend({
+        tagName: "tr",
+        className: "itemRow",
+        template: _.template(TableRowTemplate),
+        events: {
+            "change input": "itemSelected",
+            "click td.title a.manage": "itemClicked",
+        },
+        initialize: function (options) {
+            this.options = options;
+            this.app = options.app;
+            this.selectedCollection = this.app.selectedCollection;
+            this.table = this.options.table;
+            this.now = moment();
+        },
 
-    expired: function(data) {
-      if (!data.attributes.ExpirationDate) {
-        return false;
-      }
-      var dt = moment(data.attributes.ExpirationDate);
-      return dt.diff(this.now, 'seconds') < 0;
-    },
-
-    ineffective: function(data) {
-      if (!data.attributes.EffectiveDate) {
-        return false;
-      }
-      var dt = moment(data.attributes.EffectiveDate);
-      return dt.diff(this.now, 'seconds') > 0;
-    },
-
-    render: function() {
-      var self = this;
-      var data = this.model.toJSON();
-      data.selected = false;
-      if (this.selectedCollection.findWhere({UID: data.UID})) {
-        data.selected = true;
-      }
-      data.attributes = self.model.attributes;
-      data.activeColumns = self.app.activeColumns;
-      data.availableColumns = self.app.availableColumns;
-      data.portal_type = data.portal_type ? data.portal_type : '';
-      data.contenttype = data.portal_type.toLowerCase().replace(/\.| /g, '-');
-      data._authenticator = utils.getAuthenticator();
-      data.thumb_scale = self.app.thumb_scale;
-
-      var viewAction = self.app.typeToViewAction && self.app.typeToViewAction[data.attributes.portal_type] || '';
-      data.viewURL = data.attributes.getURL + viewAction;
-
-      data._t = _t;
-      data.expired = this.expired(data);
-      data.ineffective = this.ineffective(data);
-      self.$el.html(self.template(data));
-      var attrs = self.model.attributes;
-      self.$el.addClass('state-' + attrs['review_state']).addClass('type-' + attrs.portal_type); // jshint ignore:line
-      if (attrs['is_folderish']) { // jshint ignore:line
-        self.$el.addClass('folder');
-      }
-      self.$el.attr('data-path', data.path);
-      self.$el.attr('data-UID', data.UID);
-      self.$el.attr('data-id', data.id);
-      self.$el.attr('data-type', data.portal_type);
-      self.$el.attr('data-folderish', data['is_folderish']); // jshint ignore:line
-      self.$el.removeClass('expired');
-      self.$el.removeClass('ineffective');
-
-      if (data.expired) {
-        self.$el.addClass('expired');
-      }
-
-      if (data.ineffective) {
-        self.$el.addClass('ineffective');
-      }
-
-      self.el.model = this.model;
-
-      var canMove = (!(!self.app.options.moveUrl));
-
-      self.menu = new ActionMenuView({
-        app: self.app,
-        model: self.model,
-        menuOptions: self.app.menuOptions,
-        menuGenerator: self.app.menuGenerator,
-        canMove: canMove
-      });
-
-      $('.actionmenu-container', self.$el).append(self.menu.render().el);
-      return this;
-    },
-    itemClicked: function(e) {
-      /* check if this should just be opened in new window */
-      var self = this;
-      var keyEvent = this.app.keyEvent;
-      var key;
-      // Resolve the correct handler based on these keys.
-      // Default handlers live in ../navigation.js (bound to Nav)
-      if (keyEvent && keyEvent.ctrlKey ||
-          !(this.model.attributes.is_folderish)) {
-        // middle/ctrl-click or not a folder content
-        key = 'other';  // default Nav.openClicked
-      } else {
-        key = 'folder';  // default Nav.folderClicked
-      }
-      var definition = self.app.options.tableRowItemAction[key] || [];
-      // a bit of a duplicate from actionmenu.js, but this is calling
-      // directly.
-      var libName = definition[0],
-          method = definition[1];
-      if (!((typeof libName === 'string') && (typeof key === 'string'))) {
-        return null;
-      }
-      var ClsLib = require(libName);
-      var lib = new ClsLib(self);
-      return lib[method] && lib[method](e);
-    },
-    itemSelected: function() {
-      var checkbox = this.$('input')[0];
-      if (checkbox.checked) {
-        this.app.selectedCollection.add(this.model.clone());
-      } else {
-        this.app.selectedCollection.removeResult(this.model);
-      }
-
-      var selectedCollection = this.selectedCollection;
-
-      /* check for shift click now */
-      var keyEvent = this.app.keyEvent;
-      if (keyEvent && keyEvent.shiftKey && this.app['last_selected'] && // jshint ignore:line
-            this.app['last_selected'].parentNode !== null) { // jshint ignore:line
-        var $el = $(this.app['last_selected']); // jshint ignore:line
-        var lastCheckedIndex = $el.index();
-        var thisIndex = this.$el.index();
-        this.app.tableView.$('input[type="checkbox"]').each(function() {
-          $el = $(this);
-          var index = $el.parents('tr').index();
-          if ((index > lastCheckedIndex && index < thisIndex) ||
-              (index < lastCheckedIndex && index > thisIndex)) {
-            this.checked = checkbox.checked;
-            var $tr = $(this).closest('tr.itemRow');
-            if($tr.length > 0){
-              var model = $tr[0].model;
-              var existing = selectedCollection.getByUID(model.attributes.UID);
-              if (this.checked) {
-                if (!existing) {
-                  selectedCollection.add(model.clone());
-                }
-              } else if (existing) {
-                selectedCollection.removeResult(existing);
-              }
+        expired: function (data) {
+            if (!data.attributes.ExpirationDate) {
+                return false;
             }
-          }
-        });
+            var dt = moment(data.attributes.ExpirationDate);
+            return dt.diff(this.now, "seconds") < 0;
+        },
 
-      }
-      this.app['last_selected'] = this.el; // jshint ignore:line
-    }
-  });
+        ineffective: function (data) {
+            if (!data.attributes.EffectiveDate) {
+                return false;
+            }
+            var dt = moment(data.attributes.EffectiveDate);
+            return dt.diff(this.now, "seconds") > 0;
+        },
 
-  return TableRowView;
+        render: function () {
+            var self = this;
+            var data = this.model.toJSON();
+            data.selected = false;
+            if (this.selectedCollection.findWhere({ UID: data.UID })) {
+                data.selected = true;
+            }
+            data.attributes = self.model.attributes;
+            data.activeColumns = self.app.activeColumns;
+            data.availableColumns = self.app.availableColumns;
+            data.portal_type = data.portal_type ? data.portal_type : "";
+            data.contenttype = data.portal_type
+                .toLowerCase()
+                .replace(/\.| /g, "-");
+            data._authenticator = utils.getAuthenticator();
+            data.thumb_scale = self.app.thumb_scale;
+
+            var viewAction =
+                (self.app.typeToViewAction &&
+                    self.app.typeToViewAction[data.attributes.portal_type]) ||
+                "";
+            data.viewURL = data.attributes.getURL + viewAction;
+
+            data._t = _t;
+            data.expired = this.expired(data);
+            data.ineffective = this.ineffective(data);
+            self.$el.html(self.template(data));
+            var attrs = self.model.attributes;
+            self.$el
+                .addClass("state-" + attrs["review_state"])
+                .addClass("type-" + attrs.portal_type); // jshint ignore:line
+            if (attrs["is_folderish"]) {
+                // jshint ignore:line
+                self.$el.addClass("folder");
+            }
+            self.$el.attr("data-path", data.path);
+            self.$el.attr("data-UID", data.UID);
+            self.$el.attr("data-id", data.id);
+            self.$el.attr("data-type", data.portal_type);
+            self.$el.attr("data-folderish", data["is_folderish"]); // jshint ignore:line
+            self.$el.removeClass("expired");
+            self.$el.removeClass("ineffective");
+
+            if (data.expired) {
+                self.$el.addClass("expired");
+            }
+
+            if (data.ineffective) {
+                self.$el.addClass("ineffective");
+            }
+
+            self.el.model = this.model;
+
+            var canMove = !!self.app.options.moveUrl;
+
+            self.menu = new ActionMenuView({
+                app: self.app,
+                model: self.model,
+                menuOptions: self.app.menuOptions,
+                menuGenerator: self.app.menuGenerator,
+                canMove: canMove,
+            });
+
+            $(".actionmenu-container", self.$el).append(self.menu.render().el);
+            return this;
+        },
+        itemClicked: function (e) {
+            /* check if this should just be opened in new window */
+            var self = this;
+            var keyEvent = this.app.keyEvent;
+            var key;
+            // Resolve the correct handler based on these keys.
+            // Default handlers live in ../navigation.js (bound to Nav)
+            if (
+                (keyEvent && keyEvent.ctrlKey) ||
+                !this.model.attributes.is_folderish
+            ) {
+                // middle/ctrl-click or not a folder content
+                key = "other"; // default Nav.openClicked
+            } else {
+                key = "folder"; // default Nav.folderClicked
+            }
+            var definition = self.app.options.tableRowItemAction[key] || [];
+            // a bit of a duplicate from actionmenu.js, but this is calling
+            // directly.
+            var libName = definition[0],
+                method = definition[1];
+            if (!(typeof libName === "string" && typeof key === "string")) {
+                return null;
+            }
+            var ClsLib = require(libName);
+            var lib = new ClsLib(self);
+            return lib[method] && lib[method](e);
+        },
+        itemSelected: function () {
+            var checkbox = this.$("input")[0];
+            if (checkbox.checked) {
+                this.app.selectedCollection.add(this.model.clone());
+            } else {
+                this.app.selectedCollection.removeResult(this.model);
+            }
+
+            var selectedCollection = this.selectedCollection;
+
+            /* check for shift click now */
+            var keyEvent = this.app.keyEvent;
+            if (
+                keyEvent &&
+                keyEvent.shiftKey &&
+                this.app["last_selected"] && // jshint ignore:line
+                this.app["last_selected"].parentNode !== null
+            ) {
+                // jshint ignore:line
+                var $el = $(this.app["last_selected"]); // jshint ignore:line
+                var lastCheckedIndex = $el.index();
+                var thisIndex = this.$el.index();
+                this.app.tableView
+                    .$('input[type="checkbox"]')
+                    .each(function () {
+                        $el = $(this);
+                        var index = $el.parents("tr").index();
+                        if (
+                            (index > lastCheckedIndex && index < thisIndex) ||
+                            (index < lastCheckedIndex && index > thisIndex)
+                        ) {
+                            this.checked = checkbox.checked;
+                            var $tr = $(this).closest("tr.itemRow");
+                            if ($tr.length > 0) {
+                                var model = $tr[0].model;
+                                var existing = selectedCollection.getByUID(
+                                    model.attributes.UID
+                                );
+                                if (this.checked) {
+                                    if (!existing) {
+                                        selectedCollection.add(model.clone());
+                                    }
+                                } else if (existing) {
+                                    selectedCollection.removeResult(existing);
+                                }
+                            }
+                        }
+                    });
+            }
+            this.app["last_selected"] = this.el; // jshint ignore:line
+        },
+    });
+
+    return TableRowView;
 });
 
 
@@ -24735,46 +25193,44 @@ c){"dt"===a.namespace&&g.select.init(new g.Api(c))});return g.select});
  */
 
 define('mockup-patterns-datatables',[
-  'jquery',
-  'pat-base',
-  'datatables.net',
-  'datatables.net-bs',
-  'datatables.net-buttons',
-  "datatables.net-buttons-colvis",
-  "datatables.net-buttons-flash",
-  "datatables.net-buttons-html5",
-  "datatables.net-buttons-print",
-  'datatables.net-buttons-bs',
-  'datatables.net-colreorder',
-  'datatables.net-rowreorder',
-  'datatables.net-fixedcolumns',
-  'datatables.net-fixedheader',
-  'datatables.net-select'
-], function($, Base, Dt) {
-  'use strict';
+    "jquery",
+    "pat-base",
+    "datatables.net",
+    "datatables.net-bs",
+    "datatables.net-buttons",
+    "datatables.net-buttons-colvis",
+    "datatables.net-buttons-flash",
+    "datatables.net-buttons-html5",
+    "datatables.net-buttons-print",
+    "datatables.net-buttons-bs",
+    "datatables.net-colreorder",
+    "datatables.net-rowreorder",
+    "datatables.net-fixedcolumns",
+    "datatables.net-fixedheader",
+    "datatables.net-select",
+], function ($, Base, Dt) {
+    "use strict";
 
-  var DataTables = Base.extend({
-    // The name for this pattern
-    name: 'datatables',
-    trigger: '.pat-datatables',
-    parser: 'mockup',
-    table: null,
+    var DataTables = Base.extend({
+        // The name for this pattern
+        name: "datatables",
+        trigger: ".pat-datatables",
+        parser: "mockup",
+        table: null,
 
-    defaults: {
-      // Default values for attributes
-    },
+        defaults: {
+            // Default values for attributes
+        },
 
-    init: function() {
-      // The init code for your pattern goes here
-      var self = this;
-      // self.$el contains the html element
-      self.table = self.$el.DataTable(self.options);
+        init: function () {
+            // The init code for your pattern goes here
+            var self = this;
+            // self.$el contains the html element
+            self.table = self.$el.DataTable(self.options);
+        },
+    });
 
-    }
-  });
-
-  return DataTables;
-
+    return DataTables;
 });
 
 /* Sortable pattern.
@@ -24792,9 +25248,17 @@ define('mockup-patterns-datatables',[
  *
  *    # Table
  *
+ *    The patttern needs to be defined on the direct parent element of the elements to be sorted.
+ *    Heads up: A <tbody> would be added to the table by browser automatically.
+ *    The pattern needs to be defined on the <tbody> then.
+ *
  *    {{ example-2 }}
  *
  * Example: example-1
+ *    <style type="text/css" media="screen">
+ *      .item-dragging { background-color: red; }
+ *      .dragging { background: green; }
+ *    </style>
  *    <ul class="pat-sortable">
  *      <li>One</li>
  *      <li>Two</li>
@@ -24802,9 +25266,8 @@ define('mockup-patterns-datatables',[
  *    </ul>
  *
  * Example: example-2
- *    <table class="table table-stripped pat-sortable"
- *           data-pat-sortable="selector:tr;">
- *      <tbody>
+ *    <table class="table table-stripped">
+ *      <tbody class="pat-sortable" data-pat-sortable="selector:tr;">
  *        <tr>
  *          <td>One One</td>
  *          <td>One Two</td>
@@ -24822,100 +25285,39 @@ define('mockup-patterns-datatables',[
  *
  */
 
-define('mockup-patterns-sortable',[
-  'jquery',
-  'pat-base',
-  'jquery.event.drop',
-  'jquery.event.drag',
-], function($, Base, drop) {
-  'use strict';
+define('mockup-patterns-sortable',["jquery", "pat-base", "sortable"], function ($, Base, Sortable) {
+    "use strict";
 
-  var SortablePattern = Base.extend({
-    name: 'sortable',
-    trigger: '.pat-sortable',
-    parser: 'mockup',
-    defaults: {
-      selector: 'li',
-      dragClass: 'item-dragging',
-      cloneClass: 'dragging',
-      createDragItem: function(pattern, $el) {
-        return $el
-          .clone()
-          .addClass(pattern.options.cloneClass)
-          .css({ opacity: 0.75, position: 'absolute' })
-          .appendTo(document.body);
-      },
-      drop: undefined, // callback function or name of global function
-      dragOptions: {
-        distance: 2,
-      },
-    },
-    init: function() {
-      var self = this;
-      var start = 0;
+    var SortablePattern = Base.extend({
+        name: "sortable",
+        trigger: ".pat-sortable",
+        parser: "mockup",
+        defaults: {
+            selector: "li",
+            dragClass: "item-dragging",
+            cloneClass: "dragging",
+            drop: undefined, // callback function or name of global function
+        },
+        init: function () {
+            var sortable = new Sortable(this.$el[0], {
+                draggable: this.options.selector,
+                chosenClass: this.options.dragClass,
+                dragClass: this.options.cloneClass,
+                onEnd: function (e) {
+                    var cb = this.options.drop;
+                    if (!cb) {
+                        return;
+                    }
+                    if (typeof cb === "string") {
+                        cb = window[this.options.drop];
+                    }
+                    cb($(e.item), e.newIndex - e.oldIndex);
+                }.bind(this),
+            });
+        },
+    });
 
-      self.$el
-        .find(self.options.selector)
-        .drag('start', function(e, dd) {
-          var dragged = this;
-          var $el = $(this);
-          $(dragged).addClass(self.options.dragClass);
-          drop({
-            tolerance: function(event, proxy, target) {
-              if ($(target.elem).closest(self.$el).length === 0) {
-                /* prevent dragging conflict over another drag area */
-                return;
-              }
-              var test = event.pageY > target.top + target.height / 2;
-              $.data(
-                target.elem,
-                'drop+reorder',
-                test ? 'insertAfter' : 'insertBefore'
-              );
-              return this.contains(target, [event.pageX, event.pageY]);
-            },
-          });
-
-          start = $el.index();
-          return self.options.createDragItem(self, $el);
-        })
-        .drag(function(e, dd) {
-          /*jshint eqeqeq:false */
-          $(dd.proxy).css({
-            top: dd.offsetY,
-            left: dd.offsetX,
-          });
-          var drop = dd.drop[0],
-            method = $.data(drop || {}, 'drop+reorder');
-          /* XXX Cannot use triple equals here */
-          if (method && drop && (drop != dd.current || method != dd.method)) {
-            $(this)[method](drop);
-            dd.current = drop;
-            dd.method = method;
-            dd.update();
-          }
-        }, self.options.dragOptions)
-        .drag('end', function(e, dd) {
-          var $el = $(this);
-          $el.removeClass(self.options.dragClass);
-          $(dd.proxy).remove();
-          if (self.options.drop) {
-            if (typeof self.options.drop === 'string') {
-              window[self.options.drop]($el, $el.index() - start);
-            } else {
-              self.options.drop($el, $el.index() - start);
-            }
-          }
-        })
-        .drop('init', function(e, dd) {
-          /*jshint eqeqeq:false */
-          /* XXX Cannot use triple equals here */
-          return this == dd.drag ? false : true;
-        });
-    },
-  });
-
-  return SortablePattern;
+    return SortablePattern;
 });
 
 (function(root) {
@@ -25023,1208 +25425,1348 @@ define("bootstrap-alert", ["jquery"], function() {
 }(this));
 
 define('mockup-patterns-structure-url/js/views/table',[
-  'jquery',
-  'underscore',
-  'mockup-patterns-structure-url/js/views/tablerow',
-  'text!mockup-patterns-structure-url/templates/table.xml',
-  'mockup-ui-url/views/base',
-  'mockup-patterns-datatables',
-  'mockup-patterns-sortable',
-  'mockup-patterns-moment',
-  'mockup-patterns-structure-url/js/models/result',
-  'mockup-patterns-structure-url/js/views/actionmenu',
-  'translate',
-  'pat-registry',
-  'bootstrap-alert'
-], function($, _, TableRowView, TableTemplate, BaseView, patDataTables,
-            Sortable, patMoment, Result, ActionMenuView, _t, registry) {
-  'use strict';
+    "jquery",
+    "underscore",
+    "mockup-patterns-structure-url/js/views/tablerow",
+    "text!mockup-patterns-structure-url/templates/table.xml",
+    "mockup-ui-url/views/base",
+    "mockup-patterns-datatables",
+    "mockup-patterns-sortable",
+    "mockup-patterns-moment",
+    "mockup-patterns-structure-url/js/models/result",
+    "mockup-patterns-structure-url/js/views/actionmenu",
+    "translate",
+    "pat-registry",
+    "bootstrap-alert",
+], function (
+    $,
+    _,
+    TableRowView,
+    TableTemplate,
+    BaseView,
+    patDataTables,
+    Sortable,
+    patMoment,
+    Result,
+    ActionMenuView,
+    _t,
+    registry
+) {
+    "use strict";
 
-  var TableView = BaseView.extend({
-    tagName: 'div',
-    template: _.template(TableTemplate),
-    initialize: function(options) {
-      var self = this;
-      BaseView.prototype.initialize.apply(self, [options]);
-      self.collection = self.app.collection;
-      self.selectedCollection = self.app.selectedCollection;
-      self.listenTo(self.collection, 'sync', self.render);
-      self.listenTo(self.selectedCollection, 'remove', self.render);
-      self.listenTo(self.selectedCollection, 'reset', self.render);
-      self.collection.pager();
-      self.subsetIds = [];
-      self.contextInfo = null;
+    var TableView = BaseView.extend({
+        tagName: "div",
+        template: _.template(TableTemplate),
+        initialize: function (options) {
+            var self = this;
+            BaseView.prototype.initialize.apply(self, [options]);
+            self.collection = self.app.collection;
+            self.selectedCollection = self.app.selectedCollection;
+            self.listenTo(self.collection, "sync", self.render);
+            self.listenTo(self.selectedCollection, "remove", self.render);
+            self.listenTo(self.selectedCollection, "reset", self.render);
+            self.collection.pager();
+            self.subsetIds = [];
+            self.contextInfo = null;
 
-      $('body').on('context-info-loaded', function(event, data) {
-        self.contextInfo = data;
-        /* set default page info */
-        self.setContextInfo();
-      });
+            $("body").on("context-info-loaded", function (event, data) {
+                self.contextInfo = data;
+                /* set default page info */
+                self.setContextInfo();
+            });
 
-      self.dateColumns = [
-        'ModificationDate',
-        'EffectiveDate',
-        'CreationDate',
-        'ExpirationDate',
-        'start',
-        'end',
-        'last_comment_date'
-      ];
-    },
-    events: {
-      'click .fc-breadcrumbs a': 'breadcrumbClicked',
-      'change .select-all': 'selectAll',
-    },
-    setContextInfo: function() {
-      var self = this;
-      var data = self.contextInfo;
-      var $defaultPage = self.$('[data-id="' + data.defaultPage + '"]');
-      if ($defaultPage.length > 0) {
-        $defaultPage.addClass('default-page');
-      }
-      /* set breadcrumb title info */
-      var crumbs = data.breadcrumbs;
-      if (crumbs && crumbs.length) {
-        var $crumbs = self.$('.fc-breadcrumbs a.crumb');
-        _.each(crumbs, function(crumb, idx) {
-          $crumbs.eq(idx).html(crumb.title);
-        });
-      }
-    },
-    render: function() {
-      var self = this;
-
-      // By default do not start sorted by any column
-      // Ignore first column and the last one (activeColumns.length + 1)
-      // Do not show paginator, search or information, we only want column sorting
-      var datatables_options = {
-        "aaSorting": [],
-        "aoColumnDefs": [
-          { "bSortable": false, "aTargets": [ 0, self.app.activeColumns.length + 2 ] }
-        ],
-        "paging": false,
-        "searching": false,
-        "info": false
-      };
-
-      // If options were passed from the pattern, override these ones
-      $.extend(
-        datatables_options, self.app.options.datatables_options
-      );
-
-      self.$el.html(self.template({
-        _t: _t,
-        pathParts: _.filter(
-          self.app.getCurrentPath().split('/').slice(1),
-          function(val) {
-            return val.length > 0;
-          }
-        ),
-        activeColumns: self.app.activeColumns,
-        availableColumns: self.app.availableColumns,
-        datatables_options: JSON.stringify(datatables_options)
-      }));
-
-      if (self.collection.length) {
-        var container = self.$('tbody');
-        self.collection.each(function(result) {
-          self.dateColumns.map(function (col) {
-            // empty column instead of displaying "None".
-            if (result.attributes.hasOwnProperty(col) && (result.attributes[col] === 'None' || !result.attributes[col] )) {
-              result.attributes[col] = '';
-            }
-          });
-
-          var view = (new TableRowView({
-            model: result,
-            app: self.app,
-            table: self
-          })).render();
-          container.append(view.el);
-        });
-      }
-      self.moment = new patMoment(self.$el, {
-        selector: '.' + self.dateColumns.join(',.'),
-        format: self.options.app.momentFormat
-      });
-
-      if (self.app.options.moveUrl) {
-        self.addReordering();
-      }
-
-      self.storeOrder();
-
-      registry.scan(self.$el);
-
-      self.$el.find("table").on( 'order.dt', function (e, settings, details) {
-        var btn = $('<button type="button" class="btn btn-danger btn-xs"></button>')
-                  .text(_t('Reset column sorting'))
-                  .on('click', function(e) {
-                    // Use column 0 to restore ordering and then empty list so it doesn't
-                    // show the icon in the column header
-                    self.$el.find("table.pat-datatables").data('patternDatatables').table
-                        .order([ 0, "asc" ]).draw()
-                        .order([]).draw();
-                    // Restore reordering by drag and drop
-                    self.addReordering();
-                    // Clear the status message
-                    self.app.clearStatus();
-                  });
-        self.app.setStatus({
-          text: _t('Notice: Drag and drop reordering is disabled when viewing the contents sorted by a column.'),
-          type: 'warning'
-        }, btn, false, 'sorting_dndreordering_disabled');
-        $(".pat-datatables tbody").find('tr').off("drag");
-        self.$el.removeClass('order-support');
-      });
-
-      return this;
-    },
-    breadcrumbClicked: function(e) {
-      e.preventDefault();
-      var $el = $(e.target);
-      if ($el[0].tagName !== 'A') {
-        $el = $el.parent('a');
-      }
-      var path = '';
-      $($el.prevAll('a').get().reverse()).each(function() {
-        var part = $(this).attr('data-path');
-        path += part;
-        if (part !== '/') {
-          path += '/';
-        }
-      });
-      path += $el.attr('data-path');
-      this.app.setCurrentPath(path);
-      this.collection.currentPage = 1;
-      this.collection.pager();
-    },
-    selectAll: function(e) {
-      if ($(e.target).is(':checked')) {
-        $('input[type="checkbox"]', this.$('tbody')).prop('checked', true).change();
-      } else {
-        /* delaying the re-rendering is much faster in this case */
-        this.selectedCollection.remove(this.collection.models, { silent: true });
-        this.selectedCollection.trigger('remove');
-      }
-      this.setContextInfo();
-    },
-    toggleSelectAll: function(e) {
-      var $el = $(e.target);
-      if (!$el.is(':checked')) {
-        this.$('.select-all').prop('checked', false);
-      }
-    },
-    addReordering: function() {
-      var self = this;
-      // if we have a custom query going on, we do not allow sorting.
-      if (self.app.inQueryMode()) {
-        self.$el.removeClass('order-support');
-        return;
-      }
-      self.$el.addClass('order-support');
-      var dd = new Sortable(self.$('tbody'), {
-        selector: 'tr',
-        createDragItem: function(pattern, $el) {
-          var $tr = $el.clone();
-          var $table = $('<table><tbody></tbody></table>');
-          $('tbody', $table).append($tr);
-          $table.addClass('structure-dragging')
-            .css({opacity: 0.85, position: 'absolute'});
-          $table.width($el.width());
-          $table.height($el.height());
-          $table.appendTo(document.body);
-          return $table;
+            self.dateColumns = [
+                "ModificationDate",
+                "EffectiveDate",
+                "CreationDate",
+                "ExpirationDate",
+                "start",
+                "end",
+                "last_comment_date",
+            ];
         },
-        drop: function($el, delta) {
-          if (delta !== 0){
-            self.app.moveItem($el.attr('data-id'), delta, self.subsetIds);
-            self.storeOrder();
-          }
-        }
-      });
-    },
-    storeOrder: function() {
-      var self = this;
-      var subsetIds = [];
-      self.$('tbody tr.itemRow').each(function() {
-        subsetIds.push($(this).attr('data-id'));
-      });
-      self.subsetIds = subsetIds;
-    }
-  });
+        events: {
+            "click .fc-breadcrumbs a": "breadcrumbClicked",
+            "change .select-all": "selectAll",
+        },
+        setContextInfo: function () {
+            var self = this;
+            var data = self.contextInfo;
+            var $defaultPage = self.$('[data-id="' + data.defaultPage + '"]');
+            if ($defaultPage.length > 0) {
+                $defaultPage.addClass("default-page");
+            }
+            /* set breadcrumb title info */
+            var crumbs = data.breadcrumbs;
+            if (crumbs && crumbs.length) {
+                var $crumbs = self.$(".fc-breadcrumbs a.crumb");
+                _.each(crumbs, function (crumb, idx) {
+                    $crumbs.eq(idx).html(crumb.title);
+                });
+            }
+        },
+        render: function () {
+            var self = this;
 
-  return TableView;
+            // By default do not start sorted by any column
+            // Ignore first column and the last one (activeColumns.length + 1)
+            // Do not show paginator, search or information, we only want column sorting
+            var datatables_options = {
+                aaSorting: [],
+                aoColumnDefs: [
+                    {
+                        bSortable: false,
+                        aTargets: [0, self.app.activeColumns.length + 2],
+                    },
+                ],
+                paging: false,
+                searching: false,
+                info: false,
+            };
+
+            // If options were passed from the pattern, override these ones
+            $.extend(datatables_options, self.app.options.datatables_options);
+
+            self.$el.html(
+                self.template({
+                    _t: _t,
+                    pathParts: _.filter(
+                        self.app.getCurrentPath().split("/").slice(1),
+                        function (val) {
+                            return val.length > 0;
+                        }
+                    ),
+                    activeColumns: self.app.activeColumns,
+                    availableColumns: self.app.availableColumns,
+                    datatables_options: JSON.stringify(datatables_options),
+                })
+            );
+
+            if (self.collection.length) {
+                var container = self.$("tbody");
+                self.collection.each(function (result) {
+                    self.dateColumns.map(function (col) {
+                        // empty column instead of displaying "None".
+                        if (
+                            result.attributes.hasOwnProperty(col) &&
+                            (result.attributes[col] === "None" ||
+                                !result.attributes[col])
+                        ) {
+                            result.attributes[col] = "";
+                        }
+                    });
+
+                    var view = new TableRowView({
+                        model: result,
+                        app: self.app,
+                        table: self,
+                    }).render();
+                    container.append(view.el);
+                });
+            }
+            self.moment = new patMoment(self.$el, {
+                selector: "." + self.dateColumns.join(",."),
+                format: self.options.app.momentFormat,
+            });
+
+            if (self.app.options.moveUrl) {
+                self.addReordering();
+            }
+
+            self.storeOrder();
+
+            registry.scan(self.$el);
+
+            self.$el
+                .find("table")
+                .on("order.dt", function (e, settings, details) {
+                    var btn = $(
+                        '<button type="button" class="btn btn-danger btn-xs"></button>'
+                    )
+                        .text(_t("Reset column sorting"))
+                        .on("click", function (e) {
+                            // Use column 0 to restore ordering and then empty list so it doesn't
+                            // show the icon in the column header
+                            self.$el
+                                .find("table.pat-datatables")
+                                .data("patternDatatables")
+                                .table.order([0, "asc"])
+                                .draw()
+                                .order([])
+                                .draw();
+                            // Restore reordering by drag and drop
+                            self.addReordering();
+                            // Clear the status message
+                            self.app.clearStatus();
+                        });
+                    self.app.setStatus(
+                        {
+                            text: _t(
+                                "Notice: Drag and drop reordering is disabled when viewing the contents sorted by a column."
+                            ),
+                            type: "warning",
+                        },
+                        btn,
+                        false,
+                        "sorting_dndreordering_disabled"
+                    );
+                    $(".pat-datatables tbody").find("tr").off("drag");
+                    self.$el.removeClass("order-support");
+                });
+
+            return this;
+        },
+        breadcrumbClicked: function (e) {
+            e.preventDefault();
+            var $el = $(e.target);
+            if ($el[0].tagName !== "A") {
+                $el = $el.parent("a");
+            }
+            var path = "";
+            $($el.prevAll("a").get().reverse()).each(function () {
+                var part = $(this).attr("data-path");
+                path += part;
+                if (part !== "/") {
+                    path += "/";
+                }
+            });
+            path += $el.attr("data-path");
+            this.app.setCurrentPath(path);
+            this.collection.currentPage = 1;
+            this.collection.pager();
+        },
+        selectAll: function (e) {
+            if ($(e.target).is(":checked")) {
+                $('input[type="checkbox"]', this.$("tbody"))
+                    .prop("checked", true)
+                    .change();
+            } else {
+                /* delaying the re-rendering is much faster in this case */
+                this.selectedCollection.remove(this.collection.models, {
+                    silent: true,
+                });
+                this.selectedCollection.trigger("remove");
+            }
+            this.setContextInfo();
+        },
+        toggleSelectAll: function (e) {
+            var $el = $(e.target);
+            if (!$el.is(":checked")) {
+                this.$(".select-all").prop("checked", false);
+            }
+        },
+        addReordering: function () {
+            var self = this;
+            // if we have a custom query going on, we do not allow sorting.
+            if (self.app.inQueryMode()) {
+                self.$el.removeClass("order-support");
+                return;
+            }
+            self.$el.addClass("order-support");
+            var dd = new Sortable(self.$("tbody"), {
+                selector: "tr",
+                createDragItem: function (pattern, $el) {
+                    var $tr = $el.clone();
+                    var $table = $("<table><tbody></tbody></table>");
+                    $("tbody", $table).append($tr);
+                    $table
+                        .addClass("structure-dragging")
+                        .css({ opacity: 0.85, position: "absolute" });
+                    $table.width($el.width());
+                    $table.height($el.height());
+                    $table.appendTo(document.body);
+                    return $table;
+                },
+                drop: function ($el, delta) {
+                    if (delta !== 0) {
+                        self.app.moveItem(
+                            $el.attr("data-id"),
+                            delta,
+                            self.subsetIds
+                        );
+                        self.storeOrder();
+                    }
+                },
+            });
+        },
+        storeOrder: function () {
+            var self = this;
+            var subsetIds = [];
+            self.$("tbody tr.itemRow").each(function () {
+                subsetIds.push($(this).attr("data-id"));
+            });
+            self.subsetIds = subsetIds;
+        },
+    });
+
+    return TableView;
 });
 
 
 define('text!mockup-ui-url/templates/popover.xml',[],function () { return '<div class="arrow"></div>\n<div class="popover-title">\n</div>\n<div class="items popover-content">\n</div>\n\n';});
 
 define('mockup-ui-url/views/popover',[
-  'jquery',
-  'underscore',
-  'mockup-ui-url/views/container',
-  'mockup-patterns-backdrop',
-  'text!mockup-ui-url/templates/popover.xml',
-], function($, _, ContainerView, Backdrop, PopoverTemplate) {
-  'use strict';
+    "jquery",
+    "underscore",
+    "mockup-ui-url/views/container",
+    "mockup-patterns-backdrop",
+    "text!mockup-ui-url/templates/popover.xml",
+], function ($, _, ContainerView, Backdrop, PopoverTemplate) {
+    "use strict";
 
-  var PopoverView = ContainerView.extend({
-    tagName: 'div',
-    className: 'popover',
-    eventPrefix: 'popover',
-    template: PopoverTemplate,
-    content: null,
-    title: null,
-    triggerView: null,
-    idPrefix: 'popover-',
-    triggerEvents: {
-      'button:click': 'toggle'
-    },
-    placement: 'bottom',
-    events: {
-    },
-    opened: false,
-    closeOnOutClick: true,
-    appendInContainer: true,
-    backdrop: undefined,
-    $backdrop: null,
-    useBackdrop: true,
-    backdropOptions: {
-      zIndex: '1009',
-      opacity: '0.4',
-      className: 'backdrop backdrop-popover',
-      classActiveName: 'backdrop-active',
-      closeOnEsc: false,
-      closeOnClick: true
-    },
-    initialize: function(options) {
-      var self = this;
-      ContainerView.prototype.initialize.apply(this, [options]);
-      this.bindTriggerEvents();
+    var PopoverView = ContainerView.extend({
+        tagName: "div",
+        className: "popover",
+        eventPrefix: "popover",
+        template: PopoverTemplate,
+        content: null,
+        title: null,
+        triggerView: null,
+        idPrefix: "popover-",
+        triggerEvents: {
+            "button:click": "toggle",
+        },
+        placement: "bottom",
+        events: {},
+        opened: false,
+        closeOnOutClick: true,
+        appendInContainer: true,
+        backdrop: undefined,
+        $backdrop: null,
+        useBackdrop: true,
+        backdropOptions: {
+            zIndex: "1009",
+            opacity: "0.4",
+            className: "backdrop backdrop-popover",
+            classActiveName: "backdrop-active",
+            closeOnEsc: false,
+            closeOnClick: true,
+        },
+        initialize: function (options) {
+            var self = this;
+            ContainerView.prototype.initialize.apply(this, [options]);
+            this.bindTriggerEvents();
 
-      this.on('render', function() {
-        this.$el.attr('role', 'tooltip').attr('aria-hidden', 'false');
-        this.renderTitle();
-        this.renderContent();
-      }, this);
+            this.on(
+                "render",
+                function () {
+                    this.$el
+                        .attr("role", "tooltip")
+                        .attr("aria-hidden", "false");
+                    this.renderTitle();
+                    this.renderContent();
+                },
+                this
+            );
 
-      this.$el.on('keyup', function(e){
-        if (e.keyCode === 27) {
-          self.hide();
-        }
-      });
-    },
-    afterRender: function () {
-    },
-    getTemplateOptions: function(){
-      return this.options;
-    },
-    renderTitle: function() {
-      var title = this.title;
-      if(typeof(title) === 'function'){
-        title = title(this.getTemplateOptions());
-      }
-      this.$('.popover-title').empty().append(title);
-    },
-    renderContent: function() {
-      this.$('.popover-content').empty().append(this.content(this.getTemplateOptions()));
-    },
-    bindTriggerEvents: function() {
-      if (this.triggerView) {
-        _.each(this.triggerEvents, function(func, event) {
-          var method = this[func];
-          if (!method) {
-            $.error('Function not found.');
-          }
-          this.stopListening(this.triggerView, event);
-          this.listenTo(this.triggerView, event, method);
-        }, this);
-      }
-    },
-
-    getPosition: function() {
-      var $el = this.triggerView.$el;
-      return $.extend({}, {
-        width: $el[0].offsetWidth,
-        height: $el[0].offsetHeight
-      }, $el.offset());
-    },
-
-    getBodyClassName: function(){
-      var name = 'popover-';
-      if(this.options.id){
-        name += this.options.id + '-';
-      }
-      name += 'active';
-      return name;
-    },
-
-    show: function() {
-      /* hide existing */
-      $('.popover:visible').each(function(){
-        var popover = $(this).data('component');
-        if(popover){
-          popover.hide();
-        }
-      });
-
-      this.position();
-
-      this.setBackdrop();
-      if (this.useBackdrop === true) {
-        this.backdrop.show();
-      }
-
-      this.opened = true;
-
-      if (this.triggerView) {
-        this.triggerView.$el.addClass('active');
-      }
-
-      this.uiEventTrigger('show', this);
-      this.$el.attr('aria-hidden', 'false');
-      $('body').addClass(this.getBodyClassName());
-    },
-
-    position: function(){
-      var pos = this.getPosition();
-      var $tip = this.$el, tp, placement, actualWidth, actualHeight;
-
-      placement = this.placement;
-
-      $tip.css({ top: 0, left: 0 }).addClass('active');
-
-      actualWidth = $tip[0].offsetWidth;
-      actualHeight = $tip[0].offsetHeight;
-
-      switch (placement) {
-        case 'bottom-right':
-          tp = {top: pos.top + pos.height, left: pos.left + pos.width - 40};
-          break;
-        case 'bottom':
-          tp = {top: pos.top + pos.height, left: pos.left + pos.width / 2 - actualWidth / 2};
-          break;
-        case 'top':
-          tp = {top: pos.top - actualHeight, left: pos.left + pos.width / 2 - actualWidth / 2};
-          break;
-        case 'left':
-          tp = {top: pos.top + pos.height / 2 - actualHeight / 2, left: pos.left - actualWidth};
-          break;
-        case 'right':
-          tp = {top: pos.top + pos.height / 2 - actualHeight / 2, left: pos.left + pos.width};
-          break;
-      }
-
-      this.applyPlacement(tp, placement);
-    },
-
-    applyPlacement: function(offset, placement) {
-      var $el = this.$el,
-        $tip = this.$el,
-        width = $tip[0].offsetWidth,
-        height = $tip[0].offsetHeight,
-        actualWidth,
-        actualHeight,
-        delta,
-        replace;
-
-      $el.removeClass(placement);
-
-      $el.offset(offset)
-        .addClass(placement)
-        .addClass('active');
-
-      actualWidth = $tip[0].offsetWidth;
-      actualHeight = $tip[0].offsetHeight;
-
-      if (placement === 'top' && actualHeight !== height) {
-        offset.top = offset.top + height - actualHeight;
-        replace = true;
-      }
-
-      if (placement === 'bottom' || placement === 'top') {
-        delta = 0;
-
-        if (offset.left < 0) {
-          delta = offset.left * -2;
-          offset.left = 0;
-          $el.removeClass(placement);
-          $el.offset(offset).addClass(placement);
-          actualWidth = $tip[0].offsetWidth;
-          actualHeight = $tip[0].offsetHeight;
-        }
-
-        this.positionArrow(delta - width + actualWidth, actualWidth, 'left');
-
-      } else if (placement !== 'bottom-right') {
-        // If placement is bottom-right, don't override left position for the arrow that is defined in css to 20px.
-        this.positionArrow(actualHeight - height, actualHeight, 'top');
-      }
-
-      if (replace) {
-        $el.offset(offset);
-      }
-    },
-    positionArrow: function(delta, dimension, position) {
-      var $arrow = this.$('.arrow');
-      $arrow.css(position, delta ? (50 * (1 - delta / dimension) + '%') : '');
-    },
-    hide: function() {
-      this.opened = false;
-      this.$el.removeClass('active');
-      if (this.triggerView) {
-        this.triggerView.$el.removeClass('active');
-        this.triggerView.$el.attr('aria-hidden', 'true');
-      }
-      this.uiEventTrigger('hide', this);
-      this.$el.attr('aria-hidden', 'true');
-      $('body').removeClass(this.getBodyClassName());
-    },
-    toggle: function(button, e) {
-      if (this.opened) {
-        this.hide();
-      } else {
-        this.show();
-      }
-    },
-    setBackdrop: function() {
-      if (this.useBackdrop === true && this.backdrop === undefined) {
-        var self = this;
-        this.$backdrop = this.$el.closest('.ui-backdrop-element');
-        if (this.$backdrop.length === 0) {
-          this.$backdrop = $('body');
-        }
-
-        this.backdrop = new Backdrop(this.$backdrop, this.backdropOptions);
-        this.backdrop.$el.on('hidden.backdrop.patterns', function(e) {
-          if (e.namespace === 'backdrop.patterns') {
-            e.stopPropagation();
-            if (self.opened === true) {
-              self.hide();
+            this.$el.on("keyup", function (e) {
+                if (e.keyCode === 27) {
+                    self.hide();
+                }
+            });
+        },
+        afterRender: function () {},
+        getTemplateOptions: function () {
+            return this.options;
+        },
+        renderTitle: function () {
+            var title = this.title;
+            if (typeof title === "function") {
+                title = title(this.getTemplateOptions());
             }
-          }
-        });
-        this.on('popover:hide', function() {
-          this.backdrop.hide();
-        }, this);
-      }
-    }
-  });
+            this.$(".popover-title").empty().append(title);
+        },
+        renderContent: function () {
+            this.$(".popover-content")
+                .empty()
+                .append(this.content(this.getTemplateOptions()));
+        },
+        bindTriggerEvents: function () {
+            if (this.triggerView) {
+                _.each(
+                    this.triggerEvents,
+                    function (func, event) {
+                        var method = this[func];
+                        if (!method) {
+                            $.error("Function not found.");
+                        }
+                        this.stopListening(this.triggerView, event);
+                        this.listenTo(this.triggerView, event, method);
+                    },
+                    this
+                );
+            }
+        },
 
-  return PopoverView;
+        getPosition: function () {
+            var $el = this.triggerView.$el;
+            return $.extend(
+                {},
+                {
+                    width: $el[0].offsetWidth,
+                    height: $el[0].offsetHeight,
+                },
+                $el.offset()
+            );
+        },
+
+        getBodyClassName: function () {
+            var name = "popover-";
+            if (this.options.id) {
+                name += this.options.id + "-";
+            }
+            name += "active";
+            return name;
+        },
+
+        show: function () {
+            /* hide existing */
+            $(".popover:visible").each(function () {
+                var popover = $(this).data("component");
+                if (popover) {
+                    popover.hide();
+                }
+            });
+
+            this.position();
+
+            this.setBackdrop();
+            if (this.useBackdrop === true) {
+                this.backdrop.show();
+            }
+
+            this.opened = true;
+
+            if (this.triggerView) {
+                this.triggerView.$el.addClass("active");
+            }
+
+            this.uiEventTrigger("show", this);
+            this.$el.attr("aria-hidden", "false");
+            $("body").addClass(this.getBodyClassName());
+        },
+
+        position: function () {
+            var pos = this.getPosition();
+            var $tip = this.$el,
+                tp,
+                placement,
+                actualWidth,
+                actualHeight;
+
+            placement = this.placement;
+
+            $tip.css({ top: 0, left: 0 }).addClass("active");
+
+            actualWidth = $tip[0].offsetWidth;
+            actualHeight = $tip[0].offsetHeight;
+
+            switch (placement) {
+                case "bottom-right":
+                    tp = {
+                        top: pos.top + pos.height,
+                        left: pos.left + pos.width - 40,
+                    };
+                    break;
+                case "bottom":
+                    tp = {
+                        top: pos.top + pos.height,
+                        left: pos.left + pos.width / 2 - actualWidth / 2,
+                    };
+                    break;
+                case "top":
+                    tp = {
+                        top: pos.top - actualHeight,
+                        left: pos.left + pos.width / 2 - actualWidth / 2,
+                    };
+                    break;
+                case "left":
+                    tp = {
+                        top: pos.top + pos.height / 2 - actualHeight / 2,
+                        left: pos.left - actualWidth,
+                    };
+                    break;
+                case "right":
+                    tp = {
+                        top: pos.top + pos.height / 2 - actualHeight / 2,
+                        left: pos.left + pos.width,
+                    };
+                    break;
+            }
+
+            this.applyPlacement(tp, placement);
+        },
+
+        applyPlacement: function (offset, placement) {
+            var $el = this.$el,
+                $tip = this.$el,
+                width = $tip[0].offsetWidth,
+                height = $tip[0].offsetHeight,
+                actualWidth,
+                actualHeight,
+                delta,
+                replace;
+
+            $el.removeClass(placement);
+
+            $el.offset(offset).addClass(placement).addClass("active");
+
+            actualWidth = $tip[0].offsetWidth;
+            actualHeight = $tip[0].offsetHeight;
+
+            if (placement === "top" && actualHeight !== height) {
+                offset.top = offset.top + height - actualHeight;
+                replace = true;
+            }
+
+            if (placement === "bottom" || placement === "top") {
+                delta = 0;
+
+                if (offset.left < 0) {
+                    delta = offset.left * -2;
+                    offset.left = 0;
+                    $el.removeClass(placement);
+                    $el.offset(offset).addClass(placement);
+                    actualWidth = $tip[0].offsetWidth;
+                    actualHeight = $tip[0].offsetHeight;
+                }
+
+                this.positionArrow(
+                    delta - width + actualWidth,
+                    actualWidth,
+                    "left"
+                );
+            } else if (placement !== "bottom-right") {
+                // If placement is bottom-right, don't override left position for the arrow that is defined in css to 20px.
+                this.positionArrow(actualHeight - height, actualHeight, "top");
+            }
+
+            if (replace) {
+                $el.offset(offset);
+            }
+        },
+        positionArrow: function (delta, dimension, position) {
+            var $arrow = this.$(".arrow");
+            $arrow.css(
+                position,
+                delta ? 50 * (1 - delta / dimension) + "%" : ""
+            );
+        },
+        hide: function () {
+            this.opened = false;
+            this.$el.removeClass("active");
+            if (this.triggerView) {
+                this.triggerView.$el.removeClass("active");
+                this.triggerView.$el.attr("aria-hidden", "true");
+            }
+            this.uiEventTrigger("hide", this);
+            this.$el.attr("aria-hidden", "true");
+            $("body").removeClass(this.getBodyClassName());
+        },
+        toggle: function (button, e) {
+            if (this.opened) {
+                this.hide();
+            } else {
+                this.show();
+            }
+        },
+        setBackdrop: function () {
+            if (this.useBackdrop === true && this.backdrop === undefined) {
+                var self = this;
+                this.$backdrop = this.$el.closest(".ui-backdrop-element");
+                if (this.$backdrop.length === 0) {
+                    this.$backdrop = $("body");
+                }
+
+                this.backdrop = new Backdrop(
+                    this.$backdrop,
+                    this.backdropOptions
+                );
+                this.backdrop.$el.on("hidden.backdrop.patterns", function (e) {
+                    if (e.namespace === "backdrop.patterns") {
+                        e.stopPropagation();
+                        if (self.opened === true) {
+                            self.hide();
+                        }
+                    }
+                });
+                this.on(
+                    "popover:hide",
+                    function () {
+                        this.backdrop.hide();
+                    },
+                    this
+                );
+            }
+        },
+    });
+
+    return PopoverView;
 });
 
 
 define('text!mockup-patterns-structure-url/templates/selection_item.xml',[],function () { return '<span class="selected-item">\n  <a href="#" data-uid="<%- UID %>" title="remove" class="remove">\n    <span class="glyphicon glyphicon-remove-circle"></span>\n  </a>\n  <%- Title %>\n</span>\n';});
 
 define('mockup-patterns-structure-url/js/views/selectionwell',[
-  'jquery',
-  'underscore',
-  'mockup-ui-url/views/popover',
-  'text!mockup-patterns-structure-url/templates/selection_item.xml'
-], function($, _, PopoverView, ItemTemplate) {
-  'use strict';
+    "jquery",
+    "underscore",
+    "mockup-ui-url/views/popover",
+    "text!mockup-patterns-structure-url/templates/selection_item.xml",
+], function ($, _, PopoverView, ItemTemplate) {
+    "use strict";
 
-  var WellView = PopoverView.extend({
-    className: 'popover selected-items',
-    title: _.template(
-      '<input type="text" class="filter" placeholder="<%- _t("Filter") %>" />' +
-      '<a href="#" class=" remove-all">' +
-      '<span class="glyphicon glyphicon-remove-circle"></span> <%- _t("remove all") %></a>'
-    ),
-    content: _.template(
-      '<% collection.each(function(item) { %>' +
-      '<%= item_template(item.toJSON()) %>' +
-      '<% }); %>'
-    ),
-    events: {
-      'click a.remove': 'itemRemoved',
-      'keyup input.filter': 'filterSelected',
-      'click .remove-all': 'removeAll'
-    },
-    initialize: function(options) {
-      PopoverView.prototype.initialize.apply(this, [options]);
-      var self = this;
-      var timeout = 0;
-      this.listenTo(this.collection, 'reset all add remove', function() {
-        clearTimeout(timeout);
-        timeout = setTimeout(function() {
-          self.render();
-        }, 50);
-      });
-      this.options['item_template'] = _.template(ItemTemplate); // jshint ignore:line
-    },
-    render: function() {
-      PopoverView.prototype.render.call(this);
-      if (this.collection.length === 0) {
-        this.$el.removeClass('active');
-      }
-      return this;
-    },
-    itemRemoved: function(e) {
-      e.preventDefault();
-      var uid = $(e.currentTarget).data('uid');
-      this.collection.removeByUID(uid);
-      if (this.collection.length !== 0) {
-        // re-rendering causes it to close, reopen
-        this.show();
-      }
-    },
-    filterSelected: function(e) {
-      var val = $(e.target).val().toLowerCase();
-      $('.selected-item', this.$el).each(function() {
-        var $el = $(this);
-        if ($el.text().toLowerCase().indexOf(val) === -1) {
-          $el.hide();
-        } else {
-          $el.show();
-        }
-      });
-    },
-    removeAll: function(e) {
-      e.preventDefault();
-      this.collection.reset();
-      this.hide();
-    }
-  });
+    var WellView = PopoverView.extend({
+        className: "popover selected-items",
+        title: _.template(
+            '<input type="text" class="filter" placeholder="<%- _t("Filter") %>" />' +
+                '<a href="#" class=" remove-all">' +
+                '<span class="glyphicon glyphicon-remove-circle"></span> <%- _t("remove all") %></a>'
+        ),
+        content: _.template(
+            "<% collection.each(function(item) { %>" +
+                "<%= item_template(item.toJSON()) %>" +
+                "<% }); %>"
+        ),
+        events: {
+            "click a.remove": "itemRemoved",
+            "keyup input.filter": "filterSelected",
+            "click .remove-all": "removeAll",
+        },
+        initialize: function (options) {
+            PopoverView.prototype.initialize.apply(this, [options]);
+            var self = this;
+            var timeout = 0;
+            this.listenTo(this.collection, "reset all add remove", function () {
+                clearTimeout(timeout);
+                timeout = setTimeout(function () {
+                    self.render();
+                }, 50);
+            });
+            this.options["item_template"] = _.template(ItemTemplate); // jshint ignore:line
+        },
+        render: function () {
+            PopoverView.prototype.render.call(this);
+            if (this.collection.length === 0) {
+                this.$el.removeClass("active");
+            }
+            return this;
+        },
+        itemRemoved: function (e) {
+            e.preventDefault();
+            var uid = $(e.currentTarget).data("uid");
+            this.collection.removeByUID(uid);
+            if (this.collection.length !== 0) {
+                // re-rendering causes it to close, reopen
+                this.show();
+            }
+        },
+        filterSelected: function (e) {
+            var val = $(e.target).val().toLowerCase();
+            $(".selected-item", this.$el).each(function () {
+                var $el = $(this);
+                if ($el.text().toLowerCase().indexOf(val) === -1) {
+                    $el.hide();
+                } else {
+                    $el.show();
+                }
+            });
+        },
+        removeAll: function (e) {
+            e.preventDefault();
+            this.collection.reset();
+            this.hide();
+        },
+    });
 
-  return WellView;
+    return WellView;
 });
 
 define('mockup-patterns-structure-url/js/views/generic-popover',[
-  'jquery',
-  'underscore',
-  'mockup-ui-url/views/popover',
-  'translate',
-  'pat-registry'
-], function($, _, PopoverView, _t, registry) {
-  'use strict';
+    "jquery",
+    "underscore",
+    "mockup-ui-url/views/popover",
+    "translate",
+    "pat-registry",
+], function ($, _, PopoverView, _t, registry) {
+    "use strict";
 
-  var PropertiesView = PopoverView.extend({
-    events: {
-      'click button.applyBtn': 'applyButtonClicked',
-      'click button.closeBtn': 'toggle'
-    },
-    submitText: _t('Apply'),
-    initialize: function(options) {
-      var self = this;
-      self.app = options.app;
-      self.className = 'popover ' + options.id;
-      self.title = options.form.title || options.title;
-      self.submitText = options.form.submitText || _t('Apply');
-      self.submitContext = options.form.submitContext || 'primary';
-      self.data = {};
+    var PropertiesView = PopoverView.extend({
+        events: {
+            "click button.applyBtn": "applyButtonClicked",
+            "click button.closeBtn": "toggle",
+        },
+        submitText: _t("Apply"),
+        initialize: function (options) {
+            var self = this;
+            self.app = options.app;
+            self.className = "popover " + options.id;
+            self.title = options.form.title || options.title;
+            self.submitText = options.form.submitText || _t("Apply");
+            self.submitContext = options.form.submitContext || "primary";
+            self.data = {};
 
-      self.options = options;
-      self.setContent(options.form.template);
+            self.options = options;
+            self.setContent(options.form.template);
 
-      PopoverView.prototype.initialize.apply(this, [options]);
-    },
-    setContent: function(content) {
-      var self = this;
-      var html = '<form>' + content + '</form>';
-      html += '<button class="btn btn-block btn-' + self.submitContext + ' applyBtn">' + self.submitText + ' </button>';
-      if (self.options.form.closeText) {
-        html += '<button class="btn btn-block btn-default closeBtn">' + self.options.form.closeText + ' </button>';
-      }
-      this.content = _.template(html);
-    },
-    getTemplateOptions: function() {
-      var self = this;
-      var items = [];
-      self.app.selectedCollection.each(function(item) {
-        items.push(item.toJSON());
-      });
-      return $.extend({}, true, self.options, {
-        items: items,
-        data: self.data
-      });
-    },
-    applyButtonClicked: function() {
-      var self = this;
-      var data = {};
-      _.each(self.$el.find('form').serializeArray(), function(param) {
-        if (param.name in data) {
-            data[param.name] += ',' + param.value;
-        } else {
-            data[param.name] = param.value;
-        }
-      });
+            PopoverView.prototype.initialize.apply(this, [options]);
+        },
+        setContent: function (content) {
+            var self = this;
+            var html = "<form>" + content + "</form>";
+            html +=
+                '<button class="btn btn-block btn-' +
+                self.submitContext +
+                ' applyBtn">' +
+                self.submitText +
+                " </button>";
+            if (self.options.form.closeText) {
+                html +=
+                    '<button class="btn btn-block btn-default closeBtn">' +
+                    self.options.form.closeText +
+                    " </button>";
+            }
+            this.content = _.template(html);
+        },
+        getTemplateOptions: function () {
+            var self = this;
+            var items = [];
+            self.app.selectedCollection.each(function (item) {
+                items.push(item.toJSON());
+            });
+            return $.extend({}, true, self.options, {
+                items: items,
+                data: self.data,
+            });
+        },
+        applyButtonClicked: function () {
+            var self = this;
+            var data = {};
+            _.each(self.$el.find("form").serializeArray(), function (param) {
+                if (param.name in data) {
+                    data[param.name] += "," + param.value;
+                } else {
+                    data[param.name] = param.value;
+                }
+            });
 
-      self.app.buttonClickEvent(this.triggerView, data);
-      self.hide();
-    },
-    afterRender: function() {
-      var self = this;
-      if (self.options.form.dataUrl) {
-        self.$('.popover-content').html(_t('Loading...'));
-        self.app.loading.show();
-        var url = self.app.getAjaxUrl(self.options.form.dataUrl);
-        $.ajax({
-          url: url,
-          dataType: 'json',
-          type: 'POST',
-          cache: false,
-          data: {
-            selection: JSON.stringify(self.app.getSelectedUids()),
-            transitions: true,
-            render: 'yes'
-          }
-        }).done(function(result) {
-          self.data = result.data || result;
-          self.renderContent();
-          registry.scan(self.$el);
-        }).fail(function() {
-          /* we temporarily set original html to a value here so we can
+            self.app.buttonClickEvent(this.triggerView, data);
+            self.hide();
+        },
+        afterRender: function () {
+            var self = this;
+            if (self.options.form.dataUrl) {
+                self.$(".popover-content").html(_t("Loading..."));
+                self.app.loading.show();
+                var url = self.app.getAjaxUrl(self.options.form.dataUrl);
+                $.ajax({
+                    url: url,
+                    dataType: "json",
+                    type: "POST",
+                    cache: false,
+                    data: {
+                        selection: JSON.stringify(self.app.getSelectedUids()),
+                        transitions: true,
+                        render: "yes",
+                    },
+                })
+                    .done(function (result) {
+                        self.data = result.data || result;
+                        self.renderContent();
+                        registry.scan(self.$el);
+                    })
+                    .fail(function () {
+                        /* we temporarily set original html to a value here so we can
              render the updated content and then put the original back */
-          var originalContent = self.content;
-          self.setContent('<p>' + _t('Error loading popover from server.') + '</p>', false);
-          self.renderContent();
-          self.content = originalContent;
-        }).always(function() {
-          self.app.loading.hide();
-          self.position();
-        });
-      } else {
-        registry.scan(self.$el);
-        self.position();
-      }
-    },
-    toggle: function(button, e) {
-      PopoverView.prototype.toggle.apply(this, [button, e]);
-      var self = this;
-      if (!self.opened) {
-        return;
-      } else {
-        this.$el.replaceWith(this.render().el);
-        this.position();
-      }
-    }
-  });
+                        var originalContent = self.content;
+                        self.setContent(
+                            "<p>" +
+                                _t("Error loading popover from server.") +
+                                "</p>",
+                            false
+                        );
+                        self.renderContent();
+                        self.content = originalContent;
+                    })
+                    .always(function () {
+                        self.app.loading.hide();
+                        self.position();
+                    });
+            } else {
+                registry.scan(self.$el);
+                self.position();
+            }
+        },
+        toggle: function (button, e) {
+            PopoverView.prototype.toggle.apply(this, [button, e]);
+            var self = this;
+            if (!self.opened) {
+                return;
+            } else {
+                this.$el.replaceWith(this.render().el);
+                this.position();
+            }
+        },
+    });
 
-  return PropertiesView;
+    return PropertiesView;
 });
 
-define('mockup-patterns-structure-url/js/views/rearrange',[
-  'underscore',
-  'mockup-ui-url/views/popover',
-  'translate'
-], function(_, PopoverView, _t) {
-  'use strict';
+define('mockup-patterns-structure-url/js/views/rearrange',["underscore", "mockup-ui-url/views/popover", "translate"], function (
+    _,
+    PopoverView,
+    _t
+) {
+    "use strict";
 
-  var RearrangeView = PopoverView.extend({
-    className: 'popover rearrange',
-    title: _.template('<%- _t("Rearrange items in this folder") %>'),
-    content: _.template(
-      '<div class="form-group">' +
-        '<label><%- _t("What to rearrange on") %></label>' +
-        '<select name="rearrange_on" class="form-control">' +
-          '<% _.each(rearrangeProperties, function(title, property) { %>' +
-            '<option value="<%- property %>"><%- title %></option>' +
-          '<% }); %>' +
-        '</select>' +
-        '<p class="help-block">' +
-          '<b><%- _t("This permanently changes the order of items in this folder. This operation may take a long time depending on the size of the folder.") %></b>' +
-        '</p>' +
-      '</div>' +
-      '<div>' +
-        '<label> <input type="checkbox" name="reversed" /> <%- _t("Reverse") %></label>' +
-      '</div>' +
-      '<button class="btn btn-block btn-primary"><%- _t("Rearrange") %></button>'
-    ),
-    events: {
-      'click button': 'rearrangeButtonClicked'
-    },
-    initialize: function(options) {
-      this.app = options.app;
-      PopoverView.prototype.initialize.apply(this, [options]);
-      this.options.rearrangeProperties = this.app.options.rearrange.properties;
-    },
-    render: function() {
-      PopoverView.prototype.render.call(this);
-      this.$rearrangeOn = this.$('[name="rearrange_on"]');
-      this.$reversed = this.$('[name="reversed"]');
-      return this;
-    },
-    rearrangeButtonClicked: function() {
-      if (this.app.collection.queryHelper.getCurrentPath() === '/') {
-        if (!window.confirm(_t(
-          'Sorting the content on the base of the site ' +
-          'could affect your navigation order. ' +
-          'Are you certain you want to do this?'))) {
-          return;
-        }
-      }
-      var data = {
-        'rearrange_on': this.$rearrangeOn.val(),
-        reversed: false
-      };
-      if (this.$reversed[0].checked) {
-        data.reversed = true;
-      }
-      this.app.buttonClickEvent(this.triggerView, data);
-      this.hide();
-    }
-  });
+    var RearrangeView = PopoverView.extend({
+        className: "popover rearrange",
+        title: _.template('<%- _t("Rearrange items in this folder") %>'),
+        content: _.template(
+            '<div class="form-group">' +
+                '<label><%- _t("What to rearrange on") %></label>' +
+                '<select name="rearrange_on" class="form-control">' +
+                "<% _.each(rearrangeProperties, function(title, property) { %>" +
+                '<option value="<%- property %>"><%- title %></option>' +
+                "<% }); %>" +
+                "</select>" +
+                '<p class="help-block">' +
+                '<b><%- _t("This permanently changes the order of items in this folder. This operation may take a long time depending on the size of the folder.") %></b>' +
+                "</p>" +
+                "</div>" +
+                "<div>" +
+                '<label> <input type="checkbox" name="reversed" /> <%- _t("Reverse") %></label>' +
+                "</div>" +
+                '<button class="btn btn-block btn-primary"><%- _t("Rearrange") %></button>'
+        ),
+        events: {
+            "click button": "rearrangeButtonClicked",
+        },
+        initialize: function (options) {
+            this.app = options.app;
+            PopoverView.prototype.initialize.apply(this, [options]);
+            this.options.rearrangeProperties = this.app.options.rearrange.properties;
+        },
+        render: function () {
+            PopoverView.prototype.render.call(this);
+            this.$rearrangeOn = this.$('[name="rearrange_on"]');
+            this.$reversed = this.$('[name="reversed"]');
+            return this;
+        },
+        rearrangeButtonClicked: function () {
+            if (this.app.collection.queryHelper.getCurrentPath() === "/") {
+                if (
+                    !window.confirm(
+                        _t(
+                            "Sorting the content on the base of the site " +
+                                "could affect your navigation order. " +
+                                "Are you certain you want to do this?"
+                        )
+                    )
+                ) {
+                    return;
+                }
+            }
+            var data = {
+                rearrange_on: this.$rearrangeOn.val(),
+                reversed: false,
+            };
+            if (this.$reversed[0].checked) {
+                data.reversed = true;
+            }
+            this.app.buttonClickEvent(this.triggerView, data);
+            this.hide();
+        },
+    });
 
-  return RearrangeView;
+    return RearrangeView;
 });
 
 
 define('text!mockup-patterns-structure-url/templates/selection_button.xml',[],function () { return '<span class="glyphicon glyphicon-list"></span>\n<%- title %>\n<span class="label<% if (length > 0) { %> label-success<% } else { %> label-default<% } %>">\n  <%- length %>\n</span>\n';});
 
 define('mockup-patterns-structure-url/js/views/selectionbutton',[
-  'mockup-ui-url/views/button',
-  'text!mockup-patterns-structure-url/templates/selection_button.xml'
-], function(ButtonView, tplButton) {
-  'use strict';
+    "mockup-ui-url/views/button",
+    "text!mockup-patterns-structure-url/templates/selection_button.xml",
+], function (ButtonView, tplButton) {
+    "use strict";
 
-  var SelectionButton = ButtonView.extend({
-    collection: null,
-    template: tplButton,
-    initialize: function(options) {
-      ButtonView.prototype.initialize.apply(this, [options]);
-      var self = this;
-      self.timeout = 0;
-      if (this.collection !== null) {
-        this.collection.on('add remove reset', function() {
-          /* delay it */
-          clearTimeout(self.timeout);
-          self.timeout = setTimeout(function() {
-            self.render();
-            if (self.collection.length === 0) {
-              self.$el.removeClass('active');
+    var SelectionButton = ButtonView.extend({
+        collection: null,
+        template: tplButton,
+        initialize: function (options) {
+            ButtonView.prototype.initialize.apply(this, [options]);
+            var self = this;
+            self.timeout = 0;
+            if (this.collection !== null) {
+                this.collection.on(
+                    "add remove reset",
+                    function () {
+                        /* delay it */
+                        clearTimeout(self.timeout);
+                        self.timeout = setTimeout(function () {
+                            self.render();
+                            if (self.collection.length === 0) {
+                                self.$el.removeClass("active");
+                            }
+                        }, 50);
+                    },
+                    this
+                );
             }
-          }, 50);
-        }, this);
-      }
-    },
-    serializedModel: function() {
-      var obj = {
-        icon: '',
-        title: this.options.title,
-        length: 0
-      };
-      if (this.collection !== null) {
-        obj.length = this.collection.length;
-      }
-      return obj;
-    }
-  });
+        },
+        serializedModel: function () {
+            var obj = {
+                icon: "",
+                title: this.options.title,
+                length: 0,
+            };
+            if (this.collection !== null) {
+                obj.length = this.collection.length;
+            }
+            return obj;
+        },
+    });
 
-  return SelectionButton;
+    return SelectionButton;
 });
 
 
 define('text!mockup-patterns-structure-url/templates/paging.xml',[],function () { return '  <ul class="pagination pagination-sm pagination-centered">\n    <li class="<% if (currentPage === 1) { %>disabled<% } %>">\n      <a href="#" class="serverfirst">\n        &laquo;\n      </a>\n    </li>\n    <li class="<% if (currentPage === 1) { %>disabled<% } %>">\n      <a href="#" class="serverprevious">\n        &lt;\n      </a>\n    </li>\n    <% _.each(pages, function(p){ %>\n    <li class="<% if (currentPage == p) { %>active<% } else if ( p == \'...\' ) { %>disabled<% }%>">\n      <a href="#" class="page"><%- p %></a>\n    </li>\n    <% }); %>\n    <li class="<% if (currentPage === totalPages) { %>disabled<% } %>">\n      <a href="#" class="servernext">\n        &gt;\n      </a>\n    </li>\n    <li class="<% if (currentPage === totalPages) { %>disabled<% } %>">\n      <a href="#" class="serverlast">\n        &raquo;\n      </a>\n    </li>\n  </ul>\n\n  <div class="pagination pagination-sm"><%- _t("Show:") %></div>\n  <ul class="pagination pagination-sm">\n    <li class="serverhowmany serverhowmany15 <% if(perPage == 15){ %>disabled<% } %>">\n      <a href="#" class="">15</a>\n    </li>\n    <li class="serverhowmany serverhowmany30 <% if(perPage == 30){ %>disabled<% } %>">\n      <a href="#" class="">30</a>\n    </li>\n    <li class="serverhowmany serverhowmany50 <% if(perPage == 50){ %>disabled<% } %>">\n      <a href="#" class="">50</a>\n    </li>\n    <li class="serverhowmany serverhowmany250 <% if(perPage == 250){ %>disabled<% } %>">\n      <a href="#" class="">250</a>\n    </li>\n  </ul>\n\n  <div class="pagination pagination-sm">\n    <%- _t("Page:") %> <span class="current"><%- currentPage %></span>\n    <%- _t("of") %>\n    <span class="total"><%- totalPages %></span>\n          <%- _t("shown") %>\n  </div>\n';});
 
 define('mockup-patterns-structure-url/js/views/paging',[
-  'jquery',
-  'underscore',
-  'backbone',
-  'text!mockup-patterns-structure-url/templates/paging.xml',
-  'translate'
-], function($, _, Backbone, PagingTemplate, _t) {
-  'use strict';
+    "jquery",
+    "underscore",
+    "backbone",
+    "text!mockup-patterns-structure-url/templates/paging.xml",
+    "translate",
+], function ($, _, Backbone, PagingTemplate, _t) {
+    "use strict";
 
-  var PagingView = Backbone.View.extend({
-    events: {
-      'click a.servernext': 'nextResultPage',
-      'click a.serverprevious': 'previousResultPage',
-      'click a.serverlast': 'gotoLast',
-      'click a.page': 'gotoPage',
-      'click a.serverfirst': 'gotoFirst',
-      'click a.serverpage': 'gotoPage',
-      'click .serverhowmany a': 'changeCount'
-    },
+    var PagingView = Backbone.View.extend({
+        events: {
+            "click a.servernext": "nextResultPage",
+            "click a.serverprevious": "previousResultPage",
+            "click a.serverlast": "gotoLast",
+            "click a.page": "gotoPage",
+            "click a.serverfirst": "gotoFirst",
+            "click a.serverpage": "gotoPage",
+            "click .serverhowmany a": "changeCount",
+        },
 
-    tagName: 'aside',
-    template: _.template(PagingTemplate),
-    maxPages: 7,
-    initialize: function(options) {
-      this.options = options;
-      this.app = this.options.app;
-      this.collection = this.app.collection;
-      this.collection.on('reset', this.render, this);
-      this.collection.on('sync', this.render, this);
+        tagName: "aside",
+        template: _.template(PagingTemplate),
+        maxPages: 7,
+        initialize: function (options) {
+            this.options = options;
+            this.app = this.options.app;
+            this.collection = this.app.collection;
+            this.collection.on("reset", this.render, this);
+            this.collection.on("sync", this.render, this);
 
-      this.$el.appendTo('#pagination');
-    },
+            this.$el.appendTo("#pagination");
+        },
 
-    render: function() {
-      var data = this.collection.info();
-      data.pages = this.getPages(data);
-      var html = this.template($.extend({
-        _t: _t
-      }, data));
-      this.$el.html(html);
-      return this;
-    },
+        render: function () {
+            var data = this.collection.info();
+            data.pages = this.getPages(data);
+            var html = this.template(
+                $.extend(
+                    {
+                        _t: _t,
+                    },
+                    data
+                )
+            );
+            this.$el.html(html);
+            return this;
+        },
 
-    getPages: function(data) {
-      var totalPages = data.totalPages;
-      if (!totalPages) {
-        return [];
-      }
-      var currentPage = data.currentPage;
-      var left = 1;
-      var right = totalPages;
-      if (totalPages > this.maxPages) {
-        left = Math.max(1, Math.floor(currentPage - (this.maxPages / 2)));
-        right = Math.min(left + this.maxPages, totalPages);
-        if ((right - left) < this.maxPages) {
-          left = left - Math.floor(this.maxPages / 2);
-        }
-      }
-      var pages = [];
-      for (var i = left; i <= right; i = i + 1) {
-        pages.push(i);
-      }
+        getPages: function (data) {
+            var totalPages = data.totalPages;
+            if (!totalPages) {
+                return [];
+            }
+            var currentPage = data.currentPage;
+            var left = 1;
+            var right = totalPages;
+            if (totalPages > this.maxPages) {
+                left = Math.max(1, Math.floor(currentPage - this.maxPages / 2));
+                right = Math.min(left + this.maxPages, totalPages);
+                if (right - left < this.maxPages) {
+                    left = left - Math.floor(this.maxPages / 2);
+                }
+            }
+            var pages = [];
+            for (var i = left; i <= right; i = i + 1) {
+                pages.push(i);
+            }
 
-      /* add before and after */
-      if (pages[0] > 1) {
-        if (pages[0] > 2) {
-          pages = ['...'].concat(pages);
-        }
-        pages = [1].concat(pages);
-      }
-      if (pages[pages.length - 1] < (totalPages - 1)) {
-        if (pages[pages.length - 2] < totalPages - 2) {
-          pages.push('...');
-        }
-        pages.push(totalPages);
-      }
-      return pages;
-    },
-    nextResultPage: function(e) {
-      e.preventDefault();
-      this.app.clearStatus();
-      this.collection.requestNextPage();
-    },
-    previousResultPage: function(e) {
-      e.preventDefault();
-      this.app.clearStatus();
-      this.collection.requestPreviousPage();
-    },
-    gotoFirst: function(e) {
-      e.preventDefault();
-      this.app.clearStatus();
-      this.collection.goTo(this.collection.information.firstPage);
-    },
-    gotoLast: function(e) {
-      e.preventDefault();
-      this.app.clearStatus();
-      this.collection.goTo(this.collection.information.totalPages);
-    },
-    gotoPage: function(e) {
-      e.preventDefault();
-      this.app.clearStatus();
-      var page = $(e.target).text();
-      this.collection.goTo(page);
-    },
-    changeCount: function(e) {
-      e.preventDefault();
-      this.app.clearStatus();
-      var per = $(e.target).text();
-      this.collection.howManyPer(per);
-      this.app.setCookieSetting('perPage', per);
-    }
-  });
+            /* add before and after */
+            if (pages[0] > 1) {
+                if (pages[0] > 2) {
+                    pages = ["..."].concat(pages);
+                }
+                pages = [1].concat(pages);
+            }
+            if (pages[pages.length - 1] < totalPages - 1) {
+                if (pages[pages.length - 2] < totalPages - 2) {
+                    pages.push("...");
+                }
+                pages.push(totalPages);
+            }
+            return pages;
+        },
+        nextResultPage: function (e) {
+            e.preventDefault();
+            this.app.clearStatus();
+            this.collection.requestNextPage();
+        },
+        previousResultPage: function (e) {
+            e.preventDefault();
+            this.app.clearStatus();
+            this.collection.requestPreviousPage();
+        },
+        gotoFirst: function (e) {
+            e.preventDefault();
+            this.app.clearStatus();
+            this.collection.goTo(this.collection.information.firstPage);
+        },
+        gotoLast: function (e) {
+            e.preventDefault();
+            this.app.clearStatus();
+            this.collection.goTo(this.collection.information.totalPages);
+        },
+        gotoPage: function (e) {
+            e.preventDefault();
+            this.app.clearStatus();
+            var page = $(e.target).text();
+            this.collection.goTo(page);
+        },
+        changeCount: function (e) {
+            e.preventDefault();
+            this.app.clearStatus();
+            var per = $(e.target).text();
+            this.collection.howManyPer(per);
+            this.app.setCookieSetting("perPage", per);
+        },
+    });
 
-  return PagingView;
+    return PagingView;
 });
 
 define('mockup-patterns-structure-url/js/views/columns',[
-  'jquery',
-  'underscore',
-  'mockup-ui-url/views/popover',
-  'mockup-patterns-sortable'
-], function($, _, PopoverView, Sortable) {
-  'use strict';
+    "jquery",
+    "underscore",
+    "mockup-ui-url/views/popover",
+    "mockup-patterns-sortable",
+], function ($, _, PopoverView, Sortable) {
+    "use strict";
 
-  var ColumnsView = PopoverView.extend({
-    className: 'popover attribute-columns',
-    title: _.template('<%- _t("Columns") %>'),
-    content: _.template(
-      '<label><%- _t("Select columns to show, drag and drop to reorder") %></label>' +
-      '<ul>' +
-      '</ul>' +
-      '<button class="btn btn-block btn-success"><%- _t("Save") %></button>'
-    ),
-    itemTemplate: _.template(
-      '<li>' +
-        '<label>' +
-          '<input type="checkbox" value="<%- id %>"/>' +
-          '<%- title %>' +
-        '</label>' +
-      '</li>'
-    ),
-    events: {
-      'click button': 'applyButtonClicked'
-    },
-    initialize: function(options) {
-      this.app = options.app;
-      PopoverView.prototype.initialize.apply(this, [options]);
-    },
-    afterRender: function() {
-      var self = this;
+    var ColumnsView = PopoverView.extend({
+        className: "popover attribute-columns",
+        title: _.template('<%- _t("Columns") %>'),
+        content: _.template(
+            '<label><%- _t("Select columns to show, drag and drop to reorder") %></label>' +
+                "<ul>" +
+                "</ul>" +
+                '<button class="btn btn-block btn-success"><%- _t("Save") %></button>'
+        ),
+        itemTemplate: _.template(
+            "<li>" +
+                "<label>" +
+                '<input type="checkbox" value="<%- id %>"/>' +
+                "<%- title %>" +
+                "</label>" +
+                "</li>"
+        ),
+        events: {
+            "click button": "applyButtonClicked",
+        },
+        initialize: function (options) {
+            this.app = options.app;
+            PopoverView.prototype.initialize.apply(this, [options]);
+        },
+        afterRender: function () {
+            var self = this;
 
-      var objKeySortCmp = function (a, b) {
-        // object key sort compare function
-        var ca = self.app.availableColumns[a];
-        var cb = self.app.availableColumns[b];
-        if (ca < cb) {
-          return -1;
-        } else if (ca == cb) {
-          return 0;
-        } else {
-          return 1;
-        }
-      }
+            var objKeySortCmp = function (a, b) {
+                // object key sort compare function
+                var ca = self.app.availableColumns[a];
+                var cb = self.app.availableColumns[b];
+                if (ca < cb) {
+                    return -1;
+                } else if (ca == cb) {
+                    return 0;
+                } else {
+                    return 1;
+                }
+            };
 
-      self.$container = self.$('ul');
+            self.$container = self.$("ul");
 
-      _.each(self.app.activeColumns, function(id) {
-        var $el = $(self.itemTemplate({
-          title: self.app.availableColumns[id],
-          id: id
-        }));
-        $el.find('input')[0].checked = true;
-        self.$container.append($el);
-      });
+            _.each(self.app.activeColumns, function (id) {
+                var $el = $(
+                    self.itemTemplate({
+                        title: self.app.availableColumns[id],
+                        id: id,
+                    })
+                );
+                $el.find("input")[0].checked = true;
+                self.$container.append($el);
+            });
 
-      var availableKeys = _.keys(_.omit(self.app.availableColumns, self.app.activeColumns)).sort(objKeySortCmp);
-      _.each(availableKeys, function(id) {
-          var $el = $(self.itemTemplate({
-            title: self.app.availableColumns[id],
-            id: id
-          }));
-          self.$container.append($el);
-        });
+            var availableKeys = _.keys(
+                _.omit(self.app.availableColumns, self.app.activeColumns)
+            ).sort(objKeySortCmp);
+            _.each(availableKeys, function (id) {
+                var $el = $(
+                    self.itemTemplate({
+                        title: self.app.availableColumns[id],
+                        id: id,
+                    })
+                );
+                self.$container.append($el);
+            });
 
-      var dd = new Sortable(self.$container, {
-        selector: 'li'
-      });
-      return this;
-    },
-    applyButtonClicked: function() {
-      var self = this;
-      this.hide();
-      self.app.activeColumns = [];
-      self.$('input:checked').each(function() {
-        self.app.activeColumns.push($(this).val());
-      });
-      self.app.setCookieSetting(self.app.activeColumnsCookie, this.app.activeColumns);
-      self.app.tableView.render();
-    }
-  });
+            var dd = new Sortable(self.$container, {
+                selector: "li",
+            });
+            return this;
+        },
+        applyButtonClicked: function () {
+            var self = this;
+            this.hide();
+            self.app.activeColumns = [];
+            self.$("input:checked").each(function () {
+                self.app.activeColumns.push($(this).val());
+            });
+            self.app.setCookieSetting(
+                self.app.activeColumnsCookie,
+                this.app.activeColumns
+            );
+            self.app.tableView.render();
+        },
+    });
 
-  return ColumnsView;
+    return ColumnsView;
 });
 
 define('mockup-patterns-structure-url/js/views/textfilter',[
-  'jquery',
-  'underscore',
-  'mockup-ui-url/views/base',
-  'mockup-ui-url/views/button',
-  'mockup-ui-url/views/popover',
-  'mockup-patterns-querystring',
-  'translate'
-], function($, _, BaseView, ButtonView, PopoverView, QueryString, _t) {
-  'use strict';
+    "jquery",
+    "underscore",
+    "mockup-ui-url/views/base",
+    "mockup-ui-url/views/button",
+    "mockup-ui-url/views/popover",
+    "mockup-patterns-querystring",
+    "translate",
+], function ($, _, BaseView, ButtonView, PopoverView, QueryString, _t) {
+    "use strict";
 
-  var TextFilterView = BaseView.extend({
-    tagName: 'div',
-    className: 'navbar-search form-search ui-offset-parent',
-    template: _.template(
-      '<div class="input-group">' +
-      '<label class="hiddenStructure" for="textFilterInput" aria-label="<%- _t("Search") %>"><%- _t("Search") %>"</label>' +
-      '<input id="textFilterInput" type="text" class="form-control search-query" placeholder="<%- _t("Search") %>">' +
+    var TextFilterView = BaseView.extend({
+        tagName: "div",
+        className: "navbar-search form-search ui-offset-parent",
+        template: _.template(
+            '<div class="input-group">' +
+                '<label class="hiddenStructure" for="textFilterInput" aria-label="<%- _t("Search") %>"><%- _t("Search") %>"</label>' +
+                '<input id="textFilterInput" type="text" class="form-control search-query" placeholder="<%- _t("Search") %>">' +
+                '<span class="input-group-btn">' +
+                "</span>" +
+                "</div>"
+        ),
+        popoverContent: _.template('<input class="pat-querystring" />'),
+        events: {
+            "keyup .search-query": "filter",
+        },
+        term: null,
+        timeoutId: null,
+        keyupDelay: 300,
+        statusKeyFilter: "textfilter_status_message_filter",
+        statusKeySorting: "textfilter_status_message_sorting",
 
-      '<span class="input-group-btn">' +
-      '</span>' +
-      '</div>'
-    ),
-    popoverContent: _.template(
-      '<input class="pat-querystring" />'
-    ),
-    events: {
-      'keyup .search-query': 'filter'
-    },
-    term: null,
-    timeoutId: null,
-    keyupDelay: 300,
-    statusKeyFilter: 'textfilter_status_message_filter',
-    statusKeySorting: 'textfilter_status_message_sorting',
+        initialize: function (options) {
+            BaseView.prototype.initialize.apply(this, [options]);
+            this.app = this.options.app;
+        },
 
-    initialize: function(options) {
-      BaseView.prototype.initialize.apply(this, [options]);
-      this.app = this.options.app;
-    },
+        setFilterStatusMessage: function () {
+            var clear_btn = $(
+                '<button type="button" class="btn btn-primary btn-xs"></button>'
+            )
+                .text(_t("Clear"))
+                .on(
+                    "click",
+                    function () {
+                        this.clearFilter();
+                    }.bind(this)
+                );
 
-    setFilterStatusMessage: function() {
-      var clear_btn = $('<button type="button" class="btn btn-primary btn-xs"></button>')
-        .text(_t('Clear'))
-        .on('click', function() {
-          this.clearFilter();
-        }.bind(this));
+            var statusTextFilter = _t(
+                "This listing has filters applied. Not all items are shown."
+            );
+            this.app.setStatus(
+                {
+                    text: statusTextFilter,
+                    type: "success",
+                },
+                clear_btn,
+                true,
+                this.statusKeyFilter
+            );
 
-      var statusTextFilter = _t('This listing has filters applied. Not all items are shown.');
-      this.app.setStatus({
-        text: statusTextFilter,
-        type: 'success',
-      }, clear_btn, true, this.statusKeyFilter);
+            var statusTextSorting = _t(
+                "Drag and drop reordering is disabled while filters are applied."
+            );
+            this.app.setStatus(
+                {
+                    text: statusTextSorting,
+                    type: "warning",
+                },
+                null,
+                true,
+                this.statusKeySorting
+            );
+        },
 
-      var statusTextSorting = _t('Drag and drop reordering is disabled while filters are applied.');
-      this.app.setStatus({
-        text: statusTextSorting,
-        type: 'warning'
-      }, null, true, this.statusKeySorting);
+        clearFilterStatusMessage: function () {
+            if (!this.term && !this.app.additionalCriterias.length) {
+                this.app.clearStatus(this.statusKeyFilter);
+                this.app.clearStatus(this.statusKeySorting);
+            }
+        },
 
-    },
+        setTerm: function (term, set_input) {
+            var term_el = this.$el[0].querySelector(".search-query");
+            this.term = encodeURIComponent(term);
+            if (set_input) {
+                term_el.value = term;
+            }
+            this.app.collection.currentPage = 1;
+            this.app.collection.pager();
 
-    clearFilterStatusMessage: function() {
-      if (!this.term && !this.app.additionalCriterias.length) {
-        this.app.clearStatus(this.statusKeyFilter);
-        this.app.clearStatus(this.statusKeySorting);
-      }
-    },
+            if (term) {
+                term_el.classList.add("has-filter");
+                this.setFilterStatusMessage();
+            } else {
+                var hasquery = false;
+                try {
+                    var qu = this.$queryString.val();
+                    if (qu && JSON.parse(qu).length > 0) {
+                        hasquery = true;
+                    }
+                } finally {
+                    if (!hasquery) {
+                        term_el.classList.remove("has-filter");
+                        this.clearFilterStatusMessage();
+                    }
+                }
+            }
+        },
 
-    setTerm: function(term, set_input) {
-      var term_el = this.$el[0].querySelector('.search-query');
-      this.term = encodeURIComponent(term);
-      if (set_input) {
-        term_el.value = term;
-      }
-      this.app.collection.currentPage = 1;
-      this.app.collection.pager();
+        setQuery: function (query, set_input) {
+            var query_string = null;
+            var query_obj = null;
+            try {
+                if (typeof query === "string") {
+                    query_obj = JSON.parse(query);
+                    query_string = query;
+                } else {
+                    query_string = JSON.stringify(query);
+                    query_obj = query;
+                }
+            } catch (e) {
+                query_obj = [];
+                query_string = "[]";
+            }
 
-      if (term) {
-        term_el.classList.add('has-filter');
-        this.setFilterStatusMessage();
-      } else {
-        var hasquery = false;
-        try {
-          var qu =this.$queryString.val();
-          if (qu && JSON.parse(qu).length > 0) {
-            hasquery = true;
-          }
-        } finally {
-          if (! hasquery) {
-            term_el.classList.remove('has-filter');
-            this.clearFilterStatusMessage();
-          }
-        }
-      }
-    },
+            if (set_input) {
+                this.$queryString.val(query_string);
+                // TODO clear query string form
+                // this.queryString._init();
+            }
+            this.app.additionalCriterias = query_obj;
+            this.app.collection.currentPage = 1;
+            this.app.collection.pager();
+            if (query_obj.length) {
+                this.button.$el[0].classList.add("has-filter");
+                this.setFilterStatusMessage();
+            } else if (!this.term) {
+                this.button.$el[0].classList.remove("has-filter");
+                this.clearFilterStatusMessage();
+            }
+        },
 
-    setQuery: function(query, set_input) {
-      var query_string = null;
-      var query_obj = null;
-      try {
-        if (typeof query === 'string') {
-          query_obj = JSON.parse(query);
-          query_string = query;
-        } else {
-          query_string = JSON.stringify(query);
-          query_obj = query;
-        }
-      } catch (e) {
-        query_obj = [];
-        query_string = '[]';
-      }
+        clearTerm: function () {
+            this.setTerm("", true);
+        },
 
-      if (set_input) {
-        this.$queryString.val(query_string);
-        // TODO clear query string form
-        // this.queryString._init();
-      }
-      this.app.additionalCriterias = query_obj;
-      this.app.collection.currentPage = 1;
-      this.app.collection.pager();
-      if (query_obj.length) {
-        this.button.$el[0].classList.add('has-filter');
-        this.setFilterStatusMessage();
-      } else if (! this.term) {
-        this.button.$el[0].classList.remove('has-filter');
-        this.clearFilterStatusMessage();
-      }
-    },
+        clearFilter: function () {
+            this.setTerm("", true);
+            this.setQuery([], true);
+        },
 
-    clearTerm: function() {
-      this.setTerm('', true);
-    },
+        render: function () {
+            this.$el.html(this.template({ _t: _t }));
+            this.button = new ButtonView({
+                title: _t("Filter"),
+                icon: "filter",
+                extraClasses: ["btn-queryfilter"],
+            });
+            this.popover = new PopoverView({
+                triggerView: this.button,
+                id: "structure-query",
+                title: _.template(_t("Filter")),
+                content: this.popoverContent,
+                placement: "left",
+            });
+            this.$(".input-group-btn").append(this.button.render().el);
+            this.$el.append(this.popover.render().el);
+            this.popover.$el.addClass("query");
+            this.$queryString = this.popover.$("input.pat-querystring");
+            this.queryString = new QueryString(this.$queryString, {
+                indexOptionsUrl: this.app.options.indexOptionsUrl,
+                showPreviews: false,
+            });
+            var self = this;
+            self.queryString.$el.on("change", function () {
+                if (self.timeoutId) {
+                    clearTimeout(self.timeoutId);
+                }
+                self.timeoutId = setTimeout(function () {
+                    self.setQuery(self.$queryString.val(), false);
+                }, this.keyupDelay);
+            });
+            self.queryString.$el.on("initialized", function () {
+                self.queryString.$sortOn.on("change", function () {
+                    self.app["sort_on"] = self.queryString.$sortOn.val(); // jshint ignore:line
+                    self.app.collection.currentPage = 1;
+                    self.app.collection.pager();
+                });
+                self.queryString.$sortOrder.change(function () {
+                    if (self.queryString.$sortOrder[0].checked) {
+                        self.app["sort_order"] = "reverse"; // jshint ignore:line
+                    } else {
+                        self.app["sort_order"] = "ascending"; // jshint ignore:line
+                    }
+                    self.app.collection.currentPage = 1;
+                    self.app.collection.pager();
+                });
+            });
+            return this;
+        },
 
-    clearFilter: function() {
-      this.setTerm('', true);
-      this.setQuery([], true);
-    },
+        filter: function (event) {
+            var self = this;
+            if (self.timeoutId) {
+                clearTimeout(self.timeoutId);
+            }
+            self.timeoutId = setTimeout(function () {
+                var term_el = $(event.currentTarget);
+                self.setTerm(term_el.val(), false);
+            }, this.keyupDelay);
+        },
+    });
 
-    render: function() {
-      this.$el.html(this.template({_t: _t}));
-      this.button = new ButtonView({
-        title: _t('Filter'),
-        icon: 'filter',
-        extraClasses: ['btn-queryfilter', ],
-      });
-      this.popover = new PopoverView({
-        triggerView: this.button,
-        id: 'structure-query',
-        title: _.template(_t('Filter')),
-        content: this.popoverContent,
-        placement: 'left'
-      });
-      this.$('.input-group-btn').append(this.button.render().el);
-      this.$el.append(this.popover.render().el);
-      this.popover.$el.addClass('query');
-      this.$queryString = this.popover.$('input.pat-querystring');
-      this.queryString = new QueryString(
-        this.$queryString, {
-          indexOptionsUrl: this.app.options.indexOptionsUrl,
-          showPreviews: false
-        });
-      var self = this;
-      self.queryString.$el.on('change', function() {
-        if (self.timeoutId) {
-          clearTimeout(self.timeoutId);
-        }
-        self.timeoutId = setTimeout(function() {
-          self.setQuery(self.$queryString.val(), false);
-        }, this.keyupDelay);
-      });
-      self.queryString.$el.on('initialized', function() {
-        self.queryString.$sortOn.on('change', function() {
-          self.app['sort_on'] = self.queryString.$sortOn.val(); // jshint ignore:line
-          self.app.collection.currentPage = 1;
-          self.app.collection.pager();
-        });
-        self.queryString.$sortOrder.change(function() {
-          if (self.queryString.$sortOrder[0].checked) {
-            self.app['sort_order'] = 'reverse'; // jshint ignore:line
-          } else {
-            self.app['sort_order'] = 'ascending'; // jshint ignore:line
-          }
-          self.app.collection.currentPage = 1;
-          self.app.collection.pager();
-        });
-      });
-      return this;
-    },
-
-    filter: function(event) {
-      var self = this;
-      if (self.timeoutId) {
-        clearTimeout(self.timeoutId);
-      }
-      self.timeoutId = setTimeout(function() {
-        var term_el = $(event.currentTarget);
-        self.setTerm(term_el.val(), false);
-      }, this.keyupDelay);
-    }
-  });
-
-  return TextFilterView;
+    return TextFilterView;
 });
 
 // Uses AMD or browser globals to create a jQuery plugin.
@@ -28056,532 +28598,593 @@ define('text!mockup-patterns-upload-url/templates/preview.xml',[],function () { 
  *
  */
 
-
 define('mockup-patterns-upload',[
-  'jquery',
-  'underscore',
-  'pat-base',
-  'mockup-patterns-relateditems',
-  'dropzone',
-  'text!mockup-patterns-upload-url/templates/upload.xml',
-  'text!mockup-patterns-upload-url/templates/preview.xml',
-  'mockup-utils',
-  'translate'
-], function($, _, Base, RelatedItems, Dropzone, UploadTemplate, PreviewTemplate, utils, _t) {
-  'use strict';
+    "jquery",
+    "underscore",
+    "pat-base",
+    "mockup-patterns-relateditems",
+    "dropzone",
+    "text!mockup-patterns-upload-url/templates/upload.xml",
+    "text!mockup-patterns-upload-url/templates/preview.xml",
+    "mockup-utils",
+    "translate",
+], function (
+    $,
+    _,
+    Base,
+    RelatedItems,
+    Dropzone,
+    UploadTemplate,
+    PreviewTemplate,
+    utils,
+    _t
+) {
+    "use strict";
 
-  /* we do not want this plugin to auto discover */
-  Dropzone.autoDiscover = false;
+    /* we do not want this plugin to auto discover */
+    Dropzone.autoDiscover = false;
 
-  var UploadPattern = Base.extend({
-    name: 'upload',
-    trigger: '.pat-upload',
-    parser: 'mockup',
-    defaults: {
-      showTitle: true,
-      url: null, // XXX MUST provide url to submit to OR be in a form
-      className: 'upload',
-      wrap: false,
-      wrapperTemplate: '<div class="upload-wrapper"/>',
-      fileaddedClassName: 'dropping',
-      useTus: false,
-      container: '',
-      ajaxUpload: true,
+    var UploadPattern = Base.extend({
+        name: "upload",
+        trigger: ".pat-upload",
+        parser: "mockup",
+        defaults: {
+            showTitle: true,
+            url: null, // XXX MUST provide url to submit to OR be in a form
+            className: "upload",
+            wrap: false,
+            wrapperTemplate: '<div class="upload-wrapper"/>',
+            fileaddedClassName: "dropping",
+            useTus: false,
+            container: "",
+            ajaxUpload: true,
 
-      paramName: 'file',
-      addRemoveLinks: false,
-      autoCleanResults: true,
-      previewsContainer: '.previews',
-      previewTemplate: null,
-      maxFiles: null,
-      maxFilesize: 99999999, // let's not have a max by default...
+            paramName: "file",
+            addRemoveLinks: false,
+            autoCleanResults: true,
+            previewsContainer: ".previews",
+            previewTemplate: null,
+            maxFiles: null,
+            maxFilesize: 99999999, // let's not have a max by default...
 
-      allowPathSelection: undefined,
-      relatedItems: {
-        // UID attribute is required here since we're working with related items
-        attributes: ['UID', 'Title', 'Description', 'getURL', 'portal_type', 'path', 'ModificationDate'],
-        batchSize: 20,
-        basePath: '/',
-        vocabularyUrl: null,
-        width: 500,
-        maximumSelectionSize: 1,
-        selectableTypes: ['Folder']
-      }
-    },
+            allowPathSelection: undefined,
+            relatedItems: {
+                // UID attribute is required here since we're working with related items
+                attributes: [
+                    "UID",
+                    "Title",
+                    "Description",
+                    "getURL",
+                    "portal_type",
+                    "path",
+                    "ModificationDate",
+                ],
+                batchSize: 20,
+                basePath: "/",
+                vocabularyUrl: null,
+                width: 500,
+                maximumSelectionSize: 1,
+                selectableTypes: ["Folder"],
+            },
+        },
 
-    init: function() {
-      var self = this,
-          template = UploadTemplate;
+        init: function () {
+            var self = this,
+                template = UploadTemplate;
 
-      if (typeof self.options.allowPathSelection === 'undefined') {
-        // Set allowPathSelection to true, if we can use path based urls.
-        self.options.allowPathSelection = self.options.baseUrl && self.options.relativePath;
-      }
-
-      // TODO: find a way to make this work in firefox (and IE)
-      $(document).bind('paste', function(e) {
-        var oe = e.originalEvent;
-        var items = oe.clipboardData.items;
-        if (items) {
-          for (var i = 0; i < items.length; i++) {
-            if (items[i].type.indexOf('image') !== -1) {
-              var blob = items[i].getAsFile();
-              self.dropzone.addFile(blob);
+            if (typeof self.options.allowPathSelection === "undefined") {
+                // Set allowPathSelection to true, if we can use path based urls.
+                self.options.allowPathSelection =
+                    self.options.baseUrl && self.options.relativePath;
             }
-          }
-        }
-      });
-      // values that will change current processing
-      self.currentPath = self.options.currentPath;
-      self.currentFile = 0;
 
-      template = _.template(template)({
-        _t: _t,
-        allowPathSelection: self.options.allowPathSelection
-      });
-      self.$el.addClass(self.options.className);
-      self.$el.append(template);
+            // TODO: find a way to make this work in firefox (and IE)
+            $(document).bind("paste", function (e) {
+                var oe = e.originalEvent;
+                var items = oe.clipboardData.items;
+                if (items) {
+                    for (var i = 0; i < items.length; i++) {
+                        if (items[i].type.indexOf("image") !== -1) {
+                            var blob = items[i].getAsFile();
+                            self.dropzone.addFile(blob);
+                        }
+                    }
+                }
+            });
+            // values that will change current processing
+            self.currentPath = self.options.currentPath;
+            self.currentFile = 0;
 
-      self.$progress = $('.progress-bar-success', self.$el);
+            template = _.template(template)({
+                _t: _t,
+                allowPathSelection: self.options.allowPathSelection,
+            });
+            self.$el.addClass(self.options.className);
+            self.$el.append(template);
 
-      if (!self.options.showTitle) {
-        self.$el.find('h2.title').hide();
-      }
+            self.$progress = $(".progress-bar-success", self.$el);
 
-      if (!self.options.ajaxUpload) {
-        // no ajax upload, drop the fallback
-        $('.fallback', this.$el).remove();
-        if (this.$el.hasClass('.upload-container')) {
-          this.$el.addClass('no-ajax-upload');
-        } else {
-          this.$el.closest('.upload-container').addClass('no-ajax-upload');
-        }
-      }
+            if (!self.options.showTitle) {
+                self.$el.find("h2.title").hide();
+            }
 
-      if (self.options.wrap) {
-        self.$el.wrap(self.options.wrapperTemplate);
-        self.$el = self.$el.parent();
-      }
+            if (!self.options.ajaxUpload) {
+                // no ajax upload, drop the fallback
+                $(".fallback", this.$el).remove();
+                if (this.$el.hasClass(".upload-container")) {
+                    this.$el.addClass("no-ajax-upload");
+                } else {
+                    this.$el
+                        .closest(".upload-container")
+                        .addClass("no-ajax-upload");
+                }
+            }
 
-      if (self.options.allowPathSelection) {
-        // only use related items if we can generate path based urls and if it's not turned off.
-        self.$pathInput = $('input[name="location"]', self.$el);
-        self.relatedItems = self.setupRelatedItems(self.$pathInput);
-      } else {
-        $('input[name="location"]', self.$el).parent().remove();
-        self.relatedItems = null;
-      }
+            if (self.options.wrap) {
+                self.$el.wrap(self.options.wrapperTemplate);
+                self.$el = self.$el.parent();
+            }
 
-      self.$dropzone = $('.upload-area', self.$el);
+            if (self.options.allowPathSelection) {
+                // only use related items if we can generate path based urls and if it's not turned off.
+                self.$pathInput = $('input[name="location"]', self.$el);
+                self.relatedItems = self.setupRelatedItems(self.$pathInput);
+            } else {
+                $('input[name="location"]', self.$el).parent().remove();
+                self.relatedItems = null;
+            }
 
-      $('div.browse-select button.browse', self.$el).click(function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        if(!self.options.maxFiles || self.dropzone.files.length < self.options.maxFiles){
-          self.dropzone.hiddenFileInput.click();
-        }
-      });
+            self.$dropzone = $(".upload-area", self.$el);
 
-      var dzoneOptions = this.getDzoneOptions();
+            $("div.browse-select button.browse", self.$el).click(function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                if (
+                    !self.options.maxFiles ||
+                    self.dropzone.files.length < self.options.maxFiles
+                ) {
+                    self.dropzone.hiddenFileInput.click();
+                }
+            });
 
-      try {
-        // if init of Dropzone fails it says nothing and
-        // it fails silently. Using this block we make sure
-        // that if you break it w/ some weird or missing option
-        // you can get a proper log of it
-        //
-        self.dropzone = new Dropzone(self.$dropzone[0], dzoneOptions);
-      } catch (e) {
-        if (window.DEBUG) {
-          // log it!
-          console.log(e);
-        }
-        throw e;
-      }
+            var dzoneOptions = this.getDzoneOptions();
 
-      self.dropzone.on('maxfilesreached', function(){
-        self.showHideControls();
-      });
+            try {
+                // if init of Dropzone fails it says nothing and
+                // it fails silently. Using this block we make sure
+                // that if you break it w/ some weird or missing option
+                // you can get a proper log of it
+                //
+                self.dropzone = new Dropzone(self.$dropzone[0], dzoneOptions);
+            } catch (e) {
+                if (window.DEBUG) {
+                    // log it!
+                    console.log(e);
+                }
+                throw e;
+            }
 
-      self.dropzone.on('addedfile', function(/* file */) {
-        self.showHideControls();
-      });
+            self.dropzone.on("maxfilesreached", function () {
+                self.showHideControls();
+            });
 
-      self.dropzone.on('removedfile', function() {
-        self.showHideControls();
-      });
+            self.dropzone.on("addedfile", function (/* file */) {
+                self.showHideControls();
+            });
 
-      self.dropzone.on('success', function(e, response){
-        // Trigger event 'uploadAllCompleted' and pass the server's reponse and
-        // the path uid. This event can be listened to by patterns using the
-        // upload pattern, e.g. the TinyMCE pattern's link plugin.
-        var data;
-        try{
-          data = $.parseJSON(response);
-        }catch(ex){
-          data = response;
-        }
-        self.$el.trigger('uploadAllCompleted', {
-          'data': data,
-          'path_uid': (self.$pathInput) ? self.$pathInput.val() : null
-        });
-      });
+            self.dropzone.on("removedfile", function () {
+                self.showHideControls();
+            });
 
-      if (self.options.autoCleanResults) {
-        self.dropzone.on('complete', function(file) {
-          if (file.status === Dropzone.SUCCESS){
-            setTimeout(function() {
-              $(file.previewElement).fadeOut();
-            }, 3000);
-          }
-        });
-      }
+            self.dropzone.on("success", function (e, response) {
+                // Trigger event 'uploadAllCompleted' and pass the server's reponse and
+                // the path uid. This event can be listened to by patterns using the
+                // upload pattern, e.g. the TinyMCE pattern's link plugin.
+                var data;
+                try {
+                    data = $.parseJSON(response);
+                } catch (ex) {
+                    data = response;
+                }
+                self.$el.trigger("uploadAllCompleted", {
+                    data: data,
+                    path_uid: self.$pathInput ? self.$pathInput.val() : null,
+                });
+            });
 
-      self.dropzone.on('complete', function(file) {
-        if (file.status === Dropzone.SUCCESS && self.dropzone.files.length === 1) {
-          self.showHideControls();
-        }
-      });
+            if (self.options.autoCleanResults) {
+                self.dropzone.on("complete", function (file) {
+                    if (file.status === Dropzone.SUCCESS) {
+                        setTimeout(function () {
+                            $(file.previewElement).fadeOut();
+                        }, 3000);
+                    }
+                });
+            }
 
-      self.dropzone.on('error', function(file, response, xmlhr) {
-        if (typeof(xmlhr) !== 'undefined' && xmlhr.status !== 403){
-          // If error other than 403, just print a generic message
-          $('.dz-error-message span', file.previewElement).html(_t('The file transfer failed'));
-        }
-      });
+            self.dropzone.on("complete", function (file) {
+                if (
+                    file.status === Dropzone.SUCCESS &&
+                    self.dropzone.files.length === 1
+                ) {
+                    self.showHideControls();
+                }
+            });
 
-      self.dropzone.on('totaluploadprogress', function(pct) {
-        // need to caclulate total pct here in reality since we're manually
-        // processing each file one at a time.
-        pct = ((((self.currentFile - 1) * 100) + pct) / (self.dropzone.files.length * 100)) * 100;
-        self.$progress.attr('aria-valuenow', pct).css('width', pct + '%');
-      });
+            self.dropzone.on("error", function (file, response, xmlhr) {
+                if (typeof xmlhr !== "undefined" && xmlhr.status !== 403) {
+                    // If error other than 403, just print a generic message
+                    $(".dz-error-message span", file.previewElement).html(
+                        _t("The file transfer failed")
+                    );
+                }
+            });
 
-      $('.upload-all', self.$el).click(function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-        self.processUpload({
-          finished: function() {
-            self.$progress.attr('aria-valuenow', 0).css('width', '0%');
-          }
-        });
-      });
-      if(self.options.clipboardfile){
-        self.dropzone.addFile(self.options.clipboardfile);
-      }
-    },
+            self.dropzone.on("totaluploadprogress", function (pct) {
+                // need to caclulate total pct here in reality since we're manually
+                // processing each file one at a time.
+                pct =
+                    (((self.currentFile - 1) * 100 + pct) /
+                        (self.dropzone.files.length * 100)) *
+                    100;
+                self.$progress
+                    .attr("aria-valuenow", pct)
+                    .css("width", pct + "%");
+            });
 
-    showHideControls: function(){
-      /* we do this delayed because this can be called multiple times
+            $(".upload-all", self.$el).click(function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                self.processUpload({
+                    finished: function () {
+                        self.$progress
+                            .attr("aria-valuenow", 0)
+                            .css("width", "0%");
+                    },
+                });
+            });
+            if (self.options.clipboardfile) {
+                self.dropzone.addFile(self.options.clipboardfile);
+            }
+        },
+
+        showHideControls: function () {
+            /* we do this delayed because this can be called multiple times
          AND we need to do this hide/show AFTER dropzone is done with
          all it's own events. This is NASTY but the only way we can
          enforce some numFiles with dropzone! */
-      var self = this;
-      if(self._showHideTimeout){
-        clearTimeout(self._showHideTimeout);
-      }
-      self._showHideTimeout = setTimeout(function(){
-        self._showHideControls();
-      }, 50);
-    },
-
-    _showHideControls: function(){
-      var self = this;
-      var $controls = $('.controls', self.$el);
-      var $browse = $('.browse-select', self.$el);
-      var $input = $('.dz-hidden-input');
-
-      if(self.options.maxFiles){
-        if(self.dropzone.files.length < self.options.maxFiles){
-          $browse.show();
-          $input.prop('disabled', false);
-        }else{
-          $browse.hide();
-          $input.prop('disabled', true);
-        }
-      }
-      if(self.dropzone.files.length > 0){
-        $controls.fadeIn('slow');
-        var file = self.dropzone.files[0];
-        $('.dz-error-message span', file.previewElement).html('');
-      }else{
-        $controls.fadeOut('slow');
-      }
-    },
-
-    pathJoin: function() {
-      var parts = [];
-      _.each(arguments, function(part) {
-        if (!part){
-          return;
-        }
-        if (part[0] === '/'){
-          part = part.substring(1);
-        }
-        if (part[part.length - 1] === '/'){
-          part = part.substring(0, part.length - 1);
-        }
-        parts.push(part);
-      });
-      return parts.join('/');
-    },
-
-    getUrl: function() {
-
-      var self = this;
-      var url = self.options.url;
-      if (!url) {
-        if (self.options.baseUrl && self.options.relativePath){
-          url = self.options.baseUrl;
-          if (url[url.length - 1] !== '/'){
-            url = url + '/';
-          }
-          url = url + self.pathJoin(self.currentPath, self.options.relativePath);
-        } else {
-          var $form = self.$el.parents('form');
-          if ($form.length > 0){
-            url = $form.attr('action');
-          } else {
-            url = window.location.href;
-          }
-        }
-      }
-      return url;
-    },
-
-    getDzoneOptions: function() {
-      var self = this;
-
-      // This pattern REQUIRE dropzone to be clickable
-      self.options.clickable = true;
-
-      var options = $.extend({}, self.options);
-      options.url = self.getUrl();
-
-      options.headers = {
-        'X-CSRF-TOKEN': utils.getAuthenticator()
-      };
-
-      // XXX force to only upload one to the server at a time,
-      // right now we don't support multiple for backends
-      options.uploadMultiple = false;
-
-      delete options.wrap;
-      delete options.wrapperTemplate;
-      delete options.resultTemplate;
-      delete options.autoCleanResults;
-      delete options.fileaddedClassName;
-      delete options.useTus;
-
-      if (self.options.previewsContainer) {
-        /*
-         * if they have a select but it's not an id, let's make an id selector
-         * so we can target the correct container. dropzone is weird here...
-         */
-        var $preview = self.$el.find(self.options.previewsContainer);
-        if ($preview.length > 0) {
-          options.previewsContainer = $preview[0];
-        }
-      }
-
-      // XXX: do we need to allow this?
-      options.autoProcessQueue = false;
-      // options.addRemoveLinks = true;  // we show them in the template
-      options.previewTemplate = PreviewTemplate;
-
-      // if our element is a form we should force some values
-      // https://github.com/enyo/dropzone/wiki/Combine-normal-form-with-Dropzone
-      return options;
-    },
-
-    processUpload: function(options) {
-      if (!options){
-        options = {};
-      }
-
-      var self = this,
-          processing = false,
-          useTus = self.options.useTus,
-          fileaddedClassName = self.options.fileaddedClassName,
-          finished = options.finished;
-
-      self.currentFile = 0;
-
-      function process() {
-        processing = true;
-        if (self.dropzone.files.length === 0) {
-          processing = false;
-        }
-
-        var file = self.dropzone.files[0];
-        if (processing && file.status === Dropzone.ERROR){
-          // Put the file back as "queued" for retrying
-          file.status = Dropzone.QUEUED;
-          processing = false;
-        }
-
-        if (!processing){
-          self.$el.removeClass(fileaddedClassName);
-          if (finished !== undefined && typeof(finished) === 'function'){
-            finished();
-          }
-          return;
-        }
-
-        if ([Dropzone.SUCCESS, Dropzone.CANCELED]
-            .indexOf(file.status) !== -1) {
-          // remove it
-          self.dropzone.removeFile(file);
-          process();
-        } else if (file.status !== Dropzone.UPLOADING) {
-          // start processing file
-          if (useTus && window.tus) {
-            // use tus upload if installed
-            self.handleTusUpload(file);
-          } else {
-            // otherwise, just use dropzone to process
-            self.currentFile += 1;
-            self.dropzone.processFile(file);
-          }
-          setTimeout(process, 100);
-        } else {
-          // currently processing
-          setTimeout(process, 100);
-        }
-      }
-      process();
-    },
-
-    handleTusUpload: function(file) {
-      /* this needs fixing... */
-      var self = this,
-          $preview = $(file.previewElement),
-          chunkSize = 1024 * 1024 * 5; // 5mb chunk size
-
-      file.status = Dropzone.UPLOADING;
-
-      window.tus.upload(file, {
-        endpoint: self.dropzone.options.url,
-        headers: {
-          'FILENAME': file.name,
-          'X-CSRF-TOKEN': utils.getAuthenticator()
+            var self = this;
+            if (self._showHideTimeout) {
+                clearTimeout(self._showHideTimeout);
+            }
+            self._showHideTimeout = setTimeout(function () {
+                self._showHideControls();
+            }, 50);
         },
-        chunkSize: chunkSize
-      }).fail(function() {
-        if(window.DEBUG){
-          console.alert(_t('Error uploading with TUS resumable uploads'));
-        }
-        file.status = Dropzone.ERROR;
-      }).progress(function(e, bytesUploaded, bytesTotal) {
-        var percentage = (bytesUploaded / bytesTotal * 100);
-        self.$progress.attr('aria-valuenow', percentage).css('width', percentage + '%');
-        self.$progress.html(_t('uploading...') + '<br />' +
+
+        _showHideControls: function () {
+            var self = this;
+            var $controls = $(".controls", self.$el);
+            var $browse = $(".browse-select", self.$el);
+            var $input = $(".dz-hidden-input");
+
+            if (self.options.maxFiles) {
+                if (self.dropzone.files.length < self.options.maxFiles) {
+                    $browse.show();
+                    $input.prop("disabled", false);
+                } else {
+                    $browse.hide();
+                    $input.prop("disabled", true);
+                }
+            }
+            if (self.dropzone.files.length > 0) {
+                $controls.fadeIn("slow");
+                var file = self.dropzone.files[0];
+                $(".dz-error-message span", file.previewElement).html("");
+            } else {
+                $controls.fadeOut("slow");
+            }
+        },
+
+        pathJoin: function () {
+            var parts = [];
+            _.each(arguments, function (part) {
+                if (!part) {
+                    return;
+                }
+                if (part[0] === "/") {
+                    part = part.substring(1);
+                }
+                if (part[part.length - 1] === "/") {
+                    part = part.substring(0, part.length - 1);
+                }
+                parts.push(part);
+            });
+            return parts.join("/");
+        },
+
+        getUrl: function () {
+            var self = this;
+            var url = self.options.url;
+            if (!url) {
+                if (self.options.baseUrl && self.options.relativePath) {
+                    url = self.options.baseUrl;
+                    if (url[url.length - 1] !== "/") {
+                        url = url + "/";
+                    }
+                    url =
+                        url +
+                        self.pathJoin(
+                            self.currentPath,
+                            self.options.relativePath
+                        );
+                } else {
+                    var $form = self.$el.parents("form");
+                    if ($form.length > 0) {
+                        url = $form.attr("action");
+                    } else {
+                        url = window.location.href;
+                    }
+                }
+            }
+            return url;
+        },
+
+        getDzoneOptions: function () {
+            var self = this;
+
+            // This pattern REQUIRE dropzone to be clickable
+            self.options.clickable = true;
+
+            var options = $.extend({}, self.options);
+            options.url = self.getUrl();
+
+            options.headers = {
+                "X-CSRF-TOKEN": utils.getAuthenticator(),
+            };
+
+            // XXX force to only upload one to the server at a time,
+            // right now we don't support multiple for backends
+            options.uploadMultiple = false;
+
+            delete options.wrap;
+            delete options.wrapperTemplate;
+            delete options.resultTemplate;
+            delete options.autoCleanResults;
+            delete options.fileaddedClassName;
+            delete options.useTus;
+
+            if (self.options.previewsContainer) {
+                /*
+                 * if they have a select but it's not an id, let's make an id selector
+                 * so we can target the correct container. dropzone is weird here...
+                 */
+                var $preview = self.$el.find(self.options.previewsContainer);
+                if ($preview.length > 0) {
+                    options.previewsContainer = $preview[0];
+                }
+            }
+
+            // XXX: do we need to allow this?
+            options.autoProcessQueue = false;
+            // options.addRemoveLinks = true;  // we show them in the template
+            options.previewTemplate = PreviewTemplate;
+
+            // if our element is a form we should force some values
+            // https://github.com/enyo/dropzone/wiki/Combine-normal-form-with-Dropzone
+            return options;
+        },
+
+        processUpload: function (options) {
+            if (!options) {
+                options = {};
+            }
+
+            var self = this,
+                processing = false,
+                useTus = self.options.useTus,
+                fileaddedClassName = self.options.fileaddedClassName,
+                finished = options.finished;
+
+            self.currentFile = 0;
+
+            function process() {
+                processing = true;
+                if (self.dropzone.files.length === 0) {
+                    processing = false;
+                }
+
+                var file = self.dropzone.files[0];
+                if (processing && file.status === Dropzone.ERROR) {
+                    // Put the file back as "queued" for retrying
+                    file.status = Dropzone.QUEUED;
+                    processing = false;
+                }
+
+                if (!processing) {
+                    self.$el.removeClass(fileaddedClassName);
+                    if (
+                        finished !== undefined &&
+                        typeof finished === "function"
+                    ) {
+                        finished();
+                    }
+                    return;
+                }
+
+                if (
+                    [Dropzone.SUCCESS, Dropzone.CANCELED].indexOf(
+                        file.status
+                    ) !== -1
+                ) {
+                    // remove it
+                    self.dropzone.removeFile(file);
+                    process();
+                } else if (file.status !== Dropzone.UPLOADING) {
+                    // start processing file
+                    if (useTus && window.tus) {
+                        // use tus upload if installed
+                        self.handleTusUpload(file);
+                    } else {
+                        // otherwise, just use dropzone to process
+                        self.currentFile += 1;
+                        self.dropzone.processFile(file);
+                    }
+                    setTimeout(process, 100);
+                } else {
+                    // currently processing
+                    setTimeout(process, 100);
+                }
+            }
+            process();
+        },
+
+        handleTusUpload: function (file) {
+            /* this needs fixing... */
+            var self = this,
+                $preview = $(file.previewElement),
+                chunkSize = 1024 * 1024 * 5; // 5mb chunk size
+
+            file.status = Dropzone.UPLOADING;
+
+            window.tus
+                .upload(file, {
+                    endpoint: self.dropzone.options.url,
+                    headers: {
+                        "FILENAME": file.name,
+                        "X-CSRF-TOKEN": utils.getAuthenticator(),
+                    },
+                    chunkSize: chunkSize,
+                })
+                .fail(function () {
+                    if (window.DEBUG) {
+                        console.alert(
+                            _t("Error uploading with TUS resumable uploads")
+                        );
+                    }
+                    file.status = Dropzone.ERROR;
+                })
+                .progress(function (e, bytesUploaded, bytesTotal) {
+                    var percentage = (bytesUploaded / bytesTotal) * 100;
+                    self.$progress
+                        .attr("aria-valuenow", percentage)
+                        .css("width", percentage + "%");
+                    self.$progress.html(
+                        _t("uploading...") +
+                            "<br />" +
                             self.formatBytes(bytesUploaded) +
-                            ' / ' + self.formatBytes(bytesTotal));
-      }).done(function(url, file) {
-        file.status = Dropzone.SUCCESS;
-        self.dropzone.emit('success', file);
-        self.dropzone.emit('complete', file);
-      });
-    },
+                            " / " +
+                            self.formatBytes(bytesTotal)
+                    );
+                })
+                .done(function (url, file) {
+                    file.status = Dropzone.SUCCESS;
+                    self.dropzone.emit("success", file);
+                    self.dropzone.emit("complete", file);
+                });
+        },
 
-    formatBytes: function(bytes) {
-      var kb = Math.round(bytes / 1024);
-      if (kb < 1024) {
-        return kb + ' KiB';
-      }
-      var mb = Math.round(kb / 1024);
-      if (mb < 1024) {
-        return mb + ' MB';
-      }
-      return Math.round(mb / 1024) + ' GB';
-    },
+        formatBytes: function (bytes) {
+            var kb = Math.round(bytes / 1024);
+            if (kb < 1024) {
+                return kb + " KiB";
+            }
+            var mb = Math.round(kb / 1024);
+            if (mb < 1024) {
+                return mb + " MB";
+            }
+            return Math.round(mb / 1024) + " GB";
+        },
 
-    setPath: function(path){
-      var self = this;
-      self.currentPath = path;
-      self.options.url = null;
-      self.options.url = self.dropzone.options.url = self.getUrl();
-    },
+        setPath: function (path) {
+            var self = this;
+            self.currentPath = path;
+            self.options.url = null;
+            self.options.url = self.dropzone.options.url = self.getUrl();
+        },
 
-    setupRelatedItems: function($input) {
-      var self = this;
-      var options = self.options.relatedItems;
-      options.upload = false;  // ensure that related items upload is off.
-      if (self.options.initialFolder){
-        $input.attr('value', self.options.initialFolder);
-      }
-      var ri = new RelatedItems($input, options);
-      ri.$el.on('change', function() {
-        var result = $(this).select2('data');
-        var path = null;
-        if (result.length > 0){
-          path = result[0].path;
-        }
-        self.setPath(path);
-      });
-      return ri;
-    }
+        setupRelatedItems: function ($input) {
+            var self = this;
+            var options = self.options.relatedItems;
+            options.upload = false; // ensure that related items upload is off.
+            if (self.options.initialFolder) {
+                $input.attr("value", self.options.initialFolder);
+            }
+            var ri = new RelatedItems($input, options);
+            ri.$el.on("change", function () {
+                var result = $(this).select2("data");
+                var path = null;
+                if (result.length > 0) {
+                    path = result[0].path;
+                }
+                self.setPath(path);
+            });
+            return ri;
+        },
+    });
 
-  });
-
-  return UploadPattern;
-
+    return UploadPattern;
 });
 
 define('mockup-patterns-structure-url/js/views/upload',[
-  'underscore',
-  'mockup-ui-url/views/popover',
-  'mockup-patterns-upload'
-], function(_, PopoverView, Upload) {
-  'use strict';
+    "underscore",
+    "mockup-ui-url/views/popover",
+    "mockup-patterns-upload",
+], function (_, PopoverView, Upload) {
+    "use strict";
 
-  var UploadView = PopoverView.extend({
-    className: 'popover upload',
-    title: _.template('<%- _t("Upload files") %>'),
-    content: _.template(
-      '<input type="text" name="upload" style="display:none" />' +
-      '<div class="uploadify-me"></div>'),
+    var UploadView = PopoverView.extend({
+        className: "popover upload",
+        title: _.template('<%- _t("Upload files") %>'),
+        content: _.template(
+            '<input type="text" name="upload" style="display:none" />' +
+                '<div class="uploadify-me"></div>'
+        ),
 
-    initialize: function(options) {
-      var self = this;
-      self.app = options.app;
-      PopoverView.prototype.initialize.apply(self, [options]);
-      self.currentPathData = null;
-      $('body').on('context-info-loaded', function(event, data) {
-        self.currentPathData = data;
-      });
-    },
+        initialize: function (options) {
+            var self = this;
+            self.app = options.app;
+            PopoverView.prototype.initialize.apply(self, [options]);
+            self.currentPathData = null;
+            $("body").on("context-info-loaded", function (event, data) {
+                self.currentPathData = data;
+            });
+        },
 
-    render: function() {
-      var self = this;
-      PopoverView.prototype.render.call(this);
-      var options = self.app.options.upload;
-      options.success = function() {
-        self.app.collection.pager();
-      };
-      options.currentPath = self.app.getCurrentPath();
-      options.allowPathSelection = false;
-      self.upload = new Upload(self.$('.uploadify-me').addClass('pat-upload'), options);
-      return this;
-    },
+        render: function () {
+            var self = this;
+            PopoverView.prototype.render.call(this);
+            var options = self.app.options.upload;
+            options.success = function () {
+                self.app.collection.pager();
+            };
+            options.currentPath = self.app.getCurrentPath();
+            options.allowPathSelection = false;
+            self.upload = new Upload(
+                self.$(".uploadify-me").addClass("pat-upload"),
+                options
+            );
+            return this;
+        },
 
-    toggle: function(button, e) {
-      /* we need to be able to change the current default upload directory */
-      PopoverView.prototype.toggle.apply(this, [button, e]);
-      var self = this;
-      if (!this.opened) {
-        return;
-      }
-      var currentPath = self.app.getCurrentPath();
-      if (self.currentPathData && currentPath !== self.upload.currentPath){
-        self.upload.setPath(currentPath);
-      }
-    }
+        toggle: function (button, e) {
+            /* we need to be able to change the current default upload directory */
+            PopoverView.prototype.toggle.apply(this, [button, e]);
+            var self = this;
+            if (!this.opened) {
+                return;
+            }
+            var currentPath = self.app.getCurrentPath();
+            if (
+                self.currentPathData &&
+                currentPath !== self.upload.currentPath
+            ) {
+                self.upload.setPath(currentPath);
+            }
+        },
+    });
 
-  });
-
-  return UploadView;
+    return UploadView;
 });
 
 (function(root) {
@@ -28704,6 +29307,8 @@ Backbone.Paginator = (function ( Backbone, _, $ ) {
                                    bbVer[1] === 9 &&
                                    bbVer[2] === 10);
 
+      var isBeforeBackbone_1_0 = bbVer[0] === 0;
+
       var success = queryOptions.success;
       queryOptions.success = function ( resp, status, xhr ) {
         if ( success ) {
@@ -28714,7 +29319,7 @@ Backbone.Paginator = (function ( Backbone, _, $ ) {
             success( model, resp, queryOptions );
           }
         }
-        if ( model && model.trigger ) {
+        if ( isBeforeBackbone_1_0 && model && model.trigger ) {
           model.trigger( 'sync', model, resp, queryOptions );
         }
       };
@@ -28722,9 +29327,9 @@ Backbone.Paginator = (function ( Backbone, _, $ ) {
       var error = queryOptions.error;
       queryOptions.error = function ( xhr ) {
         if ( error ) {
-          error( model, xhr, queryOptions );
+          error( xhr );
         }
-        if ( model && model.trigger ) {
+        if ( isBeforeBackbone_1_0 && model && model.trigger ) {
           model.trigger( 'error', model, xhr, queryOptions );
         }
       };
@@ -29044,7 +29649,7 @@ Backbone.Paginator = (function ( Backbone, _, $ ) {
               should_push = true;
             }
 
-            // The field's value is required to be greater tan N (numbers only)
+            // The field's value is required to be greater than N (numbers only)
           }else if(rule.type === "min"){
             if( !_.isNaN( Number( model.get(rule.field) ) ) &&
                !_.isNaN( Number( rule.value ) ) &&
@@ -29052,7 +29657,7 @@ Backbone.Paginator = (function ( Backbone, _, $ ) {
               should_push = true;
             }
 
-            // The field's value is required to be smaller tan N (numbers only)
+            // The field's value is required to be smaller than N (numbers only)
           }else if(rule.type === "max"){
             if( !_.isNaN( Number( model.get(rule.field) ) ) &&
                !_.isNaN( Number( rule.value ) ) &&
@@ -29116,6 +29721,17 @@ Backbone.Paginator = (function ( Backbone, _, $ ) {
               // The field's value is required to match the regular expression
           }else if(rule.type === "pattern"){
             if( model.get(rule.field).toString().match(rule.value) ) {
+              should_push = true;
+            }
+
+            // The field's value will be applied to the model, which should
+            // return true (if model should be included) or false (model should be ignored)
+          }else if(rule.type === "custom"){
+            var attr = model.toJSON();
+            var cf = _.wrap(rule.value, function(func){
+              return func( attr );
+            });
+            if( cf() ){
               should_push = true;
             }
 
@@ -29400,7 +30016,8 @@ Backbone.Paginator = (function ( Backbone, _, $ ) {
         timeout: 25000,
         cache: false,
         type: 'GET',
-        dataType: 'jsonp'
+        dataType: 'jsonp',
+        url: self.url
       });
 
       // Allows the passing in of {data: {foo: 'bar'}} at request time to overwrite server_api defaults
@@ -29420,6 +30037,8 @@ Backbone.Paginator = (function ( Backbone, _, $ ) {
                                    bbVer[1] === 9 &&
                                    bbVer[2] === 10);
 
+      var isBeforeBackbone_1_0 = bbVer[0] === 0;
+
       var success = queryOptions.success;
       queryOptions.success = function ( resp, status, xhr ) {
 
@@ -29431,7 +30050,7 @@ Backbone.Paginator = (function ( Backbone, _, $ ) {
             success( model, resp, queryOptions );
           }
         }
-        if (bbVer[0] < 1 && model && model.trigger ) {
+        if (isBeforeBackbone_1_0 && model && model.trigger ) {
           model.trigger( 'sync', model, resp, queryOptions );
         }
       };
@@ -29441,7 +30060,7 @@ Backbone.Paginator = (function ( Backbone, _, $ ) {
         if ( error ) {
           error( xhr );
         }
-        if ( model && model.trigger ) {
+        if ( isBeforeBackbone_1_0 && model && model.trigger ) {
           model.trigger( 'error', model, xhr, queryOptions );
         }
       };
@@ -29641,763 +30260,876 @@ return window.Backbone.Paginator;
 }(this));
 
 define('mockup-patterns-structure-url/js/collections/result',[
-  'jquery',
-  'underscore',
-  'backbone',
-  'mockup-patterns-structure-url/js/models/result',
-  'mockup-utils',
-  'backbone.paginator'
-], function($, _, Backbone, Result, Utils) {
-  'use strict';
+    "jquery",
+    "underscore",
+    "backbone",
+    "mockup-patterns-structure-url/js/models/result",
+    "mockup-utils",
+    "backbone.paginator",
+], function ($, _, Backbone, Result, Utils) {
+    "use strict";
 
-  var ResultCollection = Backbone.Paginator.requestPager.extend({
-    model: Result,
-    initialize: function(models, options) {
-      this.options = options;
-      this.view = options.view;
-      this.url = options.url;
+    var ResultCollection = Backbone.Paginator.requestPager.extend({
+        model: Result,
+        initialize: function (models, options) {
+            this.options = options;
+            this.view = options.view;
+            this.url = options.url;
 
-      this.queryHelper = Utils.QueryHelper(
-        $.extend(true, {}, this.view.options, {
-          attributes: this.view.options.queryHelperAttributes
-        }));
+            this.queryHelper = Utils.QueryHelper(
+                $.extend(true, {}, this.view.options, {
+                    attributes: this.view.options.queryHelperAttributes,
+                })
+            );
 
-      this.queryParser = function(options) {
-        var self = this;
-        if (options === undefined) {
-          options = {};
-        }
-        var term = null;
-        if (self.view.toolbar) {
-          term = self.view.toolbar.get('filter').term;
-        }
-        var sortOn = self.view.sort_on; // jshint ignore:line
-        var sortOrder = self.view.sort_order; // jshint ignore:line
-        if (!sortOn) {
-          sortOn = 'getObjPositionInParent';
-        }
-        return JSON.stringify({
-          criteria: self.queryHelper.getCriterias(term, $.extend({}, options, {
-            additionalCriterias: self.view.additionalCriterias
-          })),
-          sort_on: sortOn,
-          sort_order: sortOrder
-        });
-      };
+            this.queryParser = function (options) {
+                var self = this;
+                if (options === undefined) {
+                    options = {};
+                }
+                var term = null;
+                if (self.view.toolbar) {
+                    term = self.view.toolbar.get("filter").term;
+                }
+                var sortOn = self.view.sort_on; // jshint ignore:line
+                var sortOrder = self.view.sort_order; // jshint ignore:line
+                if (!sortOn) {
+                    sortOn = "getObjPositionInParent";
+                }
+                return JSON.stringify({
+                    criteria: self.queryHelper.getCriterias(
+                        term,
+                        $.extend({}, options, {
+                            additionalCriterias: self.view.additionalCriterias,
+                        })
+                    ),
+                    sort_on: sortOn,
+                    sort_order: sortOrder,
+                });
+            };
 
-      // check and see if a hash is provided for initial path
-      if (window.location.hash.substring(0, 2) === '#/') {
-        this.queryHelper.currentPath = window.location.hash.substring(1);
-      }
+            // check and see if a hash is provided for initial path
+            if (window.location.hash.substring(0, 2) === "#/") {
+                this.queryHelper.currentPath = window.location.hash.substring(
+                    1
+                );
+            }
 
-      Backbone.Paginator.requestPager.prototype.initialize.apply(this, [models, options]);
-    },
-    getCurrentPath: function() {
-      return this.queryHelper.getCurrentPath();
-    },
-    setCurrentPath: function(path) {
-      this.queryHelper.currentPath = path;
-    },
-    pager: function() {
-      this.trigger('pager');
-      Backbone.Paginator.requestPager.prototype.pager.apply(this, []);
-    },
-    paginator_core: {
-      // the type of the request (GET by default)
-      type: 'GET',
-      // the type of reply (jsonp by default)
-      dataType: 'json',
-      url: function() {
-        return this.url;
-      }
-    },
-    paginator_ui: {
-      // the lowest page index your API allows to be accessed
-      firstPage: 1,
-      // which page should the paginator start from
-      // (also, the actual page the paginator is on)
-      currentPage: 1,
-      // how many items per page should be shown
-      perPage: 15
-    },
-    // server_api are query parameters passed directly (currently GET
-    // parameters).  These are currently generated using following
-    // functions.  Renamed to queryParams in Backbone.Paginator 2.0.
-    server_api: {
-      query: function() {
-        return this.queryParser();
-      },
-      batch: function() {
-        this.queryHelper.options.batchSize = this.perPage;
-        return JSON.stringify(this.queryHelper.getBatch(this.currentPage));
-      },
-      attributes: function() {
-        return JSON.stringify(this.queryHelper.options.attributes);
-      }
-    },
-    parse: function(response, baseSortIdx) {
-      if (baseSortIdx === undefined) {
-        baseSortIdx = 0;
-      }
-      this.totalRecords = response.total;
-      var results = response.results;
-      // XXX manually set sort order here since backbone will otherwise
-      // do arbitrary sorting?
-      _.each(results, function(item, idx) {
-        item._sort = idx;
-      });
-      return results;
-    },
-    comparator: '_sort'
-  });
+            Backbone.Paginator.requestPager.prototype.initialize.apply(this, [
+                models,
+                options,
+            ]);
+        },
+        getCurrentPath: function () {
+            return this.queryHelper.getCurrentPath();
+        },
+        setCurrentPath: function (path) {
+            this.queryHelper.currentPath = path;
+        },
+        pager: function () {
+            this.trigger("pager");
+            Backbone.Paginator.requestPager.prototype.pager.apply(this, []);
+        },
+        paginator_core: {
+            // the type of the request (GET by default)
+            type: "GET",
+            // the type of reply (jsonp by default)
+            dataType: "json",
+            url: function () {
+                return this.url;
+            },
+        },
+        paginator_ui: {
+            // the lowest page index your API allows to be accessed
+            firstPage: 1,
+            // which page should the paginator start from
+            // (also, the actual page the paginator is on)
+            currentPage: 1,
+            // how many items per page should be shown
+            perPage: 15,
+        },
+        // server_api are query parameters passed directly (currently GET
+        // parameters).  These are currently generated using following
+        // functions.  Renamed to queryParams in Backbone.Paginator 2.0.
+        server_api: {
+            query: function () {
+                return this.queryParser();
+            },
+            batch: function () {
+                this.queryHelper.options.batchSize = this.perPage;
+                return JSON.stringify(
+                    this.queryHelper.getBatch(this.currentPage)
+                );
+            },
+            attributes: function () {
+                return JSON.stringify(this.queryHelper.options.attributes);
+            },
+        },
+        parse: function (response, baseSortIdx) {
+            if (baseSortIdx === undefined) {
+                baseSortIdx = 0;
+            }
+            this.totalRecords = response.total;
+            var results = response.results;
+            // XXX manually set sort order here since backbone will otherwise
+            // do arbitrary sorting?
+            _.each(results, function (item, idx) {
+                item._sort = idx;
+            });
+            return results;
+        },
+        comparator: "_sort",
+    });
 
-  return ResultCollection;
+    return ResultCollection;
 });
 
 define('mockup-patterns-structure-url/js/collections/selected',[
-  'backbone',
-  'mockup-patterns-structure-url/js/models/result'
-], function(Backbone, Result) {
-  'use strict';
+    "backbone",
+    "mockup-patterns-structure-url/js/models/result",
+], function (Backbone, Result) {
+    "use strict";
 
-  var SelectedCollection = Backbone.Collection.extend({
-    model: Result,
-    removeResult: function(model) {
-      return this.removeByUID(model.uid());
-    },
-    removeByUID: function(uid) {
-      var found = this.getByUID(uid);
-      if (found) {
-        this.remove(found);
-      }
-      return found;
-    },
-    getByUID: function(uid) {
-      return this.findWhere({UID: uid});
-    }
-  });
+    var SelectedCollection = Backbone.Collection.extend({
+        model: Result,
+        removeResult: function (model) {
+            return this.removeByUID(model.uid());
+        },
+        removeByUID: function (uid) {
+            var found = this.getByUID(uid);
+            if (found) {
+                this.remove(found);
+            }
+            return found;
+        },
+        getByUID: function (uid) {
+            return this.findWhere({ UID: uid });
+        },
+    });
 
-  return SelectedCollection;
+    return SelectedCollection;
 });
 
 
 define('text!mockup-patterns-structure-url/templates/status.xml',[],function () { return '<div class="alert alert-<%- type %> status fc-status">\n  <strong class="fc-status-label"><%- label %></strong>\n  <span class="fc-status-text"><%- text %></span>&nbsp;<% // &nbsp; to get correct height for empty alerts %>\n</div>\n';});
 
 define('mockup-patterns-structure-url/js/views/app',[
-  'jquery',
-  'underscore',
-  'mockup-ui-url/views/toolbar',
-  'mockup-ui-url/views/buttongroup',
-  'mockup-ui-url/views/button',
-  'mockup-ui-url/views/base',
-  'mockup-patterns-structure-url/js/views/table',
-  'mockup-patterns-structure-url/js/views/selectionwell',
-  'mockup-patterns-structure-url/js/views/generic-popover',
-  'mockup-patterns-structure-url/js/views/rearrange',
-  'mockup-patterns-structure-url/js/views/selectionbutton',
-  'mockup-patterns-structure-url/js/views/paging',
-  'mockup-patterns-structure-url/js/views/columns',
-  'mockup-patterns-structure-url/js/views/textfilter',
-  'mockup-patterns-structure-url/js/views/upload',
-  'mockup-patterns-structure-url/js/collections/result',
-  'mockup-patterns-structure-url/js/collections/selected',
-  'text!mockup-patterns-structure-url/templates/status.xml',
-  'mockup-utils',
-  'translate',
-  'pat-logger',
-  'jquery.cookie'
-], function($, _, Toolbar, ButtonGroup, ButtonView, BaseView,
-  TableView, SelectionWellView,
-  GenericPopover, RearrangeView, SelectionButtonView,
-  PagingView, ColumnsView, TextFilterView, UploadView,
-  _ResultCollection, SelectedCollection, StatusTemplate, utils, _t, logger) {
-  'use strict';
+    "jquery",
+    "underscore",
+    "mockup-ui-url/views/toolbar",
+    "mockup-ui-url/views/buttongroup",
+    "mockup-ui-url/views/button",
+    "mockup-ui-url/views/base",
+    "mockup-patterns-structure-url/js/views/table",
+    "mockup-patterns-structure-url/js/views/selectionwell",
+    "mockup-patterns-structure-url/js/views/generic-popover",
+    "mockup-patterns-structure-url/js/views/rearrange",
+    "mockup-patterns-structure-url/js/views/selectionbutton",
+    "mockup-patterns-structure-url/js/views/paging",
+    "mockup-patterns-structure-url/js/views/columns",
+    "mockup-patterns-structure-url/js/views/textfilter",
+    "mockup-patterns-structure-url/js/views/upload",
+    "mockup-patterns-structure-url/js/collections/result",
+    "mockup-patterns-structure-url/js/collections/selected",
+    "text!mockup-patterns-structure-url/templates/status.xml",
+    "mockup-utils",
+    "translate",
+    "pat-logger",
+    "jquery.cookie",
+], function (
+    $,
+    _,
+    Toolbar,
+    ButtonGroup,
+    ButtonView,
+    BaseView,
+    TableView,
+    SelectionWellView,
+    GenericPopover,
+    RearrangeView,
+    SelectionButtonView,
+    PagingView,
+    ColumnsView,
+    TextFilterView,
+    UploadView,
+    _ResultCollection,
+    SelectedCollection,
+    StatusTemplate,
+    utils,
+    _t,
+    logger
+) {
+    "use strict";
 
-  var log = logger.getLogger('pat-structure');
+    var log = logger.getLogger("pat-structure");
 
-  var AppView = BaseView.extend({
-    tagName: 'div',
-    statusTemplate: _.template(StatusTemplate),
-    statusMessages: [],
-    sort_on: 'getObjPositionInParent',
-    sort_order: 'ascending',
-    additionalCriterias: [],
-    cookieSettingPrefix: '_fc_',
+    var AppView = BaseView.extend({
+        tagName: "div",
+        statusTemplate: _.template(StatusTemplate),
+        statusMessages: [],
+        sort_on: "getObjPositionInParent",
+        sort_order: "ascending",
+        additionalCriterias: [],
+        cookieSettingPrefix: "_fc_",
 
-    buttons: null,
-    textfilter: null,
-    forms: [],
+        buttons: null,
+        textfilter: null,
+        forms: [],
 
-    pasteAllowed: function () {
-        return !!$.cookie('__cp');
-    },
+        pasteAllowed: function () {
+            return !!$.cookie("__cp");
+        },
 
-    initialize: function(options) {
-      var self = this;
-      BaseView.prototype.initialize.apply(self, [options]);
-      self.loading = new utils.Loading();
-      self.loading.show();
+        initialize: function (options) {
+            var self = this;
+            BaseView.prototype.initialize.apply(self, [options]);
+            self.loading = new utils.Loading();
+            self.loading.show();
 
-      /* close popovers when clicking away */
-      $(document).click(function(e) {
-        var $el = $(e.target);
-        if (!$el.is(':visible') || $el.css('visibility') === 'hidden' || $el.css('opacity') === '0') {
-          // ignore this, fake event trigger to element that is not visible
-          return;
-        }
-        if ($el.is('a') || $el.parent().is('a')) {
-          return;
-        }
-        var $popover = $('.popover:visible');
-        if ($popover.length > 0 && !$.contains($popover[0], $el[0])) {
-          var popover = $popover.data('component');
-          if (popover) {
-            popover.hide();
-          }
-        }
-      });
+            /* close popovers when clicking away */
+            $(document).click(function (e) {
+                var $el = $(e.target);
+                if (
+                    !$el.is(":visible") ||
+                    $el.css("visibility") === "hidden" ||
+                    $el.css("opacity") === "0"
+                ) {
+                    // ignore this, fake event trigger to element that is not visible
+                    return;
+                }
+                if ($el.is("a") || $el.parent().is("a")) {
+                    return;
+                }
+                var $popover = $(".popover:visible");
+                if ($popover.length > 0 && !$.contains($popover[0], $el[0])) {
+                    var popover = $popover.data("component");
+                    if (popover) {
+                        popover.hide();
+                    }
+                }
+            });
 
-      var ResultCollection = require(options.collectionConstructor);
+            var ResultCollection = require(options.collectionConstructor);
 
-      self.collection = new ResultCollection([], {
-        // Due to default implementation need to poke at things in here,
-        // view is passed.
-        view: self,
-        url: self.options.collectionUrl,
-      });
+            self.collection = new ResultCollection([], {
+                // Due to default implementation need to poke at things in here,
+                // view is passed.
+                view: self,
+                url: self.options.collectionUrl,
+            });
 
-      self.setAllCookieSettings();
+            self.setAllCookieSettings();
 
-      self.selectedCollection = new SelectedCollection();
-      self.tableView = new TableView({app: self});
-      self.pagingView = new PagingView({app: self});
+            self.selectedCollection = new SelectedCollection();
+            self.tableView = new TableView({ app: self });
+            self.pagingView = new PagingView({ app: self });
 
-      /* initialize buttons */
-      self.setupButtons();
+            /* initialize buttons */
+            self.setupButtons();
 
-      self.wellView = new SelectionWellView({
-        collection: self.selectedCollection,
-        triggerView: self.toolbar.get('selected-items'),
-        app: self,
-        id: 'selected-items'
-      });
+            self.wellView = new SelectionWellView({
+                collection: self.selectedCollection,
+                triggerView: self.toolbar.get("selected-items"),
+                app: self,
+                id: "selected-items",
+            });
 
-      self.toolbar.get('selected-items').disable();
-      self.buttons.disable();
+            self.toolbar.get("selected-items").disable();
+            self.buttons.disable();
 
-      var timeout = 0;
-      self.selectedCollection.on('add remove reset', function( /*modal, collection*/ ) {
-        /* delay rendering since this can happen in batching */
-        clearTimeout(timeout);
-        timeout = setTimeout(function() {
-          self.updateButtons();
-        }, 100);
-      }, self);
+            var timeout = 0;
+            self.selectedCollection.on(
+                "add remove reset",
+                function (/*modal, collection*/) {
+                    /* delay rendering since this can happen in batching */
+                    clearTimeout(timeout);
+                    timeout = setTimeout(function () {
+                        self.updateButtons();
+                    }, 100);
+                },
+                self
+            );
 
-      self.collection.on('sync', function() {
-        if (self.contextInfoUrl) {
-          $.ajax({
-            url: self.getAjaxUrl(self.contextInfoUrl),
-            dataType: 'json',
-            success: function(data) {
-              $('body').trigger('context-info-loaded', [data]);
-            },
-            error: function(response) {
-              // XXX handle error?
-              if (response.status === 404) {
-                log.info('context info url not found');
-              }
+            self.collection.on("sync", function () {
+                if (self.contextInfoUrl) {
+                    $.ajax({
+                        url: self.getAjaxUrl(self.contextInfoUrl),
+                        dataType: "json",
+                        success: function (data) {
+                            $("body").trigger("context-info-loaded", [data]);
+                        },
+                        error: function (response) {
+                            // XXX handle error?
+                            if (response.status === 404) {
+                                log.info("context info url not found");
+                            }
+                        },
+                    });
+                }
+                self.loading.hide();
+            });
+
+            self.collection.on("pager", function () {
+                self.loading.show();
+                self.updateButtons();
+
+                // the remaining calls are related to window.pushstate.
+                // abort if feature unavailable.
+                if (!(window.history && window.history.pushState)) {
+                    return;
+                }
+
+                // undo the flag set by popState to prevent the push state
+                // from being triggered here, and early abort out of the
+                // function to not execute the folowing pushState logic.
+                if (self.doNotPushState) {
+                    self.doNotPushState = false;
+                    return;
+                }
+
+                var path = self.getCurrentPath();
+                var url;
+                if (path === "/") {
+                    path = "";
+                }
+                /* maintain history here */
+                if (self.options.pushStateUrl) {
+                    // permit an extra slash in pattern, but strip that if there
+                    // as path always will be prefixed with a `/`
+                    var pushStateUrl = self.options.pushStateUrl.replace(
+                        "/{path}",
+                        "{path}"
+                    );
+                    url = pushStateUrl.replace("{path}", path);
+                    window.history.pushState(null, null, url);
+                } else if (self.options.urlStructure) {
+                    // fallback to urlStructure specification
+                    url =
+                        self.options.urlStructure.base +
+                        path +
+                        self.options.urlStructure.appended;
+                    window.history.pushState(null, null, url);
+                }
+
+                if (self.options.traverseView) {
+                    // flag specifies that the context view implements a traverse
+                    // view (i.e. IPublishTraverse) and the path is a virtual path
+                    // of some kind - use the base object instead for that by not
+                    // specifying a path.
+                    path = "";
+                    // TODO figure out whether the following event after this is
+                    // needed at all.
+                }
+                $("body").trigger("structure-url-changed", [path]);
+            });
+
+            if (
+                (self.options.pushStateUrl || self.options.urlStructure) &&
+                utils.featureSupport.history()
+            ) {
+                $(window).bind("popstate", function () {
+                    /* normalize this url first... */
+                    var win = utils.getWindow();
+                    var url = win.location.href;
+                    var base, appended;
+                    if (url.indexOf("?") !== -1) {
+                        url = url.split("?")[0];
+                    }
+                    if (url.indexOf("#") !== -1) {
+                        url = url.split("#")[0];
+                    }
+                    if (self.options.pushStateUrl) {
+                        var tmp = self.options.pushStateUrl.split("{path}");
+                        base = tmp[0];
+                        appended = tmp[1];
+                    } else {
+                        base = self.options.urlStructure.base;
+                        appended = self.options.urlStructure.appended;
+                    }
+                    // take off the base url
+                    var path = url.substring(base.length);
+                    if (
+                        path.substring(path.length - appended.length) ===
+                        appended
+                    ) {
+                        /* check that it ends with appended value */
+                        path = path.substring(0, path.length - appended.length);
+                    }
+                    if (!path) {
+                        path = "/";
+                    }
+                    self.setCurrentPath(path);
+                    $("body").trigger("structure-url-changed", [path]);
+                    // since this next call causes state to be pushed...
+                    self.doNotPushState = true;
+                    self.collection.goTo(self.collection.information.firstPage);
+                });
+                /* detect key events */
+                $(document).bind("keyup keydown", function (e) {
+                    self.keyEvent = e;
+                });
             }
-          });
-        }
-        self.loading.hide();
-      });
 
-      self.collection.on('pager', function() {
-        self.loading.show();
-        self.updateButtons();
-
-        // the remaining calls are related to window.pushstate.
-        // abort if feature unavailable.
-        if (!(window.history && window.history.pushState)) {
-          return;
-        }
-
-        // undo the flag set by popState to prevent the push state
-        // from being triggered here, and early abort out of the
-        // function to not execute the folowing pushState logic.
-        if (self.doNotPushState) {
-          self.doNotPushState = false;
-          return;
-        }
-
-        var path = self.getCurrentPath();
-        var url;
-        if (path === '/') {
-          path = '';
-        }
-        /* maintain history here */
-        if (self.options.pushStateUrl) {
-          // permit an extra slash in pattern, but strip that if there
-          // as path always will be prefixed with a `/`
-          var pushStateUrl = self.options.pushStateUrl.replace(
-            '/{path}', '{path}');
-          url = pushStateUrl.replace('{path}', path);
-          window.history.pushState(null, null, url);
-        } else if (self.options.urlStructure) {
-          // fallback to urlStructure specification
-          url = self.options.urlStructure.base + path + self.options.urlStructure.appended;
-          window.history.pushState(null, null, url);
-        }
-
-        if (self.options.traverseView) {
-          // flag specifies that the context view implements a traverse
-          // view (i.e. IPublishTraverse) and the path is a virtual path
-          // of some kind - use the base object instead for that by not
-          // specifying a path.
-          path = '';
-          // TODO figure out whether the following event after this is
-          // needed at all.
-        }
-        $('body').trigger('structure-url-changed', [path]);
-
-      });
-
-      if ((self.options.pushStateUrl || self.options.urlStructure) && utils.featureSupport.history()) {
-        $(window).bind('popstate', function() {
-          /* normalize this url first... */
-          var win = utils.getWindow();
-          var url = win.location.href;
-          var base, appended;
-          if (url.indexOf('?') !== -1) {
-            url = url.split('?')[0];
-          }
-          if (url.indexOf('#') !== -1) {
-            url = url.split('#')[0];
-          }
-          if (self.options.pushStateUrl) {
-            var tmp = self.options.pushStateUrl.split('{path}');
-            base = tmp[0];
-            appended = tmp[1];
-          } else {
-            base = self.options.urlStructure.base;
-            appended = self.options.urlStructure.appended;
-          }
-          // take off the base url
-          var path = url.substring(base.length);
-          if (path.substring(path.length - appended.length) === appended) {
-            /* check that it ends with appended value */
-            path = path.substring(0, path.length - appended.length);
-          }
-          if (!path) {
-            path = '/';
-          }
-          self.setCurrentPath(path);
-          $('body').trigger('structure-url-changed', [path]);
-          // since this next call causes state to be pushed...
-          self.doNotPushState = true;
-          self.collection.goTo(self.collection.information.firstPage);
-        });
-        /* detect key events */
-        $(document).bind('keyup keydown', function(e) {
-          self.keyEvent = e;
-        });
-      }
-
-      self.togglePasteBtn();
-    },
-    updateButtons: function() {
-      var self = this;
-      if (self.selectedCollection.length) {
-        self.toolbar.get('selected-items').enable();
-        self.buttons.enable();
-      } else {
-        this.toolbar.get('selected-items').disable();
-        self.buttons.disable();
-      }
-
-      self.togglePasteBtn();
-    },
-    togglePasteBtn: function(){
-      var self = this;
-      if (_.find(self.buttons.items, function(btn){ return btn.id === 'paste'; })) {
-        if (self.pasteAllowed()) {
-          self.buttons.get('paste').enable();
-        } else {
-          self.buttons.get('paste').disable();
-        }
-      }
-    },
-    inQueryMode: function() {
-      if (this.toolbar) {
-          var term = this.toolbar.get('filter').term;
-          if (term){
-            return true;
-          }
-      }
-      if (this.additionalCriterias.length > 0) {
-        return true;
-      }
-      if (this.sort_on && this.sort_on !== 'getObjPositionInParent') { // jshint ignore:line
-        return true;
-      }
-      if (this.sort_order !== 'ascending') { // jshint ignore:line
-        return true;
-      }
-      return false;
-    },
-    getSelectedUids: function(collection) {
-      var self = this;
-      if (collection === undefined) {
-        collection = self.selectedCollection;
-      }
-      var uids = [];
-      collection.each(function(item) {
-        uids.push(item.uid());
-      });
-      return uids;
-    },
-    getCurrentPath: function() {
-      return this.collection.getCurrentPath();
-    },
-    setCurrentPath: function(path) {
-      this.collection.setCurrentPath(path);
-      this.textfilter.clearTerm();
-      this.clearStatus();
-    },
-    getAjaxUrl: function(url) {
-      return url.replace('{path}', this.getCurrentPath());
-    },
-    buttonClickEvent: function(button) {
-      var self = this;
-      var data = null;
-      var callback = null;
-
-      if (button.url) {
-        self.loading.show();
-        // handle ajax now
-
-        if (arguments.length > 1) {
-          var arg1 = arguments[1];
-          if (!arg1.preventDefault) {
-            data = arg1;
-          }
-        }
-        if (arguments.length > 2) {
-          var arg2 = arguments[2];
-          if (typeof(arg2) === 'function') {
-            callback = arg2;
-          }
-        }
-        if (data === null) {
-          data = {};
-        }
-        if (data.selection === undefined) {
-          // if selection is overridden by another mechanism
-          data.selection = JSON.stringify(self.getSelectedUids());
-        }
-        data._authenticator = utils.getAuthenticator();
-        if (data.folder === undefined) {
-          data.folder = self.getCurrentPath();
-        }
-
-        var url = self.getAjaxUrl(button.url);
-        $.ajax({
-          url: url,
-          type: 'POST',
-          data: data,
-          success: function(data) {
-            self.ajaxSuccessResponse.apply(self, [data, callback]);
-            self.loading.hide();
-          },
-          error: function(response) {
-            self.ajaxErrorResponse.apply(self, [response, url]);
-            self.loading.hide();
-          }
-        }, self);
-      }
-    },
-    ajaxSuccessResponse: function(data, callback) {
-      this.clearStatus();
-      this.selectedCollection.reset();
-      if (data.status === 'success') {
-        this.collection.reset();
-      }
-      if (data.msg) {
-        // give status message somewhere...
-        this.setStatus({text: data.msg, type: data.status || 'warning'});
-      }
-      if (callback !== null && callback !== undefined) {
-        callback(data);
-      }
-      this.collection.pager();
-    },
-    ajaxErrorResponse: function(response, url) {
-      if (response.status === 404) {
-        window.alert(_t('operation url ${url} is not valid', {url: url}));
-      } else {
-        window.alert(_t('there was an error performing the action'));
-      }
-    },
-    setupButtons: function() {
-      var self = this;
-      var items = [];
-
-      var columnsBtn = new ButtonView({
-        id: 'structure-columns',
-        tooltip: _t('Configure displayed columns'),
-        icon: 'th'
-      });
-
-      self.columnsView = new ColumnsView({
-        app: self,
-        triggerView: columnsBtn,
-        id: 'structure-columns',
-        placement: 'bottom-right'
-      });
-      items.push(columnsBtn);
-
-      items.push(new SelectionButtonView({
-        title: _t('Selected'),
-        id: 'selected-items',
-        tooltip: _t('Manage selection'),
-        collection: this.selectedCollection
-      }));
-
-      if (self.options.rearrange) {
-        var rearrangeButton = new ButtonView({
-          id: 'structure-rearrange',
-          title: _t('Rearrange'),
-          icon: 'sort-by-attributes',
-          tooltip: _t('Rearrange folder contents'),
-          url: self.options.rearrange.url
-        });
-        self.rearrangeView = new RearrangeView({
-          triggerView: rearrangeButton,
-          app: self,
-          id: 'structure-rearrange'
-        });
-        items.push(rearrangeButton);
-      }
-      if (self.options.upload && utils.featureSupport.dragAndDrop() && utils.featureSupport.fileApi()) {
-        var uploadButton = new ButtonView({
-          id: 'upload',
-          title: _t('Upload'),
-          tooltip: _t('Upload files'),
-          icon: 'upload'
-        });
-        self.uploadView = new UploadView({
-          triggerView: uploadButton,
-          app: self,
-          id: 'upload'
-        });
-        items.push(uploadButton);
-      }
-
-      var buttons = [];
-      _.each(self.options.buttons, function(buttonOptions) {
-        try {
-          var button = new ButtonView(buttonOptions);
-          buttons.push(button);
-
-          if (button.form) {
-            buttonOptions.triggerView = button;
-            buttonOptions.app = self;
-            var view = new GenericPopover(buttonOptions);
-            self.forms.push(view.el);
-          } else {
-            button.on('button:click', self.buttonClickEvent, self);
-          }
-        } catch (err) {
-          log.error('Error initializing button ' + buttonOptions.title + ' ' + err);
-        }
-      });
-      self.buttons = new ButtonGroup({
-        items: buttons,
-        id: 'mainbuttons',
-        app: self
-      });
-      items.push(self.buttons);
-
-      self.textfilter = new TextFilterView({
-        id: 'filter',
-        app: this
-      });
-      items.push(self.textfilter);
-
-      this.toolbar = new Toolbar({
-        items: items
-      });
-    },
-    moveItem: function(id, delta, subsetIds) {
-      var self = this;
-      $.ajax({
-        url: this.getAjaxUrl(this.options.moveUrl),
-        type: 'POST',
-        data: {
-          delta: delta,
-          id: id,
-          _authenticator: utils.getAuthenticator(),
-          subsetIds: JSON.stringify(subsetIds)
+            self.togglePasteBtn();
         },
-        dataType: 'json',
-        success: function(data) {
-          self.clearStatus();
-          if (data.msg) {
-            self.setStatus({text: data.msg});
-          } else if (data.status !== 'success') {
-            // XXX handle error here with something?
-            self.setStatus({text: 'error moving item', type: 'error'});
-          }
-          self.collection.pager(); // reload it all
-        },
-        error: function() {
-          self.clearStatus();
-          self.setStatus({text: 'error moving item', type: 'error'});
-        }
-      });
-    },
+        updateButtons: function () {
+            var self = this;
+            if (self.selectedCollection.length) {
+                self.toolbar.get("selected-items").enable();
+                self.buttons.enable();
+            } else {
+                this.toolbar.get("selected-items").disable();
+                self.buttons.disable();
+            }
 
-    clearStatus: function(key) {
-      var statusContainer = this.$el[0].querySelector('.fc-status-container');
-      var statusItem;
-      var toBeRemoved = [];
-      if (key) {
-        // remove specific status, even if marked with ``fixed``.
-        toBeRemoved = this.statusMessages.filter(function (item) { return item.key === key; });
-        toBeRemoved.forEach(function (statusItem) {
-          try {
-            statusContainer.removeChild(statusItem.el);
-          } catch(e) {
-            // just ignore.
-          }
-        });
-        this.statusMessages = this.statusMessages.filter(function (item) { return item.key !== key; });
-      } else {
-        // remove all status messages except those marked with ``fixed``.
-        this.statusMessages.forEach(function (statusItem) {
-          if (!statusItem.fixed) {
+            self.togglePasteBtn();
+        },
+        togglePasteBtn: function () {
+            var self = this;
+            if (
+                _.find(self.buttons.items, function (btn) {
+                    return btn.id === "paste";
+                })
+            ) {
+                if (self.pasteAllowed()) {
+                    self.buttons.get("paste").enable();
+                } else {
+                    self.buttons.get("paste").disable();
+                }
+            }
+        },
+        inQueryMode: function () {
+            if (this.toolbar) {
+                var term = this.toolbar.get("filter").term;
+                if (term) {
+                    return true;
+                }
+            }
+            if (this.additionalCriterias.length > 0) {
+                return true;
+            }
+            if (this.sort_on && this.sort_on !== "getObjPositionInParent") {
+                // jshint ignore:line
+                return true;
+            }
+            if (this.sort_order !== "ascending") {
+                // jshint ignore:line
+                return true;
+            }
+            return false;
+        },
+        getSelectedUids: function (collection) {
+            var self = this;
+            if (collection === undefined) {
+                collection = self.selectedCollection;
+            }
+            var uids = [];
+            collection.each(function (item) {
+                uids.push(item.uid());
+            });
+            return uids;
+        },
+        getCurrentPath: function () {
+            return this.collection.getCurrentPath();
+        },
+        setCurrentPath: function (path) {
+            this.collection.setCurrentPath(path);
+            this.textfilter.clearTerm();
+            this.clearStatus();
+        },
+        getAjaxUrl: function (url) {
+            return url.replace("{path}", this.getCurrentPath());
+        },
+        buttonClickEvent: function (button) {
+            var self = this;
+            var data = null;
+            var callback = null;
+
+            if (button.url) {
+                self.loading.show();
+                // handle ajax now
+
+                if (arguments.length > 1) {
+                    var arg1 = arguments[1];
+                    if (!arg1.preventDefault) {
+                        data = arg1;
+                    }
+                }
+                if (arguments.length > 2) {
+                    var arg2 = arguments[2];
+                    if (typeof arg2 === "function") {
+                        callback = arg2;
+                    }
+                }
+                if (data === null) {
+                    data = {};
+                }
+                if (data.selection === undefined) {
+                    // if selection is overridden by another mechanism
+                    data.selection = JSON.stringify(self.getSelectedUids());
+                }
+                data._authenticator = utils.getAuthenticator();
+                if (data.folder === undefined) {
+                    data.folder = self.getCurrentPath();
+                }
+
+                var url = self.getAjaxUrl(button.url);
+                $.ajax(
+                    {
+                        url: url,
+                        type: "POST",
+                        data: data,
+                        success: function (data) {
+                            self.ajaxSuccessResponse.apply(self, [
+                                data,
+                                callback,
+                            ]);
+                            self.loading.hide();
+                        },
+                        error: function (response) {
+                            self.ajaxErrorResponse.apply(self, [response, url]);
+                            self.loading.hide();
+                        },
+                    },
+                    self
+                );
+            }
+        },
+        ajaxSuccessResponse: function (data, callback) {
+            this.clearStatus();
+            this.selectedCollection.reset();
+            if (data.status === "success") {
+                this.collection.reset();
+            }
+            if (data.msg) {
+                // give status message somewhere...
+                this.setStatus({
+                    text: data.msg,
+                    type: data.status || "warning",
+                });
+            }
+            if (callback !== null && callback !== undefined) {
+                callback(data);
+            }
+            this.collection.pager();
+        },
+        ajaxErrorResponse: function (response, url) {
+            if (response.status === 404) {
+                window.alert(
+                    _t("operation url ${url} is not valid", { url: url })
+                );
+            } else {
+                window.alert(_t("there was an error performing the action"));
+            }
+        },
+        setupButtons: function () {
+            var self = this;
+            var items = [];
+
+            var columnsBtn = new ButtonView({
+                id: "structure-columns",
+                tooltip: _t("Configure displayed columns"),
+                icon: "th",
+            });
+
+            self.columnsView = new ColumnsView({
+                app: self,
+                triggerView: columnsBtn,
+                id: "structure-columns",
+                placement: "bottom-right",
+            });
+            items.push(columnsBtn);
+
+            items.push(
+                new SelectionButtonView({
+                    title: _t("Selected"),
+                    id: "selected-items",
+                    tooltip: _t("Manage selection"),
+                    collection: this.selectedCollection,
+                })
+            );
+
+            if (self.options.rearrange) {
+                var rearrangeButton = new ButtonView({
+                    id: "structure-rearrange",
+                    title: _t("Rearrange"),
+                    icon: "sort-by-attributes",
+                    tooltip: _t("Rearrange folder contents"),
+                    url: self.options.rearrange.url,
+                });
+                self.rearrangeView = new RearrangeView({
+                    triggerView: rearrangeButton,
+                    app: self,
+                    id: "structure-rearrange",
+                });
+                items.push(rearrangeButton);
+            }
+            if (
+                self.options.upload &&
+                utils.featureSupport.dragAndDrop() &&
+                utils.featureSupport.fileApi()
+            ) {
+                var uploadButton = new ButtonView({
+                    id: "upload",
+                    title: _t("Upload"),
+                    tooltip: _t("Upload files"),
+                    icon: "upload",
+                });
+                self.uploadView = new UploadView({
+                    triggerView: uploadButton,
+                    app: self,
+                    id: "upload",
+                });
+                items.push(uploadButton);
+            }
+
+            var buttons = [];
+            _.each(self.options.buttons, function (buttonOptions) {
+                try {
+                    var button = new ButtonView(buttonOptions);
+                    buttons.push(button);
+
+                    if (button.form) {
+                        buttonOptions.triggerView = button;
+                        buttonOptions.app = self;
+                        var view = new GenericPopover(buttonOptions);
+                        self.forms.push(view.el);
+                    } else {
+                        button.on("button:click", self.buttonClickEvent, self);
+                    }
+                } catch (err) {
+                    log.error(
+                        "Error initializing button " +
+                            buttonOptions.title +
+                            " " +
+                            err
+                    );
+                }
+            });
+            self.buttons = new ButtonGroup({
+                items: buttons,
+                id: "mainbuttons",
+                app: self,
+            });
+            items.push(self.buttons);
+
+            self.textfilter = new TextFilterView({
+                id: "filter",
+                app: this,
+            });
+            items.push(self.textfilter);
+
+            this.toolbar = new Toolbar({
+                items: items,
+            });
+        },
+        moveItem: function (id, delta, subsetIds) {
+            var self = this;
+            $.ajax({
+                url: this.getAjaxUrl(this.options.moveUrl),
+                type: "POST",
+                data: {
+                    delta: delta,
+                    id: id,
+                    _authenticator: utils.getAuthenticator(),
+                    subsetIds: JSON.stringify(subsetIds),
+                },
+                dataType: "json",
+                success: function (data) {
+                    self.clearStatus();
+                    if (data.msg) {
+                        self.setStatus({ text: data.msg });
+                    } else if (data.status !== "success") {
+                        // XXX handle error here with something?
+                        self.setStatus({
+                            text: "error moving item",
+                            type: "error",
+                        });
+                    }
+                    self.collection.pager(); // reload it all
+                },
+                error: function () {
+                    self.clearStatus();
+                    self.setStatus({
+                        text: "error moving item",
+                        type: "error",
+                    });
+                },
+            });
+        },
+
+        clearStatus: function (key) {
+            var statusContainer = this.$el[0].querySelector(
+                ".fc-status-container"
+            );
+            var statusItem;
+            var toBeRemoved = [];
+            if (key) {
+                // remove specific status, even if marked with ``fixed``.
+                toBeRemoved = this.statusMessages.filter(function (item) {
+                    return item.key === key;
+                });
+                toBeRemoved.forEach(function (statusItem) {
+                    try {
+                        statusContainer.removeChild(statusItem.el);
+                    } catch (e) {
+                        // just ignore.
+                    }
+                });
+                this.statusMessages = this.statusMessages.filter(function (
+                    item
+                ) {
+                    return item.key !== key;
+                });
+            } else {
+                // remove all status messages except those marked with ``fixed``.
+                this.statusMessages.forEach(
+                    function (statusItem) {
+                        if (!statusItem.fixed) {
+                            try {
+                                statusContainer.removeChild(statusItem.el);
+                                toBeRemoved.push(statusItem);
+                            } catch (e) {
+                                // just ignore.
+                            }
+                        }
+                    }.bind(this)
+                );
+                this.statusMessages = this.statusMessages.filter(function (
+                    item
+                ) {
+                    return toBeRemoved.indexOf(item) === -1;
+                });
+            }
+        },
+
+        setStatus: function (status, btn, fixed, key) {
+            if (
+                key &&
+                this.statusMessages.filter(function (item) {
+                    return item.key === key;
+                }).length > 0
+            ) {
+                // Prevent two same status messages
+                return;
+            }
+
+            var el = this.statusTemplate({
+                label: status.label || "",
+                text: status.text,
+                type: status.type || "warning",
+            });
+
+            el = utils.createElementFromHTML(el);
+
+            if (btn) {
+                btn = $(btn)[0]; // support jquert + bare dom elements
+                el.appendChild(btn);
+            }
+
+            var status = {
+                el: el,
+                fixed: fixed,
+                key: key, // to be used for filtering to prevent double status messages.
+            };
+
+            var statusContainer = this.$el[0].querySelector(
+                ".fc-status-container"
+            );
+            statusContainer.appendChild(status.el);
+            this.statusMessages.push(status);
+
+            return status;
+        },
+
+        render: function () {
+            var self = this;
+
+            self.$el.append(self.toolbar.render().el);
+            if (self.wellView) {
+                self.$el
+                    .find("#btn-" + self.wellView.id)
+                    .after(self.wellView.render().el);
+            }
+            self.forms.forEach(function (element) {
+                var id = $(element).attr("id");
+                self.$el.find("#btn-" + id).after(element);
+            });
+
+            self.$el.append(
+                utils.createElementFromHTML(
+                    '<div class="fc-status-container"></div>'
+                )
+            );
+            if (self.columnsView) {
+                self.$el
+                    .find("#btn-" + self.columnsView.id)
+                    .after(self.columnsView.render().el);
+            }
+            if (self.rearrangeView) {
+                self.$el
+                    .find("#btn-" + self.rearrangeView.id)
+                    .after(self.rearrangeView.render().el);
+            }
+            if (self.uploadView) {
+                self.$el
+                    .find("#btn-" + self.uploadView.id)
+                    .after(self.uploadView.render().el);
+            }
+
+            self.$el.append(self.tableView.render().el);
+            self.$el.append(self.pagingView.render().el);
+
+            // Backdrop class
+            if (self.options.backdropSelector !== null) {
+                $(self.options.backdropSelector).addClass(
+                    "ui-backdrop-element"
+                );
+            } else {
+                self.$el.addClass("ui-backdrop-element");
+            }
+
+            return self;
+        },
+        getCookieSetting: function (name, _default) {
+            if (_default === undefined) {
+                _default = null;
+            }
+            var val;
             try {
-              statusContainer.removeChild(statusItem.el);
-              toBeRemoved.push(statusItem);
-            } catch(e) {
-              // just ignore.
+                val = $.cookie(this.cookieSettingPrefix + name);
+                val = $.parseJSON(val).value;
+            } catch (e) {
+                /* error parsing json, load default here now */
+                return _default;
             }
-          }
-        }.bind(this));
-        this.statusMessages = this.statusMessages.filter(function (item) { return toBeRemoved.indexOf(item) === -1; });
-      }
-    },
+            if (val === undefined || val === null) {
+                return _default;
+            }
+            return val;
+        },
+        setCookieSetting: function (name, val) {
+            $.cookie(
+                this.cookieSettingPrefix + name,
+                JSON.stringify({
+                    value: val,
+                })
+            );
+        },
+        setAllCookieSettings: function () {
+            this.activeColumns = this.getCookieSetting(
+                this.activeColumnsCookie,
+                this.activeColumns
+            );
+            var perPage = this.getCookieSetting("perPage", 15);
+            if (typeof perPage === "string") {
+                perPage = parseInt(perPage);
+            }
+            this.collection.howManyPer(perPage);
+        },
+    });
 
-    setStatus: function(status, btn, fixed, key) {
-
-      if (
-        key &&
-        this.statusMessages.filter(function (item) { return item.key === key; }).length > 0
-      ) {
-        // Prevent two same status messages
-        return;
-      }
-
-      var el = this.statusTemplate({
-        label: status.label || '',
-        text: status.text,
-        type: status.type || 'warning'
-      });
-
-      el = utils.createElementFromHTML(el);
-
-      if (btn) {
-        btn = $(btn)[0];  // support jquert + bare dom elements
-        el.appendChild(btn);
-      }
-
-      var status = {
-        el: el,
-        fixed: fixed,
-        key: key // to be used for filtering to prevent double status messages.
-      };
-
-      var statusContainer = this.$el[0].querySelector('.fc-status-container');
-      statusContainer.appendChild(status.el);
-      this.statusMessages.push(status);
-
-      return status;
-    },
-
-    render: function() {
-      var self = this;
-
-      self.$el.append(self.toolbar.render().el);
-      if (self.wellView) {
-        self.$el.find('#btn-' + self.wellView.id).after(self.wellView.render().el)
-      }
-      self.forms.forEach(function(element) {
-        var id = $(element).attr('id')
-        self.$el.find('#btn-'+id).after(element)
-      });
-
-      self.$el.append(utils.createElementFromHTML('<div class="fc-status-container"></div>'));
-      if (self.columnsView) {
-        self.$el.find('#btn-' + self.columnsView.id).after(self.columnsView.render().el)
-      }
-      if (self.rearrangeView) {
-        self.$el.find('#btn-' + self.rearrangeView.id).after(self.rearrangeView.render().el)
-      }
-      if (self.uploadView) {
-        self.$el.find('#btn-' + self.uploadView.id).after(self.uploadView.render().el)
-      }
-
-      self.$el.append(self.tableView.render().el);
-      self.$el.append(self.pagingView.render().el);
-
-      // Backdrop class
-      if (self.options.backdropSelector !== null) {
-        $(self.options.backdropSelector).addClass('ui-backdrop-element');
-      } else {
-        self.$el.addClass('ui-backdrop-element');
-      }
-
-      return self;
-    },
-    getCookieSetting: function(name, _default) {
-      if (_default === undefined) {
-        _default = null;
-      }
-      var val;
-      try {
-        val = $.cookie(this.cookieSettingPrefix + name);
-        val = $.parseJSON(val).value;
-      } catch (e) {
-        /* error parsing json, load default here now */
-        return _default;
-      }
-      if (val === undefined || val === null) {
-        return _default;
-      }
-      return val;
-    },
-    setCookieSetting: function(name, val) {
-      $.cookie(this.cookieSettingPrefix + name,
-        JSON.stringify({
-          'value': val
-        })
-      );
-    },
-    setAllCookieSettings: function() {
-      this.activeColumns = this.getCookieSetting(
-        this.activeColumnsCookie,
-        this.activeColumns
-      );
-      var perPage = this.getCookieSetting('perPage', 15);
-      if (typeof(perPage) === 'string') {
-        perPage = parseInt(perPage);
-      }
-      this.collection.howManyPer(perPage);
-    }
-  });
-
-  return AppView;
+    return AppView;
 });
 
 /* Structure pattern.
@@ -30424,32 +31156,32 @@ define('mockup-patterns-structure-url/js/views/app',[
  */
 
 define('mockup-patterns-structure',[
-  'jquery',
-  'underscore',
-  'pat-base',
-  'mockup-patterns-structure-url/js/views/app'
-], function($, _, Base, AppView) {
-  'use strict';
+    "jquery",
+    "underscore",
+    "pat-base",
+    "mockup-patterns-structure-url/js/views/app",
+], function ($, _, Base, AppView) {
+    "use strict";
 
-  var Structure = Base.extend({
-    name: 'structure',
-    trigger: '.pat-structure',
-    parser: 'mockup',
-    defaults: {
-      // for implementing history changes
-      // Example: {base: 'http://mysite.com', appended: '/folder_contents'}
-      urlStructure: null,
-      vocabularyUrl: null,
-      indexOptionsUrl: null, // for querystring widget
-      contextInfoUrl: null, // for add new dropdown and other info
-      setDefaultPageUrl: null,
-      menuOptions: null, // default action menu options per item.
-      menuGenerator: 'mockup-patterns-structure-url/js/actionmenu',  // default menu generator
-      backdropSelector: '.plone-modal', // Element upon which to apply backdrops used for popovers
+    var Structure = Base.extend({
+        name: "structure",
+        trigger: ".pat-structure",
+        parser: "mockup",
+        defaults: {
+            // for implementing history changes
+            // Example: {base: 'http://mysite.com', appended: '/folder_contents'}
+            urlStructure: null,
+            vocabularyUrl: null,
+            indexOptionsUrl: null, // for querystring widget
+            contextInfoUrl: null, // for add new dropdown and other info
+            setDefaultPageUrl: null,
+            menuOptions: null, // default action menu options per item.
+            menuGenerator: "mockup-patterns-structure-url/js/actionmenu", // default menu generator
+            backdropSelector: ".plone-modal", // Element upon which to apply backdrops used for popovers
 
-      activeColumnsCookie: 'activeColumns',
+            activeColumnsCookie: "activeColumns",
 
-      /*
+            /*
         As the options operate on a merging basis per new attribute
         (key/value pairs) on the option Object in a recursive fashion,
         array items are also treated as Objects so that custom options
@@ -30460,175 +31192,194 @@ define('mockup-patterns-structure',[
         the default version prefixed with `_default_`.
       */
 
-      attributes: null,
-      _default_attributes: [
-        'CreationDate',
-        'EffectiveDate',
-        'ExpirationDate',
-        'exclude_from_nav',
-        'getIcon',
-        'getMimeIcon',
-        'getObjSize',
-        'getURL',
-        'id',
-        'is_folderish',
-        'last_comment_date',
-        'ModificationDate',
-        'path',
-        'portal_type',
-        'review_state',
-        'Subject',
-        'Title',
-        'total_comments',
-        'UID'
-      ],
+            attributes: null,
+            _default_attributes: [
+                "CreationDate",
+                "EffectiveDate",
+                "ExpirationDate",
+                "exclude_from_nav",
+                "getIcon",
+                "getMimeIcon",
+                "getObjSize",
+                "getURL",
+                "id",
+                "is_folderish",
+                "last_comment_date",
+                "ModificationDate",
+                "path",
+                "portal_type",
+                "review_state",
+                "Subject",
+                "Title",
+                "total_comments",
+                "UID",
+            ],
 
-      activeColumns: null,
-      _default_activeColumns: [
-        'ModificationDate',
-        'EffectiveDate',
-        'review_state'
-      ],
+            activeColumns: null,
+            _default_activeColumns: [
+                "ModificationDate",
+                "EffectiveDate",
+                "review_state",
+            ],
 
-      availableColumns: null,
-      _default_availableColumns: {
-        'id': 'ID',
-        'ModificationDate': 'Last modified',
-        'EffectiveDate': 'Published',
-        'ExpirationDate': 'Expiration',
-        'CreationDate': 'Created',
-        'review_state': 'Review state',
-        'Subject': 'Tags',
-        'portal_type': 'Type',
-        'is_folderish': 'Folder',
-        'exclude_from_nav': 'Excluded from navigation',
-        'getObjSize': 'Object Size',
-        'last_comment_date': 'Last comment date',
-        'total_comments': 'Total comments'
-      },
+            availableColumns: null,
+            _default_availableColumns: {
+                id: "ID",
+                ModificationDate: "Last modified",
+                EffectiveDate: "Published",
+                ExpirationDate: "Expiration",
+                CreationDate: "Created",
+                review_state: "Review state",
+                Subject: "Tags",
+                portal_type: "Type",
+                is_folderish: "Folder",
+                exclude_from_nav: "Excluded from navigation",
+                getObjSize: "Object Size",
+                last_comment_date: "Last comment date",
+                total_comments: "Total comments",
+            },
 
-      // action triggered for the primary link for each table row.
-      tableRowItemAction: null,
-      _default_tableRowItemAction: {
-        folder: ['mockup-patterns-structure-url/js/navigation', 'folderClicked'],
-        other: []
-      },
+            // action triggered for the primary link for each table row.
+            tableRowItemAction: null,
+            _default_tableRowItemAction: {
+                folder: [
+                    "mockup-patterns-structure-url/js/navigation",
+                    "folderClicked",
+                ],
+                other: [],
+            },
 
-      typeToViewAction: null,
-      _default_typeToViewAction: {
-          'File': '/view',
-          'Image': '/view',
-          'Blob': '/view'
-      },
+            typeToViewAction: null,
+            _default_typeToViewAction: {
+                File: "/view",
+                Image: "/view",
+                Blob: "/view",
+            },
 
-      defaultPageTypes: null,
-      _default_defaultPageTypes: [
-          'Document',
-          'Event',
-          'News Item',
-          'Collection'
-      ],
+            defaultPageTypes: null,
+            _default_defaultPageTypes: [
+                "Document",
+                "Event",
+                "News Item",
+                "Collection",
+            ],
 
-      collectionConstructor:
-        'mockup-patterns-structure-url/js/collections/result',
+            collectionConstructor:
+                "mockup-patterns-structure-url/js/collections/result",
 
-      momentFormat: 'L LT',
-      rearrange: {
-        properties: {
-          'id': 'ID',
-          'sortable_title': 'Title'
+            momentFormat: "L LT",
+            rearrange: {
+                properties: {
+                    id: "ID",
+                    sortable_title: "Title",
+                },
+                url: "/rearrange",
+            },
+            moveUrl: null,
+
+            buttons: null,
+            _default_buttons: [
+                {
+                    tooltip: "Cut",
+                    title: "Cut",
+                    url: "/cut",
+                },
+                {
+                    tooltip: "Copy",
+                    title: "Copy",
+                    url: "/copy",
+                },
+                {
+                    tooltip: "Paste",
+                    title: "Paste",
+                    url: "/paste",
+                },
+                {
+                    tooltip: "Delete",
+                    title: "Delete",
+                    url: "/delete",
+                    context: "danger",
+                    icon: "trash",
+                },
+                {
+                    tooltip: "Workflow",
+                    title: "Workflow",
+                    url: "/workflow",
+                },
+                {
+                    tooltip: "Tags",
+                    title: "Tags",
+                    url: "/tags",
+                },
+                {
+                    tooltip: "Properties",
+                    title: "Properties",
+                    url: "/properties",
+                },
+                {
+                    tooltip: "Rename",
+                    title: "Rename",
+                    url: "/rename",
+                },
+            ],
+
+            datatables_options: {},
+
+            upload: {
+                uploadMultiple: true,
+                showTitle: true,
+            },
         },
-        url: '/rearrange'
-      },
-      moveUrl: null,
+        init: function () {
+            var self = this;
 
-      buttons: null,
-      _default_buttons: [{
-        tooltip: 'Cut',
-        title: 'Cut',
-        url: '/cut'
-      },{
-        tooltip: 'Copy',
-        title: 'Copy',
-        url: '/copy'
-      },{
-        tooltip: 'Paste',
-        title: 'Paste',
-        url: '/paste'
-      },{
-        tooltip: 'Delete',
-        title: 'Delete',
-        url: '/delete',
-        context: 'danger',
-        icon: 'trash'
-      },{
-        tooltip: 'Workflow',
-        title: 'Workflow',
-        url: '/workflow'
-      },{
-        tooltip: 'Tags',
-        title: 'Tags',
-        url: '/tags'
-      },{
-        tooltip: 'Properties',
-        title: 'Properties',
-        url: '/properties'
-      },{
-        tooltip: 'Rename',
-        title: 'Rename',
-        url: '/rename'
-      }],
-
-      datatables_options: {},
-
-      upload: {
-        uploadMultiple: true,
-        showTitle: true
-      }
-
-    },
-    init: function() {
-      var self = this;
-
-      /*
+            /*
         This part replaces the undefined (null) values in the user
         modifiable attributes with the default values.
 
         May want to consider moving the _default_* values out of the
         options object.
       */
-      var replaceDefaults = ['attributes', 'activeColumns', 'availableColumns', 'buttons', 'typeToViewAction', 'defaultPageTypes'];
-      _.each(replaceDefaults, function(idx) {
-        if (self.options[idx] === null) {
-          self.options[idx] = self.options['_default_' + idx];
-        }
-      });
+            var replaceDefaults = [
+                "attributes",
+                "activeColumns",
+                "availableColumns",
+                "buttons",
+                "typeToViewAction",
+                "defaultPageTypes",
+            ];
+            _.each(replaceDefaults, function (idx) {
+                if (self.options[idx] === null) {
+                    self.options[idx] = self.options["_default_" + idx];
+                }
+            });
 
-      var mergeDefaults = ['tableRowItemAction'];
-      _.each(mergeDefaults, function(idx) {
-        var old = self.options[idx];
-        self.options[idx] = $.extend(
-          false, self.options['_default_' + idx], old
-        );
-      });
+            var mergeDefaults = ["tableRowItemAction"];
+            _.each(mergeDefaults, function (idx) {
+                var old = self.options[idx];
+                self.options[idx] = $.extend(
+                    false,
+                    self.options["_default_" + idx],
+                    old
+                );
+            });
 
-      self.browsing = true; // so all queries will be correct with QueryHelper
-      self.options.collectionUrl = self.options.vocabularyUrl;
-      self.options.pattern = self;
+            self.browsing = true; // so all queries will be correct with QueryHelper
+            self.options.collectionUrl = self.options.vocabularyUrl;
+            self.options.pattern = self;
 
-      // the ``attributes`` options key is not compatible with backbone,
-      // but queryHelper that will be constructed by the default
-      // ResultCollection will expect this to be passed into it.
-      self.options.queryHelperAttributes = self.options.attributes;
-      delete self.options.attributes;
+            // the ``attributes`` options key is not compatible with backbone,
+            // but queryHelper that will be constructed by the default
+            // ResultCollection will expect this to be passed into it.
+            self.options.queryHelperAttributes = self.options.attributes;
+            delete self.options.attributes;
 
-      self.view = new AppView(self.options);
-      self.$el.append(self.view.render().$el);
-    }
-  });
+            self.view = new AppView(self.options);
+            self.$el.append(self.view.render().$el);
+        },
+    });
 
-  return Structure;
-
+    return Structure;
 });
 
 /* Structure Updater pattern.
@@ -30642,38 +31393,38 @@ define('mockup-patterns-structure',[
  *
  */
 
-define('mockup-patterns-structureupdater',[
-  'jquery',
-  'pat-base'
-], function($, Base) {
-  'use strict';
+define('mockup-patterns-structureupdater',["jquery", "pat-base"], function ($, Base) {
+    "use strict";
 
-  var StructureUpdater = Base.extend({
-    name: 'structureupdater',
-    trigger: '.template-folder_contents',
-    parser: 'mockup',
-    defaults: {
-      titleSelector: '',
-      descriptionSelector: ''
-    },
+    var StructureUpdater = Base.extend({
+        name: "structureupdater",
+        trigger: ".template-folder_contents",
+        parser: "mockup",
+        defaults: {
+            titleSelector: "",
+            descriptionSelector: "",
+        },
 
-    init: function() {
+        init: function () {
+            $("body").on(
+                "context-info-loaded",
+                function (e, data) {
+                    if (this.options.titleSelector) {
+                        $(this.options.titleSelector, this.$el).html(
+                            (data.object && data.object.Title) || "&nbsp;"
+                        );
+                    }
+                    if (this.options.descriptionSelector) {
+                        $(this.options.descriptionSelector, this.$el).html(
+                            (data.object && data.object.Description) || "&nbsp;"
+                        );
+                    }
+                }.bind(this)
+            );
+        },
+    });
 
-      $('body').on('context-info-loaded', function (e, data) {
-        if (this.options.titleSelector) {
-            $(this.options.titleSelector, this.$el).html(data.object && data.object.Title || '&nbsp;');
-        }
-        if (this.options.descriptionSelector) {
-            $(this.options.descriptionSelector, this.$el).html(data.object && data.object.Description || '&nbsp;');
-        }
-      }.bind(this));
-
-    }
-
-  });
-
-  return StructureUpdater;
-
+    return StructureUpdater;
 });
 
 // Copyright (C) 2010 Plone Foundation
@@ -30702,5 +31453,5 @@ require([
   'use strict';
 });
 
-define("/Users/fred/buildouts/coredev-plone5.2/src/plone.staticresources/src/plone/staticresources/static/plone-editor-tools.js", function(){});
+define("/Volumes/WORKSPACE2/kinderdorf_plone5/srccore/plone.staticresources/src/plone/staticresources/static/plone-editor-tools.js", function(){});
 

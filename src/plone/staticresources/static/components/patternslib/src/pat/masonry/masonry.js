@@ -12,14 +12,15 @@
             "pat-parser",
             "pat-base",
             "pat-utils",
-            "masonry"
+            "masonry",
+            "imagesloaded"
             ], function() {
                 return factory.apply(this, arguments);
         });
     } else {
-        factory(root.$, root.patterns, root.patterns.Parser, root.Base, root.Masonry);
+        factory(root.$, root.patterns, root.patterns.Parser, root.Base, root.Masonry, root.imagesLoaded);
     }
-}(this, function($, logger, registry, Parser, Base, utils, Masonry) {
+}(this, function($, logger, registry, Parser, Base, utils, Masonry, imagesLoaded) {
     "use strict";
     var log = logger.getLogger("pat.masonry");
     var parser = new Parser("masonry");
@@ -55,9 +56,22 @@
 
         init: function masonryInit($el, opts) {
             this.options = parser.parse(this.$el, opts);
-
             // Initialize
             this.initMasonry();
+
+            var imgLoad = imagesLoaded(this.$el);
+            imgLoad.on("progress", function() {
+                if (! this.msnry) {
+                    this.initMasonry();
+                }
+                this.quicklayout();
+            }.bind(this));
+            imgLoad.on("always", function () {
+                if (! this.msnry) {
+                    this.initMasonry();
+                }
+                this.layout();
+            }.bind(this));
 
             // Update if something gets injected inside the pat-masonry
             this.$el
@@ -66,12 +80,19 @@
                 .on("pat-update",
                     utils.debounce(this.quicklayout.bind(this), 200));
 
-            // Initially layout on document ready.
-            $(document).ready(utils.debounce(this.layout.bind(this), 100));
-
-            // Re-Layout, if images are loaded within pat-masonry
-            $('img', this.$el)
-                .on("load", utils.debounce(this.quicklayout.bind(this), 200));
+            var callback = utils.debounce(this.quicklayout.bind(this), 400);
+            var observer = new MutationObserver(callback);
+            /* Explicitly not including style. We assume style is set dynamically only by scripts and we do all our controlled changes through classes.
+               That way we avoid masonry to react on its own style calculation */
+            var config = {
+                childList: true,
+                subtree: true,
+                characterData: false,
+                attributeOldValue: true,
+                attributes: true, 
+                attributeFilter: ['class']
+            };
+            observer.observe(document.body, config);
         },
 
         initMasonry: function () {

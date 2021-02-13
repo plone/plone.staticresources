@@ -4,8 +4,7 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<title>Scroll demo</title>
     	<link rel="stylesheet" href="/style/common.css" type="text/css">
-        <script src="/main.js" type="text/javascript" charset="utf-8"></script>
-		<script data-main="/src/pat/main" src="/src/bower_components/requirejs/require.js" type="text/javascript" charset="utf-8"></script>
+         <script src="/bundle.js" type="text/javascript" charset="utf-8"></script>
 	</head>
     <style>
         .current {
@@ -18,8 +17,6 @@
             color: #999;
         }
         #scrollable {
-            overflow: auto;
-            // max-height: 500px;
         }
     </style>
 	<body>
@@ -91,7 +88,9 @@
                 </p>
             </section>
             <p>
-                <a href="#demo-main-nav" class="pat-scroll" data-pat-scroll="trigger:auto">Back to top</a>
+                <a href="#demo-main-nav" 
+                   class="pat-scroll" 
+                   data-pat-scroll="selector: top; trigger: auto">Back to top</a>
             </p>
         </article>
 	</body>

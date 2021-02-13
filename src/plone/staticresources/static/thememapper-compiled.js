@@ -2142,14 +2142,14 @@ define('pat-logger',[
 define('pat-utils',[
     "jquery",
     "underscore",
-    "jquery.browser"  // adds itself to the jquery object, no need to pass to the define callback.
-], function($, _) {
+    "jquery.browser"
+], function($, _, browser) {
 
     $.fn.safeClone = function () {
         var $clone = this.clone();
         // IE BUG : Placeholder text becomes actual value after deep clone on textarea
         // https://connect.microsoft.com/IE/feedback/details/781612/placeholder-text-becomes-actual-value-after-deep-clone-on-textarea
-        if ($.browser.msie !== undefined && true) {
+        if (browser.msie !== undefined && true) {
             $clone.findInclusive(':input[placeholder]').each(function(i, item) {
                 var $item = $(item);
                 if ($item.attr('placeholder') === $item.val()) {
@@ -2323,8 +2323,10 @@ define('pat-utils',[
     // END: Taken from Underscore.js until here.
 
     function rebaseURL(base, url) {
-        if (url.indexOf("://")!==-1 || url[0]==="/")
+        base = new URL(base, window.location).href; // If base is relative make it absolute.
+        if (url.indexOf("://") !== -1 || url[0] === "/" || url.indexOf("data:") === 0) {
             return url;
+        }
         return base.slice(0, base.lastIndexOf("/")+1) + url;
     }
 
@@ -2386,6 +2388,22 @@ define('pat-utils',[
             });
         }
     }
+
+    function hasValue(el) {
+       if (el.tagName === "INPUT") {
+           if (el.type === "checkbox" || el.type === "radio") {
+               return el.checked;
+           }
+           return el.value !== "";
+       }
+       if (el.tagName === "SELECT") {
+           return el.selectedIndex !== -1;
+       }
+       if (el.tagName === "TEXTAREA") {
+           return el.value !== "";
+       }
+       return false;
+    };
 
     var transitions = {
         none: {hide: "hide", show: "show"},
@@ -2498,14 +2516,14 @@ define('pat-utils',[
         return results;
     }
 
-    isElementInViewport = function (el, partial, offset) { 
-        /* returns true if element is visible to the user ie. is in the viewport. 
+    isElementInViewport = function (el, partial, offset) {
+        /* returns true if element is visible to the user ie. is in the viewport.
          * Setting partial parameter to true, will only check if a part of the element is visible
-         * in the viewport, specifically that some part of that element is touching the top part 
+         * in the viewport, specifically that some part of that element is touching the top part
          * of the viewport. This only applies to the vertical direction, ie. doesnt check partial
          * visibility for horizontal scrolling
          * some code taken from:
-         * http://stackoverflow.com/questions/123999/how-to-tell-if-a-dom-element-is-visible-in-the-current-viewport/7557433#7557433         
+         * http://stackoverflow.com/questions/123999/how-to-tell-if-a-dom-element-is-visible-in-the-current-viewport/7557433#7557433
          */
         if (el === []) {
             return false;
@@ -2517,14 +2535,14 @@ define('pat-utils',[
             rec_values = [rec.top, rec.bottom, rec.left, rec.right];
         if ( _.every(rec_values, function zero(v) { if ( v === 0 ){ return true;}}) ) {
             // if every property of rec is 0, the element is invisible;
-            return false;            
+            return false;
         } else if (partial) {
             // when using getBoundingClientRect() (in the vertical case)
             // negative means above top of viewport, positive means below top of viewport
             // therefore for part of the element to be touching or crossing the top of the viewport
-            // rec.top must <= 0 and rec.bottom must >= 0 
-            // an optional tolerance offset can be added for when the desired element is not exactly 
-            // toucing the top of the viewport but needs to be considered as touching. 
+            // rec.top must <= 0 and rec.bottom must >= 0
+            // an optional tolerance offset can be added for when the desired element is not exactly
+            // toucing the top of the viewport but needs to be considered as touching.
             if (offset === undefined) {
                 offset = 0;
             }
@@ -2535,16 +2553,66 @@ define('pat-utils',[
                 // XXX do we want to include a check for the padding of an element?
                 // using window.getComputedStyle(target).paddingTop
             );
-        } else {           
-            // this will return true if the entire element is completely in the viewport 
-            return ( 
+        } else {
+            // this will return true if the entire element is completely in the viewport
+            return (
                 rec.top >= 0 &&
                 rec.left >= 0 &&
                 rec.bottom <= (window.innerHeight || document.documentElement.clientHeight) && /*or $(window).height() */
                 rec.right <= (window.innerWidth || document.documentElement.clientWidth) /*or $(window).width() */
-            );        
+            );
         }
     };
+
+    function parseTime(time) {
+        var m = /^(\d+(?:\.\d+)?)\s*(\w*)/.exec(time);
+        if (!m) {
+            throw new Error('Invalid time');
+        }
+        var amount = parseFloat(m[1])
+        switch (m[2]) {
+            case 's':
+                return Math.round(amount * 1000);
+            case 'm':
+                return Math.round(amount * 1000 * 60);
+            case 'ms':
+            default:
+                return Math.round(amount);
+        }
+    }
+
+    // Return a jQuery object with elements related to an input element.
+    function findRelatives(el) {
+        var $el = $(el),
+            $relatives = $(el),
+            $label = $();
+
+        $relatives=$relatives.add($el.closest("label"));
+        $relatives=$relatives.add($el.closest("fieldset"));
+
+        if (el.id)
+            $label=$("label[for='"+el.id+"']");
+        if (!$label.length) {
+            var $form = $el.closest("form");
+            if (!$form.length)
+                $form=$(document.body);
+            $label=$form.find("label[for='"+el.name+"']");
+        }
+        $relatives=$relatives.add($label);
+        return $relatives;
+    }
+
+    function getCSSValue(el, property, asPixels) {
+        /* Return a CSS property value for a given DOM node.
+         * For length-values, relative values are converted to pixels.
+         * Optionally parse as pixels, if applicable.
+        */
+        var value = window.getComputedStyle(el).getPropertyValue(property);
+        if (asPixels) {
+            value = parseFloat(value) || 0.0;
+        }
+        return value;
+    }
 
     var utils = {
         // pattern pimping - own module?
@@ -2561,7 +2629,11 @@ define('pat-utils',[
         addURLQueryParameter: addURLQueryParameter,
         removeDuplicateObjects: removeDuplicateObjects,
         mergeStack: mergeStack,
-        isElementInViewport: isElementInViewport
+        isElementInViewport: isElementInViewport,
+        hasValue: hasValue,
+        parseTime: parseTime,
+        findRelatives: findRelatives,
+        getCSSValue: getCSSValue
     };
     return utils;
 });
@@ -3042,8 +3114,8 @@ define('pat-jquery-ext',["jquery"], function($) {
                         "inExceptionArea": false
                     });
 
-                    $this.bind( "mouseover.timeout", methods.mouseMoved );
-                    $this.bind( "mouseenter.timeout", methods.mouseMoved );
+                    $this.on( "mouseover.timeout", methods.mouseMoved );
+                    $this.on( "mouseenter.timeout", methods.mouseMoved );
 
                     $(settings.exceptionAreas).each(function() {
                         $this.find(this)
@@ -3077,7 +3149,7 @@ define('pat-jquery-ext',["jquery"], function($) {
                 var $this = $(this),
                     data = $this.data("timeout");
 
-                $(window).unbind(".timeout");
+                $(window).off(".timeout");
                 data.timeout.remove();
                 $this.removeData("timeout");
             });
@@ -3190,6 +3262,25 @@ define('pat-jquery-ext',["jquery"], function($) {
         });
     };
 
+    //Work around warning for jQuery 3.x:
+    //JQMIGRATE: jQuery.fn.offset() requires an element connected to a document
+    $.fn.safeOffset = function() {
+        var docElem,
+            elem = this[ 0 ],
+            origin = { top: 0, left: 0 };
+
+	if ( !elem || !elem.nodeType ) {
+            return origin;
+	}
+
+        docElem = ( elem.ownerDocument || document).documentElement;
+        if ( !jQuery.contains(docElem, elem)) {
+            return origin;
+        }
+
+        return jQuery.fn.offset.apply( this, arguments );
+    };
+
     //Make absolute location
     $.fn.setPositionAbsolute = function(element,offsettop,offsetleft) {
         return this.each(function() {
@@ -3197,7 +3288,7 @@ define('pat-jquery-ext',["jquery"], function($) {
             // dynamically since every browser has different settings
             var $this = $(this);
             var thiswidth = $(this).width();
-            var    pos   = element.offset();
+            var    pos   = element.safeOffset();
             var    width = element.width();
             var    height = element.height();
             var setleft = (pos.left + width - thiswidth + offsetleft);
@@ -3216,10 +3307,10 @@ define('pat-jquery-ext',["jquery"], function($) {
             var $ancestor = $(this).closest(selector);
             if ($ancestor.length && $ancestor.css("position") !== "static") {
                 var $child = $(this);
-                var childMarginEdgeLeft = $child.offset().left - parseInt($child.css("marginLeft"), 10);
-                var childMarginEdgeTop = $child.offset().top - parseInt($child.css("marginTop"), 10);
-                var ancestorPaddingEdgeLeft = $ancestor.offset().left + parseInt($ancestor.css("borderLeftWidth"), 10);
-                var ancestorPaddingEdgeTop = $ancestor.offset().top + parseInt($ancestor.css("borderTopWidth"), 10);
+                var childMarginEdgeLeft = $child.safeOffset().left - parseInt($child.css("marginLeft"), 10);
+                var childMarginEdgeTop = $child.safeOffset().top - parseInt($child.css("marginTop"), 10);
+                var ancestorPaddingEdgeLeft = $ancestor.safeOffset().left + parseInt($ancestor.css("borderLeftWidth"), 10);
+                var ancestorPaddingEdgeTop = $ancestor.safeOffset().top + parseInt($ancestor.css("borderTopWidth"), 10);
                 left = childMarginEdgeLeft - ancestorPaddingEdgeLeft;
                 top = childMarginEdgeTop - ancestorPaddingEdgeTop;
                 // we have found the ancestor and computed the position
@@ -3237,9 +3328,16 @@ define('pat-jquery-ext',["jquery"], function($) {
     // XXX: In compat.js we include things for browser compatibility,
     // but these two seem to be only convenience. Do we really want to
     // include these as part of patterns?
-    String.prototype.startsWith = function(str) { return (this.match("^"+str) !== null); };
-    String.prototype.endsWith = function(str) { return (this.match(str+"$") !== null); };
-
+    if (!String.prototype.startsWith) {
+        String.prototype.startsWith = function (str) {
+            return (this.match("^" + str) !== null);
+        };
+    }
+    if (!String.prototype.endsWith) {
+        String.prototype.endsWith = function(str) {
+            return (this.match(str+"$") !== null);
+        };
+    }
 
     /******************************
 
@@ -3678,115 +3776,135 @@ define('pat-base',[
  *
  *  Or, it'll default to "/plonejsi18n"
  */
-define('mockup-i18n',[
-  'jquery'
-], function($) {
-  'use strict';
+define('mockup-i18n',["jquery"], function ($) {
+    "use strict";
 
-  var I18N = function() {
-    var self = this;
-    self.baseUrl = $('body').attr('data-i18ncatalogurl');
-    self.currentLanguage = $('html').attr('lang') || 'en';
+    var I18N = function () {
+        var self = this;
+        self.baseUrl = $("body").attr("data-i18ncatalogurl");
+        self.currentLanguage = $("html").attr("lang") || "en";
 
-    // Fix for country specific languages
-    if (self.currentLanguage.split('-').length > 1) {
-      self.currentLanguage = self.currentLanguage.split('-')[0] + '_' + self.currentLanguage.split('-')[1].toUpperCase();
-    }
-
-    self.storage = null;
-    self.catalogs = {};
-    self.ttl = 24 * 3600 * 1000;
-
-    // Internet Explorer 8 does not know Date.now() which is used in e.g. loadCatalog, so we "define" it
-    if (!Date.now) {
-      Date.now = function() {
-        return new Date().valueOf();
-      };
-    }
-
-    try {
-      if ('localStorage' in window && window.localStorage !== null && 'JSON' in window && window.JSON !== null) {
-        self.storage = window.localStorage;
-      }
-    } catch (e) {}
-
-    self.configure = function(config) {
-      for (var key in config){
-        self[key] = config[key];
-      }
-    };
-
-    self._setCatalog = function (domain, language, catalog) {
-      if (domain in self.catalogs) {
-        self.catalogs[domain][language] = catalog;
-      } else {
-        self.catalogs[domain] = {};
-        self.catalogs[domain][language] = catalog;
-      }
-    };
-
-    self._storeCatalog = function (domain, language, catalog) {
-      var key = domain + '-' + language;
-      if (self.storage !== null && catalog !== null) {
-        self.storage.setItem(key, JSON.stringify(catalog));
-        self.storage.setItem(key + '-updated', Date.now());
-      }
-    };
-
-    self.getUrl = function(domain, language) {
-      return self.baseUrl + '?domain=' + domain + '&language=' + language;
-    };
-
-    self.loadCatalog = function (domain, language) {
-      if (language === undefined) {
-        language = self.currentLanguage;
-      }
-      if (self.storage !== null) {
-        var key = domain + '-' + language;
-        if (key in self.storage) {
-          if ((Date.now() - parseInt(self.storage.getItem(key + '-updated'), 10)) < self.ttl) {
-            var catalog = JSON.parse(self.storage.getItem(key));
-            self._setCatalog(domain, language, catalog);
-            return;
-          }
+        // Fix for country specific languages
+        if (self.currentLanguage.split("-").length > 1) {
+            self.currentLanguage =
+                self.currentLanguage.split("-")[0] +
+                "_" +
+                self.currentLanguage.split("-")[1].toUpperCase();
         }
-      }
-      if (!self.baseUrl) {
-        return;
-      }
-      $.getJSON(self.getUrl(domain, language), function (catalog) {
-        if (catalog === null) {
-          return;
-        }
-        self._setCatalog(domain, language, catalog);
-        self._storeCatalog(domain, language, catalog);
-      });
-    };
 
-    self.MessageFactory = function (domain, language) {
-      language = language || self.currentLanguage;
-      return function translate (msgid, keywords) {
-        var msgstr;
-        if ((domain in self.catalogs) && (language in self.catalogs[domain]) && (msgid in self.catalogs[domain][language])) {
-          msgstr = self.catalogs[domain][language][msgid];
-        } else {
-          msgstr = msgid;
+        self.storage = null;
+        self.catalogs = {};
+        self.ttl = 24 * 3600 * 1000;
+
+        // Internet Explorer 8 does not know Date.now() which is used in e.g. loadCatalog, so we "define" it
+        if (!Date.now) {
+            Date.now = function () {
+                return new Date().valueOf();
+            };
         }
-        if (keywords) {
-          var regexp, keyword;
-          for (keyword in keywords) {
-            if (keywords.hasOwnProperty(keyword)) {
-              regexp = new RegExp('\\$\\{' + keyword + '\\}', 'g');
-              msgstr = msgstr.replace(regexp, keywords[keyword]);
+
+        try {
+            if (
+                "localStorage" in window &&
+                window.localStorage !== null &&
+                "JSON" in window &&
+                window.JSON !== null
+            ) {
+                self.storage = window.localStorage;
             }
-          }
-        }
-        return msgstr;
-      };
-    };
-  };
+        } catch (e) {}
 
-  return I18N;
+        self.configure = function (config) {
+            for (var key in config) {
+                self[key] = config[key];
+            }
+        };
+
+        self._setCatalog = function (domain, language, catalog) {
+            if (domain in self.catalogs) {
+                self.catalogs[domain][language] = catalog;
+            } else {
+                self.catalogs[domain] = {};
+                self.catalogs[domain][language] = catalog;
+            }
+        };
+
+        self._storeCatalog = function (domain, language, catalog) {
+            var key = domain + "-" + language;
+            if (self.storage !== null && catalog !== null) {
+                self.storage.setItem(key, JSON.stringify(catalog));
+                self.storage.setItem(key + "-updated", Date.now());
+            }
+        };
+
+        self.getUrl = function (domain, language) {
+            return self.baseUrl + "?domain=" + domain + "&language=" + language;
+        };
+
+        self.loadCatalog = function (domain, language) {
+            if (language === undefined) {
+                language = self.currentLanguage;
+            }
+            if (self.storage !== null) {
+                var key = domain + "-" + language;
+                if (key in self.storage) {
+                    if (
+                        Date.now() -
+                            parseInt(
+                                self.storage.getItem(key + "-updated"),
+                                10
+                            ) <
+                        self.ttl
+                    ) {
+                        var catalog = JSON.parse(self.storage.getItem(key));
+                        self._setCatalog(domain, language, catalog);
+                        return;
+                    }
+                }
+            }
+            if (!self.baseUrl) {
+                return;
+            }
+            $.getJSON(self.getUrl(domain, language), function (catalog) {
+                if (catalog === null) {
+                    return;
+                }
+                self._setCatalog(domain, language, catalog);
+                self._storeCatalog(domain, language, catalog);
+            });
+        };
+
+        self.MessageFactory = function (domain, language) {
+            language = language || self.currentLanguage;
+            return function translate(msgid, keywords) {
+                var msgstr;
+                if (
+                    domain in self.catalogs &&
+                    language in self.catalogs[domain] &&
+                    msgid in self.catalogs[domain][language]
+                ) {
+                    msgstr = self.catalogs[domain][language][msgid];
+                } else {
+                    msgstr = msgid;
+                }
+                if (keywords) {
+                    var regexp, keyword;
+                    for (keyword in keywords) {
+                        if (keywords.hasOwnProperty(keyword)) {
+                            regexp = new RegExp(
+                                "\\$\\{" + keyword + "\\}",
+                                "g"
+                            );
+                            msgstr = msgstr.replace(regexp, keywords[keyword]);
+                        }
+                    }
+                }
+                return msgstr;
+            };
+        };
+    };
+
+    return I18N;
 });
 
 /* i18n integration.
@@ -3798,23 +3916,21 @@ define('mockup-i18n',[
  *  Or, it'll default to "/plonejsi18n"
  */
 
-define('translate',[
-  'mockup-i18n'
-], function(I18N) {
-  'use strict';
+define('translate',["mockup-i18n"], function (I18N) {
+    "use strict";
 
-  // we're creating a singleton here so we can potentially
-  // delay the initialization of the translate catalog
-  // until after the dom is available
-  var _t = null;
-  return function(msgid, keywords) {
-    if (_t === null) {
-      var i18n = new I18N();
-      i18n.loadCatalog('widgets');
-      _t = i18n.MessageFactory('widgets');
-    }
-    return _t(msgid, keywords);
-  };
+    // we're creating a singleton here so we can potentially
+    // delay the initialization of the translate catalog
+    // until after the dom is available
+    var _t = null;
+    return function (msgid, keywords) {
+        if (_t === null) {
+            var i18n = new I18N();
+            i18n.loadCatalog("widgets");
+            _t = i18n.MessageFactory("widgets");
+        }
+        return _t(msgid, keywords);
+    };
 });
 
 /**
@@ -4364,382 +4480,413 @@ define("jqtree-contextmenu", ["jqtree"], function() {
 /* Pattern utils
  */
 
+define('mockup-utils',["jquery"], function ($) {
+    "use strict";
 
-define('mockup-utils',[
-  'jquery'
-], function($) {
-  'use strict';
+    var QueryHelper = function (options) {
+        /* if pattern argument provided, it can implement the interface of:
+         *    - browsing: boolean if currently browsing
+         *    - currentPath: string of current path to apply to search if browsing
+         *    - basePath: default path to provide if no subpath used
+         */
 
-  var QueryHelper = function(options) {
-    /* if pattern argument provided, it can implement the interface of:
-     *    - browsing: boolean if currently browsing
-     *    - currentPath: string of current path to apply to search if browsing
-     *    - basePath: default path to provide if no subpath used
-     */
+        var self = this;
+        var defaults = {
+            pattern: null, // must be passed in
+            vocabularyUrl: null,
+            searchParam: "SearchableText", // query string param to pass to search url
+            pathOperator: "plone.app.querystring.operation.string.path",
+            attributes: [
+                "UID",
+                "Title",
+                "Description",
+                "getURL",
+                "portal_type",
+            ],
+            batchSize: 10, // number of results to retrive
+            baseCriteria: [],
+            sort_on: "is_folderish",
+            sort_order: "reverse",
+            pathDepth: 1,
+        };
+        self.options = $.extend({}, defaults, options);
 
-    var self = this;
-    var defaults = {
-      pattern: null, // must be passed in
-      vocabularyUrl: null,
-      searchParam: 'SearchableText', // query string param to pass to search url
-      pathOperator: 'plone.app.querystring.operation.string.path',
-      attributes: ['UID', 'Title', 'Description', 'getURL', 'portal_type'],
-      batchSize: 10, // number of results to retrive
-      baseCriteria: [],
-      sort_on: 'is_folderish',
-      sort_order: 'reverse',
-      pathDepth: 1
+        self.pattern = self.options.pattern;
+        if (self.pattern === undefined || self.pattern === null) {
+            self.pattern = {
+                browsing: false,
+                basePath: "/",
+            };
+        }
+
+        if (self.options.url && !self.options.vocabularyUrl) {
+            self.options.vocabularyUrl = self.options.url;
+        } else if (self.pattern.vocabularyUrl) {
+            self.options.vocabularyUrl = self.pattern.vocabularyUrl;
+        }
+        self.valid = Boolean(self.options.vocabularyUrl);
+
+        self.getBatch = function (page) {
+            return {
+                page: page ? page : 1,
+                size: self.options.batchSize,
+            };
+        };
+
+        self.getCurrentPath = function () {
+            var pattern = self.pattern;
+            var currentPath;
+            /* If currentPath is set on the QueryHelper object, use that first.
+             * Then, check on the pattern.
+             * Finally, see if it is a function and call it if it is.
+             */
+            if (self.currentPath) {
+                currentPath = self.currentPath;
+            } else {
+                currentPath = pattern.currentPath;
+            }
+            if (typeof currentPath === "function") {
+                currentPath = currentPath();
+            }
+            var path = currentPath;
+            if (!path) {
+                if (pattern.basePath) {
+                    path = pattern.basePath;
+                } else if (pattern.options.basePath) {
+                    path = pattern.options.basePath;
+                } else {
+                    path = "/";
+                }
+            }
+            return path;
+        };
+
+        self.getCriterias = function (term, searchOptions) {
+            if (searchOptions === undefined) {
+                searchOptions = {};
+            }
+            searchOptions = $.extend(
+                {},
+                {
+                    useBaseCriteria: true,
+                    additionalCriterias: [],
+                },
+                searchOptions
+            );
+
+            var criterias = [];
+            if (searchOptions.useBaseCriteria) {
+                criterias = self.options.baseCriteria.slice(0);
+            }
+            if (term) {
+                term += "*";
+                criterias.push({
+                    i: self.options.searchParam,
+                    o: "plone.app.querystring.operation.string.contains",
+                    v: term,
+                });
+            }
+            if (searchOptions.searchPath) {
+                criterias.push({
+                    i: "path",
+                    o: self.options.pathOperator,
+                    v: searchOptions.searchPath + "::" + self.options.pathDepth,
+                });
+            } else if (self.pattern.browsing) {
+                criterias.push({
+                    i: "path",
+                    o: self.options.pathOperator,
+                    v: self.getCurrentPath() + "::" + self.options.pathDepth,
+                });
+            }
+            criterias = criterias.concat(searchOptions.additionalCriterias);
+            return criterias;
+        };
+
+        self.getQueryData = function (term, page) {
+            var data = {
+                query: JSON.stringify({
+                    criteria: self.getCriterias(term),
+                    sort_on: self.options.sort_on,
+                    sort_order: self.options.sort_order,
+                }),
+                attributes: JSON.stringify(self.options.attributes),
+            };
+            if (page) {
+                data.batch = JSON.stringify(self.getBatch(page));
+            }
+            return data;
+        };
+
+        self.getUrl = function () {
+            var url = self.options.vocabularyUrl;
+            if (url.indexOf("?") === -1) {
+                url += "?";
+            } else {
+                url += "&";
+            }
+            return url + $.param(self.getQueryData());
+        };
+
+        self.selectAjax = function () {
+            return {
+                url: self.options.vocabularyUrl,
+                dataType: "JSON",
+                quietMillis: 100,
+                data: function (term, page) {
+                    return self.getQueryData(term, page);
+                },
+                results: function (data, page) {
+                    var more = page * 10 < data.total; // whether or not there are more results available
+                    // notice we return the value of more so Select2 knows if more results can be loaded
+                    return {
+                        results: data.results,
+                        more: more,
+                    };
+                },
+            };
+        };
+
+        self.search = function (
+            term,
+            operation,
+            value,
+            callback,
+            useBaseCriteria,
+            type
+        ) {
+            if (useBaseCriteria === undefined) {
+                useBaseCriteria = true;
+            }
+            if (type === undefined) {
+                type = "GET";
+            }
+            var criteria = [];
+            if (useBaseCriteria) {
+                criteria = self.options.baseCriteria.slice(0);
+            }
+            criteria.push({
+                i: term,
+                o: operation,
+                v: value,
+            });
+            var data = {
+                query: JSON.stringify({
+                    criteria: criteria,
+                }),
+                attributes: JSON.stringify(self.options.attributes),
+            };
+            $.ajax({
+                url: self.options.vocabularyUrl,
+                dataType: "JSON",
+                data: data,
+                type: type,
+                success: callback,
+            });
+        };
+
+        return self;
     };
-    self.options = $.extend({}, defaults, options);
 
-    self.pattern = self.options.pattern;
-    if (self.pattern === undefined || self.pattern === null) {
-      self.pattern = {
-        browsing: false,
-        basePath: '/'
-      };
-    }
+    var Loading = function (options) {
+        /*
+         * Options:
+         *   backdrop(pattern): if you want to have the progress indicator work
+         *                      seamlessly with backdrop pattern
+         *   zIndex(integer or function): to override default z-index used
+         */
+        var self = this;
+        self.className = "plone-loader";
+        var defaults = {
+            backdrop: null,
+            zIndex: 10005, // can be a function
+        };
+        if (!options) {
+            options = {};
+        }
+        self.options = $.extend({}, defaults, options);
 
-    if (self.options.url && !self.options.vocabularyUrl) {
-      self.options.vocabularyUrl = self.options.url;
-    } else if (self.pattern.vocabularyUrl) {
-      self.options.vocabularyUrl = self.pattern.vocabularyUrl;
-    }
-    self.valid = Boolean(self.options.vocabularyUrl);
+        self.init = function () {
+            self.$el = $("." + self.className);
+            if (self.$el.length === 0) {
+                self.$el = $("<div><div></div></div>");
+                self.$el.addClass(self.className).hide().appendTo("body");
+            }
+        };
 
-    self.getBatch = function(page) {
-      return {
-        page: page ? page : 1,
-        size: self.options.batchSize
-      };
+        self.show = function (closable) {
+            self.init();
+            self.$el.show();
+            var zIndex = self.options.zIndex;
+            if (typeof zIndex === "function") {
+                zIndex = Math.max(zIndex(), 10005);
+            } else {
+                // go through all modals and backdrops and make sure we have a higher
+                // z-index to use
+                zIndex = 10005;
+                $(".plone-modal-wrapper,.plone-modal-backdrop").each(
+                    function () {
+                        zIndex = Math.max(
+                            zIndex,
+                            $(this).css("zIndex") || 10005
+                        );
+                    }
+                );
+                zIndex += 1;
+            }
+            self.$el.css("zIndex", zIndex);
+
+            if (closable === undefined) {
+                closable = true;
+            }
+            if (self.options.backdrop) {
+                self.options.backdrop.closeOnClick = closable;
+                self.options.backdrop.closeOnEsc = closable;
+                self.options.backdrop.init();
+                self.options.backdrop.show();
+            }
+        };
+
+        self.hide = function () {
+            self.init();
+            self.$el.hide();
+        };
+
+        return self;
     };
 
-    self.getCurrentPath = function() {
-      var pattern = self.pattern;
-      var currentPath;
-      /* If currentPath is set on the QueryHelper object, use that first.
-       * Then, check on the pattern.
-       * Finally, see if it is a function and call it if it is.
-       */
-      if (self.currentPath) {
-        currentPath = self.currentPath;
-      } else {
-        currentPath = pattern.currentPath;
-      }
-      if (typeof currentPath === 'function') {
-        currentPath = currentPath();
-      }
-      var path = currentPath;
-      if (!path) {
-        if (pattern.basePath) {
-          path = pattern.basePath;
-        } else if (pattern.options.basePath) {
-          path = pattern.options.basePath;
+    var getAuthenticator = function () {
+        var $el = $('input[name="_authenticator"]');
+        if ($el.length === 0) {
+            $el = $('a[href*="_authenticator"]');
+            if ($el.length > 0) {
+                return $el.attr("href").split("_authenticator=")[1];
+            }
+            return "";
         } else {
-          path = '/';
+            return $el.val();
         }
-      }
-      return path;
     };
 
-    self.getCriterias = function(term, searchOptions) {
-      if (searchOptions === undefined) {
-        searchOptions = {};
-      }
-      searchOptions = $.extend({}, {
-        useBaseCriteria: true,
-        additionalCriterias: []
-      }, searchOptions);
-
-      var criterias = [];
-      if (searchOptions.useBaseCriteria) {
-        criterias = self.options.baseCriteria.slice(0);
-      }
-      if (term) {
-        term += '*';
-        criterias.push({
-          i: self.options.searchParam,
-          o: 'plone.app.querystring.operation.string.contains',
-          v: term
-        });
-      }
-      if (searchOptions.searchPath) {
-        criterias.push({
-          i: 'path',
-          o: self.options.pathOperator,
-          v: searchOptions.searchPath + '::' + self.options.pathDepth
-        });
-      } else if (self.pattern.browsing) {
-        criterias.push({
-          i: 'path',
-          o: self.options.pathOperator,
-          v: self.getCurrentPath() + '::' + self.options.pathDepth
-        });
-      }
-      criterias = criterias.concat(searchOptions.additionalCriterias);
-      return criterias;
+    var generateId = function (prefix) {
+        if (prefix === undefined) {
+            prefix = "id";
+        }
+        return (
+            prefix +
+            Math.floor((1 + Math.random()) * 0x10000)
+                .toString(16)
+                .substring(1)
+        );
     };
 
-    self.getQueryData = function(term, page) {
-      var data = {
-        query: JSON.stringify({
-          criteria: self.getCriterias(term),
-          sort_on: self.options.sort_on,
-          sort_order: self.options.sort_order
-        }),
-        attributes: JSON.stringify(self.options.attributes)
-      };
-      if (page) {
-        data.batch = JSON.stringify(self.getBatch(page));
-      }
-      return data;
+    var setId = function ($el, prefix) {
+        if (prefix === undefined) {
+            prefix = "id";
+        }
+        var id = $el.attr("id");
+        if (id === undefined) {
+            id = generateId(prefix);
+        } else {
+            /* hopefully we don't screw anything up here... changing the id
+             * in some cases so we get a decent selector */
+            id = id.replace(/\./g, "-");
+        }
+        $el.attr("id", id);
+        return id;
     };
 
-    self.getUrl = function() {
-      var url = self.options.vocabularyUrl;
-      if (url.indexOf('?') === -1) {
-        url += '?';
-      } else {
-        url += '&';
-      }
-      return url + $.param(self.getQueryData());
+    var getWindow = function () {
+        var win = window;
+        if (win.parent !== window) {
+            win = win.parent;
+        }
+        return win;
     };
 
-    self.selectAjax = function() {
-      return {
-        url: self.options.vocabularyUrl,
-        dataType: 'JSON',
-        quietMillis: 100,
-        data: function(term, page) {
-          return self.getQueryData(term, page);
+    var parseBodyTag = function (txt) {
+        return $(
+            /<body[^>]*>[^]*<\/body>/im
+                .exec(txt)[0]
+                .replace("<body", "<div")
+                .replace("</body>", "</div>")
+        )
+            .eq(0)
+            .html();
+    };
+
+    var featureSupport = {
+        /* Well tested feature support for things we use in mockup.
+         * All gathered from: http://diveintohtml5.info/everything.html
+         * Alternative to using some form of modernizr.
+         */
+        dragAndDrop: function () {
+            return "draggable" in document.createElement("span");
         },
-        results: function(data, page) {
-          var more = (page * 10) < data.total; // whether or not there are more results available
-          // notice we return the value of more so Select2 knows if more results can be loaded
-          return {
-            results: data.results,
-            more: more
-          };
+        fileApi: function () {
+            return typeof FileReader != "undefined"; // jshint ignore:line
+        },
+        history: function () {
+            return !!(window.history && window.history.pushState);
+        },
+    };
+
+    var bool = function (val) {
+        if (typeof val === "string") {
+            val = $.trim(val).toLowerCase();
         }
-      };
+        return (
+            ["false", false, "0", 0, "", undefined, null].indexOf(val) === -1
+        );
     };
 
-    self.search = function(term, operation, value, callback, useBaseCriteria, type) {
-      if (useBaseCriteria === undefined) {
-        useBaseCriteria = true;
-      }
-      if (type === undefined) {
-        type = 'GET';
-      }
-      var criteria = [];
-      if (useBaseCriteria) {
-        criteria = self.options.baseCriteria.slice(0);
-      }
-      criteria.push({
-        i: term,
-        o: operation,
-        v: value
-      });
-      var data = {
-        query: JSON.stringify({
-          criteria: criteria
-        }),
-        attributes: JSON.stringify(self.options.attributes)
-      };
-      $.ajax({
-        url: self.options.vocabularyUrl,
-        dataType: 'JSON',
-        data: data,
-        type: type,
-        success: callback
-      });
+    var escapeHTML = function (val) {
+        return $("<div/>").text(val).html();
     };
 
-    return self;
-  };
-
-  var Loading = function(options) {
-    /*
-     * Options:
-     *   backdrop(pattern): if you want to have the progress indicator work
-     *                      seamlessly with backdrop pattern
-     *   zIndex(integer or function): to override default z-index used
-     */
-    var self = this;
-    self.className = 'plone-loader';
-    var defaults = {
-      backdrop: null,
-      zIndex: 10005 // can be a function
-    };
-    if (!options) {
-      options = {};
-    }
-    self.options = $.extend({}, defaults, options);
-
-    self.init = function() {
-      self.$el = $('.' + self.className);
-      if (self.$el.length === 0) {
-        self.$el = $('<div><div></div></div>');
-        self.$el.addClass(self.className).hide().appendTo('body');
-      }
+    var removeHTML = function (val) {
+        return val.replace(/<[^>]+>/gi, "");
     };
 
-    self.show = function(closable) {
-      self.init();
-      self.$el.show();
-      var zIndex = self.options.zIndex;
-      if (typeof(zIndex) === 'function') {
-        zIndex = Math.max(zIndex(), 10005);
-      } else {
-        // go through all modals and backdrops and make sure we have a higher
-        // z-index to use
-        zIndex = 10005;
-        $('.plone-modal-wrapper,.plone-modal-backdrop').each(function() {
-          zIndex = Math.max(zIndex, $(this).css('zIndex') || 10005);
-        });
-        zIndex += 1;
-      }
-      self.$el.css('zIndex', zIndex);
+    var storage = {
+        // Simple local storage wrapper, which doesn't break down if it's not available.
+        get: function (name) {
+            if (window.localStorage) {
+                var val = window.localStorage[name];
+                return typeof val === "string" ? JSON.parse(val) : undefined;
+            }
+        },
 
-      if (closable === undefined) {
-        closable = true;
-      }
-      if (self.options.backdrop) {
-        self.options.backdrop.closeOnClick = closable;
-        self.options.backdrop.closeOnEsc = closable;
-        self.options.backdrop.init();
-        self.options.backdrop.show();
-      }
+        set: function (name, val) {
+            if (window.localStorage) {
+                window.localStorage[name] = JSON.stringify(val);
+            }
+        },
     };
 
-    self.hide = function() {
-      self.init();
-      self.$el.hide();
+    var createElementFromHTML = function (htmlString) {
+        // From: https://stackoverflow.com/a/494348/1337474
+        var div = document.createElement("div");
+        div.innerHTML = htmlString.trim();
+        return div.firstChild;
     };
 
-    return self;
-  };
-
-  var getAuthenticator = function() {
-    var $el = $('input[name="_authenticator"]');
-    if ($el.length === 0) {
-      $el = $('a[href*="_authenticator"]');
-      if ($el.length > 0) {
-        return $el.attr('href').split('_authenticator=')[1];
-      }
-      return '';
-    } else {
-      return $el.val();
-    }
-  };
-
-  var generateId = function(prefix) {
-    if (prefix === undefined) {
-      prefix = 'id';
-    }
-    return prefix + (Math.floor((1 + Math.random()) * 0x10000)
-      .toString(16).substring(1));
-  };
-
-  var setId = function($el, prefix) {
-    if (prefix === undefined) {
-      prefix = 'id';
-    }
-    var id = $el.attr('id');
-    if (id === undefined) {
-      id = generateId(prefix);
-    } else {
-      /* hopefully we don't screw anything up here... changing the id
-       * in some cases so we get a decent selector */
-      id = id.replace(/\./g, '-');
-    }
-    $el.attr('id', id);
-    return id;
-  };
-
-  var getWindow = function() {
-    var win = window;
-    if (win.parent !== window) {
-      win = win.parent;
-    }
-    return win;
-  };
-
-  var parseBodyTag = function(txt) {
-    return $((/<body[^>]*>[^]*<\/body>/im).exec(txt)[0]
-      .replace('<body', '<div').replace('</body>', '</div>')).eq(0).html();
-  };
-
-  var featureSupport = {
-    /* Well tested feature support for things we use in mockup.
-     * All gathered from: http://diveintohtml5.info/everything.html
-     * Alternative to using some form of modernizr.
-     */
-    dragAndDrop: function() {
-      return 'draggable' in document.createElement('span');
-    },
-    fileApi: function() {
-      return typeof FileReader != 'undefined'; // jshint ignore:line
-    },
-    history: function() {
-      return !!(window.history && window.history.pushState);
-    }
-  };
-
-  var bool = function(val) {
-    if (typeof val === 'string') {
-      val = $.trim(val).toLowerCase();
-    }
-    return ['false', false, '0', 0, '', undefined, null].indexOf(val) === -1;
-  };
-
-  var escapeHTML = function(val) {
-    return $('<div/>').text(val).html();
-  };
-
-  var removeHTML = function(val) {
-    return val.replace(/<[^>]+>/ig, '');
-  };
-
-  var storage = {
-    // Simple local storage wrapper, which doesn't break down if it's not available.
-    get: function (name) {
-        if (window.localStorage) {
-          var val = window.localStorage[name];
-          return typeof(val) === 'string' ? JSON.parse(val) : undefined;
-      }
-    },
-
-    set: function (name, val) {
-      if (window.localStorage) {
-        window.localStorage[name] = JSON.stringify(val);
-      }
-    }
-  };
-
-  var createElementFromHTML = function(htmlString) {
-    // From: https://stackoverflow.com/a/494348/1337474
-    var div = document.createElement('div');
-    div.innerHTML = htmlString.trim();
-    return div.firstChild;
-  };
-
-  return {
-    bool: bool,
-    escapeHTML: escapeHTML,
-    removeHTML: removeHTML,
-    featureSupport: featureSupport,
-    generateId: generateId,
-    getAuthenticator: getAuthenticator,
-    getWindow: getWindow,
-    Loading: Loading,
-    loading: new Loading(),  // provide default loader
-    parseBodyTag: parseBodyTag,
-    QueryHelper: QueryHelper,
-    setId: setId,
-    storage: storage,
-    createElementFromHTML: createElementFromHTML
-  };
+    return {
+        bool: bool,
+        escapeHTML: escapeHTML,
+        removeHTML: removeHTML,
+        featureSupport: featureSupport,
+        generateId: generateId,
+        getAuthenticator: getAuthenticator,
+        getWindow: getWindow,
+        Loading: Loading,
+        loading: new Loading(), // provide default loader
+        parseBodyTag: parseBodyTag,
+        QueryHelper: QueryHelper,
+        setId: setId,
+        storage: storage,
+        createElementFromHTML: createElementFromHTML,
+    };
 });
 
 /* Tree pattern.
@@ -4793,67 +4940,68 @@ define('mockup-utils',[
  *
  */
 
+define('mockup-patterns-tree',["jquery", "pat-base", "mockup-utils", "jqtree"], function (
+    $,
+    Base,
+    utils
+) {
+    "use strict";
 
-define('mockup-patterns-tree',[
-  'jquery',
-  'pat-base',
-  'mockup-utils',
-  'jqtree'
-], function($, Base, utils) {
-  'use strict';
+    var Tree = Base.extend({
+        name: "tree",
+        trigger: ".pat-tree",
+        parser: "mockup",
+        defaults: {
+            dragAndDrop: false,
+            autoOpen: false,
+            selectable: true,
+            keyboardSupport: true,
+            onLoad: null,
+        },
+        init: function () {
+            var self = this;
+            /* convert all bool options */
+            for (var optionKey in self.options) {
+                var def = self.defaults[optionKey];
+                if (def !== undefined && typeof def === "boolean") {
+                    self.options[optionKey] = utils.bool(
+                        self.options[optionKey]
+                    );
+                }
+            }
 
-  var Tree = Base.extend({
-    name: 'tree',
-    trigger: '.pat-tree',
-    parser: 'mockup',
-    defaults: {
-      dragAndDrop: false,
-      autoOpen: false,
-      selectable: true,
-      keyboardSupport: true,
-      onLoad: null
-    },
-    init: function() {
-      var self = this;
-      /* convert all bool options */
-      for (var optionKey in self.options) {
-        var def = self.defaults[optionKey];
-        if (def !== undefined && typeof(def) === 'boolean') {
-          self.options[optionKey] = utils.bool(self.options[optionKey]);
-        }
-      }
+            if (self.options.onCanMoveTo === undefined) {
+                self.options.onCanMoveTo = function (moved, target, position) {
+                    /* if not using folder option, just allow, otherwise, only allow if folder */
+                    if (position === "inside") {
+                        return (
+                            target.folder === undefined ||
+                            target.folder === true
+                        );
+                    }
+                    return true;
+                };
+            }
 
-      if (self.options.onCanMoveTo === undefined) {
-        self.options.onCanMoveTo = function(moved, target, position) {
-          /* if not using folder option, just allow, otherwise, only allow if folder */
-          if (position === "inside") {
-            return target.folder === undefined || target.folder === true;
-          }
-          return true;
-        }
-      }
+            if (self.options.data && typeof self.options.data === "string") {
+                self.options.data = $.parseJSON(self.options.data);
+            }
+            if (self.options.onLoad !== null) {
+                // delay generating tree...
+                var options = $.extend({}, self.options);
+                $.getJSON(options.dataUrl, function (data) {
+                    options.data = data;
+                    delete options.dataUrl;
+                    self.tree = self.$el.tree(options);
+                    self.options.onLoad(self);
+                });
+            } else {
+                self.tree = self.$el.tree(self.options);
+            }
+        },
+    });
 
-      if (self.options.data && typeof(self.options.data) === 'string') {
-        self.options.data = $.parseJSON(self.options.data);
-      }
-      if (self.options.onLoad !== null){
-        // delay generating tree...
-        var options = $.extend({}, self.options);
-        $.getJSON(options.dataUrl, function(data) {
-          options.data = data;
-          delete options.dataUrl;
-          self.tree = self.$el.tree(options);
-          self.options.onLoad(self);
-        });
-      } else {
-        self.tree = self.$el.tree(self.options);
-      }
-    }
-  });
-
-
-  return Tree;
-
+    return Tree;
 });
 
 (function(root) {
@@ -23988,111 +24136,120 @@ exports.version = "1.2.6";
  *
  */
 
+define('mockup-patterns-texteditor',["jquery", "pat-base", "mockup-utils", "ace"], function (
+    $,
+    Base,
+    utils
+) {
+    "use strict";
 
-define('mockup-patterns-texteditor',[
-  'jquery',
-  'pat-base',
-  'mockup-utils',
-  'ace',
-], function($, Base, utils) {
-  'use strict';
+    var AcePattern = Base.extend({
+        name: "texteditor",
+        trigger: ".pat-texteditor",
+        parser: "mockup",
+        defaults: {
+            theme: null,
+            mode: "text",
+            width: 500,
+            height: 200,
+            tabSize: 4,
+            softTabs: true,
+            wrapMode: false,
+            showGutter: true,
+            showPrintMargin: false,
+            readOnly: false,
+        },
+        init: function () {
+            var self = this;
+            if (!window.ace) {
+                // XXX hack...
+                // wait, try loading later
+                setTimeout(function () {
+                    self.init();
+                }, 200);
+                return;
+            }
+            var ace = window.ace;
 
-  var AcePattern = Base.extend({
-    name: 'texteditor',
-    trigger: '.pat-texteditor',
-    parser: 'mockup',
-    defaults: {
-      theme: null,
-      mode: 'text',
-      width: 500,
-      height: 200,
-      tabSize: 4,
-      softTabs: true,
-      wrapMode: false,
-      showGutter: true,
-      showPrintMargin: false,
-      readOnly: false
-    },
-    init: function() {
-      var self = this;
-      if (!window.ace){
-        // XXX hack...
-        // wait, try loading later
-        setTimeout(function() {
-          self.init();
-        }, 200);
-        return;
-      }
-      var ace = window.ace;
+            ace.config.set("packaged", true);
+            ace.config.set(
+                "basePath",
+                "++plone++static/components/ace-builds/src/"
+            );
 
-      ace.config.set("packaged", true);
-      ace.config.set("basePath", "++plone++static/components/ace-builds/src/");
+            // set id on current element
+            var id = utils.setId(self.$el);
+            self.$wrapper = $('<div class="editorWrapper" />').css({
+                height: parseInt(self.options.height) + 25, // weird sizing issue here...
+                width: self.options.width,
+                position: "relative",
+            });
+            if (!self.$el.parent().hasClass("editorWrapper")) {
+                self.$el.wrap(self.$wrapper);
+            }
+            self.$el.css({
+                width: self.options.width,
+                height: self.options.height,
+                position: "absolute",
+            });
 
-      // set id on current element
-      var id = utils.setId(self.$el);
-      self.$wrapper = $('<div class="editorWrapper" />').css({
-        height: parseInt(self.options.height) + 25, // weird sizing issue here...
-        width: self.options.width,
-        position: 'relative'
-      });
-      if( !self.$el.parent().hasClass('editorWrapper') ) {
-          self.$el.wrap(self.$wrapper);
-      }
-      self.$el.css({
-        width: self.options.width,
-        height: self.options.height,
-        position: 'absolute'
-      });
+            self.editor = ace.edit(id);
+            if (self.options.theme) {
+                self.setTheme(self.options.theme);
+            }
+            self.editor.getSession().setMode("ace/mode/" + self.options.mode);
+            self.editor
+                .getSession()
+                .setTabSize(parseInt(self.options.tabSize, 10));
+            self.editor
+                .getSession()
+                .setUseSoftTabs(utils.bool(self.options.softTabs));
+            self.editor
+                .getSession()
+                .setUseWrapMode(utils.bool(self.options.wrapMode));
+            self.editor.renderer.setShowGutter(
+                utils.bool(self.options.showGutter)
+            );
+            self.editor.setShowPrintMargin(
+                utils.bool(self.options.showPrintMargin)
+            );
+            self.editor.setReadOnly(utils.bool(self.options.readOnly));
+        },
+        setSyntax: function (name) {
+            var self = this;
+            var modes = {
+                js: "javascript",
+                txt: "text",
+                css: "css",
+                html: "html",
+                xml: "xml",
+                less: "less",
+                py: "python",
+                pt: "xml",
+                cfg: "ini",
+            };
 
-      self.editor = ace.edit(id);
-      if (self.options.theme) {
-        self.setTheme(self.options.theme);
-      }
-      self.editor.getSession().setMode('ace/mode/' + self.options.mode);
-      self.editor.getSession().setTabSize(parseInt(self.options.tabSize, 10));
-      self.editor.getSession().setUseSoftTabs(utils.bool(self.options.softTabs));
-      self.editor.getSession().setUseWrapMode(utils.bool(self.options.wrapMode));
-      self.editor.renderer.setShowGutter(utils.bool(self.options.showGutter));
-      self.editor.setShowPrintMargin(utils.bool(self.options.showPrintMargin));
-      self.editor.setReadOnly(utils.bool(self.options.readOnly));
-    },
-    setSyntax: function(name)
-    {
-      var self = this;
-      var modes = {
-        'js': 'javascript',
-        'txt': 'text',
-        'css': 'css',
-        'html': 'html',
-        'xml': 'xml',
-        'less': 'less',
-        'py': 'python',
-        'pt': 'xml',
-        'cfg': 'ini'
-      };
+            var extension = name.substr(name.lastIndexOf(".") + 1);
+            var mode = modes[extension];
 
-      var extension = name.substr(name.lastIndexOf('.') + 1);
-      var mode = modes[extension];
+            if (mode !== undefined) {
+                self.editor.getSession().setMode("ace/mode/" + mode);
+                return true;
+            }
+        },
+        setTheme: function (theme) {
+            var self = this;
+            self.editor.setTheme("ace/theme/" + theme);
+        },
+        setText: function (data) {
+            var self = this;
+            if (self.editor) {
+                self.editor.setValue(data);
+            }
+        },
+    });
 
-      if (mode !== undefined){
-        self.editor.getSession().setMode('ace/mode/' + mode);
-        return true;
-      }
-    },
-    setTheme: function(theme) {
-      var self = this;
-      self.editor.setTheme('ace/theme/' + theme);
-    },
-    setText: function(data) {
-      var self = this;
-      if(self.editor){
-        self.editor.setValue(data);
-      }
-    }
-  });
-
-  return AcePattern;
-
+    return AcePattern;
 });
 
 
@@ -25707,187 +25864,199 @@ define('text!mockup-patterns-filemanager-url/templates/app.xml',[],function () {
 
 }));
 
-define('mockup-ui-url/views/base',[
-  'jquery',
-  'underscore',
-  'backbone',
-  'translate'
-], function($, _, Backbone, _t) {
-  'use strict';
+define('mockup-ui-url/views/base',["jquery", "underscore", "backbone", "translate"], function (
+    $,
+    _,
+    Backbone,
+    _t
+) {
+    "use strict";
 
-  var BaseView = Backbone.View.extend({
-    isUIView: true,
-    eventPrefix: 'ui',
-    template: null,
-    idPrefix: 'base-',
-    appendInContainer: true,
-    initialize: function(options) {
-      this.options = options;
-      for (var key in this.options) {
-        this[key] = this.options[key];
-      }
-      this.options._t = _t;
-    },
-    render: function() {
-      this.applyTemplate();
-
-      this.trigger('render', this);
-      this.afterRender();
-
-      if (this.options.id) {
-        // apply id to element
-        this.$el.attr('id', this.idPrefix + this.options.id);
-      }
-      return this;
-    },
-    afterRender: function() {
-
-    },
-    serializedModel: function() {
-      return this.options;
-    },
-    applyTemplate: function() {
-      if (this.template !== null) {
-        var data = $.extend({_t: _t}, this.options, this.serializedModel());
-        var template = this.template;
-        if(typeof(template) === 'string'){
-          template = _.template(template);
-        }
-        this.$el.html(template(data));
-      }
-    },
-    propagateEvent: function(eventName) {
-      if (eventName.indexOf(':') > 0) {
-        var eventId = eventName.split(':')[0];
-        if (this.eventPrefix !== '') {
-          if (eventId === this.eventPrefix ||
-              eventId === this.eventPrefix + '.' + this.id) { return true; }
-        }
-      }
-      return false;
-    },
-    uiEventTrigger: function(name) {
-      var args = [].slice.call(arguments, 0);
-
-      if (this.eventPrefix !== '') {
-        args[0] = this.eventPrefix + ':' + name;
-        Backbone.View.prototype.trigger.apply(this, args);
-        if (this.id) {
-          args[0] =  this.eventPrefix + '.' + this.id + ':' + name;
-          Backbone.View.prototype.trigger.apply(this, args);
-        }
-      }
-    }
-  });
-
-  return BaseView;
-});
-
-define('mockup-ui-url/views/container',[
-  'jquery',
-  'underscore',
-  'mockup-ui-url/views/base'
-], function($, _, BaseView) {
-  'use strict';
-
-  var Container = BaseView.extend({
-    id: '',
-    items: [],
-    itemContainer: null,
-    isOffsetParent: true,
-    idPrefix: 'container-',
-    render: function() {
-      if (this.options.id) {
-        this.$el.attr('id', this.idPrefix + this.options.id);
-      }
-
-      this.applyTemplate();
-
-      this.renderItems();
-      this.bindEvents();
-
-      if (this.isOffsetParent) {
-        this.$el.addClass('ui-offset-parent');
-      }
-
-      this.trigger('render', this);
-
-      this.afterRender();
-
-      this.$el.data('component', this);
-      return this;
-    },
-    renderItems: function() {
-      var $container;
-
-      if (this.itemContainer !== null) {
-        $container = $(this.itemContainer, this.$el);
-        if ($container.length === 0) {
-          throw 'Item Container element not found.';
-        }
-      } else {
-        $container = this.$el;
-      }
-      _.each(this.items, function(view) {
-        if (view.appendInContainer === true) {
-          $container.append(view.render().$el);
-        } else {
-          view.render();
-        }
-      }, this);
-    },
-    bindEvents: function() {
-      var self = this;
-      _.each(this.items, function(view) {
-        view.on('all', function() {
-          var slice = [].slice;
-          var eventName = arguments[0];
-          var eventTarget;
-          var newName = self.id !== '' ? self.id + '.' + eventName : eventName;
-          if (arguments.length > 1) {
-            eventTarget = arguments[1];
-          }
-          if (newName !== eventName) {
-            var newArgs = slice.call(arguments, 0);
-            newArgs[0] = newName;
-            self.trigger.apply(self, newArgs);
-          }
-          if (eventTarget !== undefined && eventTarget.isUIView === true) {
-            if (eventTarget.propagateEvent(eventName) === true) {
-              self.trigger.apply(self, arguments);
+    var BaseView = Backbone.View.extend({
+        isUIView: true,
+        eventPrefix: "ui",
+        template: null,
+        idPrefix: "base-",
+        appendInContainer: true,
+        initialize: function (options) {
+            this.options = options;
+            for (var key in this.options) {
+                this[key] = this.options[key];
             }
-          }
-        });
-      });
-    },
-    get: function(id) {
-      // Remove the recursive part because it was confusing if two children had the
-      // same id
-      return _.findWhere(this.items, {'id': id});
-    },
-    add: function(item) {
-      if (item.id !== undefined && this.get(item.id)) {
-        throw 'Another item with the same `id` already exists.';
-      }
-      this.items.push(item);
-    }
-  });
+            this.options._t = _t;
+        },
+        render: function () {
+            this.applyTemplate();
 
-  return Container;
+            this.trigger("render", this);
+            this.afterRender();
+
+            if (this.options.id) {
+                // apply id to element
+                this.$el.attr("id", this.idPrefix + this.options.id);
+            }
+            return this;
+        },
+        afterRender: function () {},
+        serializedModel: function () {
+            return this.options;
+        },
+        applyTemplate: function () {
+            if (this.template !== null) {
+                var data = $.extend(
+                    { _t: _t },
+                    this.options,
+                    this.serializedModel()
+                );
+                var template = this.template;
+                if (typeof template === "string") {
+                    template = _.template(template);
+                }
+                this.$el.html(template(data));
+            }
+        },
+        propagateEvent: function (eventName) {
+            if (eventName.indexOf(":") > 0) {
+                var eventId = eventName.split(":")[0];
+                if (this.eventPrefix !== "") {
+                    if (
+                        eventId === this.eventPrefix ||
+                        eventId === this.eventPrefix + "." + this.id
+                    ) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        },
+        uiEventTrigger: function (name) {
+            var args = [].slice.call(arguments, 0);
+
+            if (this.eventPrefix !== "") {
+                args[0] = this.eventPrefix + ":" + name;
+                Backbone.View.prototype.trigger.apply(this, args);
+                if (this.id) {
+                    args[0] = this.eventPrefix + "." + this.id + ":" + name;
+                    Backbone.View.prototype.trigger.apply(this, args);
+                }
+            }
+        },
+    });
+
+    return BaseView;
 });
 
-define('mockup-ui-url/views/toolbar',[
-  'mockup-ui-url/views/container'
-], function(ContainerView) {
-  'use strict';
+define('mockup-ui-url/views/container',["jquery", "underscore", "mockup-ui-url/views/base"], function (
+    $,
+    _,
+    BaseView
+) {
+    "use strict";
 
-  var Toolbar = ContainerView.extend({
-    tagName: 'div',
-    className: 'navbar',
-    idPrefix: 'toolbar-'
-  });
+    var Container = BaseView.extend({
+        id: "",
+        items: [],
+        itemContainer: null,
+        isOffsetParent: true,
+        idPrefix: "container-",
+        render: function () {
+            if (this.options.id) {
+                this.$el.attr("id", this.idPrefix + this.options.id);
+            }
 
-  return Toolbar;
+            this.applyTemplate();
+
+            this.renderItems();
+            this.bindEvents();
+
+            if (this.isOffsetParent) {
+                this.$el.addClass("ui-offset-parent");
+            }
+
+            this.trigger("render", this);
+
+            this.afterRender();
+
+            this.$el.data("component", this);
+            return this;
+        },
+        renderItems: function () {
+            var $container;
+
+            if (this.itemContainer !== null) {
+                $container = $(this.itemContainer, this.$el);
+                if ($container.length === 0) {
+                    throw "Item Container element not found.";
+                }
+            } else {
+                $container = this.$el;
+            }
+            _.each(
+                this.items,
+                function (view) {
+                    if (view.appendInContainer === true) {
+                        $container.append(view.render().$el);
+                    } else {
+                        view.render();
+                    }
+                },
+                this
+            );
+        },
+        bindEvents: function () {
+            var self = this;
+            _.each(this.items, function (view) {
+                view.on("all", function () {
+                    var slice = [].slice;
+                    var eventName = arguments[0];
+                    var eventTarget;
+                    var newName =
+                        self.id !== "" ? self.id + "." + eventName : eventName;
+                    if (arguments.length > 1) {
+                        eventTarget = arguments[1];
+                    }
+                    if (newName !== eventName) {
+                        var newArgs = slice.call(arguments, 0);
+                        newArgs[0] = newName;
+                        self.trigger.apply(self, newArgs);
+                    }
+                    if (
+                        eventTarget !== undefined &&
+                        eventTarget.isUIView === true
+                    ) {
+                        if (eventTarget.propagateEvent(eventName) === true) {
+                            self.trigger.apply(self, arguments);
+                        }
+                    }
+                });
+            });
+        },
+        get: function (id) {
+            // Remove the recursive part because it was confusing if two children had the
+            // same id
+            return _.findWhere(this.items, { id: id });
+        },
+        add: function (item) {
+            if (item.id !== undefined && this.get(item.id)) {
+                throw "Another item with the same `id` already exists.";
+            }
+            this.items.push(item);
+        },
+    });
+
+    return Container;
+});
+
+define('mockup-ui-url/views/toolbar',["mockup-ui-url/views/container"], function (ContainerView) {
+    "use strict";
+
+    var Toolbar = ContainerView.extend({
+        tagName: "div",
+        className: "navbar",
+        idPrefix: "toolbar-",
+    });
+
+    return Toolbar;
 });
 
 /* Tooltip pattern.
@@ -25934,712 +26103,884 @@ define('mockup-ui-url/views/toolbar',[
  *
  */
 
-define('mockup-patterns-tooltip',[
-  'jquery',
-  'pat-base'
-], function($, Base, undefined) {
-  'use strict';
+define('mockup-patterns-tooltip',["jquery", "pat-base"], function ($, Base, undefined) {
+    "use strict";
 
-  //This is pulled almost directly from the Bootstrap Tooltip
-  //extension. We rename it just to differentiate from the pattern.
-  var bootstrapTooltip = function (element, options) {
-    this.type       =
-    this.options    =
-    this.enabled    =
-    this.timeout    =
-    this.hoverState =
-    this.$element   = null
+    //This is pulled almost directly from the Bootstrap Tooltip
+    //extension. We rename it just to differentiate from the pattern.
+    var bootstrapTooltip = function (element, options) {
+        this.type = this.options = this.enabled = this.timeout = this.hoverState = this.$element = null;
 
-    this.init('tooltip', element, options)
-  }
+        this.init("tooltip", element, options);
+    };
 
-  bootstrapTooltip.VERSION  = '3.2.0'
+    bootstrapTooltip.VERSION = "3.2.0";
 
-  bootstrapTooltip.DEFAULTS = {
-    animation: true,
-    placement: 'auto',
-    selector: false,
-    template: '<div class="tooltip mockup-tooltip" role="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>',
-    trigger: 'hover focus',
-    title: '',
-    delay: 0,
-    html: true,  // TODO: fix bug, where this setting overwrites whatever is set in options
-    container: false,
-    viewport: {
-      selector: 'body',
-      padding: 0
-    }
-  }
+    bootstrapTooltip.DEFAULTS = {
+        animation: true,
+        placement: "auto",
+        selector: false,
+        template:
+            '<div class="tooltip mockup-tooltip" role="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>',
+        trigger: "hover focus",
+        title: "",
+        delay: 0,
+        html: true, // TODO: fix bug, where this setting overwrites whatever is set in options
+        container: false,
+        viewport: {
+            selector: "body",
+            padding: 0,
+        },
+    };
 
-  bootstrapTooltip.prototype.init = function (type, element, options) {
-    this.enabled   = true
-    this.type      = type
-    this.$element  = $(element)
-    this.options   = this.getOptions(options)
-    this.$viewport = this.options.viewport && $(this.options.viewport.selector || this.options.viewport)
+    bootstrapTooltip.prototype.init = function (type, element, options) {
+        this.enabled = true;
+        this.type = type;
+        this.$element = $(element);
+        this.options = this.getOptions(options);
+        this.$viewport =
+            this.options.viewport &&
+            $(this.options.viewport.selector || this.options.viewport);
 
-    var triggers = this.options.trigger.split(' ')
+        var triggers = this.options.trigger.split(" ");
 
-    for (var i = triggers.length; i--;) {
-      var trigger = triggers[i]
+        for (var i = triggers.length; i--; ) {
+            var trigger = triggers[i];
 
-      if (trigger == 'click') {
-        this.$element.on('click.' + this.type, this.options.selector, $.proxy(this.toggle, this))
-      } else if (trigger != 'manual') {
-        var eventIn  = trigger == 'hover' ? 'mouseenter' : 'focusin'
-        var eventOut = trigger == 'hover' ? 'mouseleave' : 'focusout'
+            if (trigger == "click") {
+                this.$element.on(
+                    "click." + this.type,
+                    this.options.selector,
+                    $.proxy(this.toggle, this)
+                );
+            } else if (trigger != "manual") {
+                var eventIn = trigger == "hover" ? "mouseenter" : "focusin";
+                var eventOut = trigger == "hover" ? "mouseleave" : "focusout";
 
-        this.$element.on(eventIn  + '.' + this.type, this.options.selector, $.proxy(this.enter, this))
-        this.$element.on(eventOut + '.' + this.type, this.options.selector, $.proxy(this.leave, this))
-      }
-    }
-
-    this.options.selector ?
-      (this._options = $.extend({}, this.options, { trigger: 'manual', selector: '' })) :
-      this.fixTitle()
-  }
-
-  bootstrapTooltip.prototype.getDefaults = function () {
-    return bootstrapTooltip.DEFAULTS
-  }
-
-  bootstrapTooltip.prototype.getOptions = function (options) {
-    options = $.extend({}, this.getDefaults(), this.$element.data(), options)
-
-    if (options.delay && typeof options.delay == 'number') {
-      options.delay = {
-        show: options.delay,
-        hide: options.delay
-      }
-    }
-
-    return options
-  }
-
-  bootstrapTooltip.prototype.getDelegateOptions = function () {
-    var options  = {}
-    var defaults = this.getDefaults()
-
-    this._options && $.each(this._options, function (key, value) {
-      if (defaults[key] != value) options[key] = value
-    })
-
-    return options
-  }
-
-  bootstrapTooltip.prototype.enter = function (obj) {
-    var self = obj instanceof this.constructor ?
-      obj : $(obj.currentTarget).data('bs.' + this.type)
-
-    if (!self) {
-      self = new this.constructor(obj.currentTarget, this.getDelegateOptions())
-      $(obj.currentTarget).data('bs.' + this.type, self)
-    }
-
-    self.leaving = false;
-
-    clearTimeout(self.timeout)
-
-    self.hoverState = 'in'
-
-    if (!self.options.delay || !self.options.delay.show) return self.show()
-
-    self.timeout = setTimeout(function () {
-      if (self.hoverState == 'in') self.show()
-    }, self.options.delay.show)
-  }
-
-  bootstrapTooltip.prototype.leave = function (obj) {
-    var self = obj instanceof this.constructor ?
-      obj : $(obj.currentTarget).data('bs.' + this.type)
-    self.leaving = true;
-
-    if (!self) {
-      self = new this.constructor(obj.currentTarget, this.getDelegateOptions())
-      $(obj.currentTarget).data('bs.' + this.type, self)
-    }
-
-    clearTimeout(self.timeout)
-
-    self.hoverState = 'out'
-
-    if (!self.options.delay || !self.options.delay.hide) return self.hide()
-
-    self.timeout = setTimeout(function () {
-      if (self.hoverState == 'out') self.hide()
-    }, self.options.delay.hide)
-  }
-
-  bootstrapTooltip.prototype.show = function () {
-    var e = $.Event('show.bs.' + this.type)
-
-    if (this.hasContent() && this.enabled) {
-      this.$element.trigger(e)
-      var inDom = $.contains(document.documentElement, this.$element[0])
-      if (e.isDefaultPrevented() || !inDom) return
-
-      var $tip = this.tip()
-
-      var tipId = this.getUID(this.type)
-      var self = this;
-      this.setContent().then(function() {
-      $tip.attr('id', tipId)
-      self.$element.attr('aria-describedby', tipId)
-
-      if (self.options.animation) $tip.addClass('fade')
-
-      var placement = typeof self.options.placement == 'function' ?
-        self.options.placement.call(self, $tip[0], self.$element[0]) :
-        self.options.placement
-
-      var autoToken = /\s?auto?\s?/i
-      var autoPlace = autoToken.test(placement)
-      if (autoPlace) placement = placement.replace(autoToken, '') || 'top'
-
-      $tip
-        .detach()
-        .css({ top: 0, left: 0, display: 'block' })
-        .addClass(placement)
-        .data('bs.' + self.type, self)
-
-      self.options.container ? $tip.appendTo(self.options.container) : $tip.insertAfter(self.$element)
-
-      var pos          = self.getPosition()
-      var actualWidth  = $tip[0].offsetWidth
-      var actualHeight = $tip[0].offsetHeight
-
-      if (autoPlace) {
-        var orgPlacement = placement
-        var $parent      = self.$element.parent()
-        var parentDim    = self.getPosition($parent)
-
-        placement = placement == 'bottom' && pos.top   + pos.height       + actualHeight - parentDim.scroll > parentDim.height ? 'top'    :
-                    placement == 'top'    && pos.top   - parentDim.scroll - actualHeight < 0                                   ? 'bottom' :
-                    placement == 'right'  && pos.right + actualWidth      > parentDim.width                                    ? 'left'   :
-                    placement == 'left'   && pos.left  - actualWidth      < parentDim.left                                     ? 'right'  :
-                    placement
-
-        $tip
-          .removeClass(orgPlacement)
-          .addClass(placement)
-      }
-
-      var calculatedOffset = self.getCalculatedOffset(placement, pos, actualWidth, actualHeight)
-
-      self.applyPlacement(calculatedOffset, placement)
-
-      var complete = function () {
-        self.$element.trigger('shown.bs.' + self.type);
-        self.hoverState = null;
-        if (self.leaving) {  // prevent a race condition bug when user has leaved before complete
-          self.leave(self);
+                this.$element.on(
+                    eventIn + "." + this.type,
+                    this.options.selector,
+                    $.proxy(this.enter, this)
+                );
+                this.$element.on(
+                    eventOut + "." + this.type,
+                    this.options.selector,
+                    $.proxy(this.leave, this)
+                );
+            }
         }
-      }
 
-      $.support.transition && self.$tip.hasClass('fade') ?
-        $tip
-          .one('bsTransitionEnd', complete)
-          .emulateTransitionEnd(150) :
-        complete()
-      })
-    }
-  };
+        this.options.selector
+            ? (this._options = $.extend({}, this.options, {
+                  trigger: "manual",
+                  selector: "",
+              }))
+            : this.fixTitle();
+    };
 
-  bootstrapTooltip.prototype.applyPlacement = function (offset, placement) {
-    var $tip   = this.tip()
-    var width  = $tip[0].offsetWidth
-    var height = $tip[0].offsetHeight
+    bootstrapTooltip.prototype.getDefaults = function () {
+        return bootstrapTooltip.DEFAULTS;
+    };
 
-    // manually read margins because getBoundingClientRect includes difference
-    var marginTop = parseInt($tip.css('margin-top'), 10)
-    var marginLeft = parseInt($tip.css('margin-left'), 10)
+    bootstrapTooltip.prototype.getOptions = function (options) {
+        options = $.extend(
+            {},
+            this.getDefaults(),
+            this.$element.data(),
+            options
+        );
 
-    // we must check for NaN for ie 8/9
-    if (isNaN(marginTop))  marginTop  = 0
-    if (isNaN(marginLeft)) marginLeft = 0
+        if (options.delay && typeof options.delay == "number") {
+            options.delay = {
+                show: options.delay,
+                hide: options.delay,
+            };
+        }
 
-    offset.top  = offset.top  + marginTop
-    offset.left = offset.left + marginLeft
+        return options;
+    };
 
-    // $.fn.offset doesn't round pixel values
-    // so we use setOffset directly with our own function B-0
-    $.offset.setOffset($tip[0], $.extend({
-      using: function (props) {
-        $tip.css({
-          top: Math.round(props.top),
-          left: Math.round(props.left)
-        })
-      }
-    }, offset), 0)
+    bootstrapTooltip.prototype.getDelegateOptions = function () {
+        var options = {};
+        var defaults = this.getDefaults();
 
-    $tip.addClass('in')
+        this._options &&
+            $.each(this._options, function (key, value) {
+                if (defaults[key] != value) options[key] = value;
+            });
 
-    // check to see if placing tip in new offset caused the tip to resize itself
-    var actualWidth  = $tip[0].offsetWidth
-    var actualHeight = $tip[0].offsetHeight
+        return options;
+    };
 
-    if (placement == 'top' && actualHeight != height) {
-      offset.top = offset.top + height - actualHeight
-    }
+    bootstrapTooltip.prototype.enter = function (obj) {
+        var self =
+            obj instanceof this.constructor
+                ? obj
+                : $(obj.currentTarget).data("bs." + this.type);
 
-    var delta = this.getViewportAdjustedDelta(placement, offset, actualWidth, actualHeight)
+        if (!self) {
+            self = new this.constructor(
+                obj.currentTarget,
+                this.getDelegateOptions()
+            );
+            $(obj.currentTarget).data("bs." + this.type, self);
+        }
 
-    if (delta.left) offset.left += delta.left
-    else offset.top += delta.top
+        self.leaving = false;
 
-    var arrowDelta          = delta.left ? delta.left * 2 - width + actualWidth : delta.top * 2 - height + actualHeight
-    var arrowPosition       = delta.left ? 'left'        : 'top'
-    var arrowOffsetPosition = delta.left ? 'offsetWidth' : 'offsetHeight'
+        clearTimeout(self.timeout);
 
-    $tip.offset(offset)
-    this.replaceArrow(arrowDelta, $tip[0][arrowOffsetPosition], arrowPosition)
-  }
+        self.hoverState = "in";
 
-  bootstrapTooltip.prototype.replaceArrow = function (delta, dimension, position) {
-    this.arrow().css(position, delta ? (50 * (1 - delta / dimension) + '%') : '')
-  }
+        if (!self.options.delay || !self.options.delay.show) return self.show();
 
-  bootstrapTooltip.prototype.setContent = function () {
-    var $tip  = this.tip();
-    var type = this.options.html ? 'html' : 'text';
-    var selector = this.options.patTooltip ? this.options.patTooltip.contentSelector : null;
+        self.timeout = setTimeout(function () {
+            if (self.hoverState == "in") self.show();
+        }, self.options.delay.show);
+    };
 
-    function setContent(content) {
-      if (type === 'html' && !!selector) {
-        content = $(content).find(selector).html();
-      }
-      $tip.find('.tooltip-inner')[type](content);
-    }
-    function removeClasses() {
-      $tip.removeClass('fade in top bottom left right')
-    }
-    var title = this.getTitle();
-    var url = this.getUrl();
-      if (!!url) {
-        removeClasses();
-        return $.get(url).then(function(content) {
-          setContent(content);
-        });
-      } else {
-        removeClasses();
-        setContent(title);
-        return new Promise(function(resolve, reject) {
-          resolve(title)
-        });
-      }
+    bootstrapTooltip.prototype.leave = function (obj) {
+        var self =
+            obj instanceof this.constructor
+                ? obj
+                : $(obj.currentTarget).data("bs." + this.type);
+        self.leaving = true;
 
-  };
+        if (!self) {
+            self = new this.constructor(
+                obj.currentTarget,
+                this.getDelegateOptions()
+            );
+            $(obj.currentTarget).data("bs." + this.type, self);
+        }
 
-  bootstrapTooltip.prototype.getUrl = function () {
-    return this.options.patTooltip ? this.options.patTooltip.ajaxUrl : null;
-  };
+        clearTimeout(self.timeout);
 
-  bootstrapTooltip.prototype.hide = function () {
-    var that = this
-    var $tip = this.tip()
-    var e    = $.Event('hide.bs.' + this.type)
+        self.hoverState = "out";
 
-    this.$element.removeAttr('aria-describedby')
+        if (!self.options.delay || !self.options.delay.hide) return self.hide();
 
-    function complete() {
-      if (that.hoverState != 'in') $tip.detach()
-      that.$element.trigger('hidden.bs.' + that.type)
-    }
+        self.timeout = setTimeout(function () {
+            if (self.hoverState == "out") self.hide();
+        }, self.options.delay.hide);
+    };
 
-    this.$element.trigger(e)
+    bootstrapTooltip.prototype.show = function () {
+        var e = $.Event("show.bs." + this.type);
 
-    if (e.isDefaultPrevented()) return
+        if (this.hasContent() && this.enabled) {
+            this.$element.trigger(e);
+            var inDom = $.contains(document.documentElement, this.$element[0]);
+            if (e.isDefaultPrevented() || !inDom) return;
 
-    $tip.removeClass('in')
+            var $tip = this.tip();
 
-    $.support.transition && this.$tip.hasClass('fade') ?
-      $tip
-        .one('bsTransitionEnd', complete)
-        .emulateTransitionEnd(150) :
-      complete()
+            var tipId = this.getUID(this.type);
+            var self = this;
+            this.setContent().then(function () {
+                $tip.attr("id", tipId);
+                self.$element.attr("aria-describedby", tipId);
 
-    this.hoverState = null
+                if (self.options.animation) $tip.addClass("fade");
 
-    return this
-  }
+                var placement =
+                    typeof self.options.placement == "function"
+                        ? self.options.placement.call(
+                              self,
+                              $tip[0],
+                              self.$element[0]
+                          )
+                        : self.options.placement;
 
-  bootstrapTooltip.prototype.fixTitle = function () {
-    var $e = this.$element
-    if ($e.attr('title') || typeof ($e.attr('data-original-title')) != 'string') {
-      $e.attr('data-original-title', $e.attr('title') || '').attr('title', '')
-    }
-  }
+                var autoToken = /\s?auto?\s?/i;
+                var autoPlace = autoToken.test(placement);
+                if (autoPlace)
+                    placement = placement.replace(autoToken, "") || "top";
 
-  bootstrapTooltip.prototype.hasContent = function () {
-    return this.getTitle() || this.getUrl();
-  };
+                $tip.detach()
+                    .css({ top: 0, left: 0, display: "block" })
+                    .addClass(placement)
+                    .data("bs." + self.type, self);
 
-  bootstrapTooltip.prototype.getPosition = function ($element) {
-    $element   = $element || this.$element
-    var el     = $element[0]
-    var isBody = el.tagName == 'BODY'
-    return $.extend({}, (typeof el.getBoundingClientRect == 'function') ? el.getBoundingClientRect() : null, {
-      scroll: isBody ? document.documentElement.scrollTop || document.body.scrollTop : $element.scrollTop(),
-      width:  isBody ? $(window).width()  : $element.outerWidth(),
-      height: isBody ? $(window).height() : $element.outerHeight()
-    }, isBody ? { top: 0, left: 0 } : $element.offset())
-  }
+                self.options.container
+                    ? $tip.appendTo(self.options.container)
+                    : $tip.insertAfter(self.$element);
 
-  bootstrapTooltip.prototype.getCalculatedOffset = function (placement, pos, actualWidth, actualHeight) {
-    return placement == 'bottom' ? { top: pos.top + pos.height,   left: pos.left + pos.width / 2 - actualWidth / 2  } :
-           placement == 'top'    ? { top: pos.top - actualHeight, left: pos.left + pos.width / 2 - actualWidth / 2  } :
-           placement == 'left'   ? { top: pos.top + pos.height / 2 - actualHeight / 2, left: pos.left - actualWidth } :
-        /* placement == 'right' */ { top: pos.top + pos.height / 2 - actualHeight / 2, left: pos.left + pos.width   }
+                var pos = self.getPosition();
+                var actualWidth = $tip[0].offsetWidth;
+                var actualHeight = $tip[0].offsetHeight;
 
-  }
+                if (autoPlace) {
+                    var orgPlacement = placement;
+                    var $parent = self.$element.parent();
+                    var parentDim = self.getPosition($parent);
 
-  bootstrapTooltip.prototype.getViewportAdjustedDelta = function (placement, pos, actualWidth, actualHeight) {
-    var delta = { top: 0, left: 0 }
-    if (!this.$viewport) return delta
+                    placement =
+                        placement == "bottom" &&
+                        pos.top + pos.height + actualHeight - parentDim.scroll >
+                            parentDim.height
+                            ? "top"
+                            : placement == "top" &&
+                              pos.top - parentDim.scroll - actualHeight < 0
+                            ? "bottom"
+                            : placement == "right" &&
+                              pos.right + actualWidth > parentDim.width
+                            ? "left"
+                            : placement == "left" &&
+                              pos.left - actualWidth < parentDim.left
+                            ? "right"
+                            : placement;
 
-    var viewportPadding = this.options.viewport && this.options.viewport.padding || 0
-    var viewportDimensions = this.getPosition(this.$viewport)
+                    $tip.removeClass(orgPlacement).addClass(placement);
+                }
 
-    if (/right|left/.test(placement)) {
-      var topEdgeOffset    = pos.top - viewportPadding - viewportDimensions.scroll
-      var bottomEdgeOffset = pos.top + viewportPadding - viewportDimensions.scroll + actualHeight
-      if (topEdgeOffset < viewportDimensions.top) { // top overflow
-        delta.top = viewportDimensions.top - topEdgeOffset
-      } else if (bottomEdgeOffset > viewportDimensions.top + viewportDimensions.height) { // bottom overflow
-        delta.top = viewportDimensions.top + viewportDimensions.height - bottomEdgeOffset
-      }
-    } else {
-      var leftEdgeOffset  = pos.left - viewportPadding
-      var rightEdgeOffset = pos.left + viewportPadding + actualWidth
-      if (leftEdgeOffset < viewportDimensions.left) { // left overflow
-        delta.left = viewportDimensions.left - leftEdgeOffset
-      } else if (rightEdgeOffset > viewportDimensions.width) { // right overflow
-        delta.left = viewportDimensions.left + viewportDimensions.width - rightEdgeOffset
-      }
-    }
+                var calculatedOffset = self.getCalculatedOffset(
+                    placement,
+                    pos,
+                    actualWidth,
+                    actualHeight
+                );
 
-    return delta
-  }
+                self.applyPlacement(calculatedOffset, placement);
 
-  bootstrapTooltip.prototype.getTitle = function () {
-    var title
-    var $e = this.$element
-    var o  = this.options
-    title = $e.attr('data-original-title')
-      || (typeof o.title == 'function' ? o.title.call($e[0]) :  o.title)
+                var complete = function () {
+                    self.$element.trigger("shown.bs." + self.type);
+                    self.hoverState = null;
+                    if (self.leaving) {
+                        // prevent a race condition bug when user has leaved before complete
+                        self.leave(self);
+                    }
+                };
 
-    return title
-  }
+                $.support.transition && self.$tip.hasClass("fade")
+                    ? $tip
+                          .one("bsTransitionEnd", complete)
+                          .emulateTransitionEnd(150)
+                    : complete();
+            });
+        }
+    };
 
-  bootstrapTooltip.prototype.getUID = function (prefix) {
-    do prefix += ~~(Math.random() * 1000000)
-    while (document.getElementById(prefix))
-    return prefix
-  }
+    bootstrapTooltip.prototype.applyPlacement = function (offset, placement) {
+        var $tip = this.tip();
+        var width = $tip[0].offsetWidth;
+        var height = $tip[0].offsetHeight;
 
-  bootstrapTooltip.prototype.tip = function () {
-    if (!!this.$tip) {
-      return this.$tip;
-    }
-    var $tip = this.$tip || $(this.options.template);
-    if (this.options.patTooltip) {
+        // manually read margins because getBoundingClientRect includes difference
+        var marginTop = parseInt($tip.css("margin-top"), 10);
+        var marginLeft = parseInt($tip.css("margin-left"), 10);
 
-    if (this.options.patTooltip.style) {
-      $tip.css(this.options.patTooltip.style)
-    }
-    if (this.options.patTooltip['class']) {
-      $tip.addClass(this.options.patTooltip['class'])
-    }
-    if (this.options.patTooltip.innerStyle) {
-      $tip.find('.tooltip-inner').css(this.options.patTooltip.innerStyle)
-    }
-    }
-    this.$tip = $tip;
-    return $tip;
-  }
+        // we must check for NaN for ie 8/9
+        if (isNaN(marginTop)) marginTop = 0;
+        if (isNaN(marginLeft)) marginLeft = 0;
 
-  bootstrapTooltip.prototype.arrow = function () {
-    return (this.$arrow = this.$arrow || this.tip().find('.tooltip-arrow'))
-  }
+        offset.top = offset.top + marginTop;
+        offset.left = offset.left + marginLeft;
 
-  bootstrapTooltip.prototype.validate = function () {
-    if (!this.$element[0].parentNode) {
-      this.hide()
-      this.$element = null
-      this.options  = null
-    }
-  }
+        // $.fn.offset doesn't round pixel values
+        // so we use setOffset directly with our own function B-0
+        $.offset.setOffset(
+            $tip[0],
+            $.extend(
+                {
+                    using: function (props) {
+                        $tip.css({
+                            top: Math.round(props.top),
+                            left: Math.round(props.left),
+                        });
+                    },
+                },
+                offset
+            ),
+            0
+        );
 
-  bootstrapTooltip.prototype.enable = function () {
-    this.enabled = true
-  }
+        $tip.addClass("in");
 
-  bootstrapTooltip.prototype.disable = function () {
-    this.enabled = false
-  }
+        // check to see if placing tip in new offset caused the tip to resize itself
+        var actualWidth = $tip[0].offsetWidth;
+        var actualHeight = $tip[0].offsetHeight;
 
-  bootstrapTooltip.prototype.toggleEnabled = function () {
-    this.enabled = !this.enabled
-  }
+        if (placement == "top" && actualHeight != height) {
+            offset.top = offset.top + height - actualHeight;
+        }
 
-  bootstrapTooltip.prototype.toggle = function (e) {
-    var self = this
-    if (e) {
-      self = $(e.currentTarget).data('bs.' + this.type)
-      if (!self) {
-        self = new this.constructor(e.currentTarget, this.getDelegateOptions())
-        $(e.currentTarget).data('bs.' + this.type, self)
-      }
-    }
+        var delta = this.getViewportAdjustedDelta(
+            placement,
+            offset,
+            actualWidth,
+            actualHeight
+        );
 
-    self.tip().hasClass('in') ? self.leave(self) : self.enter(self)
-  }
+        if (delta.left) offset.left += delta.left;
+        else offset.top += delta.top;
 
-  bootstrapTooltip.prototype.destroy = function () {
-    clearTimeout(this.timeout)
-    this.hide().$element.off('.' + this.type).removeData('bs.' + this.type)
-  }
+        var arrowDelta = delta.left
+            ? delta.left * 2 - width + actualWidth
+            : delta.top * 2 - height + actualHeight;
+        var arrowPosition = delta.left ? "left" : "top";
+        var arrowOffsetPosition = delta.left ? "offsetWidth" : "offsetHeight";
 
-  var Tooltip = Base.extend({
-    name: 'tooltip',
-    trigger: '.pat-tooltip',
-    parser: 'mockup',
-    defaults: {
-      html: false,
-      placement: 'top'
-    },
-    init: function() {
-        if (this.options.html === 'true' || this.options.html === true) {
-          // TODO: fix the parser!
-          this.options.html = true;
+        $tip.offset(offset);
+        this.replaceArrow(
+            arrowDelta,
+            $tip[0][arrowOffsetPosition],
+            arrowPosition
+        );
+    };
+
+    bootstrapTooltip.prototype.replaceArrow = function (
+        delta,
+        dimension,
+        position
+    ) {
+        this.arrow().css(
+            position,
+            delta ? 50 * (1 - delta / dimension) + "%" : ""
+        );
+    };
+
+    bootstrapTooltip.prototype.setContent = function () {
+        var $tip = this.tip();
+        var type = this.options.html ? "html" : "text";
+        var selector = this.options.patTooltip
+            ? this.options.patTooltip.contentSelector
+            : null;
+
+        function setContent(content) {
+            if (type === "html" && !!selector) {
+                content = $(content).find(selector).html();
+            }
+            $tip.find(".tooltip-inner")[type](content);
+        }
+        function removeClasses() {
+            $tip.removeClass("fade in top bottom left right");
+        }
+        var title = this.getTitle();
+        var url = this.getUrl();
+        if (url) {
+            removeClasses();
+            return $.get(url).then(function (content) {
+                setContent(content);
+            });
         } else {
-          this.options.html = false;
+            removeClasses();
+            setContent(title);
+            return new Promise(function (resolve, reject) {
+                resolve(title);
+            });
         }
-        this.data = new bootstrapTooltip(this.$el[0], this.options);
-      },
-  });
+    };
 
-  return Tooltip;
+    bootstrapTooltip.prototype.getUrl = function () {
+        return this.options.patTooltip ? this.options.patTooltip.ajaxUrl : null;
+    };
 
+    bootstrapTooltip.prototype.hide = function () {
+        var that = this;
+        var $tip = this.tip();
+        var e = $.Event("hide.bs." + this.type);
+
+        this.$element.removeAttr("aria-describedby");
+
+        function complete() {
+            if (that.hoverState != "in") $tip.detach();
+            that.$element.trigger("hidden.bs." + that.type);
+        }
+
+        this.$element.trigger(e);
+
+        if (e.isDefaultPrevented()) return;
+
+        $tip.removeClass("in");
+
+        $.support.transition && this.$tip.hasClass("fade")
+            ? $tip.one("bsTransitionEnd", complete).emulateTransitionEnd(150)
+            : complete();
+
+        this.hoverState = null;
+
+        return this;
+    };
+
+    bootstrapTooltip.prototype.fixTitle = function () {
+        var $e = this.$element;
+        if (
+            $e.attr("title") ||
+            typeof $e.attr("data-original-title") != "string"
+        ) {
+            $e.attr("data-original-title", $e.attr("title") || "").attr(
+                "title",
+                ""
+            );
+        }
+    };
+
+    bootstrapTooltip.prototype.hasContent = function () {
+        return this.getTitle() || this.getUrl();
+    };
+
+    bootstrapTooltip.prototype.getPosition = function ($element) {
+        $element = $element || this.$element;
+        var el = $element[0];
+        var isBody = el.tagName == "BODY";
+        return $.extend(
+            {},
+            typeof el.getBoundingClientRect == "function"
+                ? el.getBoundingClientRect()
+                : null,
+            {
+                scroll: isBody
+                    ? document.documentElement.scrollTop ||
+                      document.body.scrollTop
+                    : $element.scrollTop(),
+                width: isBody ? $(window).width() : $element.outerWidth(),
+                height: isBody ? $(window).height() : $element.outerHeight(),
+            },
+            isBody ? { top: 0, left: 0 } : $element.offset()
+        );
+    };
+
+    bootstrapTooltip.prototype.getCalculatedOffset = function (
+        placement,
+        pos,
+        actualWidth,
+        actualHeight
+    ) {
+        return placement == "bottom"
+            ? {
+                  top: pos.top + pos.height,
+                  left: pos.left + pos.width / 2 - actualWidth / 2,
+              }
+            : placement == "top"
+            ? {
+                  top: pos.top - actualHeight,
+                  left: pos.left + pos.width / 2 - actualWidth / 2,
+              }
+            : placement == "left"
+            ? {
+                  top: pos.top + pos.height / 2 - actualHeight / 2,
+                  left: pos.left - actualWidth,
+              }
+            : /* placement == 'right' */ {
+                  top: pos.top + pos.height / 2 - actualHeight / 2,
+                  left: pos.left + pos.width,
+              };
+    };
+
+    bootstrapTooltip.prototype.getViewportAdjustedDelta = function (
+        placement,
+        pos,
+        actualWidth,
+        actualHeight
+    ) {
+        var delta = { top: 0, left: 0 };
+        if (!this.$viewport) return delta;
+
+        var viewportPadding =
+            (this.options.viewport && this.options.viewport.padding) || 0;
+        var viewportDimensions = this.getPosition(this.$viewport);
+
+        if (/right|left/.test(placement)) {
+            var topEdgeOffset =
+                pos.top - viewportPadding - viewportDimensions.scroll;
+            var bottomEdgeOffset =
+                pos.top +
+                viewportPadding -
+                viewportDimensions.scroll +
+                actualHeight;
+            if (topEdgeOffset < viewportDimensions.top) {
+                // top overflow
+                delta.top = viewportDimensions.top - topEdgeOffset;
+            } else if (
+                bottomEdgeOffset >
+                viewportDimensions.top + viewportDimensions.height
+            ) {
+                // bottom overflow
+                delta.top =
+                    viewportDimensions.top +
+                    viewportDimensions.height -
+                    bottomEdgeOffset;
+            }
+        } else {
+            var leftEdgeOffset = pos.left - viewportPadding;
+            var rightEdgeOffset = pos.left + viewportPadding + actualWidth;
+            if (leftEdgeOffset < viewportDimensions.left) {
+                // left overflow
+                delta.left = viewportDimensions.left - leftEdgeOffset;
+            } else if (rightEdgeOffset > viewportDimensions.width) {
+                // right overflow
+                delta.left =
+                    viewportDimensions.left +
+                    viewportDimensions.width -
+                    rightEdgeOffset;
+            }
+        }
+
+        return delta;
+    };
+
+    bootstrapTooltip.prototype.getTitle = function () {
+        var title;
+        var $e = this.$element;
+        var o = this.options;
+        title =
+            $e.attr("data-original-title") ||
+            (typeof o.title == "function" ? o.title.call($e[0]) : o.title);
+
+        return title;
+    };
+
+    bootstrapTooltip.prototype.getUID = function (prefix) {
+        do prefix += ~~(Math.random() * 1000000);
+        while (document.getElementById(prefix));
+        return prefix;
+    };
+
+    bootstrapTooltip.prototype.tip = function () {
+        if (this.$tip) {
+            return this.$tip;
+        }
+        var $tip = this.$tip || $(this.options.template);
+        if (this.options.patTooltip) {
+            if (this.options.patTooltip.style) {
+                $tip.css(this.options.patTooltip.style);
+            }
+            if (this.options.patTooltip["class"]) {
+                $tip.addClass(this.options.patTooltip["class"]);
+            }
+            if (this.options.patTooltip.innerStyle) {
+                $tip.find(".tooltip-inner").css(
+                    this.options.patTooltip.innerStyle
+                );
+            }
+        }
+        this.$tip = $tip;
+        return $tip;
+    };
+
+    bootstrapTooltip.prototype.arrow = function () {
+        return (this.$arrow = this.$arrow || this.tip().find(".tooltip-arrow"));
+    };
+
+    bootstrapTooltip.prototype.validate = function () {
+        if (!this.$element[0].parentNode) {
+            this.hide();
+            this.$element = null;
+            this.options = null;
+        }
+    };
+
+    bootstrapTooltip.prototype.enable = function () {
+        this.enabled = true;
+    };
+
+    bootstrapTooltip.prototype.disable = function () {
+        this.enabled = false;
+    };
+
+    bootstrapTooltip.prototype.toggleEnabled = function () {
+        this.enabled = !this.enabled;
+    };
+
+    bootstrapTooltip.prototype.toggle = function (e) {
+        var self = this;
+        if (e) {
+            self = $(e.currentTarget).data("bs." + this.type);
+            if (!self) {
+                self = new this.constructor(
+                    e.currentTarget,
+                    this.getDelegateOptions()
+                );
+                $(e.currentTarget).data("bs." + this.type, self);
+            }
+        }
+
+        self.tip().hasClass("in") ? self.leave(self) : self.enter(self);
+    };
+
+    bootstrapTooltip.prototype.destroy = function () {
+        clearTimeout(this.timeout);
+        this.hide()
+            .$element.off("." + this.type)
+            .removeData("bs." + this.type);
+    };
+
+    var Tooltip = Base.extend({
+        name: "tooltip",
+        trigger: ".pat-tooltip",
+        parser: "mockup",
+        defaults: {
+            html: false,
+            placement: "top",
+        },
+        init: function () {
+            if (this.options.html === "true" || this.options.html === true) {
+                // TODO: fix the parser!
+                this.options.html = true;
+            } else {
+                this.options.html = false;
+            }
+            this.data = new bootstrapTooltip(this.$el[0], this.options);
+        },
+    });
+
+    return Tooltip;
 });
 
 define('mockup-ui-url/views/button',[
-  'underscore',
-  'mockup-ui-url/views/base',
-  'mockup-patterns-tooltip'
-], function(_, BaseView, Tooltip) {
-  'use strict';
+    "underscore",
+    "mockup-ui-url/views/base",
+    "mockup-patterns-tooltip",
+], function (_, BaseView, Tooltip) {
+    "use strict";
 
-  var ButtonView = BaseView.extend({
-    tagName: 'a',
-    className: 'btn',
-    eventPrefix: 'button',
-    context: 'default',
-    idPrefix: 'btn-',
-    attributes: {
-      'href': '#'
-    },
-    extraClasses: [],
-    tooltip: null,
-    template: '<% if (icon) { %><span class="glyphicon glyphicon-<%= icon %>"></span><% } %> <%= title %>',
-    events: {
-      'click': 'handleClick'
-    },
-    initialize: function(options) {
-      if (!options.id) {
-        var title = options.title || '';
-        options.id = title !== '' ? title.toLowerCase().replace(' ', '-') : this.cid;
-      }
-      BaseView.prototype.initialize.apply(this, [options]);
-
-      this.on('render', function() {
-        this.$el.attr('title', this.options.title || '');
-        this.$el.attr('aria-label', this.options.title || this.options.tooltip || '');
-        if (this.context !== null) {
-          this.$el.addClass('btn-' + this.context);
-        }
-        _.each(this.extraClasses, function(klass){
-          this.$el.addClass(klass);
-        }.bind(this));
-
-        if (this.tooltip !== null) {
-
-          this.$el.attr('title', this.tooltip);
-          var tooltipPattern = new Tooltip(this.$el);
-          // XXX since tooltip triggers hidden
-          // suppress so it plays nice with modals, backdrops, etc
-          this.$el.on('hidden', function(e) {
-            if (e.type === 'hidden') {
-              e.stopPropagation();
+    var ButtonView = BaseView.extend({
+        tagName: "a",
+        className: "btn",
+        eventPrefix: "button",
+        context: "default",
+        idPrefix: "btn-",
+        attributes: {
+            href: "#",
+        },
+        extraClasses: [],
+        tooltip: null,
+        template:
+            '<% if (icon) { %><span class="glyphicon glyphicon-<%= icon %>"></span><% } %> <%= title %>',
+        events: {
+            click: "handleClick",
+        },
+        initialize: function (options) {
+            if (!options.id) {
+                var title = options.title || "";
+                options.id =
+                    title !== "" ? title.toLowerCase().replace(" ", "-") : this.cid; // prettier-ignore
             }
-          });
-        }
-      }, this);
-    },
-    handleClick: function(e) {
-      e.preventDefault();
-      if (!this.$el.is('.disabled')) {
-        this.uiEventTrigger('click', this, e);
-      }
-    },
-    serializedModel: function() {
-      return _.extend({'icon': '', 'title': ''}, this.options);
-    },
-    disable: function() {
-      this.$el.addClass('disabled');
-    },
-    enable: function() {
-      this.$el.removeClass('disabled');
-    }
-  });
+            BaseView.prototype.initialize.apply(this, [options]);
 
-  return ButtonView;
+            this.on(
+                "render",
+                function () {
+                    this.$el.attr("title", this.options.title || "");
+                    this.$el.attr(
+                        "aria-label",
+                        this.options.title || this.options.tooltip || ""
+                    );
+                    if (this.context !== null) {
+                        this.$el.addClass("btn-" + this.context);
+                    }
+                    _.each(
+                        this.extraClasses,
+                        function (klass) {
+                            this.$el.addClass(klass);
+                        }.bind(this)
+                    );
+
+                    if (this.tooltip !== null) {
+                        this.$el.attr("title", this.tooltip);
+                        var tooltipPattern = new Tooltip(this.$el);
+                        // XXX since tooltip triggers hidden
+                        // suppress so it plays nice with modals, backdrops, etc
+                        this.$el.on("hidden", function (e) {
+                            if (e.type === "hidden") {
+                                e.stopPropagation();
+                            }
+                        });
+                    }
+                },
+                this
+            );
+        },
+        handleClick: function (e) {
+            e.preventDefault();
+            if (!this.$el.is(".disabled")) {
+                this.uiEventTrigger("click", this, e);
+            }
+        },
+        serializedModel: function () {
+            return _.extend({ icon: "", title: "" }, this.options);
+        },
+        disable: function () {
+            this.$el.addClass("disabled");
+        },
+        enable: function () {
+            this.$el.removeClass("disabled");
+        },
+    });
+
+    return ButtonView;
 });
 
-define('mockup-ui-url/views/buttongroup',[
-  'underscore',
-  'mockup-ui-url/views/container'
-], function(_, ContainerView) {
-  'use strict';
+define('mockup-ui-url/views/buttongroup',["underscore", "mockup-ui-url/views/container"], function (
+    _,
+    ContainerView
+) {
+    "use strict";
 
-  var ButtonGroup = ContainerView.extend({
-    tagName: 'div',
-    className: 'btn-group',
-    idPrefix: 'btngroup-',
-    disable: function() {
-      _.each(this.items, function(button) {
-        button.disable();
-      });
-    },
-    enable: function() {
-      _.each(this.items, function(button) {
-        button.enable();
-      });
-    }
-  });
+    var ButtonGroup = ContainerView.extend({
+        tagName: "div",
+        className: "btn-group",
+        idPrefix: "btngroup-",
+        disable: function () {
+            _.each(this.items, function (button) {
+                button.disable();
+            });
+        },
+        enable: function () {
+            _.each(this.items, function (button) {
+                button.enable();
+            });
+        },
+    });
 
-  return ButtonGroup;
+    return ButtonGroup;
 });
 
 define('mockup-ui-url/views/anchor',[
-  'underscore',
-  'mockup-ui-url/views/base',
-  'mockup-patterns-tooltip'
-], function(_, BaseView, Tooltip) {
-  'use strict';
+    "underscore",
+    "mockup-ui-url/views/base",
+    "mockup-patterns-tooltip",
+], function (_, BaseView, Tooltip) {
+    "use strict";
 
-  var AnchorView = BaseView.extend({
-    tagName: 'a',
-    className: 'alink',
-    eventPrefix: 'button',
-    context: 'default',
-    idPrefix: 'alink-',
-    shortcut: '',
-    attributes: {
-      'href': '#'
-    },
-    extraClasses: [],
-    tooltip: null,
-    template: '<% if (icon) { %><span class="glyphicon glyphicon-<%= icon %>"></span><% } %> <%= title %> <span class="shortcut"><%= shortcut %></span>',
-    events: {
-      'click': 'handleClick'
-    },
-    initialize: function(options) {
-      if (!options.id) {
-        var title = options.title || '';
-        options.id = title !== '' ? title.toLowerCase().replace(' ', '-') : this.cid;
-      }
-      BaseView.prototype.initialize.apply(this, [options]);
+    var AnchorView = BaseView.extend({
+        tagName: "a",
+        className: "alink",
+        eventPrefix: "button",
+        context: "default",
+        idPrefix: "alink-",
+        shortcut: "",
+        attributes: {
+            href: "#",
+        },
+        extraClasses: [],
+        tooltip: null,
+        template:
+            '<% if (icon) { %><span class="glyphicon glyphicon-<%= icon %>"></span><% } %> <%= title %> <span class="shortcut"><%= shortcut %></span>',
+        events: {
+            click: "handleClick",
+        },
+        initialize: function (options) {
+            if (!options.id) {
+                var title = options.title || "";
+                options.id =
+                    title !== "" ? title.toLowerCase().replace(" ", "-") : this.cid; // prettier-ignore
+            }
+            BaseView.prototype.initialize.apply(this, [options]);
 
-      this.on('render', function() {
-        this.$el.attr('title', this.options.tooltip || this.options.title || '');
-        this.$el.attr('aria-label', this.options.title || this.options.tooltip || '');
-        _.each(this.extraClasses, function(klass) {
-          this.$el.addClass(klass);
-        }.bind(this));
-      }, this);
-    },
-    handleClick: function(e) {
-      e.preventDefault();
-      if (!this.$el.is('.disabled')) {
-        this.uiEventTrigger('click', this, e);
-      }
-    },
-    serializedModel: function() {
-      return _.extend({'icon': '', 'title': '', 'shortcut': ''}, this.options);
-    },
-    disable: function() {
-      this.$el.addClass('disabled');
-    },
-    enable: function() {
-      this.$el.removeClass('disabled');
-    }
-  });
+            this.on(
+                "render",
+                function () {
+                    this.$el.attr(
+                        "title",
+                        this.options.tooltip || this.options.title || ""
+                    );
+                    this.$el.attr(
+                        "aria-label",
+                        this.options.title || this.options.tooltip || ""
+                    );
+                    _.each(
+                        this.extraClasses,
+                        function (klass) {
+                            this.$el.addClass(klass);
+                        }.bind(this)
+                    );
+                },
+                this
+            );
+        },
+        handleClick: function (e) {
+            e.preventDefault();
+            if (!this.$el.is(".disabled")) {
+                this.uiEventTrigger("click", this, e);
+            }
+        },
+        serializedModel: function () {
+            return _.extend(
+                { icon: "", title: "", shortcut: "" },
+                this.options
+            );
+        },
+        disable: function () {
+            this.$el.addClass("disabled");
+        },
+        enable: function () {
+            this.$el.removeClass("disabled");
+        },
+    });
 
-  return AnchorView;
+    return AnchorView;
 });
 
 
 define('text!mockup-ui-url/templates/dropdown.xml',[],function () { return '\n<a href="#" class="btn btn-default dropdown-toggle" type="button" id="dropdown-menu-" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">\n  <span class="glyphicon glyphicon-<%= icon %>"></span>\n  <span class="dropdown-title">\n\n  </span>\n  <span class="caret"></span>\n</a>\n<ul class="dropdown-menu items dropdown-content" aria-labelledby="dropdown-menu-">\n</ul>\n';});
 
 define('mockup-ui-url/views/dropdown',[
-  'jquery',
-  'underscore',
-  'mockup-ui-url/views/buttongroup',
-  'text!mockup-ui-url/templates/dropdown.xml',
-], function($, _, ButtonGroup, DropdownTemplate) {
-  'use strict';
+    "jquery",
+    "underscore",
+    "mockup-ui-url/views/buttongroup",
+    "text!mockup-ui-url/templates/dropdown.xml",
+], function ($, _, ButtonGroup, DropdownTemplate) {
+    "use strict";
 
-  var DropdownView = ButtonGroup.extend({
-    idPrefix: 'btngroup-dropdown-',
-    template: DropdownTemplate,
-    className: 'btn-group-dropdown',
-    itemContainer: "ul.dropdown-content",
-    title: null,
+    var DropdownView = ButtonGroup.extend({
+        idPrefix: "btngroup-dropdown-",
+        template: DropdownTemplate,
+        className: "btn-group-dropdown",
+        itemContainer: "ul.dropdown-content",
+        title: null,
 
-    initialize: function(options) {
-      ButtonGroup.prototype.initialize.apply(this, [options]);
+        initialize: function (options) {
+            ButtonGroup.prototype.initialize.apply(this, [options]);
 
-      this.on('render', function() {
-        this.renderTitle();
-      }, this);
-    },
+            this.on(
+                "render",
+                function () {
+                    this.renderTitle();
+                },
+                this
+            );
+        },
 
-    renderTitle: function() {
-      var title = this.options.title;
-      if(this.options.title === undefined) {
-        title = this.title;
-        if(this.title === null) {
-          title = "Menu Option";
-        }
-      }
-      this.$('.dropdown-title').empty().append(title);
-    },
+        renderTitle: function () {
+            var title = this.options.title;
+            if (this.options.title === undefined) {
+                title = this.title;
+                if (this.title === null) {
+                    title = "Menu Option";
+                }
+            }
+            this.$(".dropdown-title").empty().append(title);
+        },
 
-    renderItems: function() {
-      var self = this;
-      var $container;
+        renderItems: function () {
+            var self = this;
+            var $container;
 
-      if (this.itemContainer !== null) {
-        $container = $(this.itemContainer, this.$el);
-        if ($container.length === 0) {
-          throw 'Item Container element not found.';
-        }
-      } else {
-        $container = this.$el;
-      }
+            if (this.itemContainer !== null) {
+                $container = $(this.itemContainer, this.$el);
+                if ($container.length === 0) {
+                    throw "Item Container element not found.";
+                }
+            } else {
+                $container = this.$el;
+            }
 
-      var $item = null;
-      _.each(this.items, function(view) {
-        $item = $("<li></li>");
-        $item.append(view.render().$el.removeClass("btn"));
-        $container.append($item);
-      }, this);
-    },
+            var $item = null;
+            _.each(
+                this.items,
+                function (view) {
+                    $item = $("<li></li>");
+                    $item.append(view.render().$el.removeClass("btn"));
+                    $container.append($item);
+                },
+                this
+            );
+        },
+    });
 
-  });
-
-  return DropdownView;
+    return DropdownView;
 });
 
 /* Backdrop pattern.
@@ -26659,964 +27000,1053 @@ define('mockup-ui-url/views/dropdown',[
  *
  */
 
+define('mockup-patterns-backdrop',["jquery", "pat-base"], function ($, Base) {
+    "use strict";
 
-define('mockup-patterns-backdrop',[
-  'jquery',
-  'pat-base'
-], function($, Base) {
-  'use strict';
-
-  var Backdrop = Base.extend({
-    name: 'backdrop',
-    trigger: '.pat-backdrop',
-    parser: 'mockup',
-    defaults: {
-      zIndex: null,
-      opacity: 0.8,
-      className: 'plone-backdrop',
-      classActiveName: 'plone-backdrop-active',
-      closeOnEsc: true,
-      closeOnClick: true
-    },
-    init: function() {
-      var self = this;
-      self.$backdrop = $('> .' + self.options.className, self.$el);
-      if (self.$backdrop.size() === 0) {
-        self.$backdrop = $('<div/>')
-            .hide()
-            .appendTo(self.$el)
-            .addClass(self.options.className);
-        if (self.options.zIndex !== null) {
-          self.$backdrop.css('z-index', self.options.zIndex);
-        }
-      }
-      if (self.options.closeOnEsc === true) {
-        $(document).on('keydown', function(e, data) {
-          if (self.$el.is('.' + self.options.classActiveName)) {
-            if (e.keyCode === 27) {  // ESC key pressed
-              self.hide();
+    var Backdrop = Base.extend({
+        name: "backdrop",
+        trigger: ".pat-backdrop",
+        parser: "mockup",
+        defaults: {
+            zIndex: null,
+            opacity: 0.8,
+            className: "plone-backdrop",
+            classActiveName: "plone-backdrop-active",
+            closeOnEsc: true,
+            closeOnClick: true,
+        },
+        init: function () {
+            var self = this;
+            self.$backdrop = $("> ." + self.options.className, self.$el);
+            if (self.$backdrop.length === 0) {
+                self.$backdrop = $("<div/>")
+                    .hide()
+                    .appendTo(self.$el)
+                    .addClass(self.options.className);
+                if (self.options.zIndex !== null) {
+                    self.$backdrop.css("z-index", self.options.zIndex);
+                }
             }
-          }
-        });
-      }
-      if (self.options.closeOnClick === true) {
-        self.$backdrop.on('click', function() {
-          if (self.$el.is('.' + self.options.classActiveName)) {
-            self.hide();
-          }
-        });
-      }
-    },
-    show: function() {
-      var self = this;
-      if (!self.$el.hasClass(self.options.classActiveName)) {
-        self.emit('show');
-        self.$backdrop.css('opacity', '0').show();
-        self.$el.addClass(self.options.classActiveName);
-        self.$backdrop.animate({ opacity: self.options.opacity }, 500);
-        self.emit('shown');
-      }
-    },
-    hide: function() {
-      var self = this;
-      if (self.$el.hasClass(self.options.classActiveName)) {
-        self.emit('hide');
-        self.$backdrop.animate({ opacity: '0' }, 500).hide();
-        self.$el.removeClass(self.options.classActiveName);
-        self.emit('hidden');
-      }
-    }
-  });
+            if (self.options.closeOnEsc === true) {
+                $(document).on("keydown", function (e, data) {
+                    if (self.$el.is("." + self.options.classActiveName)) {
+                        if (e.keyCode === 27) {
+                            // ESC key pressed
+                            self.hide();
+                        }
+                    }
+                });
+            }
+            if (self.options.closeOnClick === true) {
+                self.$backdrop.on("click", function () {
+                    if (self.$el.is("." + self.options.classActiveName)) {
+                        self.hide();
+                    }
+                });
+            }
+        },
+        show: function () {
+            var self = this;
+            if (!self.$el.hasClass(self.options.classActiveName)) {
+                self.emit("show");
+                self.$backdrop.css("opacity", "0").show();
+                self.$el.addClass(self.options.classActiveName);
+                self.$backdrop.animate({ opacity: self.options.opacity }, 500);
+                self.emit("shown");
+            }
+        },
+        hide: function () {
+            var self = this;
+            if (self.$el.hasClass(self.options.classActiveName)) {
+                self.emit("hide");
+                self.$backdrop.animate({ opacity: "0" }, 500).hide();
+                self.$el.removeClass(self.options.classActiveName);
+                self.emit("hidden");
+            }
+        },
+    });
 
-  return Backdrop;
-
+    return Backdrop;
 });
 
 
 define('text!mockup-ui-url/templates/popover.xml',[],function () { return '<div class="arrow"></div>\n<div class="popover-title">\n</div>\n<div class="items popover-content">\n</div>\n\n';});
 
 define('mockup-ui-url/views/popover',[
-  'jquery',
-  'underscore',
-  'mockup-ui-url/views/container',
-  'mockup-patterns-backdrop',
-  'text!mockup-ui-url/templates/popover.xml',
-], function($, _, ContainerView, Backdrop, PopoverTemplate) {
-  'use strict';
+    "jquery",
+    "underscore",
+    "mockup-ui-url/views/container",
+    "mockup-patterns-backdrop",
+    "text!mockup-ui-url/templates/popover.xml",
+], function ($, _, ContainerView, Backdrop, PopoverTemplate) {
+    "use strict";
 
-  var PopoverView = ContainerView.extend({
-    tagName: 'div',
-    className: 'popover',
-    eventPrefix: 'popover',
-    template: PopoverTemplate,
-    content: null,
-    title: null,
-    triggerView: null,
-    idPrefix: 'popover-',
-    triggerEvents: {
-      'button:click': 'toggle'
-    },
-    placement: 'bottom',
-    events: {
-    },
-    opened: false,
-    closeOnOutClick: true,
-    appendInContainer: true,
-    backdrop: undefined,
-    $backdrop: null,
-    useBackdrop: true,
-    backdropOptions: {
-      zIndex: '1009',
-      opacity: '0.4',
-      className: 'backdrop backdrop-popover',
-      classActiveName: 'backdrop-active',
-      closeOnEsc: false,
-      closeOnClick: true
-    },
-    initialize: function(options) {
-      var self = this;
-      ContainerView.prototype.initialize.apply(this, [options]);
-      this.bindTriggerEvents();
+    var PopoverView = ContainerView.extend({
+        tagName: "div",
+        className: "popover",
+        eventPrefix: "popover",
+        template: PopoverTemplate,
+        content: null,
+        title: null,
+        triggerView: null,
+        idPrefix: "popover-",
+        triggerEvents: {
+            "button:click": "toggle",
+        },
+        placement: "bottom",
+        events: {},
+        opened: false,
+        closeOnOutClick: true,
+        appendInContainer: true,
+        backdrop: undefined,
+        $backdrop: null,
+        useBackdrop: true,
+        backdropOptions: {
+            zIndex: "1009",
+            opacity: "0.4",
+            className: "backdrop backdrop-popover",
+            classActiveName: "backdrop-active",
+            closeOnEsc: false,
+            closeOnClick: true,
+        },
+        initialize: function (options) {
+            var self = this;
+            ContainerView.prototype.initialize.apply(this, [options]);
+            this.bindTriggerEvents();
 
-      this.on('render', function() {
-        this.$el.attr('role', 'tooltip').attr('aria-hidden', 'false');
-        this.renderTitle();
-        this.renderContent();
-      }, this);
+            this.on(
+                "render",
+                function () {
+                    this.$el
+                        .attr("role", "tooltip")
+                        .attr("aria-hidden", "false");
+                    this.renderTitle();
+                    this.renderContent();
+                },
+                this
+            );
 
-      this.$el.on('keyup', function(e){
-        if (e.keyCode === 27) {
-          self.hide();
-        }
-      });
-    },
-    afterRender: function () {
-    },
-    getTemplateOptions: function(){
-      return this.options;
-    },
-    renderTitle: function() {
-      var title = this.title;
-      if(typeof(title) === 'function'){
-        title = title(this.getTemplateOptions());
-      }
-      this.$('.popover-title').empty().append(title);
-    },
-    renderContent: function() {
-      this.$('.popover-content').empty().append(this.content(this.getTemplateOptions()));
-    },
-    bindTriggerEvents: function() {
-      if (this.triggerView) {
-        _.each(this.triggerEvents, function(func, event) {
-          var method = this[func];
-          if (!method) {
-            $.error('Function not found.');
-          }
-          this.stopListening(this.triggerView, event);
-          this.listenTo(this.triggerView, event, method);
-        }, this);
-      }
-    },
-
-    getPosition: function() {
-      var $el = this.triggerView.$el;
-      return $.extend({}, {
-        width: $el[0].offsetWidth,
-        height: $el[0].offsetHeight
-      }, $el.offset());
-    },
-
-    getBodyClassName: function(){
-      var name = 'popover-';
-      if(this.options.id){
-        name += this.options.id + '-';
-      }
-      name += 'active';
-      return name;
-    },
-
-    show: function() {
-      /* hide existing */
-      $('.popover:visible').each(function(){
-        var popover = $(this).data('component');
-        if(popover){
-          popover.hide();
-        }
-      });
-
-      this.position();
-
-      this.setBackdrop();
-      if (this.useBackdrop === true) {
-        this.backdrop.show();
-      }
-
-      this.opened = true;
-
-      if (this.triggerView) {
-        this.triggerView.$el.addClass('active');
-      }
-
-      this.uiEventTrigger('show', this);
-      this.$el.attr('aria-hidden', 'false');
-      $('body').addClass(this.getBodyClassName());
-    },
-
-    position: function(){
-      var pos = this.getPosition();
-      var $tip = this.$el, tp, placement, actualWidth, actualHeight;
-
-      placement = this.placement;
-
-      $tip.css({ top: 0, left: 0 }).addClass('active');
-
-      actualWidth = $tip[0].offsetWidth;
-      actualHeight = $tip[0].offsetHeight;
-
-      switch (placement) {
-        case 'bottom-right':
-          tp = {top: pos.top + pos.height, left: pos.left + pos.width - 40};
-          break;
-        case 'bottom':
-          tp = {top: pos.top + pos.height, left: pos.left + pos.width / 2 - actualWidth / 2};
-          break;
-        case 'top':
-          tp = {top: pos.top - actualHeight, left: pos.left + pos.width / 2 - actualWidth / 2};
-          break;
-        case 'left':
-          tp = {top: pos.top + pos.height / 2 - actualHeight / 2, left: pos.left - actualWidth};
-          break;
-        case 'right':
-          tp = {top: pos.top + pos.height / 2 - actualHeight / 2, left: pos.left + pos.width};
-          break;
-      }
-
-      this.applyPlacement(tp, placement);
-    },
-
-    applyPlacement: function(offset, placement) {
-      var $el = this.$el,
-        $tip = this.$el,
-        width = $tip[0].offsetWidth,
-        height = $tip[0].offsetHeight,
-        actualWidth,
-        actualHeight,
-        delta,
-        replace;
-
-      $el.removeClass(placement);
-
-      $el.offset(offset)
-        .addClass(placement)
-        .addClass('active');
-
-      actualWidth = $tip[0].offsetWidth;
-      actualHeight = $tip[0].offsetHeight;
-
-      if (placement === 'top' && actualHeight !== height) {
-        offset.top = offset.top + height - actualHeight;
-        replace = true;
-      }
-
-      if (placement === 'bottom' || placement === 'top') {
-        delta = 0;
-
-        if (offset.left < 0) {
-          delta = offset.left * -2;
-          offset.left = 0;
-          $el.removeClass(placement);
-          $el.offset(offset).addClass(placement);
-          actualWidth = $tip[0].offsetWidth;
-          actualHeight = $tip[0].offsetHeight;
-        }
-
-        this.positionArrow(delta - width + actualWidth, actualWidth, 'left');
-
-      } else if (placement !== 'bottom-right') {
-        // If placement is bottom-right, don't override left position for the arrow that is defined in css to 20px.
-        this.positionArrow(actualHeight - height, actualHeight, 'top');
-      }
-
-      if (replace) {
-        $el.offset(offset);
-      }
-    },
-    positionArrow: function(delta, dimension, position) {
-      var $arrow = this.$('.arrow');
-      $arrow.css(position, delta ? (50 * (1 - delta / dimension) + '%') : '');
-    },
-    hide: function() {
-      this.opened = false;
-      this.$el.removeClass('active');
-      if (this.triggerView) {
-        this.triggerView.$el.removeClass('active');
-        this.triggerView.$el.attr('aria-hidden', 'true');
-      }
-      this.uiEventTrigger('hide', this);
-      this.$el.attr('aria-hidden', 'true');
-      $('body').removeClass(this.getBodyClassName());
-    },
-    toggle: function(button, e) {
-      if (this.opened) {
-        this.hide();
-      } else {
-        this.show();
-      }
-    },
-    setBackdrop: function() {
-      if (this.useBackdrop === true && this.backdrop === undefined) {
-        var self = this;
-        this.$backdrop = this.$el.closest('.ui-backdrop-element');
-        if (this.$backdrop.length === 0) {
-          this.$backdrop = $('body');
-        }
-
-        this.backdrop = new Backdrop(this.$backdrop, this.backdropOptions);
-        this.backdrop.$el.on('hidden.backdrop.patterns', function(e) {
-          if (e.namespace === 'backdrop.patterns') {
-            e.stopPropagation();
-            if (self.opened === true) {
-              self.hide();
+            this.$el.on("keyup", function (e) {
+                if (e.keyCode === 27) {
+                    self.hide();
+                }
+            });
+        },
+        afterRender: function () {},
+        getTemplateOptions: function () {
+            return this.options;
+        },
+        renderTitle: function () {
+            var title = this.title;
+            if (typeof title === "function") {
+                title = title(this.getTemplateOptions());
             }
-          }
-        });
-        this.on('popover:hide', function() {
-          this.backdrop.hide();
-        }, this);
-      }
-    }
-  });
+            this.$(".popover-title").empty().append(title);
+        },
+        renderContent: function () {
+            this.$(".popover-content")
+                .empty()
+                .append(this.content(this.getTemplateOptions()));
+        },
+        bindTriggerEvents: function () {
+            if (this.triggerView) {
+                _.each(
+                    this.triggerEvents,
+                    function (func, event) {
+                        var method = this[func];
+                        if (!method) {
+                            $.error("Function not found.");
+                        }
+                        this.stopListening(this.triggerView, event);
+                        this.listenTo(this.triggerView, event, method);
+                    },
+                    this
+                );
+            }
+        },
 
-  return PopoverView;
+        getPosition: function () {
+            var $el = this.triggerView.$el;
+            return $.extend(
+                {},
+                {
+                    width: $el[0].offsetWidth,
+                    height: $el[0].offsetHeight,
+                },
+                $el.offset()
+            );
+        },
+
+        getBodyClassName: function () {
+            var name = "popover-";
+            if (this.options.id) {
+                name += this.options.id + "-";
+            }
+            name += "active";
+            return name;
+        },
+
+        show: function () {
+            /* hide existing */
+            $(".popover:visible").each(function () {
+                var popover = $(this).data("component");
+                if (popover) {
+                    popover.hide();
+                }
+            });
+
+            this.position();
+
+            this.setBackdrop();
+            if (this.useBackdrop === true) {
+                this.backdrop.show();
+            }
+
+            this.opened = true;
+
+            if (this.triggerView) {
+                this.triggerView.$el.addClass("active");
+            }
+
+            this.uiEventTrigger("show", this);
+            this.$el.attr("aria-hidden", "false");
+            $("body").addClass(this.getBodyClassName());
+        },
+
+        position: function () {
+            var pos = this.getPosition();
+            var $tip = this.$el,
+                tp,
+                placement,
+                actualWidth,
+                actualHeight;
+
+            placement = this.placement;
+
+            $tip.css({ top: 0, left: 0 }).addClass("active");
+
+            actualWidth = $tip[0].offsetWidth;
+            actualHeight = $tip[0].offsetHeight;
+
+            switch (placement) {
+                case "bottom-right":
+                    tp = {
+                        top: pos.top + pos.height,
+                        left: pos.left + pos.width - 40,
+                    };
+                    break;
+                case "bottom":
+                    tp = {
+                        top: pos.top + pos.height,
+                        left: pos.left + pos.width / 2 - actualWidth / 2,
+                    };
+                    break;
+                case "top":
+                    tp = {
+                        top: pos.top - actualHeight,
+                        left: pos.left + pos.width / 2 - actualWidth / 2,
+                    };
+                    break;
+                case "left":
+                    tp = {
+                        top: pos.top + pos.height / 2 - actualHeight / 2,
+                        left: pos.left - actualWidth,
+                    };
+                    break;
+                case "right":
+                    tp = {
+                        top: pos.top + pos.height / 2 - actualHeight / 2,
+                        left: pos.left + pos.width,
+                    };
+                    break;
+            }
+
+            this.applyPlacement(tp, placement);
+        },
+
+        applyPlacement: function (offset, placement) {
+            var $el = this.$el,
+                $tip = this.$el,
+                width = $tip[0].offsetWidth,
+                height = $tip[0].offsetHeight,
+                actualWidth,
+                actualHeight,
+                delta,
+                replace;
+
+            $el.removeClass(placement);
+
+            $el.offset(offset).addClass(placement).addClass("active");
+
+            actualWidth = $tip[0].offsetWidth;
+            actualHeight = $tip[0].offsetHeight;
+
+            if (placement === "top" && actualHeight !== height) {
+                offset.top = offset.top + height - actualHeight;
+                replace = true;
+            }
+
+            if (placement === "bottom" || placement === "top") {
+                delta = 0;
+
+                if (offset.left < 0) {
+                    delta = offset.left * -2;
+                    offset.left = 0;
+                    $el.removeClass(placement);
+                    $el.offset(offset).addClass(placement);
+                    actualWidth = $tip[0].offsetWidth;
+                    actualHeight = $tip[0].offsetHeight;
+                }
+
+                this.positionArrow(
+                    delta - width + actualWidth,
+                    actualWidth,
+                    "left"
+                );
+            } else if (placement !== "bottom-right") {
+                // If placement is bottom-right, don't override left position for the arrow that is defined in css to 20px.
+                this.positionArrow(actualHeight - height, actualHeight, "top");
+            }
+
+            if (replace) {
+                $el.offset(offset);
+            }
+        },
+        positionArrow: function (delta, dimension, position) {
+            var $arrow = this.$(".arrow");
+            $arrow.css(
+                position,
+                delta ? 50 * (1 - delta / dimension) + "%" : ""
+            );
+        },
+        hide: function () {
+            this.opened = false;
+            this.$el.removeClass("active");
+            if (this.triggerView) {
+                this.triggerView.$el.removeClass("active");
+                this.triggerView.$el.attr("aria-hidden", "true");
+            }
+            this.uiEventTrigger("hide", this);
+            this.$el.attr("aria-hidden", "true");
+            $("body").removeClass(this.getBodyClassName());
+        },
+        toggle: function (button, e) {
+            if (this.opened) {
+                this.hide();
+            } else {
+                this.show();
+            }
+        },
+        setBackdrop: function () {
+            if (this.useBackdrop === true && this.backdrop === undefined) {
+                var self = this;
+                this.$backdrop = this.$el.closest(".ui-backdrop-element");
+                if (this.$backdrop.length === 0) {
+                    this.$backdrop = $("body");
+                }
+
+                this.backdrop = new Backdrop(
+                    this.$backdrop,
+                    this.backdropOptions
+                );
+                this.backdrop.$el.on("hidden.backdrop.patterns", function (e) {
+                    if (e.namespace === "backdrop.patterns") {
+                        e.stopPropagation();
+                        if (self.opened === true) {
+                            self.hide();
+                        }
+                    }
+                });
+                this.on(
+                    "popover:hide",
+                    function () {
+                        this.backdrop.hide();
+                    },
+                    this
+                );
+            }
+        },
+    });
+
+    return PopoverView;
 });
 
 
 define('text!mockup-patterns-filemanager-url/templates/popover.xml',[],function () { return '<div class="arrow"></div>\n<div class="popover-label">\n<div style="position: relative;" class="popover-title">\n</div>\n<a style="position: absolute; top: 5px; right: 3px; font-size: 16px; color: #999;"\n   href="#" class="popover-close">\n  <span class="glyphicon glyphicon-remove"></span>\n</a>\n</div>\n<div class="items popover-content">\n</div>\n\n';});
 
 define('mockup-patterns-filemanager-url/js/basepopover',[
-  'jquery',
-  'underscore',
-  'mockup-ui-url/views/popover',
-  'text!mockup-patterns-filemanager-url/templates/popover.xml',
-], function($, _, PopoverView, PopoverTemplate) {
-  'use strict';
+    "jquery",
+    "underscore",
+    "mockup-ui-url/views/popover",
+    "text!mockup-patterns-filemanager-url/templates/popover.xml",
+], function ($, _, PopoverView, PopoverTemplate) {
+    "use strict";
 
-  var FileManagerPopover = PopoverView.extend({
-    className: 'popover',
-    title: _.template('nothing'),
-    content: _.template('<div/>'),
-    template: PopoverTemplate,
-    initialize: function(options) {
-      this.app = options.app;
-      PopoverView.prototype.initialize.apply(this, [options]);
-    },
-    afterRender: function () {
-      var self = this;
-      self.$el.find(".popover-close").click(function(e){
-        self.hide(true);
-      });
-      return self;
-    },
-    getBodyClassName: function(){
-      var name = 'popover-';
-      if(this.options.id){
-        name += this.options.id + '-';
-      }
-      name += 'active';
-      return name;
-    },
-    render: function() {
-      var self = this;
-      PopoverView.prototype.render.call(this);
-      return self;
-    },
-    hide: function(closePopover) {
-      if(this.closeOnOutClick || closePopover == true){
-        this.opened = false;
-        this.$el.removeClass('active');
-        if (this.triggerView) {
-          this.triggerView.$el.removeClass('active');
-          this.triggerView.$el.attr('aria-hidden', 'true');
-        }
-        this.uiEventTrigger('hide', this);
-        this.$el.attr('aria-hidden', 'true');
-        $('body').removeClass(this.getBodyClassName());
-      }
-    },
-    toggle: function(button, e) {
-      PopoverView.prototype.toggle.apply(this, [button, e]);
-      var self = this;
-      if (!self.opened) {
-        return;
-      }
-      var $path = self.$('.current-path');
-      if ($path.length !== 0) {
-        $path.html(self.getPath());
-      }
-    },
-    getPath: function() {
-      return this.app.getFolderPath();
-    }
-  });
+    var FileManagerPopover = PopoverView.extend({
+        className: "popover",
+        title: _.template("nothing"),
+        content: _.template("<div/>"),
+        template: PopoverTemplate,
+        initialize: function (options) {
+            this.app = options.app;
+            PopoverView.prototype.initialize.apply(this, [options]);
+        },
+        afterRender: function () {
+            var self = this;
+            self.$el.find(".popover-close").click(function (e) {
+                self.hide(true);
+            });
+            return self;
+        },
+        getBodyClassName: function () {
+            var name = "popover-";
+            if (this.options.id) {
+                name += this.options.id + "-";
+            }
+            name += "active";
+            return name;
+        },
+        render: function () {
+            var self = this;
+            PopoverView.prototype.render.call(this);
+            return self;
+        },
+        hide: function (closePopover) {
+            if (this.closeOnOutClick || closePopover == true) {
+                this.opened = false;
+                this.$el.removeClass("active");
+                if (this.triggerView) {
+                    this.triggerView.$el.removeClass("active");
+                    this.triggerView.$el.attr("aria-hidden", "true");
+                }
+                this.uiEventTrigger("hide", this);
+                this.$el.attr("aria-hidden", "true");
+                $("body").removeClass(this.getBodyClassName());
+            }
+        },
+        toggle: function (button, e) {
+            PopoverView.prototype.toggle.apply(this, [button, e]);
+            var self = this;
+            if (!self.opened) {
+                return;
+            }
+            var $path = self.$(".current-path");
+            if ($path.length !== 0) {
+                $path.html(self.getPath());
+            }
+        },
+        getPath: function () {
+            return this.app.getFolderPath();
+        },
+    });
 
-  return FileManagerPopover;
+    return FileManagerPopover;
 });
 
 define('mockup-patterns-filemanager-url/js/addnew',[
-  'underscore',
-  'mockup-patterns-filemanager-url/js/basepopover'
-], function(_, PopoverView) {
-  'use strict';
+    "underscore",
+    "mockup-patterns-filemanager-url/js/basepopover",
+], function (_, PopoverView) {
+    "use strict";
 
-  var AddNewView = PopoverView.extend({
-    className: 'popover addnew',
-    title: _.template('<%= _t("Add new file") %>'),
-    content: _.template(
-      '<span class="current-path"></span>' +
-      '<div class="form-group">' +
-        '<label for="filename-field"><%= _t("Filename") %></label>' +
-        '<input type="text" class="form-control" ' +
+    var AddNewView = PopoverView.extend({
+        className: "popover addnew",
+        title: _.template('<%= _t("Add new file") %>'),
+        content: _.template(
+            '<span class="current-path"></span>' +
+                '<div class="form-group">' +
+                '<label for="filename-field"><%= _t("Filename") %></label>' +
+                '<input type="text" class="form-control" ' +
                 'id="filename-field" placeholder="<%= _t("Enter filename") %>">' +
-      '</div>' +
-      '<button class="btn btn-block btn-primary"><%= _t("Add") %></button>'
-    ),
-    events: {
-      'click button': 'addButtonClicked'
-    },
-    addButtonClicked: function(e) {
-      var self = this;
-      var $input = self.$('input');
-      var filename = $input.val();
-      if (filename){
-        self.app.doAction('addFile', {
-          type: 'POST',
-          data: {
-            filename: filename,
-            path: self.app.getFolderPath()
-          },
-          success: function(data) {
-            self.hide();
-            self.data = data;
-            self.app.refreshTree(function() {
-              var path = self.data.parent + '/' +  self.data.name;
-              self.app.selectItem(path);
-              delete self.data;
-            });
-          }
-        });
-        // XXX show loading
-      } else {
-        self.$('.form-group').addClass('has-error');
-      }
-    }
-  });
+                "</div>" +
+                '<button class="btn btn-block btn-primary"><%= _t("Add") %></button>'
+        ),
+        events: {
+            "click button": "addButtonClicked",
+        },
+        addButtonClicked: function (e) {
+            var self = this;
+            var $input = self.$("input");
+            var filename = $input.val();
+            if (filename) {
+                self.app.doAction("addFile", {
+                    type: "POST",
+                    data: {
+                        filename: filename,
+                        path: self.app.getFolderPath(),
+                    },
+                    success: function (data) {
+                        self.hide();
+                        self.data = data;
+                        self.app.refreshTree(function () {
+                            var path = self.data.parent + "/" + self.data.name;
+                            self.app.selectItem(path);
+                            delete self.data;
+                        });
+                    },
+                });
+                // XXX show loading
+            } else {
+                self.$(".form-group").addClass("has-error");
+            }
+        },
+    });
 
-  return AddNewView;
+    return AddNewView;
 });
 
 define('mockup-patterns-filemanager-url/js/newfolder',[
-  'underscore',
-  'mockup-patterns-filemanager-url/js/basepopover'
-], function(_, PopoverView) {
-  'use strict';
+    "underscore",
+    "mockup-patterns-filemanager-url/js/basepopover",
+], function (_, PopoverView) {
+    "use strict";
 
-  var AddNewView = PopoverView.extend({
-    className: 'popover addfolder',
-    title: _.template('<%= _t("New folder") %>'),
-    content: _.template(
-      '<span class="current-path"></span>' +
-      '<div class="form-group">' +
-        '<label for="filename-field"><%= _t("Add new folder to current directory") %></label>' +
-        '<input type="email" class="form-control" ' +
+    var AddNewView = PopoverView.extend({
+        className: "popover addfolder",
+        title: _.template('<%= _t("New folder") %>'),
+        content: _.template(
+            '<span class="current-path"></span>' +
+                '<div class="form-group">' +
+                '<label for="filename-field"><%= _t("Add new folder to current directory") %></label>' +
+                '<input type="email" class="form-control" ' +
                 'id="filename-field" placeholder="<%= _t("Enter folder name") %>">' +
-      '</div>' +
-      '<button class="btn btn-block btn-primary"><%= _t("Add") %></button>'
-    ),
-    events: {
-      'click button': 'addButtonClicked'
-    },
-    addButtonClicked: function(e) {
-      var self = this;
-      var $input = self.$('input');
-      var name = $input.val();
-      if (name) {
-        self.app.doAction('addFolder', {
-          type: 'POST',
-          data: {
-            name: name,
-            path: self.app.getFolderPath()
-          },
-          success: function(data) {
-            self.hide();
-            self.data = data;
-            self.app.refreshTree(function() {
-              var node = self.app.getNodeByPath(self.data.parent);
-              self.app.$tree.tree('openNode', node);
-              delete self.data;
-            });
-          }
-        });
-        // XXX show loading
-      } else {
-        self.$('.form-group').addClass('has-error');
-      }
-    }
-  });
+                "</div>" +
+                '<button class="btn btn-block btn-primary"><%= _t("Add") %></button>'
+        ),
+        events: {
+            "click button": "addButtonClicked",
+        },
+        addButtonClicked: function (e) {
+            var self = this;
+            var $input = self.$("input");
+            var name = $input.val();
+            if (name) {
+                self.app.doAction("addFolder", {
+                    type: "POST",
+                    data: {
+                        name: name,
+                        path: self.app.getFolderPath(),
+                    },
+                    success: function (data) {
+                        self.hide();
+                        self.data = data;
+                        self.app.refreshTree(function () {
+                            var node = self.app.getNodeByPath(self.data.parent);
+                            self.app.$tree.tree("openNode", node);
+                            delete self.data;
+                        });
+                    },
+                });
+                // XXX show loading
+            } else {
+                self.$(".form-group").addClass("has-error");
+            }
+        },
+    });
 
-  return AddNewView;
+    return AddNewView;
 });
 
 define('mockup-patterns-filemanager-url/js/findfile',[
-  'jquery',
-  'underscore',
-  'mockup-patterns-filemanager-url/js/basepopover',
-  'translate'
-], function($, _, PopoverView, _t) {
-  'use strict';
+    "jquery",
+    "underscore",
+    "mockup-patterns-filemanager-url/js/basepopover",
+    "translate",
+], function ($, _, PopoverView, _t) {
+    "use strict";
 
-  var FindFile = PopoverView.extend({
-    className: 'popover filesearch',
-    closeOnOutClick: false,
-    backdropOptions: {
-      zIndex: '1009',
-      opacity: '0.4',
-      className: 'backdrop backdrop-popover',
-      classActiveName: 'backdrop-active',
-      closeOnEsc: false,
-      closeOnClick: false
-    },
-    title: _.template('<%= _t("Find File") %>'),
-    content: _.template(
-      '<form>' +
-        '<div class="input-group">' +
-          '<input type="text" class="search form-control" ' +
-                  'id="file-search-field" placeholder="<%= _t("Find theme resource in plone") %>">' +
-        '</div>' +
-        '<div class="input-group">' +
-          '<input type="submit" class="btn btn-primary" value="<%= _t("Search") %>"/>' +
-        '</div>' +
-      '</form><br/>' +
-      '<ul class="results list-group">' +
-      '</ul>'
-    ),
-    appendToResults: function(item){
-      var self = this;
-      var $item = $(
-        '<li class="list-group-item">' +
-          '<span class="badge"><a data-target="' + item.path + '" href=#">' +
-          _t(item.filename) + '</a></span>' +
-        '</li>');
-      $('a', $item).click(function(e) {
-        e.preventDefault();
-        self.findfile($(this).attr('data-target'));
-      });
-      self.$results.append($item);
-    },
-    filterFiles: function(patt, data){
-      var self = this;
-      _.each(data, function(item) {
-        if(item.folder){
-          self.filterFiles(patt, item.children);
-        }else{
-          if(patt.test(item.filename)){
-            self.appendToResults(item);
-            self.noMatches++;
-          }
-        }
-      });
-    },
-    render: function() {
-      var self = this;
-      PopoverView.prototype.render.call(this);
-      self.$form = self.$('form');
-      self.$searchFor = self.$("input");
-      self.$results = self.$('.results');
-      self.$form.submit(function(e) {
-        e.preventDefault();
-        $.ajax({
-          url: self.app.options.actionUrl + '?action=dataTree',
-          dataType: 'json',
-          success: function(data) {
-            self.$results.empty();
-            self.noMatches = 0;
-            var searchFor = self.$searchFor.val();
-            var patt = new RegExp(searchFor, "g");
-            self.filterFiles(patt, data);
-            if(self.noMatches == 0){
-              self.$results.append("<span>No results found for " + searchFor + "</span>");
-            }
-          }
-        });
-      });
-      return self;
-    },
-    findfile: function(resource) {
-      var self = this;
-      self.app.doAction('getFile', {
-        data: {
-          path: resource
+    var FindFile = PopoverView.extend({
+        className: "popover filesearch",
+        closeOnOutClick: false,
+        backdropOptions: {
+            zIndex: "1009",
+            opacity: "0.4",
+            className: "backdrop backdrop-popover",
+            classActiveName: "backdrop-active",
+            closeOnEsc: false,
+            closeOnClick: false,
         },
-        dataType: 'json',
-        success: function(data) {
-          self.app.fileData[resource] = data;
-          self.app.openEditor(resource);
-        }
-      });
-    }
-  });
+        title: _.template('<%= _t("Find File") %>'),
+        content: _.template(
+            "<form>" +
+                '<div class="input-group">' +
+                '<input type="text" class="search form-control" ' +
+                'id="file-search-field" placeholder="<%= _t("Find theme resource in plone") %>">' +
+                "</div>" +
+                '<div class="input-group">' +
+                '<input type="submit" class="btn btn-primary" value="<%= _t("Search") %>"/>' +
+                "</div>" +
+                "</form><br/>" +
+                '<ul class="results list-group">' +
+                "</ul>"
+        ),
+        appendToResults: function (item) {
+            var self = this;
+            var $item = $(
+                '<li class="list-group-item">' +
+                    '<span class="badge"><a data-target="' +
+                    item.path +
+                    '" href=#">' +
+                    _t(item.filename) +
+                    "</a></span>" +
+                    "</li>"
+            );
+            $("a", $item).click(function (e) {
+                e.preventDefault();
+                self.findfile($(this).attr("data-target"));
+            });
+            self.$results.append($item);
+        },
+        filterFiles: function (patt, data) {
+            var self = this;
+            _.each(data, function (item) {
+                if (item.folder) {
+                    self.filterFiles(patt, item.children);
+                } else {
+                    if (patt.test(item.filename)) {
+                        self.appendToResults(item);
+                        self.noMatches++;
+                    }
+                }
+            });
+        },
+        render: function () {
+            var self = this;
+            PopoverView.prototype.render.call(this);
+            self.$form = self.$("form");
+            self.$searchFor = self.$("input");
+            self.$results = self.$(".results");
+            self.$form.submit(function (e) {
+                e.preventDefault();
+                $.ajax({
+                    url: self.app.options.actionUrl + "?action=dataTree",
+                    dataType: "json",
+                    success: function (data) {
+                        self.$results.empty();
+                        self.noMatches = 0;
+                        var searchFor = self.$searchFor.val();
+                        var patt = new RegExp(searchFor, "g");
+                        self.filterFiles(patt, data);
+                        if (self.noMatches == 0) {
+                            self.$results.append(
+                                "<span>No results found for " +
+                                    searchFor +
+                                    "</span>"
+                            );
+                        }
+                    },
+                });
+            });
+            return self;
+        },
+        findfile: function (resource) {
+            var self = this;
+            self.app.doAction("getFile", {
+                data: {
+                    path: resource,
+                },
+                dataType: "json",
+                success: function (data) {
+                    self.app.fileData[resource] = data;
+                    self.app.openEditor(resource);
+                },
+            });
+        },
+    });
 
-  return FindFile;
+    return FindFile;
 });
 
 define('mockup-patterns-filemanager-url/js/findinfiles',[
-  'jquery',
-  'underscore',
-  'mockup-patterns-filemanager-url/js/basepopover',
-  'translate'
-], function($, _, PopoverView, _t) {
-  'use strict';
+    "jquery",
+    "underscore",
+    "mockup-patterns-filemanager-url/js/basepopover",
+    "translate",
+], function ($, _, PopoverView, _t) {
+    "use strict";
 
-  var FindInFiles = PopoverView.extend({
-    className: 'popover filesearch',
-    closeOnOutClick: false,
-    backdropOptions: {
-      zIndex: '1009',
-      opacity: '0.4',
-      className: 'backdrop backdrop-popover',
-      classActiveName: 'backdrop-active',
-      closeOnEsc: false,
-      closeOnClick: false
-    },
-    title: _.template('<%= _t("Find in File") %>'),
-    content: _.template(
-      '<form>' +
-        '<div class="input-group">' +
-          '<input type="text" class="search form-control" ' +
-                  'id="file-search-field" placeholder="<%= _t("Find text within theme resource in plone") %>">' +
-        '</div>' +
-        '<div class="input-group">' +
-          '<input type="submit" class="btn btn-primary" value="<%= _t("Search") %>"/>' +
-        '</div>' +
-      '</form><br/>' +
-      '<ul style="max-height: 400px; overflow: auto;" class="results list-group">' +
-      '</ul>'
-    ),
-    appendToResults: function(item){
-      var self = this, seen = null;
-      var file_item =
-        '<li class="list-group-item" data-id="' + item.file.label + '">' +
-          '<span class="badge">' + _t(item.file.filename) + '</span><ul>';
-      for(var x in item.lines){
-        seen = item.lines[x];
-        file_item += '<li class="list-group-item" data-id="' + item.file.label + '">' +
-          '<span class="badge"><a class="ff-open-file" data-target="'+item.file.path+'" ' +
-          'target-line="'+seen.line+'" href="#">Line ' +
-          '<span style="display: inline-block; width: 100px;">' + seen.line +
-          '</span><span>'+seen.text+'</span><a></span></li>';
-      }
-      file_item += '</ul></li>';
-      var $item = $(file_item);
-      $('a', $item).click(function(e) {
-        e.preventDefault();
-        self.findinfiles(
-          $(this).attr("data-target"),
-          parseInt($(this).attr("target-line"))
-        );
-      });
-      self.$results.append($item);
-    },
-
-    filterFile: function(patt, item){
-      var self = this;
-      $.ajax({
-        url: self.app.options.actionUrl + '?action=getFile&path='+item.path.replace("/", "%2F"),
-        dataType: 'json',
-        success: function(data) {
-          var contents = data["contents"];
-          if(contents == undefined){
-            return;
-          }
-          var lines = contents.split("\n");
-          var seen = [], line = '';
-          var result = null;
-          for(var x in lines){
-            line = lines[x];
-            result = patt.exec(line);
-            if(result != null){
-              seen.push({
-                "line": parseInt(x) + 1,
-                "text": '<b>'+result[0]+'</b>'+line.substr(result["index"] + result[0].length, 20)
-              });
-            }
-          }
-          if(seen.length > 0){
-            self.appendToResults({file: item, lines: seen});
-            self.noMatches += seen.length;
-          }
-        }
-      });
-    },
-    filterFiles: function(patt, data){
-      var self = this;
-      _.each(data, function(item) {
-        if(item.folder){
-          self.filterFiles(patt, item.children);
-        }else{
-          self.filterFile(patt, item);
-        }
-      });
-    },
-    render: function() {
-      var self = this;
-      PopoverView.prototype.render.call(this);
-      self.$form = self.$('form');
-      self.$searchFor = self.$("input");
-      self.$results = self.$('.results');
-      self.$form.submit(function(e) {
-        e.preventDefault();
-        $.ajax({
-          url: self.app.options.actionUrl + '?action=dataTree',
-          dataType: 'json',
-          success: function(data) {
-            self.$results.empty();
-            self.noMatches = 0;
-            var searchFor = self.$searchFor.val();
-            var patt = new RegExp(searchFor, "g");
-            self.filterFiles(patt, data);
-          }
-        });
-      });
-      return self;
-    },
-    findinfiles: function(resource, line) {
-      var self = this;
-      self.app.doAction('getFile', {
-        data: {
-          path: resource
+    var FindInFiles = PopoverView.extend({
+        className: "popover filesearch",
+        closeOnOutClick: false,
+        backdropOptions: {
+            zIndex: "1009",
+            opacity: "0.4",
+            className: "backdrop backdrop-popover",
+            classActiveName: "backdrop-active",
+            closeOnEsc: false,
+            closeOnClick: false,
         },
-        dataType: 'json',
-        success: function(data) {
-          self.app.fileData[resource] = data;
-          self.app.openEditor(resource, {goToLine: line});
-        }
-      });
-    }
-  });
+        title: _.template('<%= _t("Find in File") %>'),
+        content: _.template(
+            "<form>" +
+                '<div class="input-group">' +
+                '<input type="text" class="search form-control" ' +
+                'id="file-search-field" placeholder="<%= _t("Find text within theme resource in plone") %>">' +
+                "</div>" +
+                '<div class="input-group">' +
+                '<input type="submit" class="btn btn-primary" value="<%= _t("Search") %>"/>' +
+                "</div>" +
+                "</form><br/>" +
+                '<ul style="max-height: 400px; overflow: auto;" class="results list-group">' +
+                "</ul>"
+        ),
+        appendToResults: function (item) {
+            var self = this,
+                seen = null;
+            var file_item =
+                '<li class="list-group-item" data-id="' +
+                item.file.label +
+                '">' +
+                '<span class="badge">' +
+                _t(item.file.filename) +
+                "</span><ul>";
+            for (var x in item.lines) {
+                seen = item.lines[x];
+                file_item +=
+                    '<li class="list-group-item" data-id="' +
+                    item.file.label +
+                    '">' +
+                    '<span class="badge"><a class="ff-open-file" data-target="' +
+                    item.file.path +
+                    '" ' +
+                    'target-line="' +
+                    seen.line +
+                    '" href="#">Line ' +
+                    '<span style="display: inline-block; width: 100px;">' +
+                    seen.line +
+                    "</span><span>" +
+                    seen.text +
+                    "</span><a></span></li>";
+            }
+            file_item += "</ul></li>";
+            var $item = $(file_item);
+            $("a", $item).click(function (e) {
+                e.preventDefault();
+                self.findinfiles(
+                    $(this).attr("data-target"),
+                    parseInt($(this).attr("target-line"))
+                );
+            });
+            self.$results.append($item);
+        },
 
-  return FindInFiles;
+        filterFile: function (patt, item) {
+            var self = this;
+            $.ajax({
+                url:
+                    self.app.options.actionUrl +
+                    "?action=getFile&path=" +
+                    item.path.replace("/", "%2F"),
+                dataType: "json",
+                success: function (data) {
+                    var contents = data["contents"];
+                    if (contents == undefined) {
+                        return;
+                    }
+                    var lines = contents.split("\n");
+                    var seen = [],
+                        line = "";
+                    var result = null;
+                    for (var x in lines) {
+                        line = lines[x];
+                        result = patt.exec(line);
+                        if (result != null) {
+                            seen.push({
+                                line: parseInt(x) + 1,
+                                text:
+                                    "<b>" +
+                                    result[0] +
+                                    "</b>" +
+                                    line.substr(
+                                        result["index"] + result[0].length,
+                                        20
+                                    ),
+                            });
+                        }
+                    }
+                    if (seen.length > 0) {
+                        self.appendToResults({ file: item, lines: seen });
+                        self.noMatches += seen.length;
+                    }
+                },
+            });
+        },
+        filterFiles: function (patt, data) {
+            var self = this;
+            _.each(data, function (item) {
+                if (item.folder) {
+                    self.filterFiles(patt, item.children);
+                } else {
+                    self.filterFile(patt, item);
+                }
+            });
+        },
+        render: function () {
+            var self = this;
+            PopoverView.prototype.render.call(this);
+            self.$form = self.$("form");
+            self.$searchFor = self.$("input");
+            self.$results = self.$(".results");
+            self.$form.submit(function (e) {
+                e.preventDefault();
+                $.ajax({
+                    url: self.app.options.actionUrl + "?action=dataTree",
+                    dataType: "json",
+                    success: function (data) {
+                        self.$results.empty();
+                        self.noMatches = 0;
+                        var searchFor = self.$searchFor.val();
+                        var patt = new RegExp(searchFor, "g");
+                        self.filterFiles(patt, data);
+                    },
+                });
+            });
+            return self;
+        },
+        findinfiles: function (resource, line) {
+            var self = this;
+            self.app.doAction("getFile", {
+                data: {
+                    path: resource,
+                },
+                dataType: "json",
+                success: function (data) {
+                    self.app.fileData[resource] = data;
+                    self.app.openEditor(resource, { goToLine: line });
+                },
+            });
+        },
+    });
+
+    return FindInFiles;
 });
 
 define('mockup-patterns-filemanager-url/js/delete',[
-  'underscore',
-  'mockup-patterns-filemanager-url/js/basepopover'
-], function(_, PopoverView) {
-  'use strict';
+    "underscore",
+    "mockup-patterns-filemanager-url/js/basepopover",
+], function (_, PopoverView) {
+    "use strict";
 
-  var DeleteView = PopoverView.extend({
-    className: 'popover delete',
-    title: _.template('<%= _t("Delete") %>'),
-    content: _.template(
-      '<span class="current-path"></span>' +
-      '<p><%= _t("Are you sure you want to delete this resource?") %></p>' +
-      '<button class="btn btn-block btn-danger"><%= _t("Yes, delete") %></button>'
-    ),
-    events: {
-      'click button': 'deleteButtonClicked'
-    },
-    getPath: function() {
-      return this.app.getNodePath();
-    },
-    deleteButtonClicked: function(e) {
-      var self = this;
-      var path = self.app.getNodePath();
-      if (path === undefined) {
-        alert('No file selected.');
-        return;
-      }
-      self.app.doAction('delete', {
-        type: 'POST',
-        data: {
-          path: path
+    var DeleteView = PopoverView.extend({
+        className: "popover delete",
+        title: _.template('<%= _t("Delete") %>'),
+        content: _.template(
+            '<span class="current-path"></span>' +
+                '<p><%= _t("Are you sure you want to delete this resource?") %></p>' +
+                '<button class="btn btn-block btn-danger"><%= _t("Yes, delete") %></button>'
+        ),
+        events: {
+            "click button": "deleteButtonClicked",
         },
-        success: function(data) {
-          self.hide();
-          self.data = data;
-          self.app.refreshTree(function() {
-
-            var parent = self.data.path;
-            parent = parent.substr(0, parent.lastIndexOf('/'));
-
-            var node = self.app.getNodeByPath(parent);
-            if (node !== null) {
-              self.app.$tree.tree('openNode', node);
+        getPath: function () {
+            return this.app.getNodePath();
+        },
+        deleteButtonClicked: function (e) {
+            var self = this;
+            var path = self.app.getNodePath();
+            if (path === undefined) {
+                alert("No file selected.");
+                return;
             }
+            self.app.doAction("delete", {
+                type: "POST",
+                data: {
+                    path: path,
+                },
+                success: function (data) {
+                    self.hide();
+                    self.data = data;
+                    self.app.refreshTree(function () {
+                        var parent = self.data.path;
+                        parent = parent.substr(0, parent.lastIndexOf("/"));
 
-            self.app.closeActiveTab();
+                        var node = self.app.getNodeByPath(parent);
+                        if (node !== null) {
+                            self.app.$tree.tree("openNode", node);
+                        }
 
-            delete self.app.fileData[self.data.path];
-            delete self.data;
-          });
-          self.app.resizeEditor();
-        }
-      });
-      // XXX show loading
-    }
-  });
+                        self.app.closeActiveTab();
 
-  return DeleteView;
+                        delete self.app.fileData[self.data.path];
+                        delete self.data;
+                    });
+                    self.app.resizeEditor();
+                },
+            });
+            // XXX show loading
+        },
+    });
+
+    return DeleteView;
 });
 
 define('mockup-patterns-filemanager-url/js/customize',[
-  'jquery',
-  'underscore',
-  'mockup-patterns-filemanager-url/js/basepopover',
-  'translate'
-], function($, _, PopoverView, _t) {
-  'use strict';
+    "jquery",
+    "underscore",
+    "mockup-patterns-filemanager-url/js/basepopover",
+    "translate",
+], function ($, _, PopoverView, _t) {
+    "use strict";
 
-  var CustomizeView = PopoverView.extend({
-    className: 'popover customize',
-    title: _.template('<%= _t("Add new override") %>'),
-    content: _.template(
-      '<form>' +
-        '<div class="input-group">' +
-          '<input type="text" class="search form-control" ' +
-                  'id="search-field" placeholder="<%= _t("Find resource in plone to override") %>">' +
-          '<span class="input-group-btn">' +
-            '<input type="submit" class="btn btn-primary" value="<%= _t("Search") %>"/>' +
-          '</span>' +
-        '</div>' +
-      '</form>' +
-      '<ul class="results list-group">' +
-      '</ul>'
-    ),
-    render: function() {
-      var self = this;
-      PopoverView.prototype.render.call(this);
-      self.$form = self.$('form');
-      self.$results = self.$('.results');
-      self.$form.submit(function(e) {
-        e.preventDefault();
-        $.ajax({
-          url: self.app.options.resourceSearchUrl,
-          dataType: 'json',
-          success: function(data) {
-            self.$results.empty();
-            _.each(data, function(item) {
-              var $item = $(
-                '<li class="list-group-item" data-id="' + item.id + '">' +
-                  '<span class="badge"><a href=#">' + _t('Customize') + '</a></span>' +
-                  item.id +
-                '</li>');
-              $('a', $item).click(function(e) {
+    var CustomizeView = PopoverView.extend({
+        className: "popover customize",
+        title: _.template('<%= _t("Add new override") %>'),
+        content: _.template(
+            "<form>" +
+                '<div class="input-group">' +
+                '<input type="text" class="search form-control" ' +
+                'id="search-field" placeholder="<%= _t("Find resource in plone to override") %>">' +
+                '<span class="input-group-btn">' +
+                '<input type="submit" class="btn btn-primary" value="<%= _t("Search") %>"/>' +
+                "</span>" +
+                "</div>" +
+                "</form>" +
+                '<ul class="results list-group">' +
+                "</ul>"
+        ),
+        render: function () {
+            var self = this;
+            PopoverView.prototype.render.call(this);
+            self.$form = self.$("form");
+            self.$results = self.$(".results");
+            self.$form.submit(function (e) {
                 e.preventDefault();
-                self.customize($(this).parents('li').eq(0).attr('data-id'));
-              });
-              self.$results.append($item);
+                $.ajax({
+                    url: self.app.options.resourceSearchUrl,
+                    dataType: "json",
+                    success: function (data) {
+                        self.$results.empty();
+                        _.each(data, function (item) {
+                            var $item = $(
+                                '<li class="list-group-item" data-id="' +
+                                    item.id +
+                                    '">' +
+                                    '<span class="badge"><a href=#">' +
+                                    _t("Customize") +
+                                    "</a></span>" +
+                                    item.id +
+                                    "</li>"
+                            );
+                            $("a", $item).click(function (e) {
+                                e.preventDefault();
+                                self.customize(
+                                    $(this).parents("li").eq(0).attr("data-id")
+                                );
+                            });
+                            self.$results.append($item);
+                        });
+                    },
+                });
             });
-          }
-        });
-      });
-      return self;
-    },
-    customize: function(resource) {
-      var self = this;
-      self.app.doAction('customize', {
-        type: 'POST',
-        data: {
-          resource: resource
+            return self;
         },
-        success: function(data) {
-          self.hide();
-          // clear out
-          self.$('input.search').attr('value', '');
-          self.$results.empty();
-          self.app.refreshTree();
-        }
-      });
-    }
-  });
+        customize: function (resource) {
+            var self = this;
+            self.app.doAction("customize", {
+                type: "POST",
+                data: {
+                    resource: resource,
+                },
+                success: function (data) {
+                    self.hide();
+                    // clear out
+                    self.$("input.search").attr("value", "");
+                    self.$results.empty();
+                    self.app.refreshTree();
+                },
+            });
+        },
+    });
 
-  return CustomizeView;
+    return CustomizeView;
 });
 
 define('mockup-patterns-filemanager-url/js/rename',[
-  'underscore',
-  'mockup-patterns-filemanager-url/js/basepopover'
-], function(_, PopoverView) {
-  'use strict';
+    "underscore",
+    "mockup-patterns-filemanager-url/js/basepopover",
+], function (_, PopoverView) {
+    "use strict";
 
-  var RenameView = PopoverView.extend({
-    className: 'popover addnew',
-    title: _.template('<%= _t("Rename") %>'),
-    content: _.template(
-      '<span class="current-path"></span>' +
-      '<div class="form-group">' +
-        '<label for="filename-field"><%= _t("Filename") %></label>' +
-        '<input type="text" class="form-control" ' +
+    var RenameView = PopoverView.extend({
+        className: "popover addnew",
+        title: _.template('<%= _t("Rename") %>'),
+        content: _.template(
+            '<span class="current-path"></span>' +
+                '<div class="form-group">' +
+                '<label for="filename-field"><%= _t("Filename") %></label>' +
+                '<input type="text" class="form-control" ' +
                 'id="filename-field">' +
-      '</div>' +
-      '<button class="btn btn-block btn-primary"><%= _t("Rename") %></button>'
-    ),
-    events: {
-      'click button': 'renameButtonClicked'
-    },
-    toggle: function(button, e) {
-      PopoverView.prototype.toggle.apply(this, [button, e]);
-      var self = this;
-      if (!self.opened) {
-        return;
-      }
-      var node = self.app.getSelectedNode();
-      self.$('input').val(node.name);
-      self.$('.current-path').html(self.app.getNodePath(node));
-    },
-    renameButtonClicked: function(e) {
-      var self = this;
-      var $input = self.$('input');
-      var filename = $input.val();
-      if (filename) {
-        self.app.doAction('renameFile', {
-          type: 'POST',
-          data: {
-            path: self.app.getNodePath(),
-            filename: filename
-          },
-          success: function(data) {
-            self.hide();
-            self.data = data;
-            self.app.refreshTree(function() {
-              var path;
-              var oldPath;
-              if (self.data.newParent != '/') {
-                path = [self.data.newParent, self.data.newName].join('/');
-                oldPath = [self.data.oldParent, self.data.oldName].join('/');
-              } else {
-                path = '/' + self.data.newName;
-                oldPath = '/' + self.data.oldName;
-              }
+                "</div>" +
+                '<button class="btn btn-block btn-primary"><%= _t("Rename") %></button>'
+        ),
+        events: {
+            "click button": "renameButtonClicked",
+        },
+        toggle: function (button, e) {
+            PopoverView.prototype.toggle.apply(this, [button, e]);
+            var self = this;
+            if (!self.opened) {
+                return;
+            }
+            var node = self.app.getSelectedNode();
+            self.$("input").val(node.name);
+            self.$(".current-path").html(self.app.getNodePath(node));
+        },
+        renameButtonClicked: function (e) {
+            var self = this;
+            var $input = self.$("input");
+            var filename = $input.val();
+            if (filename) {
+                self.app.doAction("renameFile", {
+                    type: "POST",
+                    data: {
+                        path: self.app.getNodePath(),
+                        filename: filename,
+                    },
+                    success: function (data) {
+                        self.hide();
+                        self.data = data;
+                        self.app.refreshTree(function () {
+                            var path;
+                            var oldPath;
+                            if (self.data.newParent != "/") {
+                                path = [
+                                    self.data.newParent,
+                                    self.data.newName,
+                                ].join("/");
+                                oldPath = [
+                                    self.data.oldParent,
+                                    self.data.oldName,
+                                ].join("/");
+                            } else {
+                                path = "/" + self.data.newName;
+                                oldPath = "/" + self.data.oldName;
+                            }
 
-              if (self.app.fileData[path] !== undefined) {
-                self.app.refreshFile(path);
-              } else {
-                self.app.selectItem(path);
-              }
+                            if (self.app.fileData[path] !== undefined) {
+                                self.app.refreshFile(path);
+                            } else {
+                                self.app.selectItem(path);
+                            }
 
-              self.app.closeTab(oldPath);
-              delete self.data;
-            });
-          }
-        });
-        // XXX show loading
-      } else {
-        self.$('.form-group').addClass('has-error');
-      }
-    }
-  });
+                            self.app.closeTab(oldPath);
+                            delete self.data;
+                        });
+                    },
+                });
+                // XXX show loading
+            } else {
+                self.$(".form-group").addClass("has-error");
+            }
+        },
+    });
 
-  return RenameView;
+    return RenameView;
 });
 
+!function(t,e){"object"==typeof exports&&"undefined"!=typeof module?module.exports=e():"function"==typeof define&&define.amd?define('sortable',e):(t=t||self).Sortable=e()}(this,function(){function t(){return(t=Object.assign||function(t){for(var e=1;e<arguments.length;e++){var n=arguments[e];for(var o in n)Object.prototype.hasOwnProperty.call(n,o)&&(t[o]=n[o])}return t}).apply(this,arguments)}function e(t){if("undefined"!=typeof window&&window.navigator)return!!navigator.userAgent.match(t)}var n=e(/(?:Trident.*rv[ :]?11\.|msie|iemobile|Windows Phone)/i),o=e(/Edge/i),i=e(/firefox/i),r=e(/safari/i)&&!e(/chrome/i)&&!e(/android/i),a=e(/iP(ad|od|hone)/i),l=e(/chrome/i)&&e(/android/i),s={capture:!1,passive:!1};function c(t,e,o){t.addEventListener(e,o,!n&&s)}function u(t,e,o){t.removeEventListener(e,o,!n&&s)}function d(t,e){if(e){if(">"===e[0]&&(e=e.substring(1)),t)try{if(t.matches)return t.matches(e);if(t.msMatchesSelector)return t.msMatchesSelector(e);if(t.webkitMatchesSelector)return t.webkitMatchesSelector(e)}catch(t){return!1}return!1}}function h(t){return t.host&&t!==document&&t.host.nodeType?t.host:t.parentNode}function f(t,e,n,o){if(t){n=n||document;do{if(null!=e&&(">"===e[0]?t.parentNode===n&&d(t,e):d(t,e))||o&&t===n)return t;if(t===n)break}while(t=h(t))}return null}var p,g=/\s+/g;function v(t,e,n){if(t&&e)if(t.classList)t.classList[n?"add":"remove"](e);else{var o=(" "+t.className+" ").replace(g," ").replace(" "+e+" "," ");t.className=(o+(n?" "+e:"")).replace(g," ")}}function m(t,e,n){var o=t&&t.style;if(o){if(void 0===n)return document.defaultView&&document.defaultView.getComputedStyle?n=document.defaultView.getComputedStyle(t,""):t.currentStyle&&(n=t.currentStyle),void 0===e?n:n[e];e in o||-1!==e.indexOf("webkit")||(e="-webkit-"+e),o[e]=n+("string"==typeof n?"":"px")}}function b(t,e){var n="";if("string"==typeof t)n=t;else do{var o=m(t,"transform");o&&"none"!==o&&(n=o+" "+n)}while(!e&&(t=t.parentNode));var i=window.DOMMatrix||window.WebKitCSSMatrix||window.CSSMatrix||window.MSCSSMatrix;return i&&new i(n)}function w(t,e,n){if(t){var o=t.getElementsByTagName(e),i=0,r=o.length;if(n)for(;i<r;i++)n(o[i],i);return o}return[]}function E(){return document.scrollingElement||document.documentElement}function y(t,e,o,i,r){if(t.getBoundingClientRect||t===window){var a,l,s,c,u,d,h;if(t!==window&&t!==E()?(l=(a=t.getBoundingClientRect()).top,s=a.left,c=a.bottom,u=a.right,d=a.height,h=a.width):(l=0,s=0,c=window.innerHeight,u=window.innerWidth,d=window.innerHeight,h=window.innerWidth),(e||o)&&t!==window&&(r=r||t.parentNode,!n))do{if(r&&r.getBoundingClientRect&&("none"!==m(r,"transform")||o&&"static"!==m(r,"position"))){var f=r.getBoundingClientRect();l-=f.top+parseInt(m(r,"border-top-width")),s-=f.left+parseInt(m(r,"border-left-width")),c=l+a.height,u=s+a.width;break}}while(r=r.parentNode);if(i&&t!==window){var p=b(r||t),g=p&&p.a,v=p&&p.d;p&&(c=(l/=v)+(d/=v),u=(s/=g)+(h/=g))}return{top:l,left:s,bottom:c,right:u,width:h,height:d}}}function D(t,e,n){for(var o=x(t,!0),i=y(t)[e];o;){var r=y(o)[n];if(!("top"===n||"left"===n?i>=r:i<=r))return o;if(o===E())break;o=x(o,!1)}return!1}function _(t,e,n){for(var o=0,i=0,r=t.children;i<r.length;){if("none"!==r[i].style.display&&r[i]!==It.ghost&&r[i]!==It.dragged&&f(r[i],n.draggable,t,!1)){if(o===e)return r[i];o++}i++}return null}function S(t,e){for(var n=t.lastElementChild;n&&(n===It.ghost||"none"===m(n,"display")||e&&!d(n,e));)n=n.previousElementSibling;return n||null}function C(t,e){var n=0;if(!t||!t.parentNode)return-1;for(;t=t.previousElementSibling;)"TEMPLATE"===t.nodeName.toUpperCase()||t===It.clone||e&&!d(t,e)||n++;return n}function T(t){var e=0,n=0,o=E();if(t)do{var i=b(t);e+=t.scrollLeft*i.a,n+=t.scrollTop*i.d}while(t!==o&&(t=t.parentNode));return[e,n]}function x(t,e){if(!t||!t.getBoundingClientRect)return E();var n=t,o=!1;do{if(n.clientWidth<n.scrollWidth||n.clientHeight<n.scrollHeight){var i=m(n);if(n.clientWidth<n.scrollWidth&&("auto"==i.overflowX||"scroll"==i.overflowX)||n.clientHeight<n.scrollHeight&&("auto"==i.overflowY||"scroll"==i.overflowY)){if(!n.getBoundingClientRect||n===document.body)return E();if(o||e)return n;o=!0}}}while(n=n.parentNode);return E()}function M(t,e){return Math.round(t.top)===Math.round(e.top)&&Math.round(t.left)===Math.round(e.left)&&Math.round(t.height)===Math.round(e.height)&&Math.round(t.width)===Math.round(e.width)}function N(t,e){return function(){if(!p){var n=arguments,o=this;1===n.length?t.call(o,n[0]):t.apply(o,n),p=setTimeout(function(){p=void 0},e)}}}function O(t,e,n){t.scrollLeft+=e,t.scrollTop+=n}function A(t){var e=window.Polymer,n=window.jQuery||window.Zepto;return e&&e.dom?e.dom(t).cloneNode(!0):n?n(t).clone(!0)[0]:t.cloneNode(!0)}function I(t,e){m(t,"position","absolute"),m(t,"top",e.top),m(t,"left",e.left),m(t,"width",e.width),m(t,"height",e.height)}function P(t){m(t,"position",""),m(t,"top",""),m(t,"left",""),m(t,"width",""),m(t,"height","")}var k="Sortable"+(new Date).getTime(),R=[],X={initializeByDefault:!0},Y={mount:function(t){for(var e in X)X.hasOwnProperty(e)&&!(e in t)&&(t[e]=X[e]);R.push(t)},pluginEvent:function(e,n,o){var i=this;this.eventCanceled=!1,o.cancel=function(){i.eventCanceled=!0};var r=e+"Global";R.forEach(function(i){n[i.pluginName]&&(n[i.pluginName][r]&&n[i.pluginName][r](t({sortable:n},o)),n.options[i.pluginName]&&n[i.pluginName][e]&&n[i.pluginName][e](t({sortable:n},o)))})},initializePlugins:function(t,e,n,o){for(var i in R.forEach(function(o){var i=o.pluginName;if(t.options[i]||o.initializeByDefault){var r=new o(t,e,t.options);r.sortable=t,r.options=t.options,t[i]=r,Object.assign(n,r.defaults)}}),t.options)if(t.options.hasOwnProperty(i)){var r=this.modifyOption(t,i,t.options[i]);void 0!==r&&(t.options[i]=r)}},getEventProperties:function(t,e){var n={};return R.forEach(function(o){"function"==typeof o.eventProperties&&Object.assign(n,o.eventProperties.call(e[o.pluginName],t))}),n},modifyOption:function(t,e,n){var o;return R.forEach(function(i){t[i.pluginName]&&i.optionListeners&&"function"==typeof i.optionListeners[e]&&(o=i.optionListeners[e].call(t[i.pluginName],n))}),o}};function B(e){var i=e.sortable,r=e.rootEl,a=e.name,l=e.targetEl,s=e.cloneEl,c=e.toEl,u=e.fromEl,d=e.oldIndex,h=e.newIndex,f=e.oldDraggableIndex,p=e.newDraggableIndex,g=e.originalEvent,v=e.putSortable,m=e.extraEventProperties;if(i=i||r&&r[k]){var b,w=i.options,E="on"+a.charAt(0).toUpperCase()+a.substr(1);!window.CustomEvent||n||o?(b=document.createEvent("Event")).initEvent(a,!0,!0):b=new CustomEvent(a,{bubbles:!0,cancelable:!0}),b.to=c||r,b.from=u||r,b.item=l||r,b.clone=s,b.oldIndex=d,b.newIndex=h,b.oldDraggableIndex=f,b.newDraggableIndex=p,b.originalEvent=g,b.pullMode=v?v.lastPutMode:void 0;var y=t({},m,Y.getEventProperties(a,i));for(var D in y)b[D]=y[D];r&&r.dispatchEvent(b),w[E]&&w[E].call(i,b)}}var H=function(e,n,o){var i=void 0===o?{}:o,r=i.evt,a=function(t,e){if(null==t)return{};var n,o,i={},r=Object.keys(t);for(o=0;o<r.length;o++)e.indexOf(n=r[o])>=0||(i[n]=t[n]);return i}(i,["evt"]);Y.pluginEvent.bind(It)(e,n,t({dragEl:L,parentEl:j,ghostEl:K,rootEl:W,nextEl:z,lastDownEl:G,cloneEl:U,cloneHidden:q,dragStarted:lt,putSortable:tt,activeSortable:It.active,originalEvent:r,oldIndex:V,oldDraggableIndex:Q,newIndex:Z,newDraggableIndex:$,hideGhostForTarget:xt,unhideGhostForTarget:Mt,cloneNowHidden:function(){q=!0},cloneNowShown:function(){q=!1},dispatchSortableEvent:function(t){F({sortable:n,name:t,originalEvent:r})}},a))};function F(e){B(t({putSortable:tt,cloneEl:U,targetEl:L,rootEl:W,oldIndex:V,oldDraggableIndex:Q,newIndex:Z,newDraggableIndex:$},e))}var L,j,K,W,z,G,U,q,V,Z,Q,$,J,tt,et,nt,ot,it,rt,at,lt,st,ct,ut,dt,ht=!1,ft=!1,pt=[],gt=!1,vt=!1,mt=[],bt=!1,wt=[],Et="undefined"!=typeof document,yt=a,Dt=o||n?"cssFloat":"float",_t=Et&&!l&&!a&&"draggable"in document.createElement("div"),St=function(){if(Et){if(n)return!1;var t=document.createElement("x");return t.style.cssText="pointer-events:auto","auto"===t.style.pointerEvents}}(),Ct=function(t,e){var n=m(t),o=parseInt(n.width)-parseInt(n.paddingLeft)-parseInt(n.paddingRight)-parseInt(n.borderLeftWidth)-parseInt(n.borderRightWidth),i=_(t,0,e),r=_(t,1,e),a=i&&m(i),l=r&&m(r),s=a&&parseInt(a.marginLeft)+parseInt(a.marginRight)+y(i).width,c=l&&parseInt(l.marginLeft)+parseInt(l.marginRight)+y(r).width;return"flex"===n.display?"column"===n.flexDirection||"column-reverse"===n.flexDirection?"vertical":"horizontal":"grid"===n.display?n.gridTemplateColumns.split(" ").length<=1?"vertical":"horizontal":i&&a.float&&"none"!==a.float?!r||"both"!==l.clear&&l.clear!==("left"===a.float?"left":"right")?"horizontal":"vertical":i&&("block"===a.display||"flex"===a.display||"table"===a.display||"grid"===a.display||s>=o&&"none"===n[Dt]||r&&"none"===n[Dt]&&s+c>o)?"vertical":"horizontal"},Tt=function(t){function e(t,n){return function(o,i,r,a){if(null==t&&(n||o.options.group.name&&i.options.group.name&&o.options.group.name===i.options.group.name))return!0;if(null==t||!1===t)return!1;if(n&&"clone"===t)return t;if("function"==typeof t)return e(t(o,i,r,a),n)(o,i,r,a);var l=(n?o:i).options.group.name;return!0===t||"string"==typeof t&&t===l||t.join&&t.indexOf(l)>-1}}var n={},o=t.group;o&&"object"==typeof o||(o={name:o}),n.name=o.name,n.checkPull=e(o.pull,!0),n.checkPut=e(o.put),n.revertClone=o.revertClone,t.group=n},xt=function(){!St&&K&&m(K,"display","none")},Mt=function(){!St&&K&&m(K,"display","")};Et&&document.addEventListener("click",function(t){if(ft)return t.preventDefault(),t.stopPropagation&&t.stopPropagation(),t.stopImmediatePropagation&&t.stopImmediatePropagation(),ft=!1,!1},!0);var Nt,Ot=function(t){if(L){var e=(i=(t=t.touches?t.touches[0]:t).clientX,r=t.clientY,pt.some(function(t){if(!S(t)){var e=y(t),n=t[k].options.emptyInsertThreshold;return n&&i>=e.left-n&&i<=e.right+n&&r>=e.top-n&&r<=e.bottom+n?a=t:void 0}}),a);if(e){var n={};for(var o in t)t.hasOwnProperty(o)&&(n[o]=t[o]);n.target=n.rootEl=e,n.preventDefault=void 0,n.stopPropagation=void 0,e[k]._onDragOver(n)}}var i,r,a},At=function(t){L&&L.parentNode[k]._isOutsideThisEl(t.target)};function It(e,n){if(!e||!e.nodeType||1!==e.nodeType)throw"Sortable: `el` must be an HTMLElement, not "+{}.toString.call(e);this.el=e,this.options=n=Object.assign({},n),e[k]=this;var o,i,r={group:null,sort:!0,disabled:!1,store:null,handle:null,draggable:/^[uo]l$/i.test(e.nodeName)?">li":">*",swapThreshold:1,invertSwap:!1,invertedSwapThreshold:null,removeCloneOnHide:!0,direction:function(){return Ct(e,this.options)},ghostClass:"sortable-ghost",chosenClass:"sortable-chosen",dragClass:"sortable-drag",ignore:"a, img",filter:null,preventOnFilter:!0,animation:0,easing:null,setData:function(t,e){t.setData("Text",e.textContent)},dropBubble:!1,dragoverBubble:!1,dataIdAttr:"data-id",delay:0,delayOnTouchOnly:!1,touchStartThreshold:(Number.parseInt?Number:window).parseInt(window.devicePixelRatio,10)||1,forceFallback:!1,fallbackClass:"sortable-fallback",fallbackOnBody:!1,fallbackTolerance:0,fallbackOffset:{x:0,y:0},supportPointer:!1!==It.supportPointer&&"PointerEvent"in window,emptyInsertThreshold:5};for(var a in Y.initializePlugins(this,e,r),r)!(a in n)&&(n[a]=r[a]);for(var l in Tt(n),this)"_"===l.charAt(0)&&"function"==typeof this[l]&&(this[l]=this[l].bind(this));this.nativeDraggable=!n.forceFallback&&_t,this.nativeDraggable&&(this.options.touchStartThreshold=1),n.supportPointer?c(e,"pointerdown",this._onTapStart):(c(e,"mousedown",this._onTapStart),c(e,"touchstart",this._onTapStart)),this.nativeDraggable&&(c(e,"dragover",this),c(e,"dragenter",this)),pt.push(this.el),n.store&&n.store.get&&this.sort(n.store.get(this)||[]),Object.assign(this,(i=[],{captureAnimationState:function(){i=[],this.options.animation&&[].slice.call(this.el.children).forEach(function(e){if("none"!==m(e,"display")&&void 0!==e){i.push({target:e,rect:y(e)});var n=t({},i[i.length-1].rect);if(e.thisAnimationDuration){var o=b(e,!0);o&&(n.top-=o.f,n.left-=o.e)}e.fromRect=n}})},addAnimationState:function(t){i.push(t)},removeAnimationState:function(t){i.splice(function(t,e){for(var n in t)if(t.hasOwnProperty(n))for(var o in e)if(e.hasOwnProperty(o)&&e[o]===t[n][o])return Number(n);return-1}(i,{target:t}),1)},animateAll:function(t){var e=this;if(!this.options.animation)return clearTimeout(o),void("function"==typeof t&&t());var n=!1,r=0;i.forEach(function(t){var o=0,i=t.target,a=i.fromRect,l=y(i),s=i.prevFromRect,c=i.prevToRect,u=t.rect,d=b(i,!0);d&&(l.top-=d.f,l.left-=d.e),i.toRect=l,i.thisAnimationDuration&&M(s,l)&&!M(a,l)&&(u.top-l.top)/(u.left-l.left)==(a.top-l.top)/(a.left-l.left)&&(o=function(t,e,n,o){return Math.sqrt(Math.pow(e.top-t.top,2)+Math.pow(e.left-t.left,2))/Math.sqrt(Math.pow(e.top-n.top,2)+Math.pow(e.left-n.left,2))*o.animation}(u,s,c,e.options)),M(l,a)||(i.prevFromRect=a,i.prevToRect=l,o||(o=e.options.animation),e.animate(i,u,l,o)),o&&(n=!0,r=Math.max(r,o),clearTimeout(i.animationResetTimer),i.animationResetTimer=setTimeout(function(){i.animationTime=0,i.prevFromRect=null,i.fromRect=null,i.prevToRect=null,i.thisAnimationDuration=null},o),i.thisAnimationDuration=o)}),clearTimeout(o),n?o=setTimeout(function(){"function"==typeof t&&t()},r):"function"==typeof t&&t(),i=[]},animate:function(t,e,n,o){if(o){m(t,"transition",""),m(t,"transform","");var i=b(this.el),r=(e.left-n.left)/(i&&i.a||1),a=(e.top-n.top)/(i&&i.d||1);t.animatingX=!!r,t.animatingY=!!a,m(t,"transform","translate3d("+r+"px,"+a+"px,0)"),this.forRepaintDummy=function(t){return t.offsetWidth}(t),m(t,"transition","transform "+o+"ms"+(this.options.easing?" "+this.options.easing:"")),m(t,"transform","translate3d(0,0,0)"),"number"==typeof t.animated&&clearTimeout(t.animated),t.animated=setTimeout(function(){m(t,"transition",""),m(t,"transform",""),t.animated=!1,t.animatingX=!1,t.animatingY=!1},o)}}}))}function Pt(t,e,i,r,a,l,s,c){var u,d,h=t[k],f=h.options.onMove;return!window.CustomEvent||n||o?(u=document.createEvent("Event")).initEvent("move",!0,!0):u=new CustomEvent("move",{bubbles:!0,cancelable:!0}),u.to=e,u.from=t,u.dragged=i,u.draggedRect=r,u.related=a||e,u.relatedRect=l||y(e),u.willInsertAfter=c,u.originalEvent=s,t.dispatchEvent(u),f&&(d=f.call(h,u,s)),d}function kt(t){t.draggable=!1}function Rt(){bt=!1}function Xt(t){for(var e=t.tagName+t.className+t.src+t.href+t.textContent,n=e.length,o=0;n--;)o+=e.charCodeAt(n);return o.toString(36)}function Yt(t){return setTimeout(t,0)}function Bt(t){return clearTimeout(t)}It.prototype={constructor:It,_isOutsideThisEl:function(t){this.el.contains(t)||t===this.el||(st=null)},_getDirection:function(t,e){return"function"==typeof this.options.direction?this.options.direction.call(this,t,e,L):this.options.direction},_onTapStart:function(t){if(t.cancelable){var e=this,n=this.el,o=this.options,i=o.preventOnFilter,a=t.type,l=t.touches&&t.touches[0]||t.pointerType&&"touch"===t.pointerType&&t,s=(l||t).target,c=t.target.shadowRoot&&(t.path&&t.path[0]||t.composedPath&&t.composedPath()[0])||s,u=o.filter;if(function(t){wt.length=0;for(var e=t.getElementsByTagName("input"),n=e.length;n--;){var o=e[n];o.checked&&wt.push(o)}}(n),!L&&!(/mousedown|pointerdown/.test(a)&&0!==t.button||o.disabled)&&!c.isContentEditable&&(this.nativeDraggable||!r||!s||"SELECT"!==s.tagName.toUpperCase())&&!((s=f(s,o.draggable,n,!1))&&s.animated||G===s)){if(V=C(s),Q=C(s,o.draggable),"function"==typeof u){if(u.call(this,t,s,this))return F({sortable:e,rootEl:c,name:"filter",targetEl:s,toEl:n,fromEl:n}),H("filter",e,{evt:t}),void(i&&t.cancelable&&t.preventDefault())}else if(u&&(u=u.split(",").some(function(o){if(o=f(c,o.trim(),n,!1))return F({sortable:e,rootEl:o,name:"filter",targetEl:s,fromEl:n,toEl:n}),H("filter",e,{evt:t}),!0})))return void(i&&t.cancelable&&t.preventDefault());o.handle&&!f(c,o.handle,n,!1)||this._prepareDragStart(t,l,s)}}},_prepareDragStart:function(t,e,r){var a,l=this,s=l.el,u=l.options,d=s.ownerDocument;if(r&&!L&&r.parentNode===s){var h=y(r);if(W=s,j=(L=r).parentNode,z=L.nextSibling,G=r,J=u.group,It.dragged=L,rt=(et={target:L,clientX:(e||t).clientX,clientY:(e||t).clientY}).clientX-h.left,at=et.clientY-h.top,this._lastX=(e||t).clientX,this._lastY=(e||t).clientY,L.style["will-change"]="all",a=function(){H("delayEnded",l,{evt:t}),It.eventCanceled?l._onDrop():(l._disableDelayedDragEvents(),!i&&l.nativeDraggable&&(L.draggable=!0),l._triggerDragStart(t,e),F({sortable:l,name:"choose",originalEvent:t}),v(L,u.chosenClass,!0))},u.ignore.split(",").forEach(function(t){w(L,t.trim(),kt)}),c(d,"dragover",Ot),c(d,"mousemove",Ot),c(d,"touchmove",Ot),c(d,"mouseup",l._onDrop),c(d,"touchend",l._onDrop),c(d,"touchcancel",l._onDrop),i&&this.nativeDraggable&&(this.options.touchStartThreshold=4,L.draggable=!0),H("delayStart",this,{evt:t}),!u.delay||u.delayOnTouchOnly&&!e||this.nativeDraggable&&(o||n))a();else{if(It.eventCanceled)return void this._onDrop();c(d,"mouseup",l._disableDelayedDrag),c(d,"touchend",l._disableDelayedDrag),c(d,"touchcancel",l._disableDelayedDrag),c(d,"mousemove",l._delayedDragTouchMoveHandler),c(d,"touchmove",l._delayedDragTouchMoveHandler),u.supportPointer&&c(d,"pointermove",l._delayedDragTouchMoveHandler),l._dragStartTimer=setTimeout(a,u.delay)}}},_delayedDragTouchMoveHandler:function(t){var e=t.touches?t.touches[0]:t;Math.max(Math.abs(e.clientX-this._lastX),Math.abs(e.clientY-this._lastY))>=Math.floor(this.options.touchStartThreshold/(this.nativeDraggable&&window.devicePixelRatio||1))&&this._disableDelayedDrag()},_disableDelayedDrag:function(){L&&kt(L),clearTimeout(this._dragStartTimer),this._disableDelayedDragEvents()},_disableDelayedDragEvents:function(){var t=this.el.ownerDocument;u(t,"mouseup",this._disableDelayedDrag),u(t,"touchend",this._disableDelayedDrag),u(t,"touchcancel",this._disableDelayedDrag),u(t,"mousemove",this._delayedDragTouchMoveHandler),u(t,"touchmove",this._delayedDragTouchMoveHandler),u(t,"pointermove",this._delayedDragTouchMoveHandler)},_triggerDragStart:function(t,e){e=e||"touch"==t.pointerType&&t,!this.nativeDraggable||e?c(document,this.options.supportPointer?"pointermove":e?"touchmove":"mousemove",this._onTouchMove):(c(L,"dragend",this),c(W,"dragstart",this._onDragStart));try{document.selection?Yt(function(){document.selection.empty()}):window.getSelection().removeAllRanges()}catch(t){}},_dragStarted:function(t,e){if(ht=!1,W&&L){H("dragStarted",this,{evt:e}),this.nativeDraggable&&c(document,"dragover",At);var n=this.options;!t&&v(L,n.dragClass,!1),v(L,n.ghostClass,!0),It.active=this,t&&this._appendGhost(),F({sortable:this,name:"start",originalEvent:e})}else this._nulling()},_emulateDragOver:function(){if(nt){this._lastX=nt.clientX,this._lastY=nt.clientY,xt();for(var t=document.elementFromPoint(nt.clientX,nt.clientY),e=t;t&&t.shadowRoot&&(t=t.shadowRoot.elementFromPoint(nt.clientX,nt.clientY))!==e;)e=t;if(L.parentNode[k]._isOutsideThisEl(t),e)do{if(e[k]&&e[k]._onDragOver({clientX:nt.clientX,clientY:nt.clientY,target:t,rootEl:e})&&!this.options.dragoverBubble)break;t=e}while(e=e.parentNode);Mt()}},_onTouchMove:function(t){if(et){var e=this.options,n=e.fallbackTolerance,o=e.fallbackOffset,i=t.touches?t.touches[0]:t,r=K&&b(K,!0),a=K&&r&&r.a,l=K&&r&&r.d,s=yt&&dt&&T(dt),c=(i.clientX-et.clientX+o.x)/(a||1)+(s?s[0]-mt[0]:0)/(a||1),u=(i.clientY-et.clientY+o.y)/(l||1)+(s?s[1]-mt[1]:0)/(l||1);if(!It.active&&!ht){if(n&&Math.max(Math.abs(i.clientX-this._lastX),Math.abs(i.clientY-this._lastY))<n)return;this._onDragStart(t,!0)}if(K){r?(r.e+=c-(ot||0),r.f+=u-(it||0)):r={a:1,b:0,c:0,d:1,e:c,f:u};var d="matrix("+r.a+","+r.b+","+r.c+","+r.d+","+r.e+","+r.f+")";m(K,"webkitTransform",d),m(K,"mozTransform",d),m(K,"msTransform",d),m(K,"transform",d),ot=c,it=u,nt=i}t.cancelable&&t.preventDefault()}},_appendGhost:function(){if(!K){var t=this.options.fallbackOnBody?document.body:W,e=y(L,!0,yt,!0,t),n=this.options;if(yt){for(dt=t;"static"===m(dt,"position")&&"none"===m(dt,"transform")&&dt!==document;)dt=dt.parentNode;dt!==document.body&&dt!==document.documentElement?(dt===document&&(dt=E()),e.top+=dt.scrollTop,e.left+=dt.scrollLeft):dt=E(),mt=T(dt)}v(K=L.cloneNode(!0),n.ghostClass,!1),v(K,n.fallbackClass,!0),v(K,n.dragClass,!0),m(K,"transition",""),m(K,"transform",""),m(K,"box-sizing","border-box"),m(K,"margin",0),m(K,"top",e.top),m(K,"left",e.left),m(K,"width",e.width),m(K,"height",e.height),m(K,"opacity","0.8"),m(K,"position",yt?"absolute":"fixed"),m(K,"zIndex","100000"),m(K,"pointerEvents","none"),It.ghost=K,t.appendChild(K),m(K,"transform-origin",rt/parseInt(K.style.width)*100+"% "+at/parseInt(K.style.height)*100+"%")}},_onDragStart:function(t,e){var n=this,o=t.dataTransfer,i=n.options;H("dragStart",this,{evt:t}),It.eventCanceled?this._onDrop():(H("setupClone",this),It.eventCanceled||((U=A(L)).draggable=!1,U.style["will-change"]="",this._hideClone(),v(U,this.options.chosenClass,!1),It.clone=U),n.cloneId=Yt(function(){H("clone",n),It.eventCanceled||(n.options.removeCloneOnHide||W.insertBefore(U,L),n._hideClone(),F({sortable:n,name:"clone"}))}),!e&&v(L,i.dragClass,!0),e?(ft=!0,n._loopId=setInterval(n._emulateDragOver,50)):(u(document,"mouseup",n._onDrop),u(document,"touchend",n._onDrop),u(document,"touchcancel",n._onDrop),o&&(o.effectAllowed="move",i.setData&&i.setData.call(n,o,L)),c(document,"drop",n),m(L,"transform","translateZ(0)")),ht=!0,n._dragStartId=Yt(n._dragStarted.bind(n,e,t)),c(document,"selectstart",n),lt=!0,r&&m(document.body,"user-select","none"))},_onDragOver:function(e){var n,o,i,r,a=this.el,l=e.target,s=this.options,c=s.group,u=It.active,d=J===c,h=s.sort,p=tt||u,g=this,b=!1;if(!bt){if(void 0!==e.preventDefault&&e.cancelable&&e.preventDefault(),l=f(l,s.draggable,a,!0),B("dragOver"),It.eventCanceled)return b;if(L.contains(e.target)||l.animated&&l.animatingX&&l.animatingY||g._ignoreWhileAnimating===l)return U(!1);if(ft=!1,u&&!s.disabled&&(d?h||(i=!W.contains(L)):tt===this||(this.lastPutMode=J.checkPull(this,u,L,e))&&c.checkPut(this,u,L,e))){if(r="vertical"===this._getDirection(e,l),n=y(L),B("dragOverValid"),It.eventCanceled)return b;if(i)return j=W,G(),this._hideClone(),B("revert"),It.eventCanceled||(z?W.insertBefore(L,z):W.appendChild(L)),U(!0);var w=S(a,s.draggable);if(!w||function(t,e,n){var o=y(S(n.el,n.options.draggable));return e?t.clientX>o.right+10||t.clientX<=o.right&&t.clientY>o.bottom&&t.clientX>=o.left:t.clientX>o.right&&t.clientY>o.top||t.clientX<=o.right&&t.clientY>o.bottom+10}(e,r,this)&&!w.animated){if(w===L)return U(!1);if(w&&a===e.target&&(l=w),l&&(o=y(l)),!1!==Pt(W,a,L,n,l,o,e,!!l))return G(),a.appendChild(L),j=a,q(),U(!0)}else if(l.parentNode===a){o=y(l);var E,_,T,x=L.parentNode!==a,M=!function(t,e,n){var o=n?t.left:t.top,i=n?e.left:e.top;return o===i||(n?t.right:t.bottom)===(n?e.right:e.bottom)||o+(n?t.width:t.height)/2===i+(n?e.width:e.height)/2}(L.animated&&L.toRect||n,l.animated&&l.toRect||o,r),N=r?"top":"left",A=D(l,"top","top")||D(L,"top","top"),I=A?A.scrollTop:void 0;if(st!==l&&(_=o[N],gt=!1,vt=!M&&s.invertSwap||x),0!==(E=function(t,e,n,o,i,r,a,l){var s=o?t.clientY:t.clientX,c=o?n.height:n.width,u=o?n.top:n.left,d=o?n.bottom:n.right,h=!1;if(!a)if(l&&ut<c*i){if(!gt&&(1===ct?s>u+c*r/2:s<d-c*r/2)&&(gt=!0),gt)h=!0;else if(1===ct?s<u+ut:s>d-ut)return-ct}else if(s>u+c*(1-i)/2&&s<d-c*(1-i)/2)return function(t){return C(L)<C(t)?1:-1}(e);return(h=h||a)&&(s<u+c*r/2||s>d-c*r/2)?s>u+c/2?1:-1:0}(e,l,o,r,M?1:s.swapThreshold,null==s.invertedSwapThreshold?s.swapThreshold:s.invertedSwapThreshold,vt,st===l))){var P=C(L);do{T=j.children[P-=E]}while(T&&("none"===m(T,"display")||T===K))}if(0===E||T===l)return U(!1);st=l,ct=E;var R=l.nextElementSibling,X=!1,Y=Pt(W,a,L,n,l,o,e,X=1===E);if(!1!==Y)return 1!==Y&&-1!==Y||(X=1===Y),bt=!0,setTimeout(Rt,30),G(),X&&!R?a.appendChild(L):l.parentNode.insertBefore(L,X?R:l),A&&O(A,0,I-A.scrollTop),j=L.parentNode,void 0===_||vt||(ut=Math.abs(_-y(l)[N])),q(),U(!0)}if(a.contains(L))return U(!1)}return!1}function B(s,c){H(s,g,t({evt:e,isOwner:d,axis:r?"vertical":"horizontal",revert:i,dragRect:n,targetRect:o,canSort:h,fromSortable:p,target:l,completed:U,onMove:function(t,o){return Pt(W,a,L,n,t,y(t),e,o)},changed:q},c))}function G(){B("dragOverAnimationCapture"),g.captureAnimationState(),g!==p&&p.captureAnimationState()}function U(t){return B("dragOverCompleted",{insertion:t}),t&&(d?u._hideClone():u._showClone(g),g!==p&&(v(L,tt?tt.options.ghostClass:u.options.ghostClass,!1),v(L,s.ghostClass,!0)),tt!==g&&g!==It.active?tt=g:g===It.active&&tt&&(tt=null),p===g&&(g._ignoreWhileAnimating=l),g.animateAll(function(){B("dragOverAnimationComplete"),g._ignoreWhileAnimating=null}),g!==p&&(p.animateAll(),p._ignoreWhileAnimating=null)),(l===L&&!L.animated||l===a&&!l.animated)&&(st=null),s.dragoverBubble||e.rootEl||l===document||(L.parentNode[k]._isOutsideThisEl(e.target),!t&&Ot(e)),!s.dragoverBubble&&e.stopPropagation&&e.stopPropagation(),b=!0}function q(){Z=C(L),$=C(L,s.draggable),F({sortable:g,name:"change",toEl:a,newIndex:Z,newDraggableIndex:$,originalEvent:e})}},_ignoreWhileAnimating:null,_offMoveEvents:function(){u(document,"mousemove",this._onTouchMove),u(document,"touchmove",this._onTouchMove),u(document,"pointermove",this._onTouchMove),u(document,"dragover",Ot),u(document,"mousemove",Ot),u(document,"touchmove",Ot)},_offUpEvents:function(){var t=this.el.ownerDocument;u(t,"mouseup",this._onDrop),u(t,"touchend",this._onDrop),u(t,"pointerup",this._onDrop),u(t,"touchcancel",this._onDrop),u(document,"selectstart",this)},_onDrop:function(t){var e=this.el,n=this.options;Z=C(L),$=C(L,n.draggable),H("drop",this,{evt:t}),j=L&&L.parentNode,Z=C(L),$=C(L,n.draggable),It.eventCanceled||(ht=!1,vt=!1,gt=!1,clearInterval(this._loopId),clearTimeout(this._dragStartTimer),Bt(this.cloneId),Bt(this._dragStartId),this.nativeDraggable&&(u(document,"drop",this),u(e,"dragstart",this._onDragStart)),this._offMoveEvents(),this._offUpEvents(),r&&m(document.body,"user-select",""),m(L,"transform",""),t&&(lt&&(t.cancelable&&t.preventDefault(),!n.dropBubble&&t.stopPropagation()),K&&K.parentNode&&K.parentNode.removeChild(K),(W===j||tt&&"clone"!==tt.lastPutMode)&&U&&U.parentNode&&U.parentNode.removeChild(U),L&&(this.nativeDraggable&&u(L,"dragend",this),kt(L),L.style["will-change"]="",lt&&!ht&&v(L,tt?tt.options.ghostClass:this.options.ghostClass,!1),v(L,this.options.chosenClass,!1),F({sortable:this,name:"unchoose",toEl:j,newIndex:null,newDraggableIndex:null,originalEvent:t}),W!==j?(Z>=0&&(F({rootEl:j,name:"add",toEl:j,fromEl:W,originalEvent:t}),F({sortable:this,name:"remove",toEl:j,originalEvent:t}),F({rootEl:j,name:"sort",toEl:j,fromEl:W,originalEvent:t}),F({sortable:this,name:"sort",toEl:j,originalEvent:t})),tt&&tt.save()):Z!==V&&Z>=0&&(F({sortable:this,name:"update",toEl:j,originalEvent:t}),F({sortable:this,name:"sort",toEl:j,originalEvent:t})),It.active&&(null!=Z&&-1!==Z||(Z=V,$=Q),F({sortable:this,name:"end",toEl:j,originalEvent:t}),this.save())))),this._nulling()},_nulling:function(){H("nulling",this),W=L=j=K=z=U=G=q=et=nt=lt=Z=$=V=Q=st=ct=tt=J=It.dragged=It.ghost=It.clone=It.active=null,wt.forEach(function(t){t.checked=!0}),wt.length=ot=it=0},handleEvent:function(t){switch(t.type){case"drop":case"dragend":this._onDrop(t);break;case"dragenter":case"dragover":L&&(this._onDragOver(t),function(t){t.dataTransfer&&(t.dataTransfer.dropEffect="move"),t.cancelable&&t.preventDefault()}(t));break;case"selectstart":t.preventDefault()}},toArray:function(){for(var t,e=[],n=this.el.children,o=0,i=n.length,r=this.options;o<i;o++)f(t=n[o],r.draggable,this.el,!1)&&e.push(t.getAttribute(r.dataIdAttr)||Xt(t));return e},sort:function(t){var e={},n=this.el;this.toArray().forEach(function(t,o){var i=n.children[o];f(i,this.options.draggable,n,!1)&&(e[t]=i)},this),t.forEach(function(t){e[t]&&(n.removeChild(e[t]),n.appendChild(e[t]))})},save:function(){var t=this.options.store;t&&t.set&&t.set(this)},closest:function(t,e){return f(t,e||this.options.draggable,this.el,!1)},option:function(t,e){var n=this.options;if(void 0===e)return n[t];var o=Y.modifyOption(this,t,e);n[t]=void 0!==o?o:e,"group"===t&&Tt(n)},destroy:function(){H("destroy",this);var t=this.el;t[k]=null,u(t,"mousedown",this._onTapStart),u(t,"touchstart",this._onTapStart),u(t,"pointerdown",this._onTapStart),this.nativeDraggable&&(u(t,"dragover",this),u(t,"dragenter",this)),Array.prototype.forEach.call(t.querySelectorAll("[draggable]"),function(t){t.removeAttribute("draggable")}),this._onDrop(),this._disableDelayedDragEvents(),pt.splice(pt.indexOf(this.el),1),this.el=t=null},_hideClone:function(){if(!q){if(H("hideClone",this),It.eventCanceled)return;m(U,"display","none"),this.options.removeCloneOnHide&&U.parentNode&&U.parentNode.removeChild(U),q=!0}},_showClone:function(t){if("clone"===t.lastPutMode){if(q){if(H("showClone",this),It.eventCanceled)return;L.parentNode!=W||this.options.group.revertClone?z?W.insertBefore(U,z):W.appendChild(U):W.insertBefore(U,L),this.options.group.revertClone&&this.animate(L,U),m(U,"display",""),q=!1}}else this._hideClone()}},Et&&c(document,"touchmove",function(t){(It.active||ht)&&t.cancelable&&t.preventDefault()}),It.utils={on:c,off:u,css:m,find:w,is:function(t,e){return!!f(t,e,t,!1)},extend:function(t,e){if(t&&e)for(var n in e)e.hasOwnProperty(n)&&(t[n]=e[n]);return t},throttle:N,closest:f,toggleClass:v,clone:A,index:C,nextTick:Yt,cancelNextTick:Bt,detectDirection:Ct,getChild:_},It.get=function(t){return t[k]},It.mount=function(){var e=[].slice.call(arguments);e[0].constructor===Array&&(e=e[0]),e.forEach(function(e){if(!e.prototype||!e.prototype.constructor)throw"Sortable: Mounted plugin must be a constructor function, not "+{}.toString.call(e);e.utils&&(It.utils=t({},It.utils,e.utils)),Y.mount(e)})},It.create=function(t,e){return new It(t,e)},It.version="1.12.0";var Ht,Ft,Lt,jt,Kt,Wt=[],zt=[],Gt=!1,Ut=!1,qt=!1;function Vt(t,e){zt.forEach(function(n,o){var i=e.children[n.sortableIndex+(t?Number(o):0)];i?e.insertBefore(n,i):e.appendChild(n)})}function Zt(){Wt.forEach(function(t){t!==Lt&&t.parentNode&&t.parentNode.removeChild(t)})}var Qt=function(t){var e=t.originalEvent,n=t.putSortable,o=t.dragEl,i=t.dispatchSortableEvent,r=t.unhideGhostForTarget;if(e){var a=n||t.activeSortable;(0,t.hideGhostForTarget)();var l=e.changedTouches&&e.changedTouches.length?e.changedTouches[0]:e,s=document.elementFromPoint(l.clientX,l.clientY);r(),a&&!a.el.contains(s)&&(i("spill"),this.onSpill({dragEl:o,putSortable:n}))}};function $t(){}function Jt(){}$t.prototype={startIndex:null,dragStart:function(t){this.startIndex=t.oldDraggableIndex},onSpill:function(t){var e=t.dragEl,n=t.putSortable;this.sortable.captureAnimationState(),n&&n.captureAnimationState();var o=_(this.sortable.el,this.startIndex,this.options);o?this.sortable.el.insertBefore(e,o):this.sortable.el.appendChild(e),this.sortable.animateAll(),n&&n.animateAll()},drop:Qt},Object.assign($t,{pluginName:"revertOnSpill"}),Jt.prototype={onSpill:function(t){var e=t.dragEl,n=t.putSortable||this.sortable;n.captureAnimationState(),e.parentNode&&e.parentNode.removeChild(e),n.animateAll()},drop:Qt},Object.assign(Jt,{pluginName:"removeOnSpill"});var te,ee,ne,oe,ie,re,ae=[],le=!1;function se(){ae.forEach(function(t){clearInterval(t.pid)}),ae=[]}function ce(){clearInterval(re)}var ue=N(function(t,e,n,o){if(e.scroll){var i,r=(t.touches?t.touches[0]:t).clientX,a=(t.touches?t.touches[0]:t).clientY,l=e.scrollSensitivity,s=e.scrollSpeed,c=E(),u=!1;ee!==n&&(ee=n,se(),i=e.scrollFn,!0===(te=e.scroll)&&(te=x(n,!0)));var d=0,h=te;do{var f=h,p=y(f),g=p.top,v=p.bottom,b=p.left,w=p.right,D=p.width,_=p.height,S=void 0,C=void 0,T=f.scrollWidth,M=f.scrollHeight,N=m(f),A=f.scrollLeft,I=f.scrollTop;f===c?(S=D<T&&("auto"===N.overflowX||"scroll"===N.overflowX||"visible"===N.overflowX),C=_<M&&("auto"===N.overflowY||"scroll"===N.overflowY||"visible"===N.overflowY)):(S=D<T&&("auto"===N.overflowX||"scroll"===N.overflowX),C=_<M&&("auto"===N.overflowY||"scroll"===N.overflowY));var P=S&&(Math.abs(w-r)<=l&&A+D<T)-(Math.abs(b-r)<=l&&!!A),R=C&&(Math.abs(v-a)<=l&&I+_<M)-(Math.abs(g-a)<=l&&!!I);if(!ae[d])for(var X=0;X<=d;X++)ae[X]||(ae[X]={});ae[d].vx==P&&ae[d].vy==R&&ae[d].el===f||(ae[d].el=f,ae[d].vx=P,ae[d].vy=R,clearInterval(ae[d].pid),0==P&&0==R||(u=!0,ae[d].pid=setInterval(function(){o&&0===this.layer&&It.active._onTouchMove(ie);var e=ae[this.layer].vy?ae[this.layer].vy*s:0,n=ae[this.layer].vx?ae[this.layer].vx*s:0;"function"==typeof i&&"continue"!==i.call(It.dragged.parentNode[k],n,e,t,ie,ae[this.layer].el)||O(ae[this.layer].el,n,e)}.bind({layer:d}),24))),d++}while(e.bubbleScroll&&h!==c&&(h=x(h,!1)));le=u}},30);return It.mount(new function(){function t(){for(var t in this.defaults={scroll:!0,scrollSensitivity:30,scrollSpeed:10,bubbleScroll:!0},this)"_"===t.charAt(0)&&"function"==typeof this[t]&&(this[t]=this[t].bind(this))}return t.prototype={dragStarted:function(t){var e=t.originalEvent;this.sortable.nativeDraggable?c(document,"dragover",this._handleAutoScroll):c(document,this.options.supportPointer?"pointermove":e.touches?"touchmove":"mousemove",this._handleFallbackAutoScroll)},dragOverCompleted:function(t){var e=t.originalEvent;this.options.dragOverBubble||e.rootEl||this._handleAutoScroll(e)},drop:function(){this.sortable.nativeDraggable?u(document,"dragover",this._handleAutoScroll):(u(document,"pointermove",this._handleFallbackAutoScroll),u(document,"touchmove",this._handleFallbackAutoScroll),u(document,"mousemove",this._handleFallbackAutoScroll)),ce(),se(),clearTimeout(p),p=void 0},nulling:function(){ie=ee=te=le=re=ne=oe=null,ae.length=0},_handleFallbackAutoScroll:function(t){this._handleAutoScroll(t,!0)},_handleAutoScroll:function(t,e){var i=this,a=(t.touches?t.touches[0]:t).clientX,l=(t.touches?t.touches[0]:t).clientY,s=document.elementFromPoint(a,l);if(ie=t,e||o||n||r){ue(t,this.options,s,e);var c=x(s,!0);!le||re&&a===ne&&l===oe||(re&&ce(),re=setInterval(function(){var n=x(document.elementFromPoint(a,l),!0);n!==c&&(c=n,se()),ue(t,i.options,n,e)},10),ne=a,oe=l)}else{if(!this.options.bubbleScroll||x(s,!0)===E())return void se();ue(t,this.options,x(s,!1),!1)}}},Object.assign(t,{pluginName:"scroll",initializeByDefault:!0})}),It.mount(Jt,$t),It.mount(new function(){function t(){this.defaults={swapClass:"sortable-swap-highlight"}}return t.prototype={dragStart:function(t){Nt=t.dragEl},dragOverValid:function(t){var e=t.completed,n=t.target,o=t.changed,i=t.cancel;if(t.activeSortable.options.swap){var r=this.options;if(n&&n!==this.sortable.el){var a=Nt;!1!==(0,t.onMove)(n)?(v(n,r.swapClass,!0),Nt=n):Nt=null,a&&a!==Nt&&v(a,r.swapClass,!1)}o(),e(!0),i()}},drop:function(t){var e,n,o,i,r,a,l=t.activeSortable,s=t.putSortable,c=t.dragEl,u=s||this.sortable,d=this.options;Nt&&v(Nt,d.swapClass,!1),Nt&&(d.swap||s&&s.options.swap)&&c!==Nt&&(u.captureAnimationState(),u!==l&&l.captureAnimationState(),a=(n=Nt).parentNode,(r=(e=c).parentNode)&&a&&!r.isEqualNode(n)&&!a.isEqualNode(e)&&(o=C(e),i=C(n),r.isEqualNode(a)&&o<i&&i++,r.insertBefore(n,r.children[o]),a.insertBefore(e,a.children[i])),u.animateAll(),u!==l&&l.animateAll())},nulling:function(){Nt=null}},Object.assign(t,{pluginName:"swap",eventProperties:function(){return{swapItem:Nt}}})}),It.mount(new function(){function t(t){for(var e in this)"_"===e.charAt(0)&&"function"==typeof this[e]&&(this[e]=this[e].bind(this));t.options.supportPointer?c(document,"pointerup",this._deselectMultiDrag):(c(document,"mouseup",this._deselectMultiDrag),c(document,"touchend",this._deselectMultiDrag)),c(document,"keydown",this._checkKeyDown),c(document,"keyup",this._checkKeyUp),this.defaults={selectedClass:"sortable-selected",multiDragKey:null,setData:function(e,n){var o="";Wt.length&&Ft===t?Wt.forEach(function(t,e){o+=(e?", ":"")+t.textContent}):o=n.textContent,e.setData("Text",o)}}}return t.prototype={multiDragKeyDown:!1,isMultiDrag:!1,delayStartGlobal:function(t){Lt=t.dragEl},delayEnded:function(){this.isMultiDrag=~Wt.indexOf(Lt)},setupClone:function(t){var e=t.sortable,n=t.cancel;if(this.isMultiDrag){for(var o=0;o<Wt.length;o++)zt.push(A(Wt[o])),zt[o].sortableIndex=Wt[o].sortableIndex,zt[o].draggable=!1,zt[o].style["will-change"]="",v(zt[o],this.options.selectedClass,!1),Wt[o]===Lt&&v(zt[o],this.options.chosenClass,!1);e._hideClone(),n()}},clone:function(t){var e=t.dispatchSortableEvent,n=t.cancel;this.isMultiDrag&&(this.options.removeCloneOnHide||Wt.length&&Ft===t.sortable&&(Vt(!0,t.rootEl),e("clone"),n()))},showClone:function(t){var e=t.cloneNowShown,n=t.cancel;this.isMultiDrag&&(Vt(!1,t.rootEl),zt.forEach(function(t){m(t,"display","")}),e(),Kt=!1,n())},hideClone:function(t){var e=this,n=t.cloneNowHidden,o=t.cancel;this.isMultiDrag&&(zt.forEach(function(t){m(t,"display","none"),e.options.removeCloneOnHide&&t.parentNode&&t.parentNode.removeChild(t)}),n(),Kt=!0,o())},dragStartGlobal:function(t){!this.isMultiDrag&&Ft&&Ft.multiDrag._deselectMultiDrag(),Wt.forEach(function(t){t.sortableIndex=C(t)}),Wt=Wt.sort(function(t,e){return t.sortableIndex-e.sortableIndex}),qt=!0},dragStarted:function(t){var e=this,n=t.sortable;if(this.isMultiDrag){if(this.options.sort&&(n.captureAnimationState(),this.options.animation)){Wt.forEach(function(t){t!==Lt&&m(t,"position","absolute")});var o=y(Lt,!1,!0,!0);Wt.forEach(function(t){t!==Lt&&I(t,o)}),Ut=!0,Gt=!0}n.animateAll(function(){Ut=!1,Gt=!1,e.options.animation&&Wt.forEach(function(t){P(t)}),e.options.sort&&Zt()})}},dragOver:function(t){var e=t.completed,n=t.cancel;Ut&&~Wt.indexOf(t.target)&&(e(!1),n())},revert:function(t){var e=t.fromSortable,n=t.rootEl,o=t.sortable,i=t.dragRect;Wt.length>1&&(Wt.forEach(function(t){o.addAnimationState({target:t,rect:Ut?y(t):i}),P(t),t.fromRect=i,e.removeAnimationState(t)}),Ut=!1,function(t,e){Wt.forEach(function(n,o){var i=e.children[n.sortableIndex+(t?Number(o):0)];i?e.insertBefore(n,i):e.appendChild(n)})}(!this.options.removeCloneOnHide,n))},dragOverCompleted:function(t){var e=t.sortable,n=t.isOwner,o=t.activeSortable,i=t.parentEl,r=t.putSortable,a=this.options;if(t.insertion){if(n&&o._hideClone(),Gt=!1,a.animation&&Wt.length>1&&(Ut||!n&&!o.options.sort&&!r)){var l=y(Lt,!1,!0,!0);Wt.forEach(function(t){t!==Lt&&(I(t,l),i.appendChild(t))}),Ut=!0}if(!n)if(Ut||Zt(),Wt.length>1){var s=Kt;o._showClone(e),o.options.animation&&!Kt&&s&&zt.forEach(function(t){o.addAnimationState({target:t,rect:jt}),t.fromRect=jt,t.thisAnimationDuration=null})}else o._showClone(e)}},dragOverAnimationCapture:function(t){var e=t.dragRect,n=t.isOwner,o=t.activeSortable;if(Wt.forEach(function(t){t.thisAnimationDuration=null}),o.options.animation&&!n&&o.multiDrag.isMultiDrag){jt=Object.assign({},e);var i=b(Lt,!0);jt.top-=i.f,jt.left-=i.e}},dragOverAnimationComplete:function(){Ut&&(Ut=!1,Zt())},drop:function(t){var e=t.originalEvent,n=t.rootEl,o=t.parentEl,i=t.sortable,r=t.dispatchSortableEvent,a=t.oldIndex,l=t.putSortable,s=l||this.sortable;if(e){var c=this.options,u=o.children;if(!qt)if(c.multiDragKey&&!this.multiDragKeyDown&&this._deselectMultiDrag(),v(Lt,c.selectedClass,!~Wt.indexOf(Lt)),~Wt.indexOf(Lt))Wt.splice(Wt.indexOf(Lt),1),Ht=null,B({sortable:i,rootEl:n,name:"deselect",targetEl:Lt,originalEvt:e});else{if(Wt.push(Lt),B({sortable:i,rootEl:n,name:"select",targetEl:Lt,originalEvt:e}),e.shiftKey&&Ht&&i.el.contains(Ht)){var d,h,f=C(Ht),p=C(Lt);if(~f&&~p&&f!==p)for(p>f?(h=f,d=p):(h=p,d=f+1);h<d;h++)~Wt.indexOf(u[h])||(v(u[h],c.selectedClass,!0),Wt.push(u[h]),B({sortable:i,rootEl:n,name:"select",targetEl:u[h],originalEvt:e}))}else Ht=Lt;Ft=s}if(qt&&this.isMultiDrag){if((o[k].options.sort||o!==n)&&Wt.length>1){var g=y(Lt),m=C(Lt,":not(."+this.options.selectedClass+")");if(!Gt&&c.animation&&(Lt.thisAnimationDuration=null),s.captureAnimationState(),!Gt&&(c.animation&&(Lt.fromRect=g,Wt.forEach(function(t){if(t.thisAnimationDuration=null,t!==Lt){var e=Ut?y(t):g;t.fromRect=e,s.addAnimationState({target:t,rect:e})}})),Zt(),Wt.forEach(function(t){u[m]?o.insertBefore(t,u[m]):o.appendChild(t),m++}),a===C(Lt))){var b=!1;Wt.forEach(function(t){t.sortableIndex===C(t)||(b=!0)}),b&&r("update")}Wt.forEach(function(t){P(t)}),s.animateAll()}Ft=s}(n===o||l&&"clone"!==l.lastPutMode)&&zt.forEach(function(t){t.parentNode&&t.parentNode.removeChild(t)})}},nullingGlobal:function(){this.isMultiDrag=qt=!1,zt.length=0},destroyGlobal:function(){this._deselectMultiDrag(),u(document,"pointerup",this._deselectMultiDrag),u(document,"mouseup",this._deselectMultiDrag),u(document,"touchend",this._deselectMultiDrag),u(document,"keydown",this._checkKeyDown),u(document,"keyup",this._checkKeyUp)},_deselectMultiDrag:function(t){if(!(void 0!==qt&&qt||Ft!==this.sortable||t&&f(t.target,this.options.draggable,this.sortable.el,!1)||t&&0!==t.button))for(;Wt.length;){var e=Wt[0];v(e,this.options.selectedClass,!1),Wt.shift(),B({sortable:this.sortable,rootEl:this.sortable.el,name:"deselect",targetEl:e,originalEvt:t})}},_checkKeyDown:function(t){t.key===this.options.multiDragKey&&(this.multiDragKeyDown=!0)},_checkKeyUp:function(t){t.key===this.options.multiDragKey&&(this.multiDragKeyDown=!1)}},Object.assign(t,{pluginName:"multiDrag",utils:{select:function(t){var e=t.parentNode[k];e&&e.options.multiDrag&&!~Wt.indexOf(t)&&(Ft&&Ft!==e&&(Ft.multiDrag._deselectMultiDrag(),Ft=e),v(t,e.options.selectedClass,!0),Wt.push(t))},deselect:function(t){var e=t.parentNode[k],n=Wt.indexOf(t);e&&e.options.multiDrag&&~n&&(v(t,e.options.selectedClass,!1),Wt.splice(n,1))}},eventProperties:function(){var t=this,e=[],n=[];return Wt.forEach(function(o){var i;e.push({multiDragElement:o,index:o.sortableIndex}),i=Ut&&o!==Lt?-1:Ut?C(o,":not(."+t.options.selectedClass+")"):C(o),n.push({multiDragElement:o,index:i})}),{items:[].concat(Wt),clones:[].concat(zt),oldIndicies:e,newIndicies:n}},optionListeners:{multiDragKey:function(t){return"ctrl"===(t=t.toLowerCase())?t="Control":t.length>1&&(t=t.charAt(0).toUpperCase()+t.substr(1)),t}}})}),It});
+//# sourceMappingURL=sortable.umd.js.map
+;
 (function(root) {
 define("select2", [], function() {
   return (function() {
@@ -31355,730 +31785,6 @@ the specific language governing permissions and limitations under the Apache Lic
 });
 }(this));
 
-(function(root) {
-define("jquery.event.drag", ["jquery"], function() {
-  return (function() {
-/*!
- * jquery.event.drag - v 2.2
- * Copyright (c) 2010 Three Dub Media - http://threedubmedia.com
- * Open Source MIT License - http://threedubmedia.com/code/license
- */
-// Created: 2008-06-04
-// Updated: 2012-05-21
-// REQUIRES: jquery 1.7.x
-
-// UPDATED FROM https://github.com/sutoiku/jquery.event.drag-drop
-
-;(function( $ ){
-
-// add the jquery instance method
-$.fn.drag = function( str, arg, opts ){
-	// figure out the event type
-	var type = typeof str == "string" ? str : "",
-	// figure out the event handler...
-	fn = $.isFunction( str ) ? str : $.isFunction( arg ) ? arg : null;
-	// fix the event type
-	if ( type.indexOf("drag") !== 0 )
-		type = "drag"+ type;
-	// were options passed
-	opts = ( str == fn ? arg : opts ) || {};
-	// trigger or bind event handler
-	return fn ? this.bind( type, opts, fn ) : this.trigger( type );
-};
-
-// local refs (increase compression)
-var $event = $.event,
-$special = $event.special,
-// configure the drag special event
-drag = $special.drag = {
-
-	// these are the default settings
-	defaults: {
-		which: 1, // mouse button pressed to start drag sequence
-		distance: 0, // distance dragged before dragstart
-		not: ':input', // selector to suppress dragging on target elements
-		handle: null, // selector to match handle target elements
-		relative: false, // true to use "position", false to use "offset"
-		drop: true, // false to suppress drop events, true or selector to allow
-		click: false // false to suppress click events after dragend (no proxy)
-	},
-
-	// the key name for stored drag data
-	datakey: "dragdata",
-
-	// prevent bubbling for better performance
-	noBubble: true,
-
-	// count bound related events
-	add: function( obj ){
-		// read the interaction data
-		var data = $.data( this, drag.datakey ),
-		// read any passed options
-		opts = obj.data || {};
-		// count another realted event
-		data.related += 1;
-		// extend data options bound with this event
-		// don't iterate "opts" in case it is a node
-		$.each( drag.defaults, function( key, def ){
-			if ( opts[ key ] !== undefined )
-				data[ key ] = opts[ key ];
-		});
-	},
-
-	// forget unbound related events
-	remove: function(){
-		$.data( this, drag.datakey ).related -= 1;
-	},
-
-	// configure interaction, capture settings
-	setup: function(){
-		// check for related events
-		if ( $.data( this, drag.datakey ) )
-			return;
-		// initialize the drag data with copied defaults
-		var data = $.extend({ related:0 }, drag.defaults );
-		// store the interaction data
-		$.data( this, drag.datakey, data );
-		// bind the mousedown event, which starts drag interactions
-		$event.add( this, "touchstart mousedown", drag.init, data );
-		// prevent image dragging in IE...
-		if ( this.attachEvent )
-			this.attachEvent("ondragstart", drag.dontstart );
-	},
-
-	// destroy configured interaction
-	teardown: function(){
-		var data = $.data( this, drag.datakey ) || {};
-		// check for related events
-		if ( data.related )
-			return;
-		// remove the stored data
-		$.removeData( this, drag.datakey );
-		// remove the mousedown event
-		$event.remove( this, "touchstart mousedown", drag.init );
-		// enable text selection
-		drag.textselect( true );
-		// un-prevent image dragging in IE...
-		if ( this.detachEvent )
-			this.detachEvent("ondragstart", drag.dontstart );
-	},
-
-	// initialize the interaction
-	init: function( event ){
-		// sorry, only one touch at a time
-		if ( drag.touched )
-			return;
-		// the drag/drop interaction data
-		var dd = event.data, results;
-		// check the which directive
-		if ( event.which != 0 && dd.which > 0 && event.which != dd.which )
-			return;
-		// check for suppressed selector
-		if ( $( event.target ).is( dd.not ) )
-			return;
-		// check for handle selector
-		if ( dd.handle && !$( event.target ).closest( dd.handle, event.currentTarget ).length )
-			return;
-
-		drag.touched = event.type == 'touchstart' ? this : null;
-		dd.propagates = 1;
-		dd.mousedown = this;
-		dd.interactions = [ drag.interaction( this, dd ) ];
-		dd.target = event.target;
-		dd.pageX = event.pageX;
-		dd.pageY = event.pageY;
-		dd.dragging = null;
-		// handle draginit event...
-		results = drag.hijack( event, "draginit", dd );
-		// early cancel
-		if ( !dd.propagates )
-			return;
-		// flatten the result set
-		results = drag.flatten( results );
-		// insert new interaction elements
-		if ( results && results.length ){
-			dd.interactions = [];
-			$.each( results, function(){
-				dd.interactions.push( drag.interaction( this, dd ) );
-			});
-		}
-		// remember how many interactions are propagating
-		dd.propagates = dd.interactions.length;
-		// locate and init the drop targets
-		if ( dd.drop !== false && $special.drop )
-			$special.drop.handler( event, dd );
-		// disable text selection
-		drag.textselect( false );
-		// bind additional events...
-		if ( drag.touched )
-			$event.add( drag.touched, "touchmove touchend", drag.handler, dd );
-		else
-			$event.add( document, "mousemove mouseup", drag.handler, dd );
-		// helps prevent text selection or scrolling
-		if ( !drag.touched || dd.live )
-			return false;
-	},
-
-	// returns an interaction object
-	interaction: function( elem, dd ){
-		var offset = $( elem )[ dd.relative ? "position" : "offset" ]() || { top:0, left:0 };
-		return {
-			drag: elem,
-			callback: new drag.callback(),
-			droppable: [],
-			offset: offset
-		};
-	},
-
-	// handle drag-releatd DOM events
-	handler: function( event ){
-		// read the data before hijacking anything
-		var dd = event.data;
-		// handle various events
-		switch ( event.type ){
-			// mousemove, check distance, start dragging
-			case !dd.dragging && 'touchmove':
-				event.preventDefault();
-			case !dd.dragging && 'mousemove':
-				//  drag tolerance, x² + y² = distance²
-				if ( Math.pow(  event.pageX-dd.pageX, 2 ) + Math.pow(  event.pageY-dd.pageY, 2 ) < Math.pow( dd.distance, 2 ) )
-					break; // distance tolerance not reached
-				event.target = dd.target; // force target from "mousedown" event (fix distance issue)
-				drag.hijack( event, "dragstart", dd ); // trigger "dragstart"
-				if ( dd.propagates ) // "dragstart" not rejected
-					dd.dragging = true; // activate interaction
-			// mousemove, dragging
-			case 'touchmove':
-				event.preventDefault();
-			case 'mousemove':
-				if ( dd.dragging ){
-					// trigger "drag"
-					drag.hijack( event, "drag", dd );
-					if ( dd.propagates ){
-						// manage drop events
-						if ( dd.drop !== false && $special.drop )
-							$special.drop.handler( event, dd ); // "dropstart", "dropend"
-						break; // "drag" not rejected, stop
-					}
-					event.type = "mouseup"; // helps "drop" handler behave
-				}
-			// mouseup, stop dragging
-			case 'touchend':
-			case 'mouseup':
-			default:
-				if ( drag.touched )
-					$event.remove( drag.touched, "touchmove touchend", drag.handler ); // remove touch events
-				else
-					$event.remove( document, "mousemove mouseup", drag.handler ); // remove page events
-				if ( dd.dragging ){
-					if ( dd.drop !== false && $special.drop )
-						$special.drop.handler( event, dd ); // "drop"
-					drag.hijack( event, "dragend", dd ); // trigger "dragend"
-				}
-				drag.textselect( true ); // enable text selection
-				// if suppressing click events...
-				if ( dd.click === false && dd.dragging )
-					$.data( dd.mousedown, "suppress.click", new Date().getTime() + 5 );
-				dd.dragging = drag.touched = false; // deactivate element
-				break;
-		}
-	},
-
-	// re-use event object for custom events
-	hijack: function( event, type, dd, x, elem ){
-		// not configured
-		if ( !dd )
-			return;
-		// remember the original event and type
-		var orig = { event:event.originalEvent, type:event.type },
-		// is the event drag related or drog related?
-		mode = type.indexOf("drop") ? "drag" : "drop",
-		// iteration vars
-		result, i = x || 0, ia, $elems, callback,
-		len = !isNaN( x ) ? x : dd.interactions.length;
-		// modify the event type
-		event.type = type;
-		// remove the original event
-		event.originalEvent = null;
-		// initialize the results
-		dd.results = [];
-		// handle each interacted element
-		do if ( ia = dd.interactions[ i ] ){
-			// validate the interaction
-			if ( type !== "dragend" && ia.cancelled )
-				continue;
-			// set the dragdrop properties on the event object
-			callback = drag.properties( event, dd, ia );
-			// prepare for more results
-			ia.results = [];
-			// handle each element
-			$( elem || ia[ mode ] || dd.droppable ).each(function( p, subject ){
-				// identify drag or drop targets individually
-				callback.target = subject;
-				// force propagtion of the custom event
-				event.isPropagationStopped = function(){ return false; };
-				// handle the event
-				result = subject ? $event.dispatch.call( subject, event, callback ) : null;
-				// stop the drag interaction for this element
-				if ( result === false ){
-					if ( mode == "drag" ){
-						ia.cancelled = true;
-						dd.propagates -= 1;
-					}
-					if ( type == "drop" ){
-						ia[ mode ][p] = null;
-					}
-				}
-				// assign any dropinit elements
-				else if ( type == "dropinit" )
-					ia.droppable.push( drag.element( result ) || subject );
-				// accept a returned proxy element
-				if ( type == "dragstart" )
-					ia.proxy = $( drag.element( result ) || ia.drag )[0];
-				// remember this result
-				ia.results.push( result );
-				// forget the event result, for recycling
-				delete event.result;
-				// break on cancelled handler
-				if ( type !== "dropinit" )
-					return result;
-			});
-			// flatten the results
-			dd.results[ i ] = drag.flatten( ia.results );
-			// accept a set of valid drop targets
-			if ( type == "dropinit" )
-				ia.droppable = drag.flatten( ia.droppable );
-			// locate drop targets
-			if ( type == "dragstart" && !ia.cancelled )
-				callback.update();
-		}
-		while ( ++i < len )
-		// restore the original event & type
-		event.type = orig.type;
-		event.originalEvent = orig.event;
-		// return all handler results
-		return drag.flatten( dd.results );
-	},
-
-	// extend the callback object with drag/drop properties...
-	properties: function( event, dd, ia ){
-		var obj = ia.callback;
-		// elements
-		obj.drag = ia.drag;
-		obj.proxy = ia.proxy || ia.drag;
-		// starting mouse position
-		obj.startX = dd.pageX;
-		obj.startY = dd.pageY;
-		// current distance dragged
-		obj.deltaX = event.pageX - dd.pageX;
-		obj.deltaY = event.pageY - dd.pageY;
-		// original element position
-		obj.originalX = ia.offset.left;
-		obj.originalY = ia.offset.top;
-		// adjusted element position
-		obj.offsetX = obj.originalX + obj.deltaX;
-		obj.offsetY = obj.originalY + obj.deltaY;
-		// assign the drop targets information
-		obj.drop = drag.flatten( ( ia.drop || [] ).slice() );
-		obj.available = drag.flatten( ( ia.droppable || [] ).slice() );
-		return obj;
-	},
-
-	// determine is the argument is an element or jquery instance
-	element: function( arg ){
-		if ( arg && ( arg.jquery || arg.nodeType == 1 ) )
-			return arg;
-	},
-
-	// flatten nested jquery objects and arrays into a single dimension array
-	flatten: function( arr ){
-		return $.map( arr, function( member ){
-			return member && member.jquery ? $.makeArray( member ) :
-				member && member.length ? drag.flatten( member ) : member;
-		});
-	},
-
-	// toggles text selection attributes ON (true) or OFF (false)
-	textselect: function( bool ){
-		$( document )[ bool ? "unbind" : "bind" ]("selectstart", drag.dontstart )
-			.css("MozUserSelect", bool ? "" : "none" );
-		// .attr("unselectable", bool ? "off" : "on" )
-		document.unselectable = bool ? "off" : "on";
-	},
-
-	// suppress "selectstart" and "ondragstart" events
-	dontstart: function(){
-		return false;
-	},
-
-	// a callback instance contructor
-	callback: function(){}
-
-};
-
-// callback methods
-drag.callback.prototype = {
-	update: function(){
-		if ( $special.drop && this.available.length )
-			$.each( this.available, function( i ){
-				$special.drop.locate( this, i );
-			});
-	}
-};
-
-// patch $.event.$dispatch to allow suppressing clicks
-var $dispatch = $event.dispatch;
-$event.dispatch = function( event ){
-	if ( $.data( this, "suppress."+ event.type ) - new Date().getTime() > 0 ){
-		$.removeData( this, "suppress."+ event.type );
-		return;
-	}
-	return $dispatch.apply( this, arguments );
-};
-
-// event fix hooks for touch events...
-var touchHooks =
-$event.fixHooks.touchstart =
-$event.fixHooks.touchmove =
-$event.fixHooks.touchend =
-$event.fixHooks.touchcancel = {
-	props: "clientX clientY pageX pageY screenX screenY".split( " " ),
-	filter: function( event, orig ) {
-		if ( orig ){
-			var touched = ( orig.touches && orig.touches[0] )
-				|| ( orig.changedTouches && orig.changedTouches[0] )
-				|| null;
-			// iOS webkit: touchstart, touchmove, touchend
-			if ( touched )
-				$.each( touchHooks.props, function( i, prop ){
-					event[ prop ] = touched[ prop ];
-				});
-		}
-		return event;
-	}
-};
-
-// share the same special event configuration with related events...
-//$special.draginit = $special.dragstart = $special.dragend = drag;
-
-})( jQuery );
-
-
-  }).apply(root, arguments);
-});
-}(this));
-
-(function(root) {
-define("jquery.event.drop", ["jquery"], function() {
-  return (function() {
-/*! 
- * jquery.event.drop - v 2.2
- * Copyright (c) 2010 Three Dub Media - http://threedubmedia.com
- * Open Source MIT License - http://threedubmedia.com/code/license
- */
-// Created: 2008-06-04 
-// Updated: 2012-05-21
-// REQUIRES: jquery 1.7.x, event.drag 2.2
-
-;(function($){ // secure $ jQuery alias
-
-// Events: drop, dropstart, dropend
-
-// add the jquery instance method
-$.fn.drop = function( str, arg, opts ){
-	// figure out the event type
-	var type = typeof str == "string" ? str : "",
-	// figure out the event handler...
-	fn = $.isFunction( str ) ? str : $.isFunction( arg ) ? arg : null;
-	// fix the event type
-	if ( type.indexOf("drop") !== 0 ) 
-		type = "drop"+ type;
-	// were options passed
-	opts = ( str == fn ? arg : opts ) || {};
-	// trigger or bind event handler
-	return fn ? this.bind( type, opts, fn ) : this.trigger( type );
-};
-
-// DROP MANAGEMENT UTILITY
-// returns filtered drop target elements, caches their positions
-$.drop = function( opts ){ 
-	opts = opts || {};
-	// safely set new options...
-	drop.multi = opts.multi === true ? Infinity : 
-		opts.multi === false ? 1 : !isNaN( opts.multi ) ? opts.multi : drop.multi;
-	drop.delay = opts.delay || drop.delay;
-	drop.tolerance = $.isFunction( opts.tolerance ) ? opts.tolerance : 
-		opts.tolerance === null ? null : drop.tolerance;
-	drop.mode = opts.mode || drop.mode || 'intersect';
-};
-
-// local refs (increase compression)
-var $event = $.event, 
-$special = $event.special,
-// configure the drop special event
-drop = $.event.special.drop = {
-
-	// these are the default settings
-	multi: 1, // allow multiple drop winners per dragged element
-	delay: 20, // async timeout delay
-	mode: 'overlap', // drop tolerance mode
-		
-	// internal cache
-	targets: [], 
-	
-	// the key name for stored drop data
-	datakey: "dropdata",
-		
-	// prevent bubbling for better performance
-	noBubble: true,
-	
-	// count bound related events
-	add: function( obj ){ 
-		// read the interaction data
-		var data = $.data( this, drop.datakey );
-		// count another realted event
-		data.related += 1;
-	},
-	
-	// forget unbound related events
-	remove: function(){
-		$.data( this, drop.datakey ).related -= 1;
-	},
-	
-	// configure the interactions
-	setup: function(){
-		// check for related events
-		if ( $.data( this, drop.datakey ) ) 
-			return;
-		// initialize the drop element data
-		var data = { 
-			related: 0,
-			active: [],
-			anyactive: 0,
-			winner: 0,
-			location: {}
-		};
-		// store the drop data on the element
-		$.data( this, drop.datakey, data );
-		// store the drop target in internal cache
-		drop.targets.push( this );
-	},
-	
-	// destroy the configure interaction	
-	teardown: function(){ 
-		var data = $.data( this, drop.datakey ) || {};
-		// check for related events
-		if ( data.related ) 
-			return;
-		// remove the stored data
-		$.removeData( this, drop.datakey );
-		// reference the targeted element
-		var element = this;
-		// remove from the internal cache
-		drop.targets = $.grep( drop.targets, function( target ){ 
-			return ( target !== element ); 
-		});
-	},
-	
-	// shared event handler
-	handler: function( event, dd ){ 
-		// local vars
-		var results, $targets;
-		// make sure the right data is available
-		if ( !dd ) 
-			return;
-		// handle various events
-		switch ( event.type ){
-			// draginit, from $.event.special.drag
-			case 'mousedown': // DROPINIT >>
-			case 'touchstart': // DROPINIT >>
-				// collect and assign the drop targets
-				$targets =  $( drop.targets );
-				if ( typeof dd.drop == "string" )
-					$targets = $targets.filter( dd.drop );
-				// reset drop data winner properties
-				$targets.each(function(){
-					var data = $.data( this, drop.datakey );
-					data.active = [];
-					data.anyactive = 0;
-					data.winner = 0;
-				});
-				// set available target elements
-				dd.droppable = $targets;
-				// activate drop targets for the initial element being dragged
-				$special.drag.hijack( event, "dropinit", dd ); 
-				break;
-			// drag, from $.event.special.drag
-			case 'mousemove': // TOLERATE >>
-			case 'touchmove': // TOLERATE >>
-				drop.event = event; // store the mousemove event
-				if ( !drop.timer )
-					// monitor drop targets
-					drop.tolerate( dd ); 
-				break;
-			// dragend, from $.event.special.drag
-			case 'mouseup': // DROP >> DROPEND >>
-			case 'touchend': // DROP >> DROPEND >>
-				drop.timer = clearTimeout( drop.timer ); // delete timer	
-				if ( dd.propagates ){
-					$special.drag.hijack( event, "drop", dd ); 
-					$special.drag.hijack( event, "dropend", dd ); 
-				}
-				break;
-				
-		}
-	},
-		
-	// returns the location positions of an element
-	locate: function( elem, index ){ 
-		var data = $.data( elem, drop.datakey ),
-		$elem = $( elem ), 
-		posi = $elem.offset() || {}, 
-		height = $elem.outerHeight(), 
-		width = $elem.outerWidth(),
-		location = { 
-			elem: elem, 
-			width: width, 
-			height: height,
-			top: posi.top, 
-			left: posi.left, 
-			right: posi.left + width, 
-			bottom: posi.top + height
-		};
-		// drag elements might not have dropdata
-		if ( data ){
-			data.location = location;
-			data.index = index;
-			data.elem = elem;
-		}
-		return location;
-	},
-	
-	// test the location positions of an element against another OR an X,Y coord
-	contains: function( target, test ){ // target { location } contains test [x,y] or { location }
-		return ( ( test[0] || test.left ) >= target.left && ( test[0] || test.right ) <= target.right
-			&& ( test[1] || test.top ) >= target.top && ( test[1] || test.bottom ) <= target.bottom ); 
-	},
-	
-	// stored tolerance modes
-	modes: { // fn scope: "$.event.special.drop" object 
-		// target with mouse wins, else target with most overlap wins
-		'intersect': function( event, proxy, target ){
-			return this.contains( target, [ event.pageX, event.pageY ] ) ? // check cursor
-				1e9 : this.modes.overlap.apply( this, arguments ); // check overlap
-		},
-		// target with most overlap wins	
-		'overlap': function( event, proxy, target ){
-			// calculate the area of overlap...
-			return Math.max( 0, Math.min( target.bottom, proxy.bottom ) - Math.max( target.top, proxy.top ) )
-				* Math.max( 0, Math.min( target.right, proxy.right ) - Math.max( target.left, proxy.left ) );
-		},
-		// proxy is completely contained within target bounds	
-		'fit': function( event, proxy, target ){
-			return this.contains( target, proxy ) ? 1 : 0;
-		},
-		// center of the proxy is contained within target bounds	
-		'middle': function( event, proxy, target ){
-			return this.contains( target, [ proxy.left + proxy.width * .5, proxy.top + proxy.height * .5 ] ) ? 1 : 0;
-		}
-	},	
-	
-	// sort drop target cache by by winner (dsc), then index (asc)
-	sort: function( a, b ){
-		return ( b.winner - a.winner ) || ( a.index - b.index );
-	},
-		
-	// async, recursive tolerance execution
-	tolerate: function( dd ){		
-		// declare local refs
-		var i, drp, drg, data, arr, len, elem,
-		// interaction iteration variables
-		x = 0, ia, end = dd.interactions.length,
-		// determine the mouse coords
-		xy = [ drop.event.pageX, drop.event.pageY ],
-		// custom or stored tolerance fn
-		tolerance = drop.tolerance || drop.modes[ drop.mode ];
-		// go through each passed interaction...
-		do if ( ia = dd.interactions[x] ){
-			// check valid interaction
-			if ( !ia )
-				return; 
-			// initialize or clear the drop data
-			ia.drop = [];
-			// holds the drop elements
-			arr = []; 
-			len = ia.droppable.length;
-			// determine the proxy location, if needed
-			if ( tolerance )
-				drg = drop.locate( ia.proxy ); 
-			// reset the loop
-			i = 0;
-			// loop each stored drop target
-			do if ( elem = ia.droppable[i] ){ 
-				data = $.data( elem, drop.datakey );
-				drp = data.location;
-				if ( !drp ) continue;
-				// find a winner: tolerance function is defined, call it
-				data.winner = tolerance ? tolerance.call( drop, drop.event, drg, drp ) 
-					// mouse position is always the fallback
-					: drop.contains( drp, xy ) ? 1 : 0; 
-				arr.push( data );	
-			} while ( ++i < len ); // loop 
-			// sort the drop targets
-			arr.sort( drop.sort );			
-			// reset the loop
-			i = 0;
-			// loop through all of the targets again
-			do if ( data = arr[ i ] ){
-				// winners...
-				if ( data.winner && ia.drop.length < drop.multi ){
-					// new winner... dropstart
-					if ( !data.active[x] && !data.anyactive ){
-						// check to make sure that this is not prevented
-						if ( $special.drag.hijack( drop.event, "dropstart", dd, x, data.elem )[0] !== false ){ 	
-							data.active[x] = 1;
-							data.anyactive += 1;
-						}
-						// if false, it is not a winner
-						else
-							data.winner = 0;
-					}
-					// if it is still a winner
-					if ( data.winner )
-						ia.drop.push( data.elem );
-				}
-				// losers... 
-				else if ( data.active[x] && data.anyactive == 1 ){
-					// former winner... dropend
-					$special.drag.hijack( drop.event, "dropend", dd, x, data.elem ); 
-					data.active[x] = 0;
-					data.anyactive -= 1;
-				}
-			} while ( ++i < len ); // loop 		
-		} while ( ++x < end ) // loop
-		// check if the mouse is still moving or is idle
-		if ( drop.last && xy[0] == drop.last.pageX && xy[1] == drop.last.pageY ) 
-			delete drop.timer; // idle, don't recurse
-		else  // recurse
-			drop.timer = setTimeout(function(){ 
-				drop.tolerate( dd ); 
-			}, drop.delay );
-		// remember event, to compare idleness
-		drop.last = drop.event; 
-	}
-	
-};
-
-// share the same special event configuration with related events...
-$special.dropinit = $special.dropstart = $special.dropend = drop;
-
-})(jQuery); // confine scope	
-;
-return $.drop;
-  }).apply(root, arguments);
-});
-}(this));
-
 /* Select2 pattern.
  *
  * Options:
@@ -32145,270 +31851,275 @@ return $.drop;
  *
  */
 
+define('mockup-patterns-select2',["jquery", "pat-base", "mockup-utils", "sortable", "select2"], function (
+    $,
+    Base,
+    utils,
+    Sortable
+) {
+    "use strict";
 
-define('mockup-patterns-select2',[
-  'jquery',
-  'pat-base',
-  'mockup-utils',
-  'select2',
-  'jquery.event.drag',
-  'jquery.event.drop'
-], function($, Base, utils) {
-  'use strict';
+    var Select2 = Base.extend({
+        name: "select2",
+        trigger: ".pat-select2",
+        parser: "mockup",
+        defaults: {
+            separator: ",",
+        },
+        initializeValues: function () {
+            var self = this;
+            // Init Selection ---------------------------------------------
+            if (self.options.initialValues) {
+                self.options.id = function (term) {
+                    return term.id;
+                };
+                self.options.initSelection = function ($el, callback) {
+                    var data = [],
+                        value = $el.val(),
+                        seldefaults = self.options.initialValues;
 
-  var Select2 = Base.extend({
-    name: 'select2',
-    trigger: '.pat-select2',
-    parser: 'mockup',
-    defaults: {
-      separator: ','
-    },
-    initializeValues: function() {
-      var self = this;
-      // Init Selection ---------------------------------------------
-      if (self.options.initialValues) {
-        self.options.id = function(term) {
-          return term.id;
-        };
-        self.options.initSelection = function ($el, callback) {
-          var data = [],
-              value = $el.val(),
-              seldefaults = self.options.initialValues;
+                    // Create the initSelection value that contains the default selection,
+                    // but in a javascript object
+                    if (
+                        typeof self.options.initialValues === "string" &&
+                        self.options.initialValues !== ""
+                    ) {
+                        // if default selection value starts with a '{', then treat the value as
+                        // a JSON object that needs to be parsed
+                        if (self.options.initialValues[0] === "{") {
+                            seldefaults = JSON.parse(
+                                self.options.initialValues
+                            );
+                        }
+                        // otherwise, treat the value as a list, separated by the defaults.separator value of
+                        // strings in the format "id:text", and convert it to an object
+                        else {
+                            seldefaults = {};
+                            $(
+                                self.options.initialValues.split(
+                                    self.options.separator
+                                )
+                            ).each(function () {
+                                var selection = this.split(":");
+                                var id = $.trim(selection[0]);
+                                var text = $.trim(selection[1]);
+                                seldefaults[id] = text;
+                            });
+                        }
+                    }
 
-          // Create the initSelection value that contains the default selection,
-          // but in a javascript object
-          if (typeof(self.options.initialValues) === 'string' && self.options.initialValues !== '') {
-            // if default selection value starts with a '{', then treat the value as
-            // a JSON object that needs to be parsed
-            if (self.options.initialValues[0] === '{') {
-              seldefaults = JSON.parse(self.options.initialValues);
+                    $(value.split(self.options.separator)).each(function () {
+                        var text = this;
+                        if (seldefaults[this]) {
+                            text = seldefaults[this];
+                        }
+                        data.push({
+                            id: utils.removeHTML(this),
+                            text: utils.removeHTML(text),
+                        });
+                    });
+                    callback(data);
+                };
             }
-            // otherwise, treat the value as a list, separated by the defaults.separator value of
-            // strings in the format "id:text", and convert it to an object
-            else {
-              seldefaults = {};
-              $(self.options.initialValues.split(self.options.separator)).each(function() {
-                var selection = this.split(':');
-                var id = $.trim(selection[0]);
-                var text = $.trim(selection[1]);
-                seldefaults[id] = text;
-              });
-            }
-          }
-
-          $(value.split(self.options.separator)).each(function() {
-            var text = this;
-            if (seldefaults[this]) {
-              text = seldefaults[this];
-            }
-            data.push({id: utils.removeHTML(this), text: utils.removeHTML(text)});
-          });
-          callback(data);
-        };
-      }
-    },
-    initializeTags: function() {
-      var self = this;
-      if (self.options.tags && typeof(self.options.tags) === 'string') {
-        if (self.options.tags.substr(0, 1) === '[') {
-          self.options.tags = JSON.parse(self.options.tags);
-        } else {
-          self.options.tags = self.options.tags.split(self.options.separator);
-        }
-      }
-
-      if (self.options.tags && !self.options.allowNewItems) {
-        self.options.data = $.map (self.options.tags, function (value, i) {
-          return { id: value, text: value };
-        });
-        self.options.multiple = true;
-        delete self.options.tags;
-      }
-    },
-    initializeOrdering: function() {
-      var self = this;
-      if (self.options.orderable) {
-        var formatSelection = function(data, $container) {
-          return data ? data.text : undefined;
-        };
-        if (self.options.formatSelection) {
-          formatSelection = self.options.formatSelection;
-        }
-
-        self.options.formatSelection = function(data, $container) {
-          $container.parents('li')
-            .drag('start', function(e, dd) {
-              $(this).addClass('select2-choice-dragging');
-              self.$el.select2('onSortStart');
-              $.drop({
-                tolerance: function(event, proxy, target) {
-                  var test = event.pageY > (target.top + target.height / 2);
-                  $.data(target.elem, 'drop+reorder', test ? 'insertAfter' : 'insertBefore' );
-                  return this.contains(target, [event.pageX, event.pageY]);
+        },
+        initializeTags: function () {
+            var self = this;
+            if (self.options.tags && typeof self.options.tags === "string") {
+                if (self.options.tags.substr(0, 1) === "[") {
+                    self.options.tags = JSON.parse(self.options.tags);
+                } else {
+                    self.options.tags = self.options.tags.split(
+                        self.options.separator
+                    );
                 }
-              });
-              return $( this ).clone().
-                addClass('dragging').
-                css({opacity: 0.75, position: 'absolute'}).
-                appendTo(document.body);
-            })
-            .drag(function(e, dd) {
-              /*jshint eqeqeq:false */
-              $( dd.proxy ).css({
-                top: dd.offsetY,
-                left: dd.offsetX
-              });
-              var drop = dd.drop[0],
-                  method = $.data(drop || {}, 'drop+reorder');
-
-              /* XXX Cannot use triple equals here */
-              if (drop && (drop != dd.current || method != dd.method)) {
-                $(this)[method](drop);
-                dd.current = drop;
-                dd.method = method;
-                dd.update();
-              }
-            })
-            .drag('end', function(e, dd) {
-              $(this).removeClass('select2-choice-dragging');
-              self.$el.select2('onSortEnd');
-              $( dd.proxy ).remove();
-            })
-            .drop('init', function(e, dd ) {
-              /*jshint eqeqeq:false */
-              /* XXX Cannot use triple equals here */
-              return (this == dd.drag) ? false: true;
-            });
-          return formatSelection(data, $container);
-        };
-      }
-    },
-    initializeSelect2: function() {
-      var self = this;
-      self.options.formatResultCssClass = function(ob){
-        if(ob.id){
-          return 'select2-option-' + ob.id.toLowerCase().replace(/[ \:\)\(\[\]\{\}\_\+\=\&\*\%\#]/g, '-');
-        }
-      };
-
-      function callback(action, e) {
-        if (!!action) {
-          if (self.options.debug) {
-            console.debug('callback', action, e)
-          }
-          if (typeof action === 'string') {
-            action = window[action];
-          }
-          return action(e);
-        } else {
-          return action;
-        }
-      }
-
-      self.$el.select2(self.options);
-      self.$el.on('select2-selected', function(e) {
-          callback(self.options.onSelected, e);
-      });
-      self.$el.on('select2-selecting', function(e) {
-          callback(self.options.onSelecting, e);
-      });
-      self.$el.on('select2-deselecting', function(e) {
-          callback(self.options.onDeselecting, e);
-      });
-      self.$el.on('select2-deselected', function(e) {
-          callback(self.options.onDeselected, e);
-      });
-      self.$select2 = self.$el.parent().find('.select2-container');
-      self.$el.parent().off('close.plone-modal.patterns');
-      if (self.options.orderable) {
-        self.$select2.addClass('select2-orderable');
-      }
-    },
-    opened: function () {
-      var self = this;
-      var isOpen = $('.select2-dropdown-open', self.$el.parent()).length === 1;
-      return isOpen;
-    },
-    init: function() {
-      var self = this;
-
-      self.options.allowNewItems = self.options.hasOwnProperty ('allowNewItems') ?
-            JSON.parse(self.options.allowNewItems) : true;
-
-      if (self.options.ajax || self.options.vocabularyUrl) {
-        if (self.options.vocabularyUrl) {
-          self.options.multiple = self.options.multiple === undefined ? true : self.options.multiple;
-          self.options.ajax = self.options.ajax || {};
-          self.options.ajax.url = self.options.vocabularyUrl;
-          // XXX removing the following function does'nt break tests. dead code?
-          self.options.initSelection = function ($el, callback) {
-            var data = [], value = $el.val();
-            $(value.split(self.options.separator)).each(function () {
-              var val = utils.removeHTML(this);
-              data.push({id: val, text: val});
-            });
-            callback(data);
-          };
-        }
-
-        var queryTerm = '';
-        self.options.ajax = $.extend({
-          quietMillis: 300,
-          data: function (term, page) {
-            queryTerm = term;
-            return {
-              query: term,
-              'page_limit': 10,
-              page: page
-            };
-          },
-          results: function (data, page) {
-            var results = data.results;
-            if (self.options.vocabularyUrl) {
-              var dataIds = [];
-              $.each(data.results, function(i, item) {
-                dataIds.push(item.id);
-              });
-              results = [];
-
-              var haveResult = queryTerm === '' || $.inArray(queryTerm, dataIds) >= 0;
-              if (self.options.allowNewItems && !haveResult) {
-                queryTerm = utils.removeHTML(queryTerm);
-                results.push({id: queryTerm, text: queryTerm});
-              }
-
-              $.each(data.results, function(i, item) {
-                results.push(item);
-              });
             }
-            return { results: results };
-          }
-        }, self.options.ajax);
-      } else if (self.options.multiple && self.$el.is('select')) {
-        // Multiselects need to be converted to input[type=hidden]
-        // for Select2
-        var vals = self.$el.val() || [];
-        var options = $.map(self.$el.find('option'), function (o) { return {text: $(o).html(), id: o.value}; });
-        var $hidden = $('<input type="hidden" />');
-        $hidden.val(vals.join(self.options.separator));
-        $hidden.attr('class', self.$el.attr('class'));
-        $hidden.attr('name', self.$el.attr('name'));
-        $hidden.attr('id', self.$el.attr('id'));
-        self.$orig = self.$el;
-        self.$el.replaceWith($hidden);
-        self.$el = $hidden;
-        self.options.data = options;
-      }
 
-      self.initializeValues();
-      self.initializeTags();
-      self.initializeOrdering();
-      self.initializeSelect2();
-    }
-  });
+            if (self.options.tags && !self.options.allowNewItems) {
+                self.options.data = $.map(self.options.tags, function (
+                    value,
+                    i
+                ) {
+                    return { id: value, text: value };
+                });
+                self.options.multiple = true;
+                delete self.options.tags;
+            }
+        },
+        initializeOrdering: function () {
+            var self = this;
+            if (!self.options.orderable) {
+                return;
+            }
+            this.$el.on(
+                "change",
+                function (e) {
+                    var sortable_el = this.$select2[0].querySelector(
+                        ".select2-choices"
+                    );
+                    var sortable = new Sortable(sortable_el, {
+                        draggable: "li",
+                        dragClass: "select2-choice-dragging",
+                        chosenClass: "dragging",
+                        onStart: function (e) {
+                            self.$el.select2("onSortStart");
+                        }.bind(this),
+                        onEnd: function (e) {
+                            this.$el.select2("onSortEnd");
+                        }.bind(this),
+                    });
+                }.bind(this)
+            );
+        },
+        initializeSelect2: function () {
+            var self = this;
+            self.options.formatResultCssClass = function (ob) {
+                if (ob.id) {
+                    return (
+                        "select2-option-" +
+                        ob.id
+                            .toLowerCase()
+                            .replace(/[ \:\)\(\[\]\{\}\_\+\=\&\*\%\#]/g, "-")
+                    );
+                }
+            };
 
-  return Select2;
+            function callback(action, e) {
+                if (action) {
+                    if (self.options.debug) {
+                        console.debug("callback", action, e);
+                    }
+                    if (typeof action === "string") {
+                        action = window[action];
+                    }
+                    return action(e);
+                } else {
+                    return action;
+                }
+            }
 
+            self.$el.select2(self.options);
+            self.$el.on("select2-selected", function (e) {
+                callback(self.options.onSelected, e);
+            });
+            self.$el.on("select2-selecting", function (e) {
+                callback(self.options.onSelecting, e);
+            });
+            self.$el.on("select2-deselecting", function (e) {
+                callback(self.options.onDeselecting, e);
+            });
+            self.$el.on("select2-deselected", function (e) {
+                callback(self.options.onDeselected, e);
+            });
+            self.$select2 = self.$el.parent().find(".select2-container");
+            self.$el.parent().off("close.plone-modal.patterns");
+            if (self.options.orderable) {
+                self.$select2.addClass("select2-orderable");
+            }
+        },
+        opened: function () {
+            var self = this;
+            var isOpen =
+                $(".select2-dropdown-open", self.$el.parent()).length === 1;
+            return isOpen;
+        },
+        init: function () {
+            var self = this;
+
+            self.options.allowNewItems = self.options.hasOwnProperty(
+                "allowNewItems"
+            )
+                ? JSON.parse(self.options.allowNewItems)
+                : true;
+
+            if (self.options.ajax || self.options.vocabularyUrl) {
+                if (self.options.vocabularyUrl) {
+                    self.options.multiple =
+                        self.options.multiple === undefined
+                            ? true
+                            : self.options.multiple;
+                    self.options.ajax = self.options.ajax || {};
+                    self.options.ajax.url = self.options.vocabularyUrl;
+                    // XXX removing the following function does'nt break tests. dead code?
+                    self.options.initSelection = function ($el, callback) {
+                        var data = [],
+                            value = $el.val();
+                        $(value.split(self.options.separator)).each(
+                            function () {
+                                var val = utils.removeHTML(this);
+                                data.push({ id: val, text: val });
+                            }
+                        );
+                        callback(data);
+                    };
+                }
+
+                var queryTerm = "";
+                self.options.ajax = $.extend(
+                    {
+                        quietMillis: 300,
+                        data: function (term, page) {
+                            queryTerm = term;
+                            return {
+                                query: term,
+                                page_limit: 10,
+                                page: page,
+                            };
+                        },
+                        results: function (data, page) {
+                            var results = data.results;
+                            if (self.options.vocabularyUrl) {
+                                var dataIds = [];
+                                $.each(data.results, function (i, item) {
+                                    dataIds.push(item.id);
+                                });
+                                results = [];
+
+                                var haveResult =
+                                    queryTerm === "" ||
+                                    $.inArray(queryTerm, dataIds) >= 0;
+                                if (self.options.allowNewItems && !haveResult) {
+                                    queryTerm = utils.removeHTML(queryTerm);
+                                    results.push({
+                                        id: queryTerm,
+                                        text: queryTerm,
+                                    });
+                                }
+
+                                $.each(data.results, function (i, item) {
+                                    results.push(item);
+                                });
+                            }
+                            return { results: results };
+                        },
+                    },
+                    self.options.ajax
+                );
+            } else if (self.options.multiple && self.$el.is("select")) {
+                // Multiselects need to be converted to input[type=hidden]
+                // for Select2
+                var vals = self.$el.val() || [];
+                var options = $.map(self.$el.find("option"), function (o) {
+                    return { text: $(o).html(), id: o.value };
+                });
+                var $hidden = $('<input type="hidden" />');
+                $hidden.val(vals.join(self.options.separator));
+                $hidden.attr("class", self.$el.attr("class"));
+                $hidden.attr("name", self.$el.attr("name"));
+                $hidden.attr("id", self.$el.attr("id"));
+                self.$orig = self.$el;
+                self.$el.replaceWith($hidden);
+                self.$el = $hidden;
+                self.options.data = options;
+            }
+
+            self.initializeValues();
+            self.initializeTags();
+            self.initializeOrdering();
+            self.initializeSelect2();
+        },
+    });
+
+    return Select2;
 });
 
 
@@ -32699,680 +32410,766 @@ define("bootstrap-dropdown", ["jquery"], function() {
  */
 
 define('mockup-patterns-relateditems',[
-  'jquery',
-  'underscore',
-  'pat-base',
-  'mockup-patterns-select2',
-  'mockup-ui-url/views/button',
-  'mockup-utils',
-  'pat-registry',
-  'translate',
-  'text!mockup-patterns-relateditems-url/templates/breadcrumb.xml',
-  'text!mockup-patterns-relateditems-url/templates/favorite.xml',
-  'text!mockup-patterns-relateditems-url/templates/recentlyused.xml',
-  'text!mockup-patterns-relateditems-url/templates/result.xml',
-  'text!mockup-patterns-relateditems-url/templates/selection.xml',
-  'text!mockup-patterns-relateditems-url/templates/toolbar.xml',
-  'bootstrap-dropdown'
-], function($, _, Base, Select2, ButtonView, utils, registry, _t,
-            BreadcrumbTemplate,
-            FavoriteTemplate,
-            RecentlyUsedTemplate,
-            ResultTemplate,
-            SelectionTemplate,
-            ToolbarTemplate
+    "jquery",
+    "underscore",
+    "pat-base",
+    "mockup-patterns-select2",
+    "mockup-ui-url/views/button",
+    "mockup-utils",
+    "pat-registry",
+    "translate",
+    "text!mockup-patterns-relateditems-url/templates/breadcrumb.xml",
+    "text!mockup-patterns-relateditems-url/templates/favorite.xml",
+    "text!mockup-patterns-relateditems-url/templates/recentlyused.xml",
+    "text!mockup-patterns-relateditems-url/templates/result.xml",
+    "text!mockup-patterns-relateditems-url/templates/selection.xml",
+    "text!mockup-patterns-relateditems-url/templates/toolbar.xml",
+    "bootstrap-dropdown",
+], function (
+    $,
+    _,
+    Base,
+    Select2,
+    ButtonView,
+    utils,
+    registry,
+    _t,
+    BreadcrumbTemplate,
+    FavoriteTemplate,
+    RecentlyUsedTemplate,
+    ResultTemplate,
+    SelectionTemplate,
+    ToolbarTemplate
 ) {
-  'use strict';
+    "use strict";
 
-  var KEY = {
-    LEFT: 37,
-    RIGHT: 39
-  };
+    var KEY = {
+        LEFT: 37,
+        RIGHT: 39,
+    };
 
-  var RelatedItems = Base.extend({
-    name: 'relateditems',
-    trigger: '.pat-relateditems',
-    parser: 'mockup',
-    currentPath: undefined,
-    selectedUIDs: [],
-    openAfterInit: undefined,
-    defaults: {
-      // main option
-      vocabularyUrl: null,  // must be set to work
+    var RelatedItems = Base.extend({
+        name: "relateditems",
+        trigger: ".pat-relateditems",
+        parser: "mockup",
+        currentPath: undefined,
+        selectedUIDs: [],
+        openAfterInit: undefined,
+        defaults: {
+            // main option
+            vocabularyUrl: null, // must be set to work
 
-      // more options
-      attributes: ['UID', 'Title', 'portal_type', 'path', 'getURL', 'getIcon', 'is_folderish', 'review_state'],  // used by utils.QueryHelper
-      basePath: '',
-      pageSize: 10,
-      browsing: undefined,
-      closeOnSelect: true,
-      contextPath: undefined,
-      dropdownCssClass: 'pattern-relateditems-dropdown',
-      favorites: [],
-      recentlyUsed: false,
-      recentlyUsedMaxItems: 20,
-      recentlyUsedKey: 'relateditems_recentlyused',
-      maximumSelectionSize: -1,
-      minimumInputLength: 0,
-      mode: 'auto', // possible values are 'auto', 'search' and 'browse'.
-      orderable: true,  // mockup-patterns-select2
-      pathOperator: 'plone.app.querystring.operation.string.path',
-      rootPath: '/',
-      rootUrl: '',  // default to be relative.
-      scanSelection: false,  // False, to no unnecessarily use CPU time on this.
-      selectableTypes: null, // null means everything is selectable, otherwise a list of strings to match types that are selectable
-      separator: ',',
-      sortOn: null,
-      sortOrder: 'ascending',
-      tokenSeparators: [',', ' '],
-      upload: false,
-      uploadAllowView: undefined,
-      width: '100%',
+            // more options
+            attributes: [
+                "UID",
+                "Title",
+                "portal_type",
+                "path",
+                "getURL",
+                "getIcon",
+                "is_folderish",
+                "review_state",
+            ], // used by utils.QueryHelper
+            basePath: "",
+            pageSize: 10,
+            browsing: undefined,
+            closeOnSelect: true,
+            contextPath: undefined,
+            dropdownCssClass: "pattern-relateditems-dropdown",
+            favorites: [],
+            recentlyUsed: false,
+            recentlyUsedMaxItems: 20,
+            recentlyUsedKey: "relateditems_recentlyused",
+            maximumSelectionSize: -1,
+            minimumInputLength: 0,
+            mode: "auto", // possible values are 'auto', 'search' and 'browse'.
+            orderable: true, // mockup-patterns-select2
+            pathOperator: "plone.app.querystring.operation.string.path",
+            rootPath: "/",
+            rootUrl: "", // default to be relative.
+            scanSelection: false, // False, to no unnecessarily use CPU time on this.
+            selectableTypes: null, // null means everything is selectable, otherwise a list of strings to match types that are selectable
+            separator: ",",
+            sortOn: null,
+            sortOrder: "ascending",
+            tokenSeparators: [",", " "],
+            upload: false,
+            uploadAllowView: undefined,
+            width: "100%",
 
-      // templates
-      breadcrumbTemplate: BreadcrumbTemplate,
-      breadcrumbTemplateSelector: null,
-      favoriteTemplate: FavoriteTemplate,
-      favoriteTemplateSelector: null,
-      recentlyusedTemplate: RecentlyUsedTemplate,
-      recentlyusedTemplateSelector: null,
-      resultTemplate: ResultTemplate,
-      resultTemplateSelector: null,
-      selectionTemplate: SelectionTemplate,
-      selectionTemplateSelector: null,
-      toolbarTemplate: ToolbarTemplate,
-      toolbarTemplateSelector: null,
+            // templates
+            breadcrumbTemplate: BreadcrumbTemplate,
+            breadcrumbTemplateSelector: null,
+            favoriteTemplate: FavoriteTemplate,
+            favoriteTemplateSelector: null,
+            recentlyusedTemplate: RecentlyUsedTemplate,
+            recentlyusedTemplateSelector: null,
+            resultTemplate: ResultTemplate,
+            resultTemplateSelector: null,
+            selectionTemplate: SelectionTemplate,
+            selectionTemplateSelector: null,
+            toolbarTemplate: ToolbarTemplate,
+            toolbarTemplateSelector: null,
 
-      // needed
-      multiple: true,
+            // needed
+            multiple: true,
+        },
 
-    },
-
-    recentlyUsed: function (filterSelectable) {
-      var ret = utils.storage.get(this.options.recentlyUsedKey) || [];
-      // hard-limit to 1000 entries
-      ret = ret.slice(ret.length-1000, ret.length);
-      if (filterSelectable) {
-        // Filter out only selectable items.
-        // This is used only to create the list of items to be displayed.
-        // the list to be stored is unfiltered and can be reused among
-        // different instances of this widget with different settings.
-        ret.filter(this.isSelectable.bind(this));
-      }
-      // max is applied AFTER filtering selectable items.
-      var max = parseInt(this.options.recentlyUsedMaxItems, 10);
-      if (max) {
-        // return the slice from the end, as we want to display newest items first.
-        ret = ret.slice(ret.length-max, ret.length);
-      }
-      return ret;
-    },
-
-    applyTemplate: function(tpl, item) {
-      var self = this;
-      var template;
-      if (self.options[tpl + 'TemplateSelector']) {
-        template = $(self.options[tpl + 'TemplateSelector']).html();
-        if (!template) {
-          template = self.options[tpl + 'Template'];
-        }
-      } else {
-        template = self.options[tpl + 'Template'];
-      }
-      // let's give all the options possible to the template generation
-      var options = $.extend(true, {}, self.options, item, {
-        'browsing': self.browsing,
-        'open_folder': _t('Open folder'),
-        'current_directory': _t('current directory:'),
-        'one_level_up': _t('Go one level up')
-      });
-      options._item = item;
-      return _.template(template)(options);
-    },
-
-    setAjax: function () {
-      var ajax = {
-
-        url: this.options.vocabularyUrl,
-        dataType: 'JSON',
-        quietMillis: 500,
-
-        data: function (term, page) {
-
-          var criterias = [];
-          if (term) {
-            term = '*' + term + '*';
-            criterias.push({
-              i: 'SearchableText',
-              o: 'plone.app.querystring.operation.string.contains',
-              v: term
-            });
-          }
-
-          // We don't restrict for selectable types while browsing...
-          if (!this.browsing && this.options.selectableTypes) {
-            criterias.push({
-              i: 'portal_type',
-              o: 'plone.app.querystring.operation.selection.any',
-              v: this.options.selectableTypes
-            });
-          }
-
-          criterias.push({
-            i: 'path',
-            o: this.options.pathOperator,
-            v: this.options.rootPath + this.currentPath + (this.browsing ? '::1' : '')
-          });
-
-          var sort_on = this.options.sortOn;
-          var sort_order = sort_on ? this.options.sortOrder : null;
-          if (this.browsing && sort_on === null) {
-            sort_on = 'getObjPositionInParent';
-            sort_order = 'ascending';
-          }
-
-          var data = {
-            query: JSON.stringify({
-              criteria: criterias,
-              sort_on: sort_on,
-              sort_order: sort_order
-            }),
-            attributes: JSON.stringify(this.options.attributes),
-            batch: JSON.stringify({
-              page: page ? page : 1,
-              size: this.options.pageSize
-            })
-          };
-          return data;
-        }.bind(this),
-
-        results: function (data, page) {
-
-          var more = (page * this.options.pageSize) < data.total;
-          var results = data.results;
-
-          this.selectedUIDs = (this.$el.select2('data') || []).map(function (el) {
-            // populate current selection. Reuse in formatResult
-            return el.UID;
-          });
-
-          // Filter out items:
-          // While browsing: always include folderish items
-          // Browsing and searching: Only include selectable items which are not already selected, and all folders
-          // even if they're selected, as we need them available for browsing/selecting their children
-          results = results.filter(
-            function (item) {
-              if (
-                (this.browsing && item.is_folderish) ||
-                (this.isSelectable(item) && this.selectedUIDs.indexOf(item.UID) === -1)
-              ) {
-                return true;
-              }
-              return false;
-            }.bind(this)
-          );
-
-          // Extend ``data`` with a ``oneLevelUp`` item when browsing
-          var path = this.currentPath.split('/');
-          if (page === 1 &&           // Show level up only on top.
-            this.browsing  &&         // only level up when browsing
-            path.length > 1 &&        // do not try to level up one level under root.
-            this.currentPath !== '/'  // do not try to level up beyond root
-          ) {
-            results = [{
-              'oneLevelUp': true,
-              'Title': _t('One level up'),
-              'path': path.slice(0, path.length - 1).join('/') || '/',
-              'currentPath': this.currentPath,
-              'is_folderish': true,
-              'selectable': false
-            }].concat(results);
-          }
-          return {
-            results: results,
-            more: more
-          };
-        }.bind(this)
-
-      };
-      this.options.ajax = ajax;
-    },
-
-    renderToolbar: function () {
-      var self = this;
-      var path = self.currentPath;
-      var html;
-
-      var paths = path.split('/');
-      var itemPath = '';
-      var itemsHtml = '';
-      _.each(paths, function(node) {
-        if (node !== '') {
-          var item = {};
-          item.path = itemPath = itemPath + '/' + node;
-          item.text = node;
-          itemsHtml = itemsHtml + self.applyTemplate('breadcrumb', item);
-        }
-      });
-
-      // favorites
-      var favoritesHtml = '';
-      _.each(self.options.favorites, function (item) {
-        var item_copy = _.clone(item);
-        item_copy.path = item_copy.path.substr(self.options.rootPath.length) || '/';
-        favoritesHtml = favoritesHtml + self.applyTemplate('favorite', item_copy);
-      });
-
-      var recentlyUsedHtml = '';
-      if (self.options.recentlyUsed) {
-        var recentlyUsed = self.recentlyUsed(true);  // filter out only those items which can actually be selected
-        _.each(recentlyUsed.reverse(), function (item) {  // reverse to get newest first.
-          recentlyUsedHtml = recentlyUsedHtml + self.applyTemplate('recentlyused', item);
-        });
-      }
-
-      html = self.applyTemplate('toolbar', {
-        items: itemsHtml,
-        favItems: favoritesHtml,
-        favText: _t('Favorites'),
-        searchText: _t('Current path:'),
-        searchModeText: _t('Search'),
-        browseModeText: _t('Browse'),
-        recentlyUsedItems: recentlyUsedHtml,
-        recentlyUsedText: _t('Recently Used'),
-      });
-
-      self.$toolbar.html(html);
-
-      $('.dropdown-toggle', self.$toolbar).dropdown();
-
-      // unbind mouseup event from select2 to override the behavior:
-      $(".pattern-relateditems-dropdown").unbind("mouseup");
-      $(".pattern-relateditems-dropdown").bind("mouseup", function(e) {
-          e.stopPropagation();
-      });
-
-      $('button.mode.search', self.$toolbar).on('click', function(e) {
-        e.preventDefault();
-        if (self.browsing) {
-          $('button.mode.search', self.$toolbar).toggleClass('btn-primary btn-default');
-          $('button.mode.browse', self.$toolbar).toggleClass('btn-primary btn-default');
-          self.browsing = false;
-          if (self.$el.select2('data').length > 0) {
-            // Have to call after initialization
-            self.openAfterInit = true;
-          }
-          if (!self.openAfterInit) {
-            self.$el.select2('close');
-            self.$el.select2('open');
-          }
-        } else {
-          // just open result list
-          self.$el.select2('close');
-          self.$el.select2('open');
-        }
-      });
-
-      $('button.mode.browse', self.$toolbar).on('click', function(e) {
-        e.preventDefault();
-        if (!self.browsing) {
-          $('button.mode.search', self.$toolbar).toggleClass('btn-primary btn-default');
-          $('button.mode.browse', self.$toolbar).toggleClass('btn-primary btn-default');
-          self.browsing = true;
-          if (self.$el.select2('data').length > 0) {
-            // Have to call after initialization
-            self.openAfterInit = true;
-          }
-          if (!self.openAfterInit) {
-            self.$el.select2('close');
-            self.$el.select2('open');
-          }
-        } else {
-          // just open result list
-          self.$el.select2('close');
-          self.$el.select2('open');
-        }
-      });
-
-      $('a.crumb', self.$toolbar).on('click', function(e) {
-        e.preventDefault();
-        self.browseTo($(this).attr('href'));
-      });
-
-      $('a.fav', self.$toolbar).on('click', function(e) {
-        e.preventDefault();
-        self.browseTo($(this).attr('href'));
-      });
-
-      if (self.options.recentlyUsed) {
-        $('.pattern-relateditems-recentlyused-select', self.$toolbar).on('click', function(event) {
-          event.preventDefault();
-          var uid = $(this).data('uid');
-          var item = self.recentlyUsed().filter(function (it) { return it.UID === uid; });
-          if (item.length > 0) {
-            item = item[0];
-          } else {
-            return;
-          }
-          self.selectItem(item);
-          if (self.options.maximumSelectionSize > 0) {
-            var items = self.$el.select2('data');
-            if (items.length >= self.options.maximumSelectionSize) {
-              return;
+        recentlyUsed: function (filterSelectable) {
+            var ret = utils.storage.get(this.options.recentlyUsedKey) || [];
+            // hard-limit to 1000 entries
+            ret = ret.slice(ret.length - 1000, ret.length);
+            if (filterSelectable) {
+                // Filter out only selectable items.
+                // This is used only to create the list of items to be displayed.
+                // the list to be stored is unfiltered and can be reused among
+                // different instances of this widget with different settings.
+                ret.filter(this.isSelectable.bind(this));
             }
-          }
-        });
-      }
+            // max is applied AFTER filtering selectable items.
+            var max = parseInt(this.options.recentlyUsedMaxItems, 10);
+            if (max) {
+                // return the slice from the end, as we want to display newest items first.
+                ret = ret.slice(ret.length - max, ret.length);
+            }
+            return ret;
+        },
 
-      function initUploadView(UploadView, disabled) {
-        var uploadButtonId = 'upload-' + utils.generateId();
-        var uploadButton = new ButtonView({
-          id:  uploadButtonId,
-          title: _t('Upload'),
-          tooltip: _t('Upload files'),
-          icon: 'upload',
-        });
-        if (disabled) {
-          uploadButton.disable();
-        }
-        $('.controls', self.$toolbar).prepend(uploadButton.render().el);
-        self.uploadView = new UploadView({
-          triggerView: uploadButton,
-          app: self
-        });
-        $('#btn-' +  uploadButtonId, self.$toolbar).append(self.uploadView.render().el);
-      }
-
-      // upload
-      if (self.options.upload && utils.featureSupport.dragAndDrop() && utils.featureSupport.fileApi()) {
-
-        require(['mockup-patterns-relateditems-upload'], function (UploadView) {
-          if (self.options.uploadAllowView) {
-            // Check, if uploads are allowed in current context
-            $.ajax({
-              url: self.options.uploadAllowView,
-              // url: self.currentUrl() + self.options.uploadAllowView,  // not working yet
-              dataType: 'JSON',
-              data: {
-                path: self.options.rootPath + self.currentPath
-              },
-              type: 'GET',
-              success: function (result) {
-                initUploadView(UploadView, !result.allowUpload);
-              }
-            });
-          } else {
-            // just initialize upload view without checking, if uploads are allowed.
-            initUploadView(UploadView);
-          }
-        });
-
-      }
-
-    },
-
-    browseTo: function (path) {
-      var self = this;
-      self.emit('before-browse');
-      self.currentPath = path;
-      self.$el.select2('close');
-      self.renderToolbar();
-      self.$el.select2('open');
-      self.emit('after-browse');
-    },
-
-    selectItem: function(item) {
-      var self = this;
-      self.emit('selecting');
-      var data = self.$el.select2('data');
-      data.push(item);
-      self.$el.select2('data', data, true);
-
-      if (self.options.recentlyUsed) {
-        // add to recently added items
-        var recentlyUsed = self.recentlyUsed();  // do not filter for selectable but get all. append to that list the new item.
-        var alreadyPresent = recentlyUsed.filter(function (it) { return it.UID === item.UID; });
-        if (alreadyPresent.length > 0) {
-          recentlyUsed.splice(recentlyUsed.indexOf(alreadyPresent[0]), 1);
-        }
-        recentlyUsed.push(item);
-        utils.storage.set(self.options.recentlyUsedKey, recentlyUsed);
-      }
-
-      self.emit('selected');
-    },
-
-    deselectItem: function(item) {
-      var self = this;
-      self.emit('deselecting');
-      var data = self.$el.select2('data');
-      _.each(data, function(obj, i) {
-        if (obj.UID === item.UID) {
-          data.splice(i, 1);
-        }
-      });
-      self.$el.select2('data', data, true);
-      self.emit('deselected');
-    },
-
-    isSelectable: function(item) {
-      var self = this;
-      if (item.selectable === false) {
-        return false;
-      }
-      if (self.options.selectableTypes === null) {
-        return true;
-      } else {
-        return self.options.selectableTypes.indexOf(item.portal_type) !== -1;
-      }
-    },
-
-    init: function() {
-      var self = this;
-
-      self.browsing = self.options.mode !== 'search';
-
-      // Remove trailing slash
-      self.options.rootPath = self.options.rootPath.replace(/\/$/, '');
-      // Substract rootPath from basePath with is the relative currentPath. Has a leading slash. Or use '/'
-      self.currentPath = self.options.basePath.substr(self.options.rootPath.length) || '/';
-
-      self.setAjax();
-
-      self.$el.wrap('<div class="pattern-relateditems-container" />');
-      self.$container = self.$el.parents('.pattern-relateditems-container');
-      self.$container.width(self.options.width);
-
-      Select2.prototype.initializeValues.call(self);
-      Select2.prototype.initializeTags.call(self);
-
-      self.options.formatSelection = function(item) {
-
-        item = $.extend(true, {
-            'Title': '',
-            'getIcon': '',
-            'getURL': '',
-            'path': '',
-            'portal_type': '',
-            'review_state': ''
-        }, item);
-
-        // activate petterns on the result set.
-        var $selection = $(self.applyTemplate('selection', item));
-        if (self.options.scanSelection) {
-          registry.scan($selection);
-        }
-        if (self.options.maximumSelectionSize == 1){
-          // If this related field accepts only 1 item, the breadcrumbs should
-          // reflect the location for this particular item
-          var itemPath = item.path;
-          var path_split = itemPath.split('/');
-          path_split = path_split.slice(0,-1);  // Remove last part of path, we always want the parent path
-          itemPath = path_split.join('/');
-          self.currentPath = itemPath;
-          self.renderToolbar();
-        }
-        return $selection;
-      };
-
-      Select2.prototype.initializeOrdering.call(self);
-
-
-
-      self.options.formatResult = function(item) {
-        item.selectable = self.isSelectable(item);
-
-        item = $.extend(true, {
-            'Title': '',
-            'getIcon': '',
-            'getURL': '',
-            'is_folderish': false,
-            'oneLevelUp': false,
-            'path': '',
-            'portal_type': '',
-            'review_state': '',
-            'selectable': false,
-        }, item);
-
-        if (self.selectedUIDs.indexOf(item.UID) !== -1) {
-            // do not allow already selected items to be selected again.
-            item.selectable = false;
-        }
-
-        var result = $(self.applyTemplate('result', item));
-
-        $('.pattern-relateditems-result-select', result).on('click', function(event) {
-          event.preventDefault();
-          // event.stopPropagation();
-          if ($(this).is('.selectable')) {
-            var $parent = $(this).parents('.pattern-relateditems-result');
-            if ($parent.is('.pattern-relateditems-active')) {
-              $parent.removeClass('pattern-relateditems-active');
-              self.deselectItem(item);
-            } else {
-              if (self.options.maximumSelectionSize > 0) {
-                var items = self.$el.select2('data');
-                if (items.length >= self.options.maximumSelectionSize) {
-                  self.$el.select2('close');
+        applyTemplate: function (tpl, item) {
+            var self = this;
+            var template;
+            if (self.options[tpl + "TemplateSelector"]) {
+                template = $(self.options[tpl + "TemplateSelector"]).html();
+                if (!template) {
+                    template = self.options[tpl + "Template"];
                 }
-              }
-              self.selectItem(item);
-              $parent.addClass('pattern-relateditems-active');
-              if (self.options.closeOnSelect) {
-                self.$el.select2('close');
-              }
+            } else {
+                template = self.options[tpl + "Template"];
             }
-          }
-        });
+            // let's give all the options possible to the template generation
+            var options = $.extend(true, {}, self.options, item, {
+                browsing: self.browsing,
+                open_folder: _t("Open folder"),
+                current_directory: _t("current directory:"),
+                one_level_up: _t("Go one level up"),
+            });
+            options._item = item;
+            return _.template(template)(options);
+        },
 
-        $('.pattern-relateditems-result-browse', result).on('click', function(event) {
-          event.preventDefault();
-          event.stopPropagation();
-          var path = $(this).data('path');
-          self.browseTo(path);
-        });
+        setAjax: function () {
+            var ajax = {
+                url: this.options.vocabularyUrl,
+                dataType: "JSON",
+                quietMillis: 500,
 
-        return $(result);
-      };
+                data: function (term, page) {
+                    var criterias = [];
+                    if (term) {
+                        term = "*" + term + "*";
+                        criterias.push({
+                            i: "SearchableText",
+                            o:
+                                "plone.app.querystring.operation.string.contains",
+                            v: term,
+                        });
+                    }
 
-      self.options.initSelection = function(element, callback) {
-        var value = $(element).val();
-        if (value !== '') {
-          var ids = value.split(self.options.separator);
-          var query = new utils.QueryHelper(
-            $.extend(true, {}, self.options, {
-              pattern: self
-            })
-          );
-          query.search(
-            'UID', 'plone.app.querystring.operation.list.contains', ids,
-            function(data) {
-              var results = data.results.reduce(function(prev, item) {
-                prev[item.UID] = item;
-                return prev;
-              }, {});
+                    // We don't restrict for selectable types while browsing...
+                    if (!this.browsing && this.options.selectableTypes) {
+                        criterias.push({
+                            i: "portal_type",
+                            o: "plone.app.querystring.operation.selection.any",
+                            v: this.options.selectableTypes,
+                        });
+                    }
 
-              try {
-                callback(
-                  ids
-                  .map(function(uid) {
-                    return results[uid];
-                  })
-                  .filter(function(item) {
-                    return item !== undefined;
-                  })
+                    criterias.push({
+                        i: "path",
+                        o: this.options.pathOperator,
+                        v:
+                            this.options.rootPath +
+                            this.currentPath +
+                            (this.browsing ? "::1" : ""),
+                    });
+
+                    var sort_on = this.options.sortOn;
+                    var sort_order = sort_on ? this.options.sortOrder : null;
+                    if (this.browsing && sort_on === null) {
+                        sort_on = "getObjPositionInParent";
+                        sort_order = "ascending";
+                    }
+
+                    var data = {
+                        query: JSON.stringify({
+                            criteria: criterias,
+                            sort_on: sort_on,
+                            sort_order: sort_order,
+                        }),
+                        attributes: JSON.stringify(this.options.attributes),
+                        batch: JSON.stringify({
+                            page: page ? page : 1,
+                            size: this.options.pageSize,
+                        }),
+                    };
+                    return data;
+                }.bind(this),
+
+                results: function (data, page) {
+                    var more = page * this.options.pageSize < data.total;
+                    var results = data.results;
+
+                    this.selectedUIDs = (this.$el.select2("data") || []).map(
+                        function (el) {
+                            // populate current selection. Reuse in formatResult
+                            return el.UID;
+                        }
+                    );
+
+                    // Filter out items:
+                    // While browsing: always include folderish items
+                    // Browsing and searching: Only include selectable items which are not already selected, and all folders
+                    // even if they're selected, as we need them available for browsing/selecting their children
+                    results = results.filter(
+                        function (item) {
+                            if (
+                                (this.browsing && item.is_folderish) ||
+                                (this.isSelectable(item) &&
+                                    this.selectedUIDs.indexOf(item.UID) === -1)
+                            ) {
+                                return true;
+                            }
+                            return false;
+                        }.bind(this)
+                    );
+
+                    // Extend ``data`` with a ``oneLevelUp`` item when browsing
+                    var path = this.currentPath.split("/");
+                    if (
+                        page === 1 && // Show level up only on top.
+                        this.browsing && // only level up when browsing
+                        path.length > 1 && // do not try to level up one level under root.
+                        this.currentPath !== "/" // do not try to level up beyond root
+                    ) {
+                        results = [
+                            {
+                                oneLevelUp: true,
+                                Title: _t("One level up"),
+                                path:
+                                    path.slice(0, path.length - 1).join("/") ||
+                                    "/",
+                                currentPath: this.currentPath,
+                                is_folderish: true,
+                                selectable: false,
+                            },
+                        ].concat(results);
+                    }
+                    return {
+                        results: results,
+                        more: more,
+                    };
+                }.bind(this),
+            };
+            this.options.ajax = ajax;
+        },
+
+        renderToolbar: function () {
+            var self = this;
+            var path = self.currentPath;
+            var html;
+
+            var paths = path.split("/");
+            var itemPath = "";
+            var itemsHtml = "";
+            _.each(paths, function (node) {
+                if (node !== "") {
+                    var item = {};
+                    item.path = itemPath = itemPath + "/" + node;
+                    item.text = node;
+                    itemsHtml =
+                        itemsHtml + self.applyTemplate("breadcrumb", item);
+                }
+            });
+
+            // favorites
+            var favoritesHtml = "";
+            _.each(self.options.favorites, function (item) {
+                var item_copy = _.clone(item);
+                item_copy.path =
+                    item_copy.path.substr(self.options.rootPath.length) || "/";
+                favoritesHtml =
+                    favoritesHtml + self.applyTemplate("favorite", item_copy);
+            });
+
+            var recentlyUsedHtml = "";
+            if (self.options.recentlyUsed) {
+                var recentlyUsed = self.recentlyUsed(true); // filter out only those items which can actually be selected
+                _.each(recentlyUsed.reverse(), function (item) {
+                    // reverse to get newest first.
+                    recentlyUsedHtml =
+                        recentlyUsedHtml +
+                        self.applyTemplate("recentlyused", item);
+                });
+            }
+
+            html = self.applyTemplate("toolbar", {
+                items: itemsHtml,
+                favItems: favoritesHtml,
+                favText: _t("Favorites"),
+                searchText: _t("Current path:"),
+                searchModeText: _t("Search"),
+                browseModeText: _t("Browse"),
+                recentlyUsedItems: recentlyUsedHtml,
+                recentlyUsedText: _t("Recently Used"),
+            });
+
+            self.$toolbar.html(html);
+
+            $(".dropdown-toggle", self.$toolbar).dropdown();
+
+            // unbind mouseup event from select2 to override the behavior:
+            $(".pattern-relateditems-dropdown").unbind("mouseup");
+            $(".pattern-relateditems-dropdown").bind("mouseup", function (e) {
+                e.stopPropagation();
+            });
+
+            $("button.mode.search", self.$toolbar).on("click", function (e) {
+                e.preventDefault();
+                if (self.browsing) {
+                    $("button.mode.search", self.$toolbar).toggleClass(
+                        "btn-primary btn-default"
+                    );
+                    $("button.mode.browse", self.$toolbar).toggleClass(
+                        "btn-primary btn-default"
+                    );
+                    self.browsing = false;
+                    if (self.$el.select2("data").length > 0) {
+                        // Have to call after initialization
+                        self.openAfterInit = true;
+                    }
+                    if (!self.openAfterInit) {
+                        self.$el.select2("close");
+                        self.$el.select2("open");
+                    }
+                } else {
+                    // just open result list
+                    self.$el.select2("close");
+                    self.$el.select2("open");
+                }
+            });
+
+            $("button.mode.browse", self.$toolbar).on("click", function (e) {
+                e.preventDefault();
+                if (!self.browsing) {
+                    $("button.mode.search", self.$toolbar).toggleClass(
+                        "btn-primary btn-default"
+                    );
+                    $("button.mode.browse", self.$toolbar).toggleClass(
+                        "btn-primary btn-default"
+                    );
+                    self.browsing = true;
+                    if (self.$el.select2("data").length > 0) {
+                        // Have to call after initialization
+                        self.openAfterInit = true;
+                    }
+                    if (!self.openAfterInit) {
+                        self.$el.select2("close");
+                        self.$el.select2("open");
+                    }
+                } else {
+                    // just open result list
+                    self.$el.select2("close");
+                    self.$el.select2("open");
+                }
+            });
+
+            $("a.crumb", self.$toolbar).on("click", function (e) {
+                e.preventDefault();
+                self.browseTo($(this).attr("href"));
+            });
+
+            $("a.fav", self.$toolbar).on("click", function (e) {
+                e.preventDefault();
+                self.browseTo($(this).attr("href"));
+            });
+
+            if (self.options.recentlyUsed) {
+                $(
+                    ".pattern-relateditems-recentlyused-select",
+                    self.$toolbar
+                ).on("click", function (event) {
+                    event.preventDefault();
+                    var uid = $(this).data("uid");
+                    var item = self.recentlyUsed().filter(function (it) {
+                        return it.UID === uid;
+                    });
+                    if (item.length > 0) {
+                        item = item[0];
+                    } else {
+                        return;
+                    }
+                    self.selectItem(item);
+                    if (self.options.maximumSelectionSize > 0) {
+                        var items = self.$el.select2("data");
+                        if (items.length >= self.options.maximumSelectionSize) {
+                            return;
+                        }
+                    }
+                });
+            }
+
+            function initUploadView(UploadView, disabled) {
+                var uploadButtonId = "upload-" + utils.generateId();
+                var uploadButton = new ButtonView({
+                    id: uploadButtonId,
+                    title: _t("Upload"),
+                    tooltip: _t("Upload files"),
+                    icon: "upload",
+                });
+                if (disabled) {
+                    uploadButton.disable();
+                }
+                $(".controls", self.$toolbar).prepend(uploadButton.render().el);
+                self.uploadView = new UploadView({
+                    triggerView: uploadButton,
+                    app: self,
+                });
+                $("#btn-" + uploadButtonId, self.$toolbar).append(
+                    self.uploadView.render().el
                 );
-              } catch (e) {
-                // Select2 3.5.4 throws an error in some cases in
-                // updateSelection, ``this.selection.find(".select2-search-choice").remove();``
-                // No idea why, hard to track.
-              }
+            }
 
-              if (self.openAfterInit) {
-                // open after initialization
-                self.$el.select2('open');
-                self.openAfterInit = undefined;
-              }
+            // upload
+            if (
+                self.options.upload &&
+                utils.featureSupport.dragAndDrop() &&
+                utils.featureSupport.fileApi()
+            ) {
+                require(["mockup-patterns-relateditems-upload"], function (
+                    UploadView
+                ) {
+                    if (self.options.uploadAllowView) {
+                        // Check, if uploads are allowed in current context
+                        $.ajax({
+                            url: self.options.uploadAllowView,
+                            // url: self.currentUrl() + self.options.uploadAllowView,  // not working yet
+                            dataType: "JSON",
+                            data: {
+                                path: self.options.rootPath + self.currentPath,
+                            },
+                            type: "GET",
+                            success: function (result) {
+                                initUploadView(UploadView, !result.allowUpload);
+                            },
+                        });
+                    } else {
+                        // just initialize upload view without checking, if uploads are allowed.
+                        initUploadView(UploadView);
+                    }
+                });
+            }
+        },
 
-            },
-            false
-          );
-        }
-      };
+        browseTo: function (path) {
+            var self = this;
+            self.emit("before-browse");
+            self.currentPath = path;
+            self.$el.select2("close");
+            self.renderToolbar();
+            self.$el.select2("open");
+            self.emit("after-browse");
+        },
 
-      self.options.tokenizer = function (input) {
-        if (this.options.mode === 'auto') {
-          this.browsing = input ? false : true;
-        }
-      }.bind(this);
+        selectItem: function (item) {
+            var self = this;
+            self.emit("selecting");
+            var data = self.$el.select2("data");
+            data.push(item);
+            self.$el.select2("data", data, true);
 
-      self.options.id = function(item) {
-        return item.UID;
-      };
+            if (self.options.recentlyUsed) {
+                // add to recently added items
+                var recentlyUsed = self.recentlyUsed(); // do not filter for selectable but get all. append to that list the new item.
+                var alreadyPresent = recentlyUsed.filter(function (it) {
+                    return it.UID === item.UID;
+                });
+                if (alreadyPresent.length > 0) {
+                    recentlyUsed.splice(
+                        recentlyUsed.indexOf(alreadyPresent[0]),
+                        1
+                    );
+                }
+                recentlyUsed.push(item);
+                utils.storage.set(self.options.recentlyUsedKey, recentlyUsed);
+            }
 
-      Select2.prototype.initializeSelect2.call(self);
+            self.emit("selected");
+        },
 
-      self.$toolbar = $('<div class="toolbar ui-offset-parent" />');
-      self.$container.prepend(self.$toolbar);
-      self.$el.on('select2-selecting', function(event) {
-        if (!self.isSelectable(event.choice)) {
-          event.preventDefault();
-        }
-      });
-      self.renderToolbar();
+        deselectItem: function (item) {
+            var self = this;
+            self.emit("deselecting");
+            var data = self.$el.select2("data");
+            _.each(data, function (obj, i) {
+                if (obj.UID === item.UID) {
+                    data.splice(i, 1);
+                }
+            });
+            self.$el.select2("data", data, true);
+            self.emit("deselected");
+        },
 
-      $(document).on('keyup', self.$el, function(event) {
-        var isOpen = Select2.prototype.opened.call(self);
+        isSelectable: function (item) {
+            var self = this;
+            if (item.selectable === false) {
+                return false;
+            }
+            if (self.options.selectableTypes === null) {
+                return true;
+            } else {
+                return (
+                    self.options.selectableTypes.indexOf(item.portal_type) !==
+                    -1
+                );
+            }
+        },
 
-        if (!isOpen) {
-          return;
-        }
+        init: function () {
+            var self = this;
 
-        if ((event.which === KEY.LEFT) || (event.which === KEY.RIGHT)) {
-          event.stopPropagation();
+            self.browsing = self.options.mode !== "search";
 
-          var selectorContext =
-            event.which === KEY.LEFT
-              ? '.pattern-relateditems-result.one-level-up'
-              : '.select2-highlighted';
+            // Remove trailing slash
+            self.options.rootPath = self.options.rootPath.replace(/\/$/, "");
+            // Substract rootPath from basePath with is the relative currentPath. Has a leading slash. Or use '/'
+            self.currentPath =
+                self.options.basePath.substr(self.options.rootPath.length) ||
+                "/";
 
-          var browsableItemSelector = '.pattern-relateditems-result-browse';
-          var browsableItem = $(browsableItemSelector, selectorContext);
+            self.setAjax();
 
-          if (browsableItem.length !== 1) {
-            return;
-          }
+            self.$el.wrap('<div class="pattern-relateditems-container" />');
+            self.$container = self.$el.parents(
+                ".pattern-relateditems-container"
+            );
+            self.$container.width(self.options.width);
 
-          var path = browsableItem.data('path');
+            Select2.prototype.initializeValues.call(self);
+            Select2.prototype.initializeTags.call(self);
 
-          self.browseTo(path);
-        }
-      });
-    }
-  });
+            self.options.formatSelection = function (item) {
+                item = $.extend(
+                    true,
+                    {
+                        Title: "",
+                        getIcon: "",
+                        getURL: "",
+                        path: "",
+                        portal_type: "",
+                        review_state: "",
+                    },
+                    item
+                );
 
-  return RelatedItems;
+                // activate petterns on the result set.
+                var $selection = $(self.applyTemplate("selection", item));
+                if (self.options.scanSelection) {
+                    registry.scan($selection);
+                }
+                if (self.options.maximumSelectionSize == 1) {
+                    // If this related field accepts only 1 item, the breadcrumbs should
+                    // reflect the location for this particular item
+                    var itemPath = item.path;
+                    var path_split = itemPath.split("/");
+                    path_split = path_split.slice(0, -1); // Remove last part of path, we always want the parent path
+                    itemPath = path_split.join("/");
+                    self.currentPath = itemPath;
+                    self.renderToolbar();
+                }
+                return $selection;
+            };
 
+            Select2.prototype.initializeOrdering.call(self);
+
+            self.options.formatResult = function (item) {
+                item.selectable = self.isSelectable(item);
+
+                item = $.extend(
+                    true,
+                    {
+                        Title: "",
+                        getIcon: "",
+                        getURL: "",
+                        is_folderish: false,
+                        oneLevelUp: false,
+                        path: "",
+                        portal_type: "",
+                        review_state: "",
+                        selectable: false,
+                    },
+                    item
+                );
+
+                if (self.selectedUIDs.indexOf(item.UID) !== -1) {
+                    // do not allow already selected items to be selected again.
+                    item.selectable = false;
+                }
+
+                var result = $(self.applyTemplate("result", item));
+
+                $(".pattern-relateditems-result-select", result).on(
+                    "click",
+                    function (event) {
+                        event.preventDefault();
+                        // event.stopPropagation();
+                        if ($(this).is(".selectable")) {
+                            var $parent = $(this).parents(
+                                ".pattern-relateditems-result"
+                            );
+                            if ($parent.is(".pattern-relateditems-active")) {
+                                $parent.removeClass(
+                                    "pattern-relateditems-active"
+                                );
+                                self.deselectItem(item);
+                            } else {
+                                if (self.options.maximumSelectionSize > 0) {
+                                    var items = self.$el.select2("data");
+                                    if (
+                                        items.length >=
+                                        self.options.maximumSelectionSize
+                                    ) {
+                                        self.$el.select2("close");
+                                    }
+                                }
+                                self.selectItem(item);
+                                $parent.addClass("pattern-relateditems-active");
+                                if (self.options.closeOnSelect) {
+                                    self.$el.select2("close");
+                                }
+                            }
+                        }
+                    }
+                );
+
+                $(".pattern-relateditems-result-browse", result).on(
+                    "click",
+                    function (event) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        var path = $(this).data("path");
+                        self.browseTo(path);
+                    }
+                );
+
+                return $(result);
+            };
+
+            self.options.initSelection = function (element, callback) {
+                var value = $(element).val();
+                if (value !== "") {
+                    var ids = value.split(self.options.separator);
+                    var query = new utils.QueryHelper(
+                        $.extend(true, {}, self.options, {
+                            pattern: self,
+                        })
+                    );
+                    query.search(
+                        "UID",
+                        "plone.app.querystring.operation.list.contains",
+                        ids,
+                        function (data) {
+                            var results = data.results.reduce(function (
+                                prev,
+                                item
+                            ) {
+                                prev[item.UID] = item;
+                                return prev;
+                            },
+                            {});
+
+                            try {
+                                callback(
+                                    ids
+                                        .map(function (uid) {
+                                            return results[uid];
+                                        })
+                                        .filter(function (item) {
+                                            return item !== undefined;
+                                        })
+                                );
+                            } catch (e) {
+                                // Select2 3.5.4 throws an error in some cases in
+                                // updateSelection, ``this.selection.find(".select2-search-choice").remove();``
+                                // No idea why, hard to track.
+                            }
+
+                            if (self.openAfterInit) {
+                                // open after initialization
+                                self.$el.select2("open");
+                                self.openAfterInit = undefined;
+                            }
+                        },
+                        false
+                    );
+                }
+            };
+
+            self.options.tokenizer = function (input) {
+                if (this.options.mode === "auto") {
+                    this.browsing = input ? false : true;
+                }
+            }.bind(this);
+
+            self.options.id = function (item) {
+                return item.UID;
+            };
+
+            Select2.prototype.initializeSelect2.call(self);
+
+            self.$toolbar = $('<div class="toolbar ui-offset-parent" />');
+            self.$container.prepend(self.$toolbar);
+            self.$el.on("select2-selecting", function (event) {
+                if (!self.isSelectable(event.choice)) {
+                    event.preventDefault();
+                }
+            });
+            self.renderToolbar();
+
+            $(document).on("keyup", self.$el, function (event) {
+                var isOpen = Select2.prototype.opened.call(self);
+
+                if (!isOpen) {
+                    return;
+                }
+
+                if (event.which === KEY.LEFT || event.which === KEY.RIGHT) {
+                    event.stopPropagation();
+
+                    var selectorContext =
+                        event.which === KEY.LEFT
+                            ? ".pattern-relateditems-result.one-level-up"
+                            : ".select2-highlighted";
+
+                    var browsableItemSelector =
+                        ".pattern-relateditems-result-browse";
+                    var browsableItem = $(
+                        browsableItemSelector,
+                        selectorContext
+                    );
+
+                    if (browsableItem.length !== 1) {
+                        return;
+                    }
+
+                    var path = browsableItem.data("path");
+
+                    self.browseTo(path);
+                }
+            });
+        },
+    });
+
+    return RelatedItems;
 });
 
 // Uses AMD or browser globals to create a jQuery plugin.
@@ -35204,521 +35001,581 @@ define('text!mockup-patterns-upload-url/templates/preview.xml',[],function () { 
  *
  */
 
-
 define('mockup-patterns-upload',[
-  'jquery',
-  'underscore',
-  'pat-base',
-  'mockup-patterns-relateditems',
-  'dropzone',
-  'text!mockup-patterns-upload-url/templates/upload.xml',
-  'text!mockup-patterns-upload-url/templates/preview.xml',
-  'mockup-utils',
-  'translate'
-], function($, _, Base, RelatedItems, Dropzone, UploadTemplate, PreviewTemplate, utils, _t) {
-  'use strict';
+    "jquery",
+    "underscore",
+    "pat-base",
+    "mockup-patterns-relateditems",
+    "dropzone",
+    "text!mockup-patterns-upload-url/templates/upload.xml",
+    "text!mockup-patterns-upload-url/templates/preview.xml",
+    "mockup-utils",
+    "translate",
+], function (
+    $,
+    _,
+    Base,
+    RelatedItems,
+    Dropzone,
+    UploadTemplate,
+    PreviewTemplate,
+    utils,
+    _t
+) {
+    "use strict";
 
-  /* we do not want this plugin to auto discover */
-  Dropzone.autoDiscover = false;
+    /* we do not want this plugin to auto discover */
+    Dropzone.autoDiscover = false;
 
-  var UploadPattern = Base.extend({
-    name: 'upload',
-    trigger: '.pat-upload',
-    parser: 'mockup',
-    defaults: {
-      showTitle: true,
-      url: null, // XXX MUST provide url to submit to OR be in a form
-      className: 'upload',
-      wrap: false,
-      wrapperTemplate: '<div class="upload-wrapper"/>',
-      fileaddedClassName: 'dropping',
-      useTus: false,
-      container: '',
-      ajaxUpload: true,
+    var UploadPattern = Base.extend({
+        name: "upload",
+        trigger: ".pat-upload",
+        parser: "mockup",
+        defaults: {
+            showTitle: true,
+            url: null, // XXX MUST provide url to submit to OR be in a form
+            className: "upload",
+            wrap: false,
+            wrapperTemplate: '<div class="upload-wrapper"/>',
+            fileaddedClassName: "dropping",
+            useTus: false,
+            container: "",
+            ajaxUpload: true,
 
-      paramName: 'file',
-      addRemoveLinks: false,
-      autoCleanResults: true,
-      previewsContainer: '.previews',
-      previewTemplate: null,
-      maxFiles: null,
-      maxFilesize: 99999999, // let's not have a max by default...
+            paramName: "file",
+            addRemoveLinks: false,
+            autoCleanResults: true,
+            previewsContainer: ".previews",
+            previewTemplate: null,
+            maxFiles: null,
+            maxFilesize: 99999999, // let's not have a max by default...
 
-      allowPathSelection: undefined,
-      relatedItems: {
-        // UID attribute is required here since we're working with related items
-        attributes: ['UID', 'Title', 'Description', 'getURL', 'portal_type', 'path', 'ModificationDate'],
-        batchSize: 20,
-        basePath: '/',
-        vocabularyUrl: null,
-        width: 500,
-        maximumSelectionSize: 1,
-        selectableTypes: ['Folder']
-      }
-    },
+            allowPathSelection: undefined,
+            relatedItems: {
+                // UID attribute is required here since we're working with related items
+                attributes: [
+                    "UID",
+                    "Title",
+                    "Description",
+                    "getURL",
+                    "portal_type",
+                    "path",
+                    "ModificationDate",
+                ],
+                batchSize: 20,
+                basePath: "/",
+                vocabularyUrl: null,
+                width: 500,
+                maximumSelectionSize: 1,
+                selectableTypes: ["Folder"],
+            },
+        },
 
-    init: function() {
-      var self = this,
-          template = UploadTemplate;
+        init: function () {
+            var self = this,
+                template = UploadTemplate;
 
-      if (typeof self.options.allowPathSelection === 'undefined') {
-        // Set allowPathSelection to true, if we can use path based urls.
-        self.options.allowPathSelection = self.options.baseUrl && self.options.relativePath;
-      }
-
-      // TODO: find a way to make this work in firefox (and IE)
-      $(document).bind('paste', function(e) {
-        var oe = e.originalEvent;
-        var items = oe.clipboardData.items;
-        if (items) {
-          for (var i = 0; i < items.length; i++) {
-            if (items[i].type.indexOf('image') !== -1) {
-              var blob = items[i].getAsFile();
-              self.dropzone.addFile(blob);
+            if (typeof self.options.allowPathSelection === "undefined") {
+                // Set allowPathSelection to true, if we can use path based urls.
+                self.options.allowPathSelection =
+                    self.options.baseUrl && self.options.relativePath;
             }
-          }
-        }
-      });
-      // values that will change current processing
-      self.currentPath = self.options.currentPath;
-      self.currentFile = 0;
 
-      template = _.template(template)({
-        _t: _t,
-        allowPathSelection: self.options.allowPathSelection
-      });
-      self.$el.addClass(self.options.className);
-      self.$el.append(template);
+            // TODO: find a way to make this work in firefox (and IE)
+            $(document).bind("paste", function (e) {
+                var oe = e.originalEvent;
+                var items = oe.clipboardData.items;
+                if (items) {
+                    for (var i = 0; i < items.length; i++) {
+                        if (items[i].type.indexOf("image") !== -1) {
+                            var blob = items[i].getAsFile();
+                            self.dropzone.addFile(blob);
+                        }
+                    }
+                }
+            });
+            // values that will change current processing
+            self.currentPath = self.options.currentPath;
+            self.currentFile = 0;
 
-      self.$progress = $('.progress-bar-success', self.$el);
+            template = _.template(template)({
+                _t: _t,
+                allowPathSelection: self.options.allowPathSelection,
+            });
+            self.$el.addClass(self.options.className);
+            self.$el.append(template);
 
-      if (!self.options.showTitle) {
-        self.$el.find('h2.title').hide();
-      }
+            self.$progress = $(".progress-bar-success", self.$el);
 
-      if (!self.options.ajaxUpload) {
-        // no ajax upload, drop the fallback
-        $('.fallback', this.$el).remove();
-        if (this.$el.hasClass('.upload-container')) {
-          this.$el.addClass('no-ajax-upload');
-        } else {
-          this.$el.closest('.upload-container').addClass('no-ajax-upload');
-        }
-      }
+            if (!self.options.showTitle) {
+                self.$el.find("h2.title").hide();
+            }
 
-      if (self.options.wrap) {
-        self.$el.wrap(self.options.wrapperTemplate);
-        self.$el = self.$el.parent();
-      }
+            if (!self.options.ajaxUpload) {
+                // no ajax upload, drop the fallback
+                $(".fallback", this.$el).remove();
+                if (this.$el.hasClass(".upload-container")) {
+                    this.$el.addClass("no-ajax-upload");
+                } else {
+                    this.$el
+                        .closest(".upload-container")
+                        .addClass("no-ajax-upload");
+                }
+            }
 
-      if (self.options.allowPathSelection) {
-        // only use related items if we can generate path based urls and if it's not turned off.
-        self.$pathInput = $('input[name="location"]', self.$el);
-        self.relatedItems = self.setupRelatedItems(self.$pathInput);
-      } else {
-        $('input[name="location"]', self.$el).parent().remove();
-        self.relatedItems = null;
-      }
+            if (self.options.wrap) {
+                self.$el.wrap(self.options.wrapperTemplate);
+                self.$el = self.$el.parent();
+            }
 
-      self.$dropzone = $('.upload-area', self.$el);
+            if (self.options.allowPathSelection) {
+                // only use related items if we can generate path based urls and if it's not turned off.
+                self.$pathInput = $('input[name="location"]', self.$el);
+                self.relatedItems = self.setupRelatedItems(self.$pathInput);
+            } else {
+                $('input[name="location"]', self.$el).parent().remove();
+                self.relatedItems = null;
+            }
 
-      $('div.browse-select button.browse', self.$el).click(function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        if(!self.options.maxFiles || self.dropzone.files.length < self.options.maxFiles){
-          self.dropzone.hiddenFileInput.click();
-        }
-      });
+            self.$dropzone = $(".upload-area", self.$el);
 
-      var dzoneOptions = this.getDzoneOptions();
+            $("div.browse-select button.browse", self.$el).click(function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                if (
+                    !self.options.maxFiles ||
+                    self.dropzone.files.length < self.options.maxFiles
+                ) {
+                    self.dropzone.hiddenFileInput.click();
+                }
+            });
 
-      try {
-        // if init of Dropzone fails it says nothing and
-        // it fails silently. Using this block we make sure
-        // that if you break it w/ some weird or missing option
-        // you can get a proper log of it
-        //
-        self.dropzone = new Dropzone(self.$dropzone[0], dzoneOptions);
-      } catch (e) {
-        if (window.DEBUG) {
-          // log it!
-          console.log(e);
-        }
-        throw e;
-      }
+            var dzoneOptions = this.getDzoneOptions();
 
-      self.dropzone.on('maxfilesreached', function(){
-        self.showHideControls();
-      });
+            try {
+                // if init of Dropzone fails it says nothing and
+                // it fails silently. Using this block we make sure
+                // that if you break it w/ some weird or missing option
+                // you can get a proper log of it
+                //
+                self.dropzone = new Dropzone(self.$dropzone[0], dzoneOptions);
+            } catch (e) {
+                if (window.DEBUG) {
+                    // log it!
+                    console.log(e);
+                }
+                throw e;
+            }
 
-      self.dropzone.on('addedfile', function(/* file */) {
-        self.showHideControls();
-      });
+            self.dropzone.on("maxfilesreached", function () {
+                self.showHideControls();
+            });
 
-      self.dropzone.on('removedfile', function() {
-        self.showHideControls();
-      });
+            self.dropzone.on("addedfile", function (/* file */) {
+                self.showHideControls();
+            });
 
-      self.dropzone.on('success', function(e, response){
-        // Trigger event 'uploadAllCompleted' and pass the server's reponse and
-        // the path uid. This event can be listened to by patterns using the
-        // upload pattern, e.g. the TinyMCE pattern's link plugin.
-        var data;
-        try{
-          data = $.parseJSON(response);
-        }catch(ex){
-          data = response;
-        }
-        self.$el.trigger('uploadAllCompleted', {
-          'data': data,
-          'path_uid': (self.$pathInput) ? self.$pathInput.val() : null
-        });
-      });
+            self.dropzone.on("removedfile", function () {
+                self.showHideControls();
+            });
 
-      if (self.options.autoCleanResults) {
-        self.dropzone.on('complete', function(file) {
-          if (file.status === Dropzone.SUCCESS){
-            setTimeout(function() {
-              $(file.previewElement).fadeOut();
-            }, 3000);
-          }
-        });
-      }
+            self.dropzone.on("success", function (e, response) {
+                // Trigger event 'uploadAllCompleted' and pass the server's reponse and
+                // the path uid. This event can be listened to by patterns using the
+                // upload pattern, e.g. the TinyMCE pattern's link plugin.
+                var data;
+                try {
+                    data = $.parseJSON(response);
+                } catch (ex) {
+                    data = response;
+                }
+                self.$el.trigger("uploadAllCompleted", {
+                    data: data,
+                    path_uid: self.$pathInput ? self.$pathInput.val() : null,
+                });
+            });
 
-      self.dropzone.on('complete', function(file) {
-        if (file.status === Dropzone.SUCCESS && self.dropzone.files.length === 1) {
-          self.showHideControls();
-        }
-      });
+            if (self.options.autoCleanResults) {
+                self.dropzone.on("complete", function (file) {
+                    if (file.status === Dropzone.SUCCESS) {
+                        setTimeout(function () {
+                            $(file.previewElement).fadeOut();
+                        }, 3000);
+                    }
+                });
+            }
 
-      self.dropzone.on('error', function(file, response, xmlhr) {
-        if (typeof(xmlhr) !== 'undefined' && xmlhr.status !== 403){
-          // If error other than 403, just print a generic message
-          $('.dz-error-message span', file.previewElement).html(_t('The file transfer failed'));
-        }
-      });
+            self.dropzone.on("complete", function (file) {
+                if (
+                    file.status === Dropzone.SUCCESS &&
+                    self.dropzone.files.length === 1
+                ) {
+                    self.showHideControls();
+                }
+            });
 
-      self.dropzone.on('totaluploadprogress', function(pct) {
-        // need to caclulate total pct here in reality since we're manually
-        // processing each file one at a time.
-        pct = ((((self.currentFile - 1) * 100) + pct) / (self.dropzone.files.length * 100)) * 100;
-        self.$progress.attr('aria-valuenow', pct).css('width', pct + '%');
-      });
+            self.dropzone.on("error", function (file, response, xmlhr) {
+                if (typeof xmlhr !== "undefined" && xmlhr.status !== 403) {
+                    // If error other than 403, just print a generic message
+                    $(".dz-error-message span", file.previewElement).html(
+                        _t("The file transfer failed")
+                    );
+                }
+            });
 
-      $('.upload-all', self.$el).click(function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-        self.processUpload({
-          finished: function() {
-            self.$progress.attr('aria-valuenow', 0).css('width', '0%');
-          }
-        });
-      });
-      if(self.options.clipboardfile){
-        self.dropzone.addFile(self.options.clipboardfile);
-      }
-    },
+            self.dropzone.on("totaluploadprogress", function (pct) {
+                // need to caclulate total pct here in reality since we're manually
+                // processing each file one at a time.
+                pct =
+                    (((self.currentFile - 1) * 100 + pct) /
+                        (self.dropzone.files.length * 100)) *
+                    100;
+                self.$progress
+                    .attr("aria-valuenow", pct)
+                    .css("width", pct + "%");
+            });
 
-    showHideControls: function(){
-      /* we do this delayed because this can be called multiple times
+            $(".upload-all", self.$el).click(function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                self.processUpload({
+                    finished: function () {
+                        self.$progress
+                            .attr("aria-valuenow", 0)
+                            .css("width", "0%");
+                    },
+                });
+            });
+            if (self.options.clipboardfile) {
+                self.dropzone.addFile(self.options.clipboardfile);
+            }
+        },
+
+        showHideControls: function () {
+            /* we do this delayed because this can be called multiple times
          AND we need to do this hide/show AFTER dropzone is done with
          all it's own events. This is NASTY but the only way we can
          enforce some numFiles with dropzone! */
-      var self = this;
-      if(self._showHideTimeout){
-        clearTimeout(self._showHideTimeout);
-      }
-      self._showHideTimeout = setTimeout(function(){
-        self._showHideControls();
-      }, 50);
-    },
-
-    _showHideControls: function(){
-      var self = this;
-      var $controls = $('.controls', self.$el);
-      var $browse = $('.browse-select', self.$el);
-      var $input = $('.dz-hidden-input');
-
-      if(self.options.maxFiles){
-        if(self.dropzone.files.length < self.options.maxFiles){
-          $browse.show();
-          $input.prop('disabled', false);
-        }else{
-          $browse.hide();
-          $input.prop('disabled', true);
-        }
-      }
-      if(self.dropzone.files.length > 0){
-        $controls.fadeIn('slow');
-        var file = self.dropzone.files[0];
-        $('.dz-error-message span', file.previewElement).html('');
-      }else{
-        $controls.fadeOut('slow');
-      }
-    },
-
-    pathJoin: function() {
-      var parts = [];
-      _.each(arguments, function(part) {
-        if (!part){
-          return;
-        }
-        if (part[0] === '/'){
-          part = part.substring(1);
-        }
-        if (part[part.length - 1] === '/'){
-          part = part.substring(0, part.length - 1);
-        }
-        parts.push(part);
-      });
-      return parts.join('/');
-    },
-
-    getUrl: function() {
-
-      var self = this;
-      var url = self.options.url;
-      if (!url) {
-        if (self.options.baseUrl && self.options.relativePath){
-          url = self.options.baseUrl;
-          if (url[url.length - 1] !== '/'){
-            url = url + '/';
-          }
-          url = url + self.pathJoin(self.currentPath, self.options.relativePath);
-        } else {
-          var $form = self.$el.parents('form');
-          if ($form.length > 0){
-            url = $form.attr('action');
-          } else {
-            url = window.location.href;
-          }
-        }
-      }
-      return url;
-    },
-
-    getDzoneOptions: function() {
-      var self = this;
-
-      // This pattern REQUIRE dropzone to be clickable
-      self.options.clickable = true;
-
-      var options = $.extend({}, self.options);
-      options.url = self.getUrl();
-
-      options.headers = {
-        'X-CSRF-TOKEN': utils.getAuthenticator()
-      };
-
-      // XXX force to only upload one to the server at a time,
-      // right now we don't support multiple for backends
-      options.uploadMultiple = false;
-
-      delete options.wrap;
-      delete options.wrapperTemplate;
-      delete options.resultTemplate;
-      delete options.autoCleanResults;
-      delete options.fileaddedClassName;
-      delete options.useTus;
-
-      if (self.options.previewsContainer) {
-        /*
-         * if they have a select but it's not an id, let's make an id selector
-         * so we can target the correct container. dropzone is weird here...
-         */
-        var $preview = self.$el.find(self.options.previewsContainer);
-        if ($preview.length > 0) {
-          options.previewsContainer = $preview[0];
-        }
-      }
-
-      // XXX: do we need to allow this?
-      options.autoProcessQueue = false;
-      // options.addRemoveLinks = true;  // we show them in the template
-      options.previewTemplate = PreviewTemplate;
-
-      // if our element is a form we should force some values
-      // https://github.com/enyo/dropzone/wiki/Combine-normal-form-with-Dropzone
-      return options;
-    },
-
-    processUpload: function(options) {
-      if (!options){
-        options = {};
-      }
-
-      var self = this,
-          processing = false,
-          useTus = self.options.useTus,
-          fileaddedClassName = self.options.fileaddedClassName,
-          finished = options.finished;
-
-      self.currentFile = 0;
-
-      function process() {
-        processing = true;
-        if (self.dropzone.files.length === 0) {
-          processing = false;
-        }
-
-        var file = self.dropzone.files[0];
-        if (processing && file.status === Dropzone.ERROR){
-          // Put the file back as "queued" for retrying
-          file.status = Dropzone.QUEUED;
-          processing = false;
-        }
-
-        if (!processing){
-          self.$el.removeClass(fileaddedClassName);
-          if (finished !== undefined && typeof(finished) === 'function'){
-            finished();
-          }
-          return;
-        }
-
-        if ([Dropzone.SUCCESS, Dropzone.CANCELED]
-            .indexOf(file.status) !== -1) {
-          // remove it
-          self.dropzone.removeFile(file);
-          process();
-        } else if (file.status !== Dropzone.UPLOADING) {
-          // start processing file
-          if (useTus && window.tus) {
-            // use tus upload if installed
-            self.handleTusUpload(file);
-          } else {
-            // otherwise, just use dropzone to process
-            self.currentFile += 1;
-            self.dropzone.processFile(file);
-          }
-          setTimeout(process, 100);
-        } else {
-          // currently processing
-          setTimeout(process, 100);
-        }
-      }
-      process();
-    },
-
-    handleTusUpload: function(file) {
-      /* this needs fixing... */
-      var self = this,
-          $preview = $(file.previewElement),
-          chunkSize = 1024 * 1024 * 5; // 5mb chunk size
-
-      file.status = Dropzone.UPLOADING;
-
-      window.tus.upload(file, {
-        endpoint: self.dropzone.options.url,
-        headers: {
-          'FILENAME': file.name,
-          'X-CSRF-TOKEN': utils.getAuthenticator()
+            var self = this;
+            if (self._showHideTimeout) {
+                clearTimeout(self._showHideTimeout);
+            }
+            self._showHideTimeout = setTimeout(function () {
+                self._showHideControls();
+            }, 50);
         },
-        chunkSize: chunkSize
-      }).fail(function() {
-        if(window.DEBUG){
-          console.alert(_t('Error uploading with TUS resumable uploads'));
-        }
-        file.status = Dropzone.ERROR;
-      }).progress(function(e, bytesUploaded, bytesTotal) {
-        var percentage = (bytesUploaded / bytesTotal * 100);
-        self.$progress.attr('aria-valuenow', percentage).css('width', percentage + '%');
-        self.$progress.html(_t('uploading...') + '<br />' +
+
+        _showHideControls: function () {
+            var self = this;
+            var $controls = $(".controls", self.$el);
+            var $browse = $(".browse-select", self.$el);
+            var $input = $(".dz-hidden-input");
+
+            if (self.options.maxFiles) {
+                if (self.dropzone.files.length < self.options.maxFiles) {
+                    $browse.show();
+                    $input.prop("disabled", false);
+                } else {
+                    $browse.hide();
+                    $input.prop("disabled", true);
+                }
+            }
+            if (self.dropzone.files.length > 0) {
+                $controls.fadeIn("slow");
+                var file = self.dropzone.files[0];
+                $(".dz-error-message span", file.previewElement).html("");
+            } else {
+                $controls.fadeOut("slow");
+            }
+        },
+
+        pathJoin: function () {
+            var parts = [];
+            _.each(arguments, function (part) {
+                if (!part) {
+                    return;
+                }
+                if (part[0] === "/") {
+                    part = part.substring(1);
+                }
+                if (part[part.length - 1] === "/") {
+                    part = part.substring(0, part.length - 1);
+                }
+                parts.push(part);
+            });
+            return parts.join("/");
+        },
+
+        getUrl: function () {
+            var self = this;
+            var url = self.options.url;
+            if (!url) {
+                if (self.options.baseUrl && self.options.relativePath) {
+                    url = self.options.baseUrl;
+                    if (url[url.length - 1] !== "/") {
+                        url = url + "/";
+                    }
+                    url =
+                        url +
+                        self.pathJoin(
+                            self.currentPath,
+                            self.options.relativePath
+                        );
+                } else {
+                    var $form = self.$el.parents("form");
+                    if ($form.length > 0) {
+                        url = $form.attr("action");
+                    } else {
+                        url = window.location.href;
+                    }
+                }
+            }
+            return url;
+        },
+
+        getDzoneOptions: function () {
+            var self = this;
+
+            // This pattern REQUIRE dropzone to be clickable
+            self.options.clickable = true;
+
+            var options = $.extend({}, self.options);
+            options.url = self.getUrl();
+
+            options.headers = {
+                "X-CSRF-TOKEN": utils.getAuthenticator(),
+            };
+
+            // XXX force to only upload one to the server at a time,
+            // right now we don't support multiple for backends
+            options.uploadMultiple = false;
+
+            delete options.wrap;
+            delete options.wrapperTemplate;
+            delete options.resultTemplate;
+            delete options.autoCleanResults;
+            delete options.fileaddedClassName;
+            delete options.useTus;
+
+            if (self.options.previewsContainer) {
+                /*
+                 * if they have a select but it's not an id, let's make an id selector
+                 * so we can target the correct container. dropzone is weird here...
+                 */
+                var $preview = self.$el.find(self.options.previewsContainer);
+                if ($preview.length > 0) {
+                    options.previewsContainer = $preview[0];
+                }
+            }
+
+            // XXX: do we need to allow this?
+            options.autoProcessQueue = false;
+            // options.addRemoveLinks = true;  // we show them in the template
+            options.previewTemplate = PreviewTemplate;
+
+            // if our element is a form we should force some values
+            // https://github.com/enyo/dropzone/wiki/Combine-normal-form-with-Dropzone
+            return options;
+        },
+
+        processUpload: function (options) {
+            if (!options) {
+                options = {};
+            }
+
+            var self = this,
+                processing = false,
+                useTus = self.options.useTus,
+                fileaddedClassName = self.options.fileaddedClassName,
+                finished = options.finished;
+
+            self.currentFile = 0;
+
+            function process() {
+                processing = true;
+                if (self.dropzone.files.length === 0) {
+                    processing = false;
+                }
+
+                var file = self.dropzone.files[0];
+                if (processing && file.status === Dropzone.ERROR) {
+                    // Put the file back as "queued" for retrying
+                    file.status = Dropzone.QUEUED;
+                    processing = false;
+                }
+
+                if (!processing) {
+                    self.$el.removeClass(fileaddedClassName);
+                    if (
+                        finished !== undefined &&
+                        typeof finished === "function"
+                    ) {
+                        finished();
+                    }
+                    return;
+                }
+
+                if (
+                    [Dropzone.SUCCESS, Dropzone.CANCELED].indexOf(
+                        file.status
+                    ) !== -1
+                ) {
+                    // remove it
+                    self.dropzone.removeFile(file);
+                    process();
+                } else if (file.status !== Dropzone.UPLOADING) {
+                    // start processing file
+                    if (useTus && window.tus) {
+                        // use tus upload if installed
+                        self.handleTusUpload(file);
+                    } else {
+                        // otherwise, just use dropzone to process
+                        self.currentFile += 1;
+                        self.dropzone.processFile(file);
+                    }
+                    setTimeout(process, 100);
+                } else {
+                    // currently processing
+                    setTimeout(process, 100);
+                }
+            }
+            process();
+        },
+
+        handleTusUpload: function (file) {
+            /* this needs fixing... */
+            var self = this,
+                $preview = $(file.previewElement),
+                chunkSize = 1024 * 1024 * 5; // 5mb chunk size
+
+            file.status = Dropzone.UPLOADING;
+
+            window.tus
+                .upload(file, {
+                    endpoint: self.dropzone.options.url,
+                    headers: {
+                        "FILENAME": file.name,
+                        "X-CSRF-TOKEN": utils.getAuthenticator(),
+                    },
+                    chunkSize: chunkSize,
+                })
+                .fail(function () {
+                    if (window.DEBUG) {
+                        console.alert(
+                            _t("Error uploading with TUS resumable uploads")
+                        );
+                    }
+                    file.status = Dropzone.ERROR;
+                })
+                .progress(function (e, bytesUploaded, bytesTotal) {
+                    var percentage = (bytesUploaded / bytesTotal) * 100;
+                    self.$progress
+                        .attr("aria-valuenow", percentage)
+                        .css("width", percentage + "%");
+                    self.$progress.html(
+                        _t("uploading...") +
+                            "<br />" +
                             self.formatBytes(bytesUploaded) +
-                            ' / ' + self.formatBytes(bytesTotal));
-      }).done(function(url, file) {
-        file.status = Dropzone.SUCCESS;
-        self.dropzone.emit('success', file);
-        self.dropzone.emit('complete', file);
-      });
-    },
+                            " / " +
+                            self.formatBytes(bytesTotal)
+                    );
+                })
+                .done(function (url, file) {
+                    file.status = Dropzone.SUCCESS;
+                    self.dropzone.emit("success", file);
+                    self.dropzone.emit("complete", file);
+                });
+        },
 
-    formatBytes: function(bytes) {
-      var kb = Math.round(bytes / 1024);
-      if (kb < 1024) {
-        return kb + ' KiB';
-      }
-      var mb = Math.round(kb / 1024);
-      if (mb < 1024) {
-        return mb + ' MB';
-      }
-      return Math.round(mb / 1024) + ' GB';
-    },
+        formatBytes: function (bytes) {
+            var kb = Math.round(bytes / 1024);
+            if (kb < 1024) {
+                return kb + " KiB";
+            }
+            var mb = Math.round(kb / 1024);
+            if (mb < 1024) {
+                return mb + " MB";
+            }
+            return Math.round(mb / 1024) + " GB";
+        },
 
-    setPath: function(path){
-      var self = this;
-      self.currentPath = path;
-      self.options.url = null;
-      self.options.url = self.dropzone.options.url = self.getUrl();
-    },
+        setPath: function (path) {
+            var self = this;
+            self.currentPath = path;
+            self.options.url = null;
+            self.options.url = self.dropzone.options.url = self.getUrl();
+        },
 
-    setupRelatedItems: function($input) {
-      var self = this;
-      var options = self.options.relatedItems;
-      options.upload = false;  // ensure that related items upload is off.
-      if (self.options.initialFolder){
-        $input.attr('value', self.options.initialFolder);
-      }
-      var ri = new RelatedItems($input, options);
-      ri.$el.on('change', function() {
-        var result = $(this).select2('data');
-        var path = null;
-        if (result.length > 0){
-          path = result[0].path;
-        }
-        self.setPath(path);
-      });
-      return ri;
-    }
+        setupRelatedItems: function ($input) {
+            var self = this;
+            var options = self.options.relatedItems;
+            options.upload = false; // ensure that related items upload is off.
+            if (self.options.initialFolder) {
+                $input.attr("value", self.options.initialFolder);
+            }
+            var ri = new RelatedItems($input, options);
+            ri.$el.on("change", function () {
+                var result = $(this).select2("data");
+                var path = null;
+                if (result.length > 0) {
+                    path = result[0].path;
+                }
+                self.setPath(path);
+            });
+            return ri;
+        },
+    });
 
-  });
-
-  return UploadPattern;
-
+    return UploadPattern;
 });
 
 define('mockup-patterns-filemanager-url/js/upload',[
-  'underscore',
-  'mockup-patterns-filemanager-url/js/basepopover',
-  'mockup-patterns-upload'
-], function(_, PopoverView, Upload) {
-  'use strict';
+    "underscore",
+    "mockup-patterns-filemanager-url/js/basepopover",
+    "mockup-patterns-upload",
+], function (_, PopoverView, Upload) {
+    "use strict";
 
-  var UploadView = PopoverView.extend({
-    className: 'popover upload',
-    title: _.template('<%= _t("Upload") %>'),
-    content: _.template(
-      '<span>Location: <span class="current-path"></span></span>' +
-      '<input type="text" name="upload" style="display:none" />' +
-      '<div class="uploadify-me"></div>'),
-    render: function() {
-      var self = this;
-      PopoverView.prototype.render.call(this);
-      self.upload = new Upload(self.$('.uploadify-me').addClass('pat-upload'), {
-        url: self.app.options.uploadUrl,
-        success: function(response) {
-          if (self.callback) {
-            if (response.status == 'success') {
-              self.callback.apply(self.app, [response]);
-            } else {
-              alert('There was a problem during the upload process');
+    var UploadView = PopoverView.extend({
+        className: "popover upload",
+        title: _.template('<%= _t("Upload") %>'),
+        content: _.template(
+            '<span>Location: <span class="current-path"></span></span>' +
+                '<input type="text" name="upload" style="display:none" />' +
+                '<div class="uploadify-me"></div>'
+        ),
+        render: function () {
+            var self = this;
+            PopoverView.prototype.render.call(this);
+            self.upload = new Upload(
+                self.$(".uploadify-me").addClass("pat-upload"),
+                {
+                    url: self.app.options.uploadUrl,
+                    success: function (response) {
+                        if (self.callback) {
+                            if (response.status == "success") {
+                                self.callback.apply(self.app, [response]);
+                            } else {
+                                alert(
+                                    "There was a problem during the upload process"
+                                );
+                            }
+                        }
+                    },
+                }
+            );
+            return this;
+        },
+        toggle: function (button, e) {
+            /* we need to be able to change the current default upload directory */
+            PopoverView.prototype.toggle.apply(this, [button, e]);
+            if (!this.opened) {
+                return;
             }
-          }
-        }
-      });
-      return this;
-    },
-    toggle: function(button, e) {
-      /* we need to be able to change the current default upload directory */
-      PopoverView.prototype.toggle.apply(this, [button, e]);
-      if (!this.opened) {
-        return;
-      }
-    }
+        },
+    });
 
-  });
-
-  return UploadView;
+    return UploadView;
 });
 
 /* Filemanager pattern.
@@ -35754,1458 +35611,1560 @@ define('mockup-patterns-filemanager-url/js/upload',[
  */
 
 define('mockup-patterns-filemanager',[
-  'jquery',
-  'pat-base',
-  'underscore',
-  'jqtree-contextmenu',
-  'mockup-patterns-tree',
-  'mockup-patterns-texteditor',
-  'text!mockup-patterns-filemanager-url/templates/app.xml',
-  'mockup-ui-url/views/toolbar',
-  'mockup-ui-url/views/button',
-  'mockup-ui-url/views/buttongroup',
-  'mockup-ui-url/views/anchor',
-  'mockup-ui-url/views/dropdown',
-  'mockup-patterns-filemanager-url/js/addnew',
-  'mockup-patterns-filemanager-url/js/newfolder',
-  'mockup-patterns-filemanager-url/js/findfile',
-  'mockup-patterns-filemanager-url/js/findinfiles',
-  'mockup-patterns-filemanager-url/js/delete',
-  'mockup-patterns-filemanager-url/js/customize',
-  'mockup-patterns-filemanager-url/js/rename',
-  'mockup-patterns-filemanager-url/js/upload',
-  'translate',
-  'mockup-utils',
-  'text!mockup-ui-url/templates/popover.xml',
-  'text!mockup-ui-url/templates/dropdown.xml'
-], function($, Base, _, ContextMenu, Tree, TextEditor, AppTemplate, Toolbar,
-  ButtonView, ButtonGroup, AnchorView, DropdownView,
-  AddNewView, NewFolderView, FindFileView, FindInFilesView, DeleteView,
-  CustomizeView, RenameView, UploadView, _t, utils) {
-  'use strict';
+    "jquery",
+    "pat-base",
+    "underscore",
+    "jqtree-contextmenu",
+    "mockup-patterns-tree",
+    "mockup-patterns-texteditor",
+    "text!mockup-patterns-filemanager-url/templates/app.xml",
+    "mockup-ui-url/views/toolbar",
+    "mockup-ui-url/views/button",
+    "mockup-ui-url/views/buttongroup",
+    "mockup-ui-url/views/anchor",
+    "mockup-ui-url/views/dropdown",
+    "mockup-patterns-filemanager-url/js/addnew",
+    "mockup-patterns-filemanager-url/js/newfolder",
+    "mockup-patterns-filemanager-url/js/findfile",
+    "mockup-patterns-filemanager-url/js/findinfiles",
+    "mockup-patterns-filemanager-url/js/delete",
+    "mockup-patterns-filemanager-url/js/customize",
+    "mockup-patterns-filemanager-url/js/rename",
+    "mockup-patterns-filemanager-url/js/upload",
+    "translate",
+    "mockup-utils",
+    "text!mockup-ui-url/templates/popover.xml",
+    "text!mockup-ui-url/templates/dropdown.xml",
+], function (
+    $,
+    Base,
+    _,
+    ContextMenu,
+    Tree,
+    TextEditor,
+    AppTemplate,
+    Toolbar,
+    ButtonView,
+    ButtonGroup,
+    AnchorView,
+    DropdownView,
+    AddNewView,
+    NewFolderView,
+    FindFileView,
+    FindInFilesView,
+    DeleteView,
+    CustomizeView,
+    RenameView,
+    UploadView,
+    _t,
+    utils
+) {
+    "use strict";
 
-  var FileManager = Base.extend({
-    name: 'filemanager',
-    trigger: '.pat-filemanager',
-    parser: 'mockup',
-    template: _.template(AppTemplate),
-    tabItemTemplate: _.template(
-      '<li class="active" data-path="<%= path %>">' +
-        '<a href="#" class="select"><%= path %></a>' +
-        '<a href="#" class="remove">' +
-          '<span class="glyphicon glyphicon-remove-circle"></span>' +
-        '</a>' +
-      '</li>'),
-    saveBtn: null,
-    uploadFolder: '',
-    fileData: {},
-    /* mapping of files to data that it describes */
-    defaults: {
-      aceConfig: {},
-      actionUrl: null,
-      uploadUrl: null,
-      resourceSearchUrl: null,
-      treeConfig: {
-        autoOpen: true
-      }
-    },
-    init: function() {
-      var self = this;
-
-      if (self.options.actionUrl === null) {
-        self.$el.html('Must specify actionUrl setting for pattern');
-        return;
-      }
-
-      self.options.treeConfig = $.extend(true, {}, self.treeConfig, {
-        dataUrl: self.options.actionUrl + '?action=dataTree',
-        dragAndDrop: true,
-        useContextMenu: true,
-        onCanMoveTo: function(moved, target, position) {
-          /* if not using folder option, just allow, otherwise, only allow if folder */
-          if (position === "inside") {
-            return target.folder === undefined || target.folder === true;
-          }
-          return true;
+    var FileManager = Base.extend({
+        name: "filemanager",
+        trigger: ".pat-filemanager",
+        parser: "mockup",
+        template: _.template(AppTemplate),
+        tabItemTemplate: _.template(
+            '<li class="active" data-path="<%= path %>">' +
+                '<a href="#" class="select"><%= path %></a>' +
+                '<a href="#" class="remove">' +
+                '<span class="glyphicon glyphicon-remove-circle"></span>' +
+                "</a>" +
+                "</li>"
+        ),
+        saveBtn: null,
+        uploadFolder: "",
+        fileData: {},
+        /* mapping of files to data that it describes */
+        defaults: {
+            aceConfig: {},
+            actionUrl: null,
+            uploadUrl: null,
+            resourceSearchUrl: null,
+            treeConfig: {
+                autoOpen: true,
+            },
         },
-        onCreateLi: function(node, li) {
-          var imageTypes = ['png', 'jpg', 'jpeg', 'gif', 'ico'];
-          var themeTypes = ['css', 'html', 'htm', 'txt', 'xml', 'js', 'cfg', 'less'];
-          $('span', li).addClass('glyphicon');
-          if (node.folder) {
-            $('span', li).addClass('glyphicon-folder-close').addClass("droptarget");
-          } else if ($.inArray(node.fileType, imageTypes) >= 0) {
-            $('span', li).addClass('glyphicon-picture');
-          } else if ($.inArray(node.fileType, themeTypes) >= 0) {
-            $('span', li).addClass('glyphicon-file');
-          } else {
-            $('span', li).addClass('glyphicon-cog');
-          }
-        }
-      });
+        init: function () {
+            var self = this;
 
-      self.fileData = {};
+            if (self.options.actionUrl === null) {
+                self.$el.html("Must specify actionUrl setting for pattern");
+                return;
+            }
 
-      self.saveBtn = new ButtonView({
-        id: 'save',
-        title: _t('Save'),
-        icon: 'floppy-disk',
-        context: 'primary',
-        shortcut: 'Ctrl-S'
-      });
-      self.btns = {
-        "newfolder": new AnchorView({
-          id: 'newfolder',
-          title: _t('New folder'),
-          tooltip: _t('Add new folder to current directory'),
-          icon: 'folder-open',
-          context: 'default',
-          shortcut: 'Alt-Shift-N'
-        }),
-        "newfile": new AnchorView({
-          id: 'addnew',
-          title: _t('New file'),
-          tooltip: _t('Add new file to current folder'),
-          icon: 'file',
-          context: 'default',
-          shortcut: 'Alt-N'
-        }),
-        "findfile": new AnchorView({
-          id: 'findfile',
-          title: _t('Find File'),
-          tooltip: _t('Find theme resource in plone'),
-          icon: 'search',
-          context: 'default',
-          shortcut: 'Ctrl-F'
-        }),
-        "findtextinfile": new AnchorView({
-          id: 'findinfiles',
-          title: _t('Find in Files'),
-          tooltip: _t('Find text within theme resource in plone'),
-          icon: 'search',
-          context: 'default',
-          shortcut: 'Ctrl-E'
-        }),
-        "rename": new AnchorView({
-          id: 'rename',
-          title: _t('Rename'),
-          tooltip: _t('Rename currently selected resource'),
-          icon: 'random',
-          context: 'default'
-        }),
-        "delete": new AnchorView({
-          id: 'delete',
-          title: _t('Delete'),
-          tooltip: _t('Delete currently selected resource'),
-          icon: 'trash',
-          context: 'danger'
-        }),
-      };
-
-      var newFolderView = new NewFolderView({
-        triggerView: self.btns["newfolder"],
-        app: self
-      });
-      var addNewView = new AddNewView({
-        triggerView: self.btns["newfile"],
-        app: self
-      });
-      var findFileView = new FindFileView({
-        triggerView: self.btns["findfile"],
-        app: self
-      });
-      var findinFilesView = new FindInFilesView({
-        triggerView: self.btns["findtextinfile"],
-        app: self
-      });
-      var renameView = new RenameView({
-        triggerView: self.btns["rename"],
-        app: self
-      });
-      var deleteView = new DeleteView({
-        triggerView: self.btns["delete"],
-        app: self
-      });
-
-      var file_menu = new DropdownView({
-        title: _t('File'),
-        items: [
-          addNewView.triggerView,
-          newFolderView.triggerView
-        ],
-        id: 'file_menu',
-        app: self,
-        icon: 'file',
-        disable: function() {}
-      });
-
-      var edit_menu = new DropdownView({
-        title: _t('Edit'),
-        items: [
-          renameView.triggerView,
-          deleteView.triggerView
-        ],
-        id: 'edit_menu',
-        app: self,
-        icon: 'file',
-        disable: function() {}
-      });
-
-      var find_menu = new DropdownView({
-        title: _t('Find'),
-        items: [
-          findFileView.triggerView,
-          findinFilesView.triggerView
-        ],
-        id: 'find_menu',
-        icon: 'search',
-        app: self,
-        disable: function() {}
-      });
-
-      var views = {
-        "file_menu": [
-          newFolderView,
-          addNewView
-        ],
-        "edit_menu": [
-          renameView,
-          deleteView,
-        ],
-        "find_menu": [
-          findFileView,
-          findinFilesView
-        ],
-      };
-      var mainButtons = [
-        self.saveBtn,
-        file_menu,
-        edit_menu,
-        find_menu,
-      ];
-
-      if (self.options.uploadUrl && utils.featureSupport.dragAndDrop() && utils.featureSupport.fileApi()) {
-        self.btns["upload"] = new AnchorView({
-            id: 'upload',
-            title: _t('Upload Local Files...'),
-            tooltip: _t('Upload file to current directory'),
-            icon: 'upload',
-            context: 'default'
-        });
-        var uploadView = new UploadView({
-          triggerView: self.btns["upload"],
-          app: self,
-          callback: function(data) {
-            var path = self.uploadFolder + '/' + data.name;
-            self.refreshTree(function() {
-              self.selectItem(path);
-              self.getUpload().toggle();
+            self.options.treeConfig = $.extend(true, {}, self.treeConfig, {
+                dataUrl: self.options.actionUrl + "?action=dataTree",
+                dragAndDrop: true,
+                useContextMenu: true,
+                onCanMoveTo: function (moved, target, position) {
+                    /* if not using folder option, just allow, otherwise, only allow if folder */
+                    if (position === "inside") {
+                        return (
+                            target.folder === undefined ||
+                            target.folder === true
+                        );
+                    }
+                    return true;
+                },
+                onCreateLi: function (node, li) {
+                    var imageTypes = ["png", "jpg", "jpeg", "gif", "ico"];
+                    var themeTypes = [
+                        "css",
+                        "html",
+                        "htm",
+                        "txt",
+                        "xml",
+                        "js",
+                        "cfg",
+                        "less",
+                    ];
+                    $("span", li).addClass("glyphicon");
+                    if (node.folder) {
+                        $("span", li)
+                            .addClass("glyphicon-folder-close")
+                            .addClass("droptarget");
+                    } else if ($.inArray(node.fileType, imageTypes) >= 0) {
+                        $("span", li).addClass("glyphicon-picture");
+                    } else if ($.inArray(node.fileType, themeTypes) >= 0) {
+                        $("span", li).addClass("glyphicon-file");
+                    } else {
+                        $("span", li).addClass("glyphicon-cog");
+                    }
+                },
             });
 
-          }
-        });
+            self.fileData = {};
 
-        views.file_menu.push(uploadView);
-        file_menu.items.push(uploadView.triggerView);
-      }
-      if (self.options.resourceSearchUrl) {
-        self.btns["customize"] = new AnchorView({
-          id: 'customize',
-          title: _t('Add new override'),
-          tooltip: _t('Find resource in plone to override'),
-          context: 'default'
-        });
-        var customizeView = new CustomizeView({
-          triggerView: self.btns["customize"],
-          app: self
-        });
-        views["edit_menu"].push(customizeView);
-        edit_menu.items.push(customizeView.triggerView);
-      }
-      self.views = [];
-      self.views = self.views.concat(views.file_menu).concat(views.edit_menu).concat(views.find_menu);
-
-      self.toolbar = new Toolbar({
-        items: [
-          new ButtonGroup({
-            items: mainButtons,
-            id: 'main',
-            app: self
-          })
-        ]
-      });
-
-      self._save = function() {
-
-        var path = $('.active', self.$tabs).data('path');
-        if (path === undefined || path === false) {
-          alert('No file selected.');
-          return;
-        }
-        self.doAction('saveFile', {
-          type: 'POST',
-          data: {
-            path: path,
-            data: self.ace.editor.getValue(),
-            _authenticator: utils.getAuthenticator()
-          },
-          success: function(data) {
-            if (data['error'] !== undefined) {
-              alert('There was a problem saving the file.');
-            }
-            $('[data-path="' + path + '"]').removeClass('modified');
-          }
-        });
-      };
-
-      self.saveBtn.on('button:click', function() {
-        self._save();
-      });
-      self.render();
-      self.shortcuts();
-
-    },
-
-    shortcuts: function(){
-
-      this.$el[0].addEventListener('keyup', function (e) {
-        // "Alt+N"
-        if (e.altKey && e.keyCode === 78) {
-          this.btns.newfile.$el.click();
-        }
-      }.bind(this));
-
-      this.$el[0].addEventListener('keyup', function (e) {
-        // "Alt+Shift+N"
-        if (e.altKey && e.shiftKey && e.keyCode === 78) {
-          this.btns.newfolder.$el.click();
-        }
-      }.bind(this));
-
-      this.$el[0].addEventListener('keyup', function (e) {
-        // "Ctrl+S"
-        if (e.ctrlKey && e.keyCode === 83) {
-          this.saveBtn.$el.click();
-        }
-      }.bind(this));
-
-      this.$el[0].addEventListener('keyup', function (e) {
-        // "Ctrl+F"
-        if (e.ctrlKey && e.keyCode === 70) {
-          this.btns.findfile.$el.click();
-        }
-      }.bind(this));
-
-      this.$el[0].addEventListener('keyup', function (e) {
-        // "Ctrl+E
-        if (e.ctrlKey && e.keyCode === 69) {
-          this.btns.findtextinfile.$el.click();
-        }
-      }.bind(this));
-
-    },
-
-    $: function(selector) {
-      return this.$el.find(selector);
-    },
-    refreshTree: function(callback) {
-      var self = this;
-      if (callback === undefined) {
-        callback = function() {};
-      }
-      self.$tree.tree('loadDataFromUrl',
-        self.options.actionUrl + '?action=dataTree',
-        null,
-        callback
-      );
-    },
-    render: function() {
-      var self = this;
-      self.$el.html(self.template(self.options));
-      self.$('#toolbar').append(self.toolbar.render().el);
-      _.each(self.views, function(view) {
-        self.$('#toolbar').append(view.render().el);
-      });
-      self.$tree = self.$('.tree');
-      self.$nav = self.$('nav');
-      self.$tabs = $('ul.nav', self.$nav);
-      self.tree = new Tree(self.$tree, self.options.treeConfig);
-      self.$editor = self.$('.editor');
-
-      /* close popovers when clicking away */
-      $(document).click(function(e) {
-        var $el = $(e.target);
-        if (!$el.is(':visible')) {
-          // ignore this, fake event trigger to element that is not visible
-          return;
-        }
-        if ($el.is('a') || $el.parent().is('a')) {
-          return;
-        }
-        var $popover = $('.popover:visible');
-        if ($popover.length > 0 && !$.contains($popover[0], $el[0])) {
-          var popover = $popover.data('component');
-          if (popover) {
-            popover.hide();
-          }
-        }
-      });
-
-      // bind 'tree.contextmenu' event
-      self.$tree.jqTreeContextMenu({
-          menu: '#contextual-menu',
-          onContextMenuItem: function(e, node, $el) {
-            var action = $el.data("item");
-            try {
-              self.btns[action].el.click();
-            } catch($err) {
-              console.log("Command does not exist: " + action);
-            }
-          }
-      });
-
-      self.$tree.bind('tree.select', function(e) {
-        if (e.node === null) {
-          self.toggleButtons(false);
-        } else {
-          self.toggleButtons(true);
-          self.handleClick(e);
-        }
-      });
-
-      self.$tree.bind('tree.move', function(event) {
-
-        var target_node = event.move_info.target_node;
-        var srcpath = event.move_info.moved_node.path;
-        var newpath = target_node.path;
-        if (event.move_info.position !== "inside" ){
-          newpath = newpath.substring(newpath.indexOf('/'), newpath.lastIndexOf('/'));
-        }
-
-        self.doAction('move', {
-          data: {
-            source: srcpath,
-            destination: newpath
-          },
-          dataType: 'json',
-          success: function(data) {
-            self.$tree.tree('reload', function() {
-              self.$tree.tree('selectNode', target_node);
+            self.saveBtn = new ButtonView({
+                id: "save",
+                title: _t("Save"),
+                icon: "floppy-disk",
+                context: "primary",
+                shortcut: "Ctrl-S",
             });
-            var jdata = JSON.parse(data);
-            if(jdata.error != ''){
-              alert(jdata.error);
+            self.btns = {
+                newfolder: new AnchorView({
+                    id: "newfolder",
+                    title: _t("New folder"),
+                    tooltip: _t("Add new folder to current directory"),
+                    icon: "folder-open",
+                    context: "default",
+                    shortcut: "Alt-Shift-N",
+                }),
+                newfile: new AnchorView({
+                    id: "addnew",
+                    title: _t("New file"),
+                    tooltip: _t("Add new file to current folder"),
+                    icon: "file",
+                    context: "default",
+                    shortcut: "Alt-N",
+                }),
+                findfile: new AnchorView({
+                    id: "findfile",
+                    title: _t("Find File"),
+                    tooltip: _t("Find theme resource in plone"),
+                    icon: "search",
+                    context: "default",
+                    shortcut: "Ctrl-F",
+                }),
+                findtextinfile: new AnchorView({
+                    id: "findinfiles",
+                    title: _t("Find in Files"),
+                    tooltip: _t("Find text within theme resource in plone"),
+                    icon: "search",
+                    context: "default",
+                    shortcut: "Ctrl-E",
+                }),
+                rename: new AnchorView({
+                    id: "rename",
+                    title: _t("Rename"),
+                    tooltip: _t("Rename currently selected resource"),
+                    icon: "random",
+                    context: "default",
+                }),
+                delete: new AnchorView({
+                    id: "delete",
+                    title: _t("Delete"),
+                    tooltip: _t("Delete currently selected resource"),
+                    icon: "trash",
+                    context: "danger",
+                }),
+            };
+
+            var newFolderView = new NewFolderView({
+                triggerView: self.btns["newfolder"],
+                app: self,
+            });
+            var addNewView = new AddNewView({
+                triggerView: self.btns["newfile"],
+                app: self,
+            });
+            var findFileView = new FindFileView({
+                triggerView: self.btns["findfile"],
+                app: self,
+            });
+            var findinFilesView = new FindInFilesView({
+                triggerView: self.btns["findtextinfile"],
+                app: self,
+            });
+            var renameView = new RenameView({
+                triggerView: self.btns["rename"],
+                app: self,
+            });
+            var deleteView = new DeleteView({
+                triggerView: self.btns["delete"],
+                app: self,
+            });
+
+            var file_menu = new DropdownView({
+                title: _t("File"),
+                items: [addNewView.triggerView, newFolderView.triggerView],
+                id: "file_menu",
+                app: self,
+                icon: "file",
+                disable: function () {},
+            });
+
+            var edit_menu = new DropdownView({
+                title: _t("Edit"),
+                items: [renameView.triggerView, deleteView.triggerView],
+                id: "edit_menu",
+                app: self,
+                icon: "file",
+                disable: function () {},
+            });
+
+            var find_menu = new DropdownView({
+                title: _t("Find"),
+                items: [findFileView.triggerView, findinFilesView.triggerView],
+                id: "find_menu",
+                icon: "search",
+                app: self,
+                disable: function () {},
+            });
+
+            var views = {
+                file_menu: [newFolderView, addNewView],
+                edit_menu: [renameView, deleteView],
+                find_menu: [findFileView, findinFilesView],
+            };
+            var mainButtons = [self.saveBtn, file_menu, edit_menu, find_menu];
+
+            if (
+                self.options.uploadUrl &&
+                utils.featureSupport.dragAndDrop() &&
+                utils.featureSupport.fileApi()
+            ) {
+                self.btns["upload"] = new AnchorView({
+                    id: "upload",
+                    title: _t("Upload Local Files..."),
+                    tooltip: _t("Upload file to current directory"),
+                    icon: "upload",
+                    context: "default",
+                });
+                var uploadView = new UploadView({
+                    triggerView: self.btns["upload"],
+                    app: self,
+                    callback: function (data) {
+                        var path = self.uploadFolder + "/" + data.name;
+                        self.refreshTree(function () {
+                            self.selectItem(path);
+                            self.getUpload().toggle();
+                        });
+                    },
+                });
+
+                views.file_menu.push(uploadView);
+                file_menu.items.push(uploadView.triggerView);
             }
-          }
-        });
-      });
+            if (self.options.resourceSearchUrl) {
+                self.btns["customize"] = new AnchorView({
+                    id: "customize",
+                    title: _t("Add new override"),
+                    tooltip: _t("Find resource in plone to override"),
+                    context: "default",
+                });
+                var customizeView = new CustomizeView({
+                    triggerView: self.btns["customize"],
+                    app: self,
+                });
+                views["edit_menu"].push(customizeView);
+                edit_menu.items.push(customizeView.triggerView);
+            }
+            self.views = [];
+            self.views = self.views
+                .concat(views.file_menu)
+                .concat(views.edit_menu)
+                .concat(views.find_menu);
 
-      self.$tree.bind('tree.open', function(e) {
-        var element = $(e.node.element).find(':first').find('.glyphicon');
-        $(element).addClass('glyphicon-folder-open');
-        $(element).removeClass('glyphicon-folder-close');
-      });
+            self.toolbar = new Toolbar({
+                items: [
+                    new ButtonGroup({
+                        items: mainButtons,
+                        id: "main",
+                        app: self,
+                    }),
+                ],
+            });
 
-      self.$tree.bind('tree.close', function(e) {
-        var element = $(e.node.element).find(':first').find('.glyphicon');
-        $(element).addClass('glyphicon-folder-close');
-        $(element).removeClass('glyphicon-folder-open');
-      });
+            self._save = function () {
+                var path = $(".active", self.$tabs).data("path");
+                if (path === undefined || path === false) {
+                    alert("No file selected.");
+                    return;
+                }
+                self.doAction("saveFile", {
+                    type: "POST",
+                    data: {
+                        path: path,
+                        data: self.ace.editor.getValue(),
+                        _authenticator: utils.getAuthenticator(),
+                    },
+                    success: function (data) {
+                        if (data["error"] !== undefined) {
+                            alert("There was a problem saving the file.");
+                        }
+                        $('[data-path="' + path + '"]').removeClass("modified");
+                    },
+                });
+            };
 
-      self.$tree.bind('tree.init', function(e) {
-        var node = self.$tree.tree('getTree').children[0];
-        if (node) {
-          self.$tree.tree('selectNode', node);
-        }
-      });
+            self.saveBtn.on("button:click", function () {
+                self._save();
+            });
+            self.render();
+            self.shortcuts();
+        },
 
-      $(self.$tabs).on('click', function(e) {
-        var path = $(e.target).data('path');
-        if (path === undefined) {
-          path = $(e.target.parentElement).data('path');
-          if (path === undefined) {
-            return false;
-          }
-        }
-        self.selectItem(path);
-      });
-      $(window).on('resize', function() {
-        self.resizeEditor();
-      });
-    },
-    toggleButtons: function(on) {
-      if (on === undefined) {
-        return;
-      }
+        shortcuts: function () {
+            this.$el[0].addEventListener(
+                "keyup",
+                function (e) {
+                    // "Alt+N"
+                    if (e.altKey && e.keyCode === 78) {
+                        this.btns.newfile.$el.click();
+                    }
+                }.bind(this)
+            );
 
-      if (on) {
-        $('#btn-delete', this.$el).prop('disabled', false);
-        $('#btn-save', this.$el).prop('disabled', false);
-        $('#btn-rename', this.$el).prop('disabled', false);
-      } else {
-        $('#btn-delete', this.$el).prop('disabled', true);
-        $('#btn-save', this.$el).prop('disabled', true);
-        $('#btn-rename', this.$el).prop('disabled', true);
-      }
-    },
-    handleClick: function(event) {
-      var self = this;
-      self.closeActivePopovers();
-      self.openFile(event);
-    },
-    closeActiveTab: function() {
-      var self = this;
-      var active = self.$tabs.find('.active .remove');
-      var $siblings = $(active).parent().siblings();
-      if ($siblings.length > 0) {
-        var $item;
-        if ($(active).parent().prev().length > 0) {
-          $item = $(active).parent().prev();
-        } else {
-          $item = $(active).parent().next();
-        }
-        $(active).parent().remove();
-        $item.click();
-      } else {
-        $(active).parent().remove();
-        self.toggleButtons(false);
-        self.openEditor();
-      }
-    },
-    closeTab: function(path) {
-      var self = this;
-      if (path === undefined) {
-        return;
-      }
+            this.$el[0].addEventListener(
+                "keyup",
+                function (e) {
+                    // "Alt+Shift+N"
+                    if (e.altKey && e.shiftKey && e.keyCode === 78) {
+                        this.btns.newfolder.$el.click();
+                    }
+                }.bind(this)
+            );
 
-      var tabs = self.$tabs.children();
+            this.$el[0].addEventListener(
+                "keyup",
+                function (e) {
+                    // "Ctrl+S"
+                    if (e.ctrlKey && e.keyCode === 83) {
+                        this.saveBtn.$el.click();
+                    }
+                }.bind(this)
+            );
 
-      $(tabs).each(function() {
-        if ($(this).data('path') == path) {
-          $(this).find('a.remove').trigger('click');
-        }
-      });
-    },
-    closeActivePopovers: function() {
-      var active = $('.navbar a.active');
-      $(active).each(function() {
-        $(this).click();
-      });
-    },
-    createTab: function(path) {
-      var self = this;
-      var $item = $(self.tabItemTemplate({
-        path: path
-      }));
-      self.shrinkTab($item);
-      self.$tabs.append($item);
-      $('.remove', $item).click(function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        self.closeActivePopovers();
-        if ($(this).parent().hasClass('active')) {
-          self.closeActiveTab();
-        } else {
-          $(this).parent().remove();
-        }
-      });
-      $('.select', $item).click(function(e) {
-        e.preventDefault();
-        $('li', self.$tabs).removeClass('active');
-        var $li = $(this).parent();
-        self.closeActivePopovers();
-        $li.addClass('active');
-      });
-    },
-    updateTabs: function(path) {
-      var self = this;
-      if (path === undefined) {
-        return;
-      }
-      $('li', self.$tabs).removeClass('active');
-      var $existing = $('[data-path="' + path + '"]', self.$tabs);
-      if ($existing.length === 0) {
-        self.createTab(path);
-      } else {
-        $existing.addClass('active');
-      }
-    },
-    shrinkTab: function(tab) {
-      var self = this;
-      if (self.$tabs.hasClass('smallTabs')) {
-        tab = $(tab);
-        var text = tab.text();
-        if (text.lastIndexOf('/') > 0) {
-          text = text.substr(text.lastIndexOf('/') + 1);
-          tab.find('.select').text(text);
-        }
-      }
-    },
-    openFile: function(event) {
-      var self = this;
-      if (event.node === null) {
-        return true;
-      }
-      if (event.node.folder) {
-        if (self.options.theme) {
-          self.setUploadUrl(event.node.path);
-        }
-        return true;
-      }
-      var doc = event.node.path;
-      if (self.fileData[doc]) {
-        self.openEditor(doc);
+            this.$el[0].addEventListener(
+                "keyup",
+                function (e) {
+                    // "Ctrl+F"
+                    if (e.ctrlKey && e.keyCode === 70) {
+                        this.btns.findfile.$el.click();
+                    }
+                }.bind(this)
+            );
 
-        var resetLine = function() {
-          if (self.fileData[doc].line === undefined) {
-            return;
-          }
-          self.ace.editor.scrollToLine(self.fileData[doc].line);
-          self.ace.editor.moveCursorToPosition(self.fileData[doc].cursorPosition);
-          //We only want this to fire after the intial render,
-          //Not after rendering a "scroll" or "focus" event,
-          //So we remove it immediately after.
-          self.ace.editor.renderer.off('afterRender', resetLine);
-        };
-        //This sets the listener before rendering finishes
-        self.ace.editor.renderer.on('afterRender', resetLine);
-      } else {
-        self.doAction('getFile', {
-          data: {
-            path: doc
-          },
-          dataType: 'json',
-          success: function(data) {
-            self.fileData[doc] = data;
-            self.openEditor(doc);
-          }
-        });
-      }
-    },
-    getNodeByPath: function(path) {
-      var self = this;
-      if (path === undefined || path === '') {
-        return null;
-      }
+            this.$el[0].addEventListener(
+                "keyup",
+                function (e) {
+                    // "Ctrl+E
+                    if (e.ctrlKey && e.keyCode === 69) {
+                        this.btns.findtextinfile.$el.click();
+                    }
+                }.bind(this)
+            );
+        },
 
-      if (path.indexOf('/') === 0) {
-        path = path.substr(1, path.length);
-      }
+        $: function (selector) {
+            return this.$el.find(selector);
+        },
+        refreshTree: function (callback) {
+            var self = this;
+            if (callback === undefined) {
+                callback = function () {};
+            }
+            self.$tree.tree(
+                "loadDataFromUrl",
+                self.options.actionUrl + "?action=dataTree",
+                null,
+                callback
+            );
+        },
+        render: function () {
+            var self = this;
+            self.$el.html(self.template(self.options));
+            self.$("#toolbar").append(self.toolbar.render().el);
+            _.each(self.views, function (view) {
+                self.$("#toolbar").append(view.render().el);
+            });
+            self.$tree = self.$(".tree");
+            self.$nav = self.$("nav");
+            self.$tabs = $("ul.nav", self.$nav);
+            self.tree = new Tree(self.$tree, self.options.treeConfig);
+            self.$editor = self.$(".editor");
 
-      var folders = path.split('/');
-      var children = self.$tree.tree('getTree').children;
+            /* close popovers when clicking away */
+            $(document).click(function (e) {
+                var $el = $(e.target);
+                if (!$el.is(":visible")) {
+                    // ignore this, fake event trigger to element that is not visible
+                    return;
+                }
+                if ($el.is("a") || $el.parent().is("a")) {
+                    return;
+                }
+                var $popover = $(".popover:visible");
+                if ($popover.length > 0 && !$.contains($popover[0], $el[0])) {
+                    var popover = $popover.data("component");
+                    if (popover) {
+                        popover.hide();
+                    }
+                }
+            });
 
-      for (var i = 0; i < folders.length; i++) {
-        for (var z = 0; z < children.length; z++) {
-          if (children[z].name == folders[i]) {
-            if (children[z].folder == true && i != (folders.length - 1)) {
-              children = children[z].children;
-              break;
+            // bind 'tree.contextmenu' event
+            self.$tree.jqTreeContextMenu({
+                menu: "#contextual-menu",
+                onContextMenuItem: function (e, node, $el) {
+                    var action = $el.data("item");
+                    try {
+                        self.btns[action].el.click();
+                    } catch ($err) {
+                        console.log("Command does not exist: " + action);
+                    }
+                },
+            });
+
+            self.$tree.bind("tree.select", function (e) {
+                if (e.node === null) {
+                    self.toggleButtons(false);
+                } else {
+                    self.toggleButtons(true);
+                    self.handleClick(e);
+                }
+            });
+
+            self.$tree.bind("tree.move", function (event) {
+                var target_node = event.move_info.target_node;
+                var srcpath = event.move_info.moved_node.path;
+                var newpath = target_node.path;
+                if (event.move_info.position !== "inside") {
+                    newpath = newpath.substring(
+                        newpath.indexOf("/"),
+                        newpath.lastIndexOf("/")
+                    );
+                }
+
+                self.doAction("move", {
+                    data: {
+                        source: srcpath,
+                        destination: newpath,
+                    },
+                    dataType: "json",
+                    success: function (data) {
+                        self.$tree.tree("reload", function () {
+                            self.$tree.tree("selectNode", target_node);
+                        });
+                        var jdata = JSON.parse(data);
+                        if (jdata.error != "") {
+                            alert(jdata.error);
+                        }
+                    },
+                });
+            });
+
+            self.$tree.bind("tree.open", function (e) {
+                var element = $(e.node.element)
+                    .find(":first")
+                    .find(".glyphicon");
+                $(element).addClass("glyphicon-folder-open");
+                $(element).removeClass("glyphicon-folder-close");
+            });
+
+            self.$tree.bind("tree.close", function (e) {
+                var element = $(e.node.element)
+                    .find(":first")
+                    .find(".glyphicon");
+                $(element).addClass("glyphicon-folder-close");
+                $(element).removeClass("glyphicon-folder-open");
+            });
+
+            self.$tree.bind("tree.init", function (e) {
+                var node = self.$tree.tree("getTree").children[0];
+                if (node) {
+                    self.$tree.tree("selectNode", node);
+                }
+            });
+
+            $(self.$tabs).on("click", function (e) {
+                var path = $(e.target).data("path");
+                if (path === undefined) {
+                    path = $(e.target.parentElement).data("path");
+                    if (path === undefined) {
+                        return false;
+                    }
+                }
+                self.selectItem(path);
+            });
+            $(window).on("resize", function () {
+                self.resizeEditor();
+            });
+        },
+        toggleButtons: function (on) {
+            if (on === undefined) {
+                return;
+            }
+
+            if (on) {
+                $("#btn-delete", this.$el).prop("disabled", false);
+                $("#btn-save", this.$el).prop("disabled", false);
+                $("#btn-rename", this.$el).prop("disabled", false);
             } else {
-              return children[z];
+                $("#btn-delete", this.$el).prop("disabled", true);
+                $("#btn-save", this.$el).prop("disabled", true);
+                $("#btn-rename", this.$el).prop("disabled", true);
             }
-          }
-        }
-      }
-
-      return null;
-    },
-    doAction: function(action, options) {
-      var self = this;
-      if (!options) {
-        options = {};
-      }
-      $.ajax({
-        url: self.options.actionUrl,
-        type: options.type || 'GET',
-        data: $.extend({}, {
-          _authenticator: utils.getAuthenticator(),
-          action: action
-        }, options.data || {}),
-        success: options.success,
-        failure: options.failure || function() {}
-      });
-    },
-    openEditor: function(path, options) {
-      var self = this;
-
-      if (path !== undefined) {
-        self.updateTabs(path);
-      }
-      if (options === undefined) {
-        options = {};
-      }
-
-      // first we need to save the current editor content
-      if (self.currentPath) {
-        self.fileData[self.currentPath].contents = self.ace.editor.getValue();
-        var lineNum = self.ace.editor.getFirstVisibleRow();
-        self.fileData[self.currentPath].line = lineNum;
-        self.fileData[self.currentPath].cursorPosition = self.ace.editor.getCursorPosition();
-      }
-      self.currentPath = path;
-      if (self.ace !== undefined) {
-        self.ace.editor.destroy();
-        self.ace.editor.container.parentNode.replaceChild(
-          self.ace.editor.container.cloneNode(true),
-          self.ace.editor.container
-        );
-      }
-      self.ace = new TextEditor(self.$editor);
-
-      if (self.currentPath === undefined) {
-        self.ace.setText('');
-        self.ace.setSyntax('text');
-        self.ace.editor.clearSelection();
-        self.$tree.tree('selectNode', null);
-      } else if (typeof self.fileData[path].info !== 'undefined') {
-        var preview = self.fileData[path].info;
-        if (self.ace.editor !== undefined) {
-          self.ace.editor.off();
-        }
-        $('.ace_editor').empty().append(preview);
-      } else {
-        self.ace.setText(self.fileData[path].contents);
-        self.ace.setSyntax(path);
-        self.ace.editor.clearSelection();
-      }
-
-      self.resizeEditor();
-      if(options.goToLine != undefined){
-        self.ace.editor.gotoLine(options.goToLine, 0, true);
-      }
-
-      self.$el.trigger('fileChange');
-      self.ace.editor.on('change', function() {
-        if (self.ace.editor.curOp && self.ace.editor.curOp.command.name) {
-          $('[data-path="' + path + '"]').addClass('modified');
-        }
-      });
-      self.ace.editor.on('paste', function() {
-        $('[data-path="' + path + '"]').addClass('modified');
-      });
-      self.ace.editor.commands.addCommand({
-        name: 'saveFile',
-        bindKey: {
-          win: 'Ctrl-S',
-          mac: 'Command-S',
-          sender: 'editor|cli'
         },
-        exec: function(env, args, request) {
-          self._save();
-        }
-      });
-    },
-    getSelectedNode: function() {
-      return this.$tree.tree('getSelectedNode');
-    },
-    getNodePath: function(node) {
-      var self = this;
-      if (node === undefined) {
-        node = self.getSelectedNode();
-      }
-      var path = self.getFolderPath(node.parent);
-      if (path !== '/') {
-        path += '/';
-      }
+        handleClick: function (event) {
+            var self = this;
+            self.closeActivePopovers();
+            self.openFile(event);
+        },
+        closeActiveTab: function () {
+            var self = this;
+            var active = self.$tabs.find(".active .remove");
+            var $siblings = $(active).parent().siblings();
+            if ($siblings.length > 0) {
+                var $item;
+                if ($(active).parent().prev().length > 0) {
+                    $item = $(active).parent().prev();
+                } else {
+                    $item = $(active).parent().next();
+                }
+                $(active).parent().remove();
+                $item.click();
+            } else {
+                $(active).parent().remove();
+                self.toggleButtons(false);
+                self.openEditor();
+            }
+        },
+        closeTab: function (path) {
+            var self = this;
+            if (path === undefined) {
+                return;
+            }
 
-      var name = (node.name !== undefined) ? node.name : '';
-      return path + name;
-    },
-    getFolderPath: function(node) {
-      var self = this;
-      if (node === undefined) {
-        node = self.getSelectedNode();
-      }
-      var parts = [];
-      if (!node.folder && node.name) {
-        node = node.parent;
-      }
-      while (node.name) {
-        parts.push(node.name);
-        node = node.parent;
-      }
-      parts.reverse();
-      return '/' + parts.join('/');
-    },
-    getUpload: function() {
-      var self = this;
+            var tabs = self.$tabs.children();
 
-      return _.find(self.views, function(x) {
-        return x.upload !== undefined;
-      });
-    },
-    resizeEditor: function() {
-      var self = this;
+            $(tabs).each(function () {
+                if ($(this).data("path") == path) {
+                    $(this).find("a.remove").trigger("click");
+                }
+            });
+        },
+        closeActivePopovers: function () {
+            var active = $(".navbar a.active");
+            $(active).each(function () {
+                $(this).click();
+            });
+        },
+        createTab: function (path) {
+            var self = this;
+            var $item = $(
+                self.tabItemTemplate({
+                    path: path,
+                })
+            );
+            self.shrinkTab($item);
+            self.$tabs.append($item);
+            $(".remove", $item).click(function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                self.closeActivePopovers();
+                if ($(this).parent().hasClass("active")) {
+                    self.closeActiveTab();
+                } else {
+                    $(this).parent().remove();
+                }
+            });
+            $(".select", $item).click(function (e) {
+                e.preventDefault();
+                $("li", self.$tabs).removeClass("active");
+                var $li = $(this).parent();
+                self.closeActivePopovers();
+                $li.addClass("active");
+            });
+        },
+        updateTabs: function (path) {
+            var self = this;
+            if (path === undefined) {
+                return;
+            }
+            $("li", self.$tabs).removeClass("active");
+            var $existing = $('[data-path="' + path + '"]', self.$tabs);
+            if ($existing.length === 0) {
+                self.createTab(path);
+            } else {
+                $existing.addClass("active");
+            }
+        },
+        shrinkTab: function (tab) {
+            var self = this;
+            if (self.$tabs.hasClass("smallTabs")) {
+                tab = $(tab);
+                var text = tab.text();
+                if (text.lastIndexOf("/") > 0) {
+                    text = text.substr(text.lastIndexOf("/") + 1);
+                    tab.find(".select").text(text);
+                }
+            }
+        },
+        openFile: function (event) {
+            var self = this;
+            if (event.node === null) {
+                return true;
+            }
+            if (event.node.folder) {
+                if (self.options.theme) {
+                    self.setUploadUrl(event.node.path);
+                }
+                return true;
+            }
+            var doc = event.node.path;
+            if (self.fileData[doc]) {
+                self.openEditor(doc);
 
-      self.$editor = $('.editor', self.$el);
-      var tab = self.$tabs.children()[0];
-      if ($(tab).outerHeight() < (self.$tabs.height() - 1)) {
-        self.$tabs.addClass('smallTabs');
-        $(self.$tabs.children()).each(function() {
-          self.shrinkTab(this);
-        });
-      }
-      var tabBox = self.$tabs.parent();
+                var resetLine = function () {
+                    if (self.fileData[doc].line === undefined) {
+                        return;
+                    }
+                    self.ace.editor.scrollToLine(self.fileData[doc].line);
+                    self.ace.editor.moveCursorToPosition(
+                        self.fileData[doc].cursorPosition
+                    );
+                    //We only want this to fire after the intial render,
+                    //Not after rendering a "scroll" or "focus" event,
+                    //So we remove it immediately after.
+                    self.ace.editor.renderer.off("afterRender", resetLine);
+                };
+                //This sets the listener before rendering finishes
+                self.ace.editor.renderer.on("afterRender", resetLine);
+            } else {
+                self.doAction("getFile", {
+                    data: {
+                        path: doc,
+                    },
+                    dataType: "json",
+                    success: function (data) {
+                        self.fileData[doc] = data;
+                        self.openEditor(doc);
+                    },
+                });
+            }
+        },
+        getNodeByPath: function (path) {
+            var self = this;
+            if (path === undefined || path === "") {
+                return null;
+            }
 
-      //Contains both the tabs, and editor window
-      var container = tabBox.parent().parent();
-      var h = container.innerHeight();
-      h -= tabBox.outerHeight();
+            if (path.indexOf("/") === 0) {
+                path = path.substr(1, path.length);
+            }
 
-      //+2 for the editor borders
-      h -= 2;
-      //accounts for the borders/margin
-      self.$editor.height(h);
-      var w = container.innerWidth();
-      w -= (container.outerWidth(true) - container.innerWidth());
+            var folders = path.split("/");
+            var children = self.$tree.tree("getTree").children;
 
-      self.$editor.width(w);
-      if (self.ace !== undefined) {
-        //This forces ace to redraw if the container has changed size
-        self.ace.editor.resize();
-        self.ace.editor.$blockScrolling = Infinity;
-        self.ace.editor.focus();
-      }
-    },
-    selectItem: function(path) {
-      var self = this;
-      var node = self.getNodeByPath(path);
-      self.$tree.tree('selectNode', node);
-    },
-    setUploadUrl: function(path) {
-      var self = this;
+            for (var i = 0; i < folders.length; i++) {
+                for (var z = 0; z < children.length; z++) {
+                    if (children[z].name == folders[i]) {
+                        if (
+                            children[z].folder == true &&
+                            i != folders.length - 1
+                        ) {
+                            children = children[z].children;
+                            break;
+                        } else {
+                            return children[z];
+                        }
+                    }
+                }
+            }
 
-      if (path === undefined) {
-        path = '';
-      }
+            return null;
+        },
+        doAction: function (action, options) {
+            var self = this;
+            if (!options) {
+                options = {};
+            }
+            $.ajax({
+                url: self.options.actionUrl,
+                type: options.type || "GET",
+                data: $.extend(
+                    {},
+                    {
+                        _authenticator: utils.getAuthenticator(),
+                        action: action,
+                    },
+                    options.data || {}
+                ),
+                success: options.success,
+                failure: options.failure || function () {},
+            });
+        },
+        openEditor: function (path, options) {
+            var self = this;
 
-      self.uploadFolder = path;
-      var view = self.getUpload();
-      if (view !== undefined) {
-        var url = self.options.uploadUrl +
-          path +
-          '/themeFileUpload' +
-          '?_authenticator=' +
-          utils.getAuthenticator();
+            if (path !== undefined) {
+                self.updateTabs(path);
+            }
+            if (options === undefined) {
+                options = {};
+            }
 
-        view.upload.dropzone.options.url = url;
-      }
-    },
-    refreshFile: function(path) {
-      var self = this;
+            // first we need to save the current editor content
+            if (self.currentPath) {
+                self.fileData[
+                    self.currentPath
+                ].contents = self.ace.editor.getValue();
+                var lineNum = self.ace.editor.getFirstVisibleRow();
+                self.fileData[self.currentPath].line = lineNum;
+                self.fileData[
+                    self.currentPath
+                ].cursorPosition = self.ace.editor.getCursorPosition();
+            }
+            self.currentPath = path;
+            if (self.ace !== undefined) {
+                self.ace.editor.destroy();
+                self.ace.editor.container.parentNode.replaceChild(
+                    self.ace.editor.container.cloneNode(true),
+                    self.ace.editor.container
+                );
+            }
+            self.ace = new TextEditor(self.$editor);
 
-      if (path === undefined) {
-        path = self.getSelectedNode().path;
-      }
-      self.closeTab(path);
-      delete self.fileData[path];
-      self.selectItem(path);
-    }
-  });
+            if (self.currentPath === undefined) {
+                self.ace.setText("");
+                self.ace.setSyntax("text");
+                self.ace.editor.clearSelection();
+                self.$tree.tree("selectNode", null);
+            } else if (typeof self.fileData[path].info !== "undefined") {
+                var preview = self.fileData[path].info;
+                if (self.ace.editor !== undefined) {
+                    self.ace.editor.off();
+                }
+                $(".ace_editor").empty().append(preview);
+            } else {
+                self.ace.setText(self.fileData[path].contents);
+                self.ace.setSyntax(path);
+                self.ace.editor.clearSelection();
+            }
 
-  return FileManager;
+            self.resizeEditor();
+            if (options.goToLine != undefined) {
+                self.ace.editor.gotoLine(options.goToLine, 0, true);
+            }
 
+            self.$el.trigger("fileChange");
+            self.ace.editor.on("change", function () {
+                if (
+                    self.ace.editor.curOp &&
+                    self.ace.editor.curOp.command.name
+                ) {
+                    $('[data-path="' + path + '"]').addClass("modified");
+                }
+            });
+            self.ace.editor.on("paste", function () {
+                $('[data-path="' + path + '"]').addClass("modified");
+            });
+            self.ace.editor.commands.addCommand({
+                name: "saveFile",
+                bindKey: {
+                    win: "Ctrl-S",
+                    mac: "Command-S",
+                    sender: "editor|cli",
+                },
+                exec: function (env, args, request) {
+                    self._save();
+                },
+            });
+        },
+        getSelectedNode: function () {
+            return this.$tree.tree("getSelectedNode");
+        },
+        getNodePath: function (node) {
+            var self = this;
+            if (node === undefined) {
+                node = self.getSelectedNode();
+            }
+            var path = self.getFolderPath(node.parent);
+            if (path !== "/") {
+                path += "/";
+            }
+
+            var name = node.name !== undefined ? node.name : "";
+            return path + name;
+        },
+        getFolderPath: function (node) {
+            var self = this;
+            if (node === undefined) {
+                node = self.getSelectedNode();
+            }
+            var parts = [];
+            if (!node.folder && node.name) {
+                node = node.parent;
+            }
+            while (node.name) {
+                parts.push(node.name);
+                node = node.parent;
+            }
+            parts.reverse();
+            return "/" + parts.join("/");
+        },
+        getUpload: function () {
+            var self = this;
+
+            return _.find(self.views, function (x) {
+                return x.upload !== undefined;
+            });
+        },
+        resizeEditor: function () {
+            var self = this;
+
+            self.$editor = $(".editor", self.$el);
+            var tab = self.$tabs.children()[0];
+            if ($(tab).outerHeight() < self.$tabs.height() - 1) {
+                self.$tabs.addClass("smallTabs");
+                $(self.$tabs.children()).each(function () {
+                    self.shrinkTab(this);
+                });
+            }
+            var tabBox = self.$tabs.parent();
+
+            //Contains both the tabs, and editor window
+            var container = tabBox.parent().parent();
+            var h = container.innerHeight();
+            h -= tabBox.outerHeight();
+
+            //+2 for the editor borders
+            h -= 2;
+            //accounts for the borders/margin
+            self.$editor.height(h);
+            var w = container.innerWidth();
+            w -= container.outerWidth(true) - container.innerWidth();
+
+            self.$editor.width(w);
+            if (self.ace !== undefined) {
+                //This forces ace to redraw if the container has changed size
+                self.ace.editor.resize();
+                self.ace.editor.$blockScrolling = Infinity;
+                self.ace.editor.focus();
+            }
+        },
+        selectItem: function (path) {
+            var self = this;
+            var node = self.getNodeByPath(path);
+            self.$tree.tree("selectNode", node);
+        },
+        setUploadUrl: function (path) {
+            var self = this;
+
+            if (path === undefined) {
+                path = "";
+            }
+
+            self.uploadFolder = path;
+            var view = self.getUpload();
+            if (view !== undefined) {
+                var url =
+                    self.options.uploadUrl +
+                    path +
+                    "/themeFileUpload" +
+                    "?_authenticator=" +
+                    utils.getAuthenticator();
+
+                view.upload.dropzone.options.url = url;
+            }
+        },
+        refreshFile: function (path) {
+            var self = this;
+
+            if (path === undefined) {
+                path = self.getSelectedNode().path;
+            }
+            self.closeTab(path);
+            delete self.fileData[path];
+            self.selectItem(path);
+        },
+    });
+
+    return FileManager;
 });
 
-define('mockup-patterns-thememapper-url/js/rulebuilder',[
-  'jquery',
-  'underscore'
-], function($, _) {
-  'use strict';
-
-  var RuleBuilder = function(thememapper) {
-    /**
-     * Rule builder
-     *
-     * Contains functions to build CSS and XPath selectors as well as a Diazo rule
-     * from a given node, and acts as a state machine for the rules wizard.
-     *
-     */
-
-    var self = this;
-    self.thememapper = thememapper;
-
-    self.themeInspector = null;
-    self.unthemedInspector = null;
-
-    self.active = false;
-    self.currentScope = null;
-    self.haveScrolled = false;
-
-    self.ruleType = null;
-    self.subtype = null;
-
-    self._contentElement = null;
-    self._themeElement = null;
-
-    self.rulesFilename = 'rules.xml';
-
-    self.ruleBuilderPopover = {
-      el: self.thememapper.rulebuilderView.el,
-      button: self.thememapper.rulebuilderView.triggerView.el,
-      isOpened: function() {
-        return $(this.el).is(':visible');
-      },
-      close: function() {
-        if (this.isOpened()) {
-          if (self.active && $els.step2.is(':visible')) {
-            self.end();
-          } else {
-            $(this.button).click();
-          }
-        }
-      },
-      load: function() {
-        if (!this.isOpened()) {
-          $(this.button).click();
-        }
-      }
-    };
-
-    var $els = {
-      reusePanel: $('#new-rule-reuse-panel'),
-      reuseSelectors: $('#new-rule-reuse-selectors'),
-      selectTheme: $('#new-rule-select-theme'),
-      selectThemeNext: $('#new-rule-select-theme .next'),
-      selectContentNext: $('#new-rule-select-content .next'),
-      wizardSteps: $('.rule-wizard-step'),
-      selectContent: $('#new-rule-select-content'),
-      step1: $('#new-rule-step-1'),
-      step1Next: $('#new-rule-step-1 .next'),
-      step2: $('#new-rule-step-2'),
-      step2Insert: $('#new-rule-step-2 .insert'),
-      step2Copy: $('#new-rule-step-2 .copy'),
-      inspectors: self.thememapper.$inspectorContainer,
-      ruleOutput: $('#new-rule-output'),
-      themePanel: $('#inspectors .mockup-inspector'),
-      themePanelTop: $('.mockup-inspector .panel-toolbar'),
-      unthemedPanel: $('#inspectors .unthemed-inspector'),
-      unthemedPanelTop: $('.unthemed-inspector .panel-toolbar'),
-      newRuleThemeChildren: $('#new-rule-theme-children'),
-      newRuleUnthemedChildren: $('#new-rule-content-children'),
-      modifiers: $('.rule-modifier'),
-      selectors: $('.selector-info'),
-      closers: $('.new-rule .close, .new-rule .wizard-cancel')
-    };
-
-    $els.step1Next.click(function() {
-      var ruleType = self.getSelectedType();
-      self.start(ruleType);
-    });
-
-    $els.closers.click(function() {
-      self.end();
-      self.ruleBuilderPopover.close();
-    });
-
-    $els.selectThemeNext.click(function() {
-      self.themeInspector.on();
-
-      if (!$els.inspectors.is(':visible')) {
-        self.thememapper.showInspectors();
-      }
-
-      self.scrollTo($els.themePanelTop);
-      self.ruleBuilderPopover.close();
-
-      $els.themePanel.expose({
-        color: '#fff',
-        closeOnClick: false,
-        closeOnEsc: false,
-        closeSpeed: 0,
-        onLoad: function() {
-          self.scrollTo(this.getExposed());
-        },
-      });
-    });
-
-    $els.step2Copy.hide();
-    $els.step2Insert.click(function() {
-
-      var rule = $els.ruleOutput.val();
-
-      var aceEditor = self.thememapper.fileManager.ace.editor;
-      var session = aceEditor.getSession();
-
-      function findStartTag(backwards) {
-        aceEditor.find('<\\w+', {
-          backwards: backwards,
-          wrap: false,
-          wholeWord: false,
-          regExp: true
-        });
-      }
-
-      function indent(string, amount) {
-        var padding = '';
-        for (var i = 0; i < amount; ++i) {
-          padding += ' ';
-        }
-        return '\n' + padding + string.replace(/\n/g, '\n' + padding) + '\n';
-      }
-
-      //If we're already starting at the very end, go back to the beginning
-      if (session.getDocument().$lines.length == aceEditor.getSelectionRange().end.row + 1) {
-        aceEditor.navigateFileStart();
-      }
-
-      // Go to the next opening tag - we want to insert before this
-      findStartTag(false);
-      if (aceEditor.getCursorPosition().row <= 1) {
-        // Probably the opening rules tag
-        findStartTag(false);
-      }
-
-      var selectionText = aceEditor.getSelectedText();
-
-      // If we didn't find anything, look for the end of the current tag
-      if (selectionText === '') {
-        aceEditor.find('(/>|</)', {
-          backwards: false,
-          wrap: false,
-          wholeWord: false,
-          regExp: true
-        });
-
-        selectionText = aceEditor.getSelectedText();
-        if (selectionText === '') {
-          // Still nothing? Go to the end
-          aceEditor.navigateFileEnd();
-        } else {
-          // Go one past the end tag, but first figure out how far we should i
-          aceEditor.navigateDown();
-        }
-      }
-
-      var indentation = aceEditor.getSelectionRange().start.column;
-      var cursorPosition = aceEditor.getCursorPosition();
-      var newlines = rule.match(/\n/g);
-      var rows = 0;
-      if (newlines != null) {
-        rows = newlines.length;
-      }
-
-      aceEditor.gotoLine(cursorPosition.row);
-      aceEditor.insert(indent(rule, indentation));
-      aceEditor.getSelection().selectTo(cursorPosition.row + rows + 1, 0);
-      aceEditor.gotoLine(cursorPosition.row);
-      aceEditor.container.focus();
-
-      self.ruleBuilderPopover.close();
-
-      self.scrollTo(self.thememapper.fileManager.$el);
-
-      // Clear the selection now that we're done with it
-      self.unthemedInspector.save(null);
-      self.themeInspector.save(null);
-    });
-
-    $els.selectContentNext.click(function() {
-      self.unthemedInspector.on();
-      if (!$els.inspectors.is(':visible')) {
-        self.thememapper.showInspectors();
-      }
-
-      self.scrollTo($els.unthemedPanelTop);
-      self.ruleBuilderPopover.close();
-
-      $els.unthemedPanel.expose({
-        color: '#fff',
-        closeOnClick: false,
-        closeOnEsc: false,
-        closeSpeed: 0,
-        onLoad: function() {
-          self.scrollTo(this.getExposed());
-        },
-      });
-    });
-
-    $els.modifiers.change(function() {
-      self.updateRule();
-    });
-    self.end = function() {
-      self._contentElement = null;
-      self._themeElement = null;
-      self.currentScope = null;
-      self.active = false;
-      self.ruleType = null;
-      self.subtype = null;
-
-      self.callback(this);
-    };
-
-    self.start = function(ruleType) {
-      var self = this;
-
-      if (ruleType === undefined) {
-        ruleType = self.getSelectedType();
-      }
-
-      self.themeInspector = self.thememapper.mockupInspector;
-      self.unthemedInspector = self.thememapper.unthemedInspector;
-
-      self._contentElement = null;
-      self._themeElement = null;
-      self.currentScope = 'theme';
-
-      // Drop rules get e.g. drop:content or drop:theme,
-      // which predetermines the scope
-      var ruleSplit = ruleType.split(':');
-      if (ruleSplit.length >= 2) {
-        self.ruleType = ruleSplit[0];
-        self.subtype = ruleSplit[1];
-        self.currentScope = self.subtype;
-      } else {
-        self.ruleType = ruleType;
-        self.subtype = null;
-      }
-
-      self.active = true;
-
-      self.callback(self);
-    };
-
-    /**
-     * Build a diazo rule. 'themeChildren' and 'contentChildren' should be true or
-     * false to indicate whether a -children selector is to be used.
-     */
-    self.buildRule = function(themeChildren, contentChildren) {
-      if (self.ruleType === null) {
-        return '';
-      }
-
-      if (self.subtype !== null) {
-        if (self.subtype === 'content') {
-          return '<' + self.ruleType + '\n    ' +
-            self.calculateDiazoSelector(self._contentElement, 'content', contentChildren) +
-            '\n    />';
-        } else if (self.subtype === 'theme') {
-          return '<' + self.ruleType + '\n    ' +
-            self.calculateDiazoSelector(self._themeElement, 'theme', themeChildren) +
-            '\n    />';
-        }
-
-      } else {
-        return '<' + self.ruleType + '\n    ' +
-          self.calculateDiazoSelector(self._themeElement, 'theme', themeChildren) + '\n    ' +
-          self.calculateDiazoSelector(self._contentElement, 'content', contentChildren) +
-          '\n    />';
-      }
-
-      // Should never happen
-      return 'Error';
-    };
-
-    /**
-     * Return a valid (but not necessarily unique) CSS selector for the given
-     * element.
-     */
-    self.calculateCSSSelector = function(element) {
-      var selector = element.tagName.toLowerCase();
-
-      if (element.id) {
-        selector += '#' + element.id;
-      } else {
-        var classes = $(element).attr('class');
-        if (classes !== undefined) {
-          var splitClasses = classes.split(/\s+/);
-          for (var i = 0; i < splitClasses.length; i = i + 1) {
-            if (splitClasses[i] !== '' && splitClasses[i].indexOf('_theming') === -1) {
-              selector += '.' + splitClasses[i];
-              break;
-            }
-          }
-        }
-      }
-
-      return selector;
-    };
-
-    /**
-     * Return a valid, unqiue CSS selector for the given element. Returns null if
-     * no reasoanble unique selector can be built.
-     */
-    self.calculateUniqueCSSSelector = function(element) {
-      var paths = [];
-      var path = null;
-
-      var parents = $(element).parents();
-      var ultimateParent = parents[parents.length - 1];
-
-      while (element && element.nodeType === 1) {
-        var selector = this.calculateCSSSelector(element);
-        paths.splice(0, 0, selector);
-        path = paths.join(' ');
-
-        // The ultimateParent constraint is necessary since
-        // this may be inside an iframe
-        if ($(path, ultimateParent).length === 1) {
-          return path;
-        }
-
-        element = element.parentNode;
-      }
-
-      return null;
-    };
-
-    /**
-     * Return a valid, unique XPath selector for the given element.
-     */
-    self.calculateUniqueXPathExpression = function(element) {
-      var parents = $(element).parents();
-
-      function elementIndex(e) {
-        var siblings = $(e).siblings(e.tagName.toLowerCase());
-        if (siblings.length > 0) {
-          return '[' + ($(e).index() + 1) + ']';
-        } else {
-          return '';
-        }
-      }
-
-      var xpathString = '/' + element.tagName.toLowerCase();
-      if (element.id) {
-        return '/' + xpathString + '[@id=\'' + element.id + '\']';
-      } else {
-        xpathString += elementIndex(element);
-      }
-
-      for (var i = 0; i < parents.length; i = i + 1) {
-        var p = parents[i];
-        var pString = '/' + p.tagName.toLowerCase();
-
-        if (p.id) {
-          return '/' + pString + '[@id=\'' + p.id + '\']' + xpathString;
-        } else {
-          xpathString = pString + elementIndex(p) + xpathString;
-        }
-      }
-
-      return xpathString;
-    };
-
-    /**
-     * Return a unique CSS or XPath selector, preferring a CSS one.
-     */
-    self.bestSelector = function(element) {
-      return self.calculateUniqueCSSSelector(element) ||
-        self.calculateUniqueXPathExpression(element);
-    };
-
-    self.openRuleFile = function() {
-
-      var fileManager = self.thememapper.fileManager;
-
-      var treeNodes = fileManager.$tree.tree('getTree');
-      var opened = false;
-
-      _.each(treeNodes.children, function(node) {
-        if (node.name == self.rulesFilename) {
-          //if it's open already, don't reopen it.
-          //That will move the cursors location
-          if (fileManager.$tabs.find('.active').data('path') != '/' + self.rulesFilename) {
-            self.thememapper.fileManager.openFile({
-              node: node
-            });
-          }
-          opened = true;
-        }
-      });
-      return opened;
-    };
-
-    /**
-     * Build a Diazo selector element with the appropriate namespace.
-     */
-    self.calculateDiazoSelector = function(element, scope, children) {
-      var selectorType = scope;
-      if (children) {
-        selectorType += '-children';
-      }
-
-      var cssSelector = self.calculateUniqueCSSSelector(element);
-      if (cssSelector) {
-        return 'css:' + selectorType + '="' + cssSelector + '"';
-      } else {
-        var xpathSelector = self.calculateUniqueXPathExpression(element);
-        return selectorType + '="' + xpathSelector + '"';
-      }
-
-    };
-
-    self.select = function(element) {
-      if (this.currentScope == 'theme') {
-        this._themeElement = element;
-      } else if (this.currentScope == 'content') {
-        this._contentElement = element;
-      }
-    };
-
-    self.getSelectedType = function() {
-      var type = $('input[name=\'new-rule-type\']:checked').val();
-      return type;
-    };
-
-    self.next = function() {
-      var self = this;
-      if (self.subtype !== null) {
-        // Drop rules have only one scope
+define('mockup-patterns-thememapper-url/js/rulebuilder',["jquery", "underscore"], function ($, _) {
+    "use strict";
+
+    var RuleBuilder = function (thememapper) {
+        /**
+         * Rule builder
+         *
+         * Contains functions to build CSS and XPath selectors as well as a Diazo rule
+         * from a given node, and acts as a state machine for the rules wizard.
+         *
+         */
+
+        var self = this;
+        self.thememapper = thememapper;
+
+        self.themeInspector = null;
+        self.unthemedInspector = null;
+
+        self.active = false;
         self.currentScope = null;
-      } else {
-        // Other rules have content and theme
-        if (self.currentScope == 'theme') {
-          self.currentScope = 'content';
-        } else if (self.currentScope == 'content') {
-          self.currentScope = null;
-        }
-      }
-      this.callback(this);
+        self.haveScrolled = false;
+
+        self.ruleType = null;
+        self.subtype = null;
+
+        self._contentElement = null;
+        self._themeElement = null;
+
+        self.rulesFilename = "rules.xml";
+
+        self.ruleBuilderPopover = {
+            el: self.thememapper.rulebuilderView.el,
+            button: self.thememapper.rulebuilderView.triggerView.el,
+            isOpened: function () {
+                return $(this.el).is(":visible");
+            },
+            close: function () {
+                if (this.isOpened()) {
+                    if (self.active && $els.step2.is(":visible")) {
+                        self.end();
+                    } else {
+                        $(this.button).click();
+                    }
+                }
+            },
+            load: function () {
+                if (!this.isOpened()) {
+                    $(this.button).click();
+                }
+            },
+        };
+
+        var $els = {
+            reusePanel: $("#new-rule-reuse-panel"),
+            reuseSelectors: $("#new-rule-reuse-selectors"),
+            selectTheme: $("#new-rule-select-theme"),
+            selectThemeNext: $("#new-rule-select-theme .next"),
+            selectContentNext: $("#new-rule-select-content .next"),
+            wizardSteps: $(".rule-wizard-step"),
+            selectContent: $("#new-rule-select-content"),
+            step1: $("#new-rule-step-1"),
+            step1Next: $("#new-rule-step-1 .next"),
+            step2: $("#new-rule-step-2"),
+            step2Insert: $("#new-rule-step-2 .insert"),
+            step2Copy: $("#new-rule-step-2 .copy"),
+            inspectors: self.thememapper.$inspectorContainer,
+            ruleOutput: $("#new-rule-output"),
+            themePanel: $("#inspectors .mockup-inspector"),
+            themePanelTop: $(".mockup-inspector .panel-toolbar"),
+            unthemedPanel: $("#inspectors .unthemed-inspector"),
+            unthemedPanelTop: $(".unthemed-inspector .panel-toolbar"),
+            newRuleThemeChildren: $("#new-rule-theme-children"),
+            newRuleUnthemedChildren: $("#new-rule-content-children"),
+            modifiers: $(".rule-modifier"),
+            selectors: $(".selector-info"),
+            closers: $(".new-rule .close, .new-rule .wizard-cancel"),
+        };
+
+        $els.step1Next.click(function () {
+            var ruleType = self.getSelectedType();
+            self.start(ruleType);
+        });
+
+        $els.closers.click(function () {
+            self.end();
+            self.ruleBuilderPopover.close();
+        });
+
+        $els.selectThemeNext.click(function () {
+            self.themeInspector.on();
+
+            if (!$els.inspectors.is(":visible")) {
+                self.thememapper.showInspectors();
+            }
+
+            self.scrollTo($els.themePanelTop);
+            self.ruleBuilderPopover.close();
+
+            $els.themePanel.expose({
+                color: "#fff",
+                closeOnClick: false,
+                closeOnEsc: false,
+                closeSpeed: 0,
+                onLoad: function () {
+                    self.scrollTo(this.getExposed());
+                },
+            });
+        });
+
+        $els.step2Copy.hide();
+        $els.step2Insert.click(function () {
+            var rule = $els.ruleOutput.val();
+
+            var aceEditor = self.thememapper.fileManager.ace.editor;
+            var session = aceEditor.getSession();
+
+            function findStartTag(backwards) {
+                aceEditor.find("<\\w+", {
+                    backwards: backwards,
+                    wrap: false,
+                    wholeWord: false,
+                    regExp: true,
+                });
+            }
+
+            function indent(string, amount) {
+                var padding = "";
+                for (var i = 0; i < amount; ++i) {
+                    padding += " ";
+                }
+                return (
+                    "\n" +
+                    padding +
+                    string.replace(/\n/g, "\n" + padding) +
+                    "\n"
+                );
+            }
+
+            //If we're already starting at the very end, go back to the beginning
+            if (
+                session.getDocument().$lines.length ==
+                aceEditor.getSelectionRange().end.row + 1
+            ) {
+                aceEditor.navigateFileStart();
+            }
+
+            // Go to the next opening tag - we want to insert before this
+            findStartTag(false);
+            if (aceEditor.getCursorPosition().row <= 1) {
+                // Probably the opening rules tag
+                findStartTag(false);
+            }
+
+            var selectionText = aceEditor.getSelectedText();
+
+            // If we didn't find anything, look for the end of the current tag
+            if (selectionText === "") {
+                aceEditor.find("(/>|</)", {
+                    backwards: false,
+                    wrap: false,
+                    wholeWord: false,
+                    regExp: true,
+                });
+
+                selectionText = aceEditor.getSelectedText();
+                if (selectionText === "") {
+                    // Still nothing? Go to the end
+                    aceEditor.navigateFileEnd();
+                } else {
+                    // Go one past the end tag, but first figure out how far we should i
+                    aceEditor.navigateDown();
+                }
+            }
+
+            var indentation = aceEditor.getSelectionRange().start.column;
+            var cursorPosition = aceEditor.getCursorPosition();
+            var newlines = rule.match(/\n/g);
+            var rows = 0;
+            if (newlines != null) {
+                rows = newlines.length;
+            }
+
+            aceEditor.gotoLine(cursorPosition.row);
+            aceEditor.insert(indent(rule, indentation));
+            aceEditor.getSelection().selectTo(cursorPosition.row + rows + 1, 0);
+            aceEditor.gotoLine(cursorPosition.row);
+            aceEditor.container.focus();
+
+            self.ruleBuilderPopover.close();
+
+            self.scrollTo(self.thememapper.fileManager.$el);
+
+            // Clear the selection now that we're done with it
+            self.unthemedInspector.save(null);
+            self.themeInspector.save(null);
+        });
+
+        $els.selectContentNext.click(function () {
+            self.unthemedInspector.on();
+            if (!$els.inspectors.is(":visible")) {
+                self.thememapper.showInspectors();
+            }
+
+            self.scrollTo($els.unthemedPanelTop);
+            self.ruleBuilderPopover.close();
+
+            $els.unthemedPanel.expose({
+                color: "#fff",
+                closeOnClick: false,
+                closeOnEsc: false,
+                closeSpeed: 0,
+                onLoad: function () {
+                    self.scrollTo(this.getExposed());
+                },
+            });
+        });
+
+        $els.modifiers.change(function () {
+            self.updateRule();
+        });
+        self.end = function () {
+            self._contentElement = null;
+            self._themeElement = null;
+            self.currentScope = null;
+            self.active = false;
+            self.ruleType = null;
+            self.subtype = null;
+
+            self.callback(this);
+        };
+
+        self.start = function (ruleType) {
+            var self = this;
+
+            if (ruleType === undefined) {
+                ruleType = self.getSelectedType();
+            }
+
+            self.themeInspector = self.thememapper.mockupInspector;
+            self.unthemedInspector = self.thememapper.unthemedInspector;
+
+            self._contentElement = null;
+            self._themeElement = null;
+            self.currentScope = "theme";
+
+            // Drop rules get e.g. drop:content or drop:theme,
+            // which predetermines the scope
+            var ruleSplit = ruleType.split(":");
+            if (ruleSplit.length >= 2) {
+                self.ruleType = ruleSplit[0];
+                self.subtype = ruleSplit[1];
+                self.currentScope = self.subtype;
+            } else {
+                self.ruleType = ruleType;
+                self.subtype = null;
+            }
+
+            self.active = true;
+
+            self.callback(self);
+        };
+
+        /**
+         * Build a diazo rule. 'themeChildren' and 'contentChildren' should be true or
+         * false to indicate whether a -children selector is to be used.
+         */
+        self.buildRule = function (themeChildren, contentChildren) {
+            if (self.ruleType === null) {
+                return "";
+            }
+
+            if (self.subtype !== null) {
+                if (self.subtype === "content") {
+                    return (
+                        "<" +
+                        self.ruleType +
+                        "\n    " +
+                        self.calculateDiazoSelector(
+                            self._contentElement,
+                            "content",
+                            contentChildren
+                        ) +
+                        "\n    />"
+                    );
+                } else if (self.subtype === "theme") {
+                    return (
+                        "<" +
+                        self.ruleType +
+                        "\n    " +
+                        self.calculateDiazoSelector(
+                            self._themeElement,
+                            "theme",
+                            themeChildren
+                        ) +
+                        "\n    />"
+                    );
+                }
+            } else {
+                return (
+                    "<" +
+                    self.ruleType +
+                    "\n    " +
+                    self.calculateDiazoSelector(
+                        self._themeElement,
+                        "theme",
+                        themeChildren
+                    ) +
+                    "\n    " +
+                    self.calculateDiazoSelector(
+                        self._contentElement,
+                        "content",
+                        contentChildren
+                    ) +
+                    "\n    />"
+                );
+            }
+
+            // Should never happen
+            return "Error";
+        };
+
+        /**
+         * Return a valid (but not necessarily unique) CSS selector for the given
+         * element.
+         */
+        self.calculateCSSSelector = function (element) {
+            var selector = element.tagName.toLowerCase();
+
+            if (element.id) {
+                selector += "#" + element.id;
+            } else {
+                var classes = $(element).attr("class");
+                if (classes !== undefined) {
+                    var splitClasses = classes.split(/\s+/);
+                    for (var i = 0; i < splitClasses.length; i = i + 1) {
+                        if (
+                            splitClasses[i] !== "" &&
+                            splitClasses[i].indexOf("_theming") === -1
+                        ) {
+                            selector += "." + splitClasses[i];
+                            break;
+                        }
+                    }
+                }
+            }
+
+            return selector;
+        };
+
+        /**
+         * Return a valid, unqiue CSS selector for the given element. Returns null if
+         * no reasoanble unique selector can be built.
+         */
+        self.calculateUniqueCSSSelector = function (element) {
+            var paths = [];
+            var path = null;
+
+            var parents = $(element).parents();
+            var ultimateParent = parents[parents.length - 1];
+
+            while (element && element.nodeType === 1) {
+                var selector = this.calculateCSSSelector(element);
+                paths.splice(0, 0, selector);
+                path = paths.join(" ");
+
+                // The ultimateParent constraint is necessary since
+                // this may be inside an iframe
+                if ($(path, ultimateParent).length === 1) {
+                    return path;
+                }
+
+                element = element.parentNode;
+            }
+
+            return null;
+        };
+
+        /**
+         * Return a valid, unique XPath selector for the given element.
+         */
+        self.calculateUniqueXPathExpression = function (element) {
+            var parents = $(element).parents();
+
+            function elementIndex(e) {
+                var siblings = $(e).siblings(e.tagName.toLowerCase());
+                if (siblings.length > 0) {
+                    return "[" + ($(e).index() + 1) + "]";
+                } else {
+                    return "";
+                }
+            }
+
+            var xpathString = "/" + element.tagName.toLowerCase();
+            if (element.id) {
+                return "/" + xpathString + "[@id='" + element.id + "']";
+            } else {
+                xpathString += elementIndex(element);
+            }
+
+            for (var i = 0; i < parents.length; i = i + 1) {
+                var p = parents[i];
+                var pString = "/" + p.tagName.toLowerCase();
+
+                if (p.id) {
+                    return "/" + pString + "[@id='" + p.id + "']" + xpathString;
+                } else {
+                    xpathString = pString + elementIndex(p) + xpathString;
+                }
+            }
+
+            return xpathString;
+        };
+
+        /**
+         * Return a unique CSS or XPath selector, preferring a CSS one.
+         */
+        self.bestSelector = function (element) {
+            return (
+                self.calculateUniqueCSSSelector(element) ||
+                self.calculateUniqueXPathExpression(element)
+            );
+        };
+
+        self.openRuleFile = function () {
+            var fileManager = self.thememapper.fileManager;
+
+            var treeNodes = fileManager.$tree.tree("getTree");
+            var opened = false;
+
+            _.each(treeNodes.children, function (node) {
+                if (node.name == self.rulesFilename) {
+                    //if it's open already, don't reopen it.
+                    //That will move the cursors location
+                    if (
+                        fileManager.$tabs.find(".active").data("path") !=
+                        "/" + self.rulesFilename
+                    ) {
+                        self.thememapper.fileManager.openFile({
+                            node: node,
+                        });
+                    }
+                    opened = true;
+                }
+            });
+            return opened;
+        };
+
+        /**
+         * Build a Diazo selector element with the appropriate namespace.
+         */
+        self.calculateDiazoSelector = function (element, scope, children) {
+            var selectorType = scope;
+            if (children) {
+                selectorType += "-children";
+            }
+
+            var cssSelector = self.calculateUniqueCSSSelector(element);
+            if (cssSelector) {
+                return "css:" + selectorType + '="' + cssSelector + '"';
+            } else {
+                var xpathSelector = self.calculateUniqueXPathExpression(
+                    element
+                );
+                return selectorType + '="' + xpathSelector + '"';
+            }
+        };
+
+        self.select = function (element) {
+            if (this.currentScope == "theme") {
+                this._themeElement = element;
+            } else if (this.currentScope == "content") {
+                this._contentElement = element;
+            }
+        };
+
+        self.getSelectedType = function () {
+            var type = $("input[name='new-rule-type']:checked").val();
+            return type;
+        };
+
+        self.next = function () {
+            var self = this;
+            if (self.subtype !== null) {
+                // Drop rules have only one scope
+                self.currentScope = null;
+            } else {
+                // Other rules have content and theme
+                if (self.currentScope == "theme") {
+                    self.currentScope = "content";
+                } else if (self.currentScope == "content") {
+                    self.currentScope = null;
+                }
+            }
+            this.callback(this);
+        };
+
+        self.updateRule = function () {
+            $els.ruleOutput.val(
+                self.buildRule(
+                    $els.newRuleThemeChildren.is(":checked"),
+                    $els.newRuleUnthemedChildren.is(":checked")
+                )
+            );
+        };
+
+        self.scrollTo = function (selector) {
+            if ($(selector).length == 0) {
+                return;
+            }
+
+            $("html,body").animate(
+                {
+                    scrollTop: $(selector).offset().top,
+                },
+                600
+            );
+        };
+
+        /**
+         *   Called by the rulebuilderView. If there are selected
+         *   elements in the inspectors, we want to give the user the
+         *   option to use those.
+         */
+        self.checkSelectors = function () {
+            var selected = false;
+            $(".selector-info").each(function () {
+                if ($(this).text() != "") {
+                    //Theres an item selected, so show the option to use it
+                    $els.reusePanel.show();
+                    selected = true;
+                }
+            });
+            if (!selected) {
+                //if we opened the panel previously, close it now
+                $els.reusePanel.hide();
+            }
+            return selected;
+        };
+        self.callback = function (ruleBuilder) {
+            $els.wizardSteps.hide();
+
+            var themeFrameHighlighter = this.thememapper.mockupInspector;
+            var unthemedFrameHighlighter = this.thememapper.unthemedInspector;
+
+            if ($.mask.isLoaded(true) && !self.ruleBuilderPopover.isOpened()) {
+                self.scrollTo(self.thememapper.fileManager.$el);
+                $.mask.close();
+            }
+
+            if (ruleBuilder.currentScope == "theme") {
+                if (
+                    themeFrameHighlighter.saved != null &&
+                    $els.reuseSelectors.is(":checked")
+                ) {
+                    self.ruleBuilderPopover.close();
+
+                    // Use saved rule
+                    ruleBuilder.select(themeFrameHighlighter.saved);
+                    ruleBuilder.next();
+                } else {
+                    // Let the frame highlighter perform a selection
+                    $els.selectTheme.show();
+                    if (!self.ruleBuilderPopover.isOpened()) {
+                        self.ruleBuilderPopover.load();
+                    }
+                }
+            } else if (ruleBuilder.currentScope == "content") {
+                if (
+                    unthemedFrameHighlighter.saved != null &&
+                    $els.reuseSelectors.is(":checked")
+                ) {
+                    self.ruleBuilderPopover.close();
+
+                    // Use saved rule
+                    ruleBuilder.select(unthemedFrameHighlighter.saved);
+                    ruleBuilder.next();
+                } else {
+                    // Let the frame highlighter perform a selection
+                    $els.selectContent.show();
+                    if (!self.ruleBuilderPopover.isOpened()) {
+                        self.ruleBuilderPopover.load();
+                    }
+                }
+            } else if (
+                ruleBuilder.ruleType != null &&
+                ruleBuilder.currentScope == null
+            ) {
+                $els.wizardSteps.hide();
+                $els.step2.show();
+                self.updateRule(ruleBuilder);
+
+                if (self.openRuleFile()) {
+                    $els.step2Insert.show();
+                } else {
+                    $els.step2Insert.hide();
+                }
+
+                if (!self.ruleBuilderPopover.isOpened()) {
+                    self.ruleBuilderPopover.load();
+                }
+            } else {
+                // end
+
+                if (self.ruleBuilderPopover.isOpened()) {
+                    self.ruleBuilderPopover.close();
+                }
+
+                $els.wizardSteps.hide();
+                $els.step1.show();
+            }
+        };
     };
 
-    self.updateRule = function() {
-      $els.ruleOutput.val(
-        self.buildRule(
-          $els.newRuleThemeChildren.is(':checked'),
-          $els.newRuleUnthemedChildren.is(':checked')
-        )
-      );
-    };
-
-    self.scrollTo = function(selector) {
-      if ($(selector).length == 0) {
-        return;
-      }
-
-      $('html,body').animate({
-        scrollTop: $(selector).offset().top
-      }, 600);
-    };
-
-    /**
-     *   Called by the rulebuilderView. If there are selected
-     *   elements in the inspectors, we want to give the user the
-     *   option to use those.
-     */
-    self.checkSelectors = function() {
-      var selected = false;
-      $('.selector-info').each(function() {
-        if ($(this).text() != '') {
-          //Theres an item selected, so show the option to use it
-          $els.reusePanel.show();
-          selected = true;
-        }
-      });
-      if (!selected) {
-        //if we opened the panel previously, close it now
-        $els.reusePanel.hide();
-      }
-      return selected;
-    };
-    self.callback = function(ruleBuilder) {
-      $els.wizardSteps.hide();
-
-      var themeFrameHighlighter = this.thememapper.mockupInspector;
-      var unthemedFrameHighlighter = this.thememapper.unthemedInspector;
-
-      if ($.mask.isLoaded(true) && !self.ruleBuilderPopover.isOpened()) {
-        self.scrollTo(self.thememapper.fileManager.$el);
-        $.mask.close();
-      }
-
-      if (ruleBuilder.currentScope == 'theme') {
-        if (themeFrameHighlighter.saved != null && $els.reuseSelectors.is(':checked')) {
-          self.ruleBuilderPopover.close();
-
-          // Use saved rule
-          ruleBuilder.select(themeFrameHighlighter.saved);
-          ruleBuilder.next();
-        } else {
-          // Let the frame highlighter perform a selection
-          $els.selectTheme.show();
-          if (!self.ruleBuilderPopover.isOpened()) {
-            self.ruleBuilderPopover.load();
-          }
-        }
-
-      } else if (ruleBuilder.currentScope == 'content') {
-        if (unthemedFrameHighlighter.saved != null && $els.reuseSelectors.is(':checked')) {
-          self.ruleBuilderPopover.close();
-
-          // Use saved rule
-          ruleBuilder.select(unthemedFrameHighlighter.saved);
-          ruleBuilder.next();
-        } else {
-          // Let the frame highlighter perform a selection
-          $els.selectContent.show();
-          if (!self.ruleBuilderPopover.isOpened()) {
-            self.ruleBuilderPopover.load();
-          }
-        }
-
-      } else if (ruleBuilder.ruleType != null && ruleBuilder.currentScope == null) {
-
-        $els.wizardSteps.hide();
-        $els.step2.show();
-        self.updateRule(ruleBuilder);
-
-        if (self.openRuleFile()) {
-          $els.step2Insert.show();
-        } else {
-          $els.step2Insert.hide();
-        }
-
-        if (!self.ruleBuilderPopover.isOpened()) {
-          self.ruleBuilderPopover.load();
-        }
-
-      } else { // end
-
-        if (self.ruleBuilderPopover.isOpened()) {
-          self.ruleBuilderPopover.close();
-        }
-
-        $els.wizardSteps.hide();
-        $els.step1.show();
-      }
-    };
-  };
-
-  return RuleBuilder;
+    return RuleBuilder;
 });
 
 
 define('text!mockup-patterns-thememapper-url/templates/rulebuilder.xml',[],function () { return '<div class="new-rule">\n    <h1 class="documentFirstHeading">Build rule</h1>\n\n    <div id="new-rule-step-1" class="rule-wizard-step" style="display: block;">\n        <div class="documentDescription">\n            This wizard will help you build a Diazo rule by selecting relevant elements using\n            the <strong>HTML mockup</strong> and <strong>Unthemed content</strong> inspectors.\n        </div>\n\n        <form>\n            <div id="new-rule-type-panel" class="inputs">\n                <div>\n                    <input type="radio" name="new-rule-type" value="replace" id="new-rule-replace" checked="checked" />\n                    <label for="new-rule-replace">\n                        <strong>Replace</strong> an element of the theme with an element from the content\n                    </label>\n                </div>\n                <div>\n                    <input type="radio" name="new-rule-type" value="before" id="new-rule-before" />\n                    <label for="new-rule-before">\n                        Insert an element from the content <strong>before</strong> an element in the theme\n                    </label>\n                </div>\n                <div>\n                    <input type="radio" name="new-rule-type" value="after" id="new-rule-after" />\n                    <label for="new-rule-after">\n                        Insert an element from the content <strong>after</strong> an element in the theme\n                    </label>\n                </div>\n                <div>\n                    <input type="radio" name="new-rule-type" value="drop:content" id="new-rule-drop-content" />\n                    <label for="new-rule-drop-content">\n                        <strong>Drop</strong> an element in the <strong>content</strong>\n                    </label>\n                </div>\n                <div>\n                    <input type="radio" name="new-rule-type" value="drop:theme" id="new-rule-drop-theme" />\n                    <label for="new-rule-drop-theme">\n                        <strong>Drop</strong> an element in the <strong>theme</strong>\n                    </label>\n                </div>\n            </div>\n            <div class="field inputs" id="new-rule-reuse-panel" style="display: none;">\n                <input type="checkbox" name="new-rule-reuse-selectors" value="yes" id="new-rule-reuse-selectors" checked="checked" />\n                <label for="new-rule-reuse-selectors">\n                    Use selected elements\n                </label>\n                <div class="formHelp">\n                    If selected, the rule builder will use the elements you have currently selected\n                    in the <strong>HTML mockup</strong> and/or <strong>Unthemed content</strong>\n                    inspectors instead of prompting you to select new ones.\n                </div>\n            </div>\n        </form>\n\n        <div class="formControls new-rule-actions">\n            <input type="submit" class="btn btn-primary next submitting" value="Next" />\n            <input type="submit" class="btn btn-default standalone close" value="Cancel" />\n        </div>\n\n    </div>\n    <div id="new-rule-select-theme" class="rule-wizard-step" style="display: none;">\n        <div class="documentDescription">\n            Please select an element using the <strong>HTML mockup</strong> inspector.\n        </div>\n        <div class="formControls new-rule-actions">\n            <input type="submit" class="btn btn-primary next" value="Ok" />\n            <input type="submit" class="btn btn-default standalone wizard-cancel" value="Cancel" />\n        </div>\n    </div>\n    <div id="new-rule-select-content" class="rule-wizard-step" style="display: none;">\n        <div class="documentDescription">\n            Please select an element using the <strong>Unthemed content</strong> inspector.\n        </div>\n        <div class="formControls new-rule-actions">\n            <input type="submit" class="btn btn-primary next submitting" value="Ok" />\n            <input type="submit" class="btn btn-default standalone wizard-cancel" value="Cancel" />\n        </div>\n    </div>\n    <div id="new-rule-step-2" class="rule-wizard-step" style="display: none;">\n        <div class="documentDescription">\n            The rule can be found below. Use the checkboxes\n            to further refine it.\n        </div>\n        <form>\n            <div id="new-rule-output-panel">\n                <textarea name="new-rule-output" id="new-rule-output"></textarea>\n            </div>\n            <div id="new-rule-selector-panel">\n                <div>\n                    <input type="checkbox" class="rule-modifier" name="new-rule-theme-children" value="replace" id="new-rule-theme-children" />\n                    <label for="new-rule-theme-children">Apply rule to children of the matched theme node(s)</label>\n                </div>\n                <div>\n                    <input type="checkbox" class="rule-modifier" name="new-rule-content-children" value="replace" id="new-rule-content-children" />\n                    <label for="new-rule-content-children">Apply rule to children of the matched content node(s)</label>\n                </div>\n            </div>\n\n        </form>\n        <div class="formControls new-rule-actions">\n            <input type="submit" class="btn btn-primary insert submitting" title="Insert rule into the rules.xml file" value="Insert" />\n            <input type="submit" class="btn btn-primary copy" value="Copy to clipboard" style="display: none;" />\n            <input type="submit" class="btn btn-default close" value="Close" />\n        </div>\n    </div>\n</div>\n';});
 
 define('mockup-patterns-thememapper-url/js/rulebuilderview',[
-  'underscore',
-  'mockup-patterns-filemanager-url/js/basepopover',
-  'text!mockup-patterns-thememapper-url/templates/rulebuilder.xml',
-], function(_, PopoverView, RulebuilderTemplate) {
-  'use strict';
-  var rulebuilderTemplate = _.template(RulebuilderTemplate);
+    "underscore",
+    "mockup-patterns-filemanager-url/js/basepopover",
+    "text!mockup-patterns-thememapper-url/templates/rulebuilder.xml",
+], function (_, PopoverView, RulebuilderTemplate) {
+    "use strict";
+    var rulebuilderTemplate = _.template(RulebuilderTemplate);
 
-  var RuleBuilderView = PopoverView.extend({
-    className: 'popover rulebuilderView',
-    title: _.template('<%= _t("Rule Builder") %>'),
-    content: rulebuilderTemplate,
-    render: function() {
-      PopoverView.prototype.render.call(this);
-      return this;
-    },
-    toggle: function(button, e) {
-      PopoverView.prototype.toggle.apply(this, [button, e]);
-      if (!this.opened) {
-        return;
-      } else {
-        this.app.ruleBuilder.checkSelectors();
-      }
-    }
+    var RuleBuilderView = PopoverView.extend({
+        className: "popover rulebuilderView",
+        title: _.template('<%= _t("Rule Builder") %>'),
+        content: rulebuilderTemplate,
+        render: function () {
+            PopoverView.prototype.render.call(this);
+            return this;
+        },
+        toggle: function (button, e) {
+            PopoverView.prototype.toggle.apply(this, [button, e]);
+            if (!this.opened) {
+                return;
+            } else {
+                this.app.ruleBuilder.checkSelectors();
+            }
+        },
+    });
 
-  });
-
-  return RuleBuilderView;
+    return RuleBuilderView;
 });
 
 /*
@@ -37213,343 +37172,353 @@ define('mockup-patterns-thememapper-url/js/rulebuilderview',[
  * code that has since been removed from mockup
  */
 
-define('mockup-patterns-resourceregistry-url/js/iframe',[
-  'jquery'
-], function($) {
-  'use strict';
+define('mockup-patterns-resourceregistry-url/js/iframe',["jquery"], function ($) {
+    "use strict";
 
-  window.IFrame = function(options) { this.init(options); };
-  window.IFrame.prototype = {
-    defaults: {
-      doctype: '<!doctype html>',
-      title: '',
-      name: '',
-      resources: [],
-      callback: function(){},
-      configure: function(){},
-      onLoad: function(){}
-    },
+    window.IFrame = function (options) {
+        this.init(options);
+    };
+    window.IFrame.prototype = {
+        defaults: {
+            doctype: "<!doctype html>",
+            title: "",
+            name: "",
+            resources: [],
+            callback: function () {},
+            configure: function () {},
+            onLoad: function () {},
+        },
 
-    init: function(options) {
-      var self = this;
-      self.options = $.extend({}, self.defaults, options);
+        init: function (options) {
+            var self = this;
+            self.options = $.extend({}, self.defaults, options);
 
-      // register this guy
-      if(!window.iframe){
-        window.iframe = {};
-      }
-      window.iframe[self.options.name] = self;
+            // register this guy
+            if (!window.iframe) {
+                window.iframe = {};
+            }
+            window.iframe[self.options.name] = self;
 
-      self.loaded = false;
+            self.loaded = false;
 
-      // Create iframe
-      var iframe = window.document.createElement('iframe');
+            // Create iframe
+            var iframe = window.document.createElement("iframe");
 
-      iframe.setAttribute('id', self.options.name);
-      iframe.setAttribute('name', self.options.name);
-      iframe.setAttribute('style', 'display:none;');
-      iframe.setAttribute('src', 'javascript:false');
+            iframe.setAttribute("id", self.options.name);
+            iframe.setAttribute("name", self.options.name);
+            iframe.setAttribute("style", "display:none;");
+            iframe.setAttribute("src", "javascript:false");
 
-      window.document.body.appendChild(iframe);
-      self.el = iframe;
-      self.window = iframe.contentWindow;
-      self.document = self.window.document;
+            window.document.body.appendChild(iframe);
+            self.el = iframe;
+            self.window = iframe.contentWindow;
+            self.document = self.window.document;
 
-      self.options.configure(self);
+            self.options.configure(self);
 
-      var resourcesData = '';
-      for(var i=0; i<self.options.resources.length; i=i+1){
-        var url = self.options.resources[i];
-        var resource;
-        if (url.slice( -3 ) === '.js') {
-          resource = window.document.createElement('script');
-          resource.src = url;
-          resource.type = 'text/javascript';
-          resource.async = false;
-        } else if (url.slice( -4 ) === '.css') {
-          resource = window.document.createElement('link');
-          resource.href = url;
-          resource.type = 'text/css';
-          resource.rel = 'stylesheet';
-        } else if (url.slice( -5 ) === '.less') {
-          resource = window.document.createElement('link');
-          resource.href = url;
-          resource.type = 'text/css';
-          resource.rel = 'stylesheet/less';
-        }
-        resourcesData += '\n' + resource.outerHTML;
-      }
+            var resourcesData = "";
+            for (var i = 0; i < self.options.resources.length; i = i + 1) {
+                var url = self.options.resources[i];
+                var resource;
+                if (url.slice(-3) === ".js") {
+                    resource = window.document.createElement("script");
+                    resource.src = url;
+                    resource.type = "text/javascript";
+                    resource.async = false;
+                } else if (url.slice(-4) === ".css") {
+                    resource = window.document.createElement("link");
+                    resource.href = url;
+                    resource.type = "text/css";
+                    resource.rel = "stylesheet";
+                } else if (url.slice(-5) === ".less") {
+                    resource = window.document.createElement("link");
+                    resource.href = url;
+                    resource.type = "text/css";
+                    resource.rel = "stylesheet/less";
+                }
+                resourcesData += "\n" + resource.outerHTML;
+            }
 
-      self.document.open();
-      self.document.write(
-          self.options.doctype +
-          '<html>' +
-            '<head>' +
-              '<title>' + self.options.title + '</title>' +
-              '<meta http-equiv="X-UA-Compatible" content="IE=edge">' +
-            '</head>' +
-            '<body onload="parent.window.iframe[\'' +
-                self.options.name + '\'].load()">' +
-              resourcesData +
-            '</body>' +
-          '</html>'
-      );
-      self.document.close();
-    },
+            self.document.open();
+            self.document.write(
+                self.options.doctype +
+                    "<html>" +
+                    "<head>" +
+                    "<title>" +
+                    self.options.title +
+                    "</title>" +
+                    '<meta http-equiv="X-UA-Compatible" content="IE=edge">' +
+                    "</head>" +
+                    "<body onload=\"parent.window.iframe['" +
+                    self.options.name +
+                    "'].load()\">" +
+                    resourcesData +
+                    "</body>" +
+                    "</html>"
+            );
+            self.document.close();
+        },
 
-    load: function() {
-      var self = this;
+        load: function () {
+            var self = this;
 
-      // check if already loaded
-      if ( self.loaded === true ) {
-        return;
-      }
+            // check if already loaded
+            if (self.loaded === true) {
+                return;
+            }
 
-      // mark iframe as loaded
-      self.loaded = true;
+            // mark iframe as loaded
+            self.loaded = true;
 
-      self.options.onLoad(self);
-    },
-    destroy: function(){
-      delete window.iframe[this.options.name];
-      window.document.body.removeChild(this.el);
-    }
-  };
+            self.options.onLoad(self);
+        },
+        destroy: function () {
+            delete window.iframe[this.options.name];
+            window.document.body.removeChild(this.el);
+        },
+    };
 
-  return window.IFrame;
+    return window.IFrame;
 });
 
 define('mockup-patterns-thememapper-url/js/lessbuilderview',[
-  'jquery',
-  'underscore',
-  'mockup-patterns-filemanager-url/js/basepopover',
-  'mockup-patterns-resourceregistry-url/js/iframe'
-], function($, _, PopoverView, IFrame) {
-  'use strict';
-  var lessBuilderTemplate = _.template(
-    '<div id="lessBuilder">' +
-      '<span class="message"></span>' +
-      '<span style="display: none;" class="errorMessage"></span>' +
-      '<div class="buttonBox">' +
-        '<label for="lessFileName">Save as:</label>' +
-        '<input id="lessFileName" type="text" placeholder="filename" />' +
-        '<button id="compileBtn" class="btn btn-primary">Compile</button>' +
-        '<button id="errorBtn" class="btn btn-default">Clear</button>' +
-      '</div>' +
-    '</div>'
-  );
+    "jquery",
+    "underscore",
+    "mockup-patterns-filemanager-url/js/basepopover",
+    "mockup-patterns-resourceregistry-url/js/iframe",
+], function ($, _, PopoverView, IFrame) {
+    "use strict";
+    var lessBuilderTemplate = _.template(
+        '<div id="lessBuilder">' +
+            '<span class="message"></span>' +
+            '<span style="display: none;" class="errorMessage"></span>' +
+            '<div class="buttonBox">' +
+            '<label for="lessFileName">Save as:</label>' +
+            '<input id="lessFileName" type="text" placeholder="filename" />' +
+            '<button id="compileBtn" class="btn btn-primary">Compile</button>' +
+            '<button id="errorBtn" class="btn btn-default">Clear</button>' +
+            "</div>" +
+            "</div>"
+    );
 
-  var LessBuilderView = PopoverView.extend({
-    className: 'popover lessbuilderview',
-    title: _.template('<%= _t("LESS Builder") %>'),
-    content: lessBuilderTemplate,
-    $button: null,
-    $start: null,
-    $working: null,
-    $done: null,
-    $error: null,
-    render: function() {
-      var self = this;
-      PopoverView.prototype.render.call(this);
-      self.$message = $('.message', this.$el);
-      self.$error = $('.errorMessage', this.$el);
-      self.$button = $('#compileBtn', this.$el);
-      self.$filename = $('#lessFileName', this.$el);
-      self.$errorButton = $('#errorBtn', this.$el);
-      self.$button.on('click', function() {
-        self.showLessBuilder();
-      });
-      self.$errorButton.on('click', function() {
-        self.start();
-        self.toggle();
-      });
-      self.start();
-      return this;
-    },
-    toggle: function(button, e) {
-      PopoverView.prototype.toggle.apply(this, [button, e]);
-      this.setFilename();
-    },
-    setFilename: function() {
-      var self = this;
-
-      if (self.app.lessPaths['save'] === undefined) {
-        return;
-      }
-
-      var filePath = self.app.lessPaths['less'];
-      var devPath = self.app.devPath[0];
-      var prodPath = self.app.prodPath[0];
-      var f;
-
-      if (filePath == devPath) {
-        f = prodPath;
-      } else {
-        f = self.app.lessPaths['save'];
-      }
-
-      f = f.substr(f.lastIndexOf('/') + 1, f.length);
-      self.$filename.attr('placeholder', f);
-    },
-    start: function() {
-      var self = this;
-      self.$button.show();
-      self.$errorButton.hide();
-      self.$message.text('Click to compile the current file');
-      self.$error.hide();
-    },
-    working: function() {
-      var self = this;
-      self.$button.hide();
-      self.$message.text('Working....');
-    },
-    end: function() {
-      var self = this;
-      self.$message.text('Compiled successfully');
-      setTimeout(self.reset.bind(self), 3000);
-    },
-    reset: function() {
-      var self = this;
-      self.start();
-      self.toggle();
-    },
-    showError: function(error) {
-      this.$message.text('');
-      this.$error.text(error).show();
-      this.$errorButton.show();
-    },
-    showLessBuilder: function() {
-      var self = this;
-
-      if (self.app.lessPaths['save'] === undefined) {
-        self.showError('Error: invalid filetype');
-        return false;
-      }
-
-      self.working();
-
-      var config = {
-        less: [self.app.lessVariableUrl,
-          self.app.lessPaths['less'],
-          self.app.lessUrl
-        ]
-      };
-
-      var iframe = new IFrame({
-        name: 'lessc',
-        resources: config.less,
-        callback: self.app.saveThemeCSS,
-        env: self.app,
-        configure: function(iframe) {
-          iframe.window.lessErrorReporting = function(what, error, href) {
-            if (error.href !== undefined) {
-              self.app.fileManager.ace.editor.scrollToLine(error.line, true);
-              if (error.type == 'Name') {
-                var reg = new RegExp('.*(@\\S+)\\s.*');
-                var matches = reg.exec(error.message);
-                if (matches !== null) {
-                  var varName = matches[1];
-                  var result = self.app.fileManager.ace.editor.findAll(varName);
-                }
-              } else {
-                //The line number is always off by 1? (and LESS indexes from 0) so -2
-                self.app.fileManager.ace.editor.moveCursorToPosition({
-                  row: error.line - 2,
-                  column: error.column
-                });
-                self.app.fileManager.ace.editor.focus();
-              }
-              self.showError(error);
-            }
-          };
-          iframe.styles = [];
+    var LessBuilderView = PopoverView.extend({
+        className: "popover lessbuilderview",
+        title: _.template('<%= _t("LESS Builder") %>'),
+        content: lessBuilderTemplate,
+        $button: null,
+        $start: null,
+        $working: null,
+        $done: null,
+        $error: null,
+        render: function () {
+            var self = this;
+            PopoverView.prototype.render.call(this);
+            self.$message = $(".message", this.$el);
+            self.$error = $(".errorMessage", this.$el);
+            self.$button = $("#compileBtn", this.$el);
+            self.$filename = $("#lessFileName", this.$el);
+            self.$errorButton = $("#errorBtn", this.$el);
+            self.$button.on("click", function () {
+                self.showLessBuilder();
+            });
+            self.$errorButton.on("click", function () {
+                self.start();
+                self.toggle();
+            });
+            self.start();
+            return this;
         },
-        onLoad: function(iframe) {
-          iframe.window.less.pageLoadFinished.then(
-            function() {
-              var $ = window.parent.$;
-              var iframe = window.iframe['lessc'];
-              var styles = $('style', iframe.document);
+        toggle: function (button, e) {
+            PopoverView.prototype.toggle.apply(this, [button, e]);
+            this.setFilename();
+        },
+        setFilename: function () {
+            var self = this;
 
-              var css = '';
-
-              $(styles).each(function() {
-                css += this.innerHTML;
-              });
-
-              iframe.options.callback(css);
+            if (self.app.lessPaths["save"] === undefined) {
+                return;
             }
-          );
-        }
-      });
 
-    },
-  });
+            var filePath = self.app.lessPaths["less"];
+            var devPath = self.app.devPath[0];
+            var prodPath = self.app.prodPath[0];
+            var f;
 
-  return LessBuilderView;
+            if (filePath == devPath) {
+                f = prodPath;
+            } else {
+                f = self.app.lessPaths["save"];
+            }
+
+            f = f.substr(f.lastIndexOf("/") + 1, f.length);
+            self.$filename.attr("placeholder", f);
+        },
+        start: function () {
+            var self = this;
+            self.$button.show();
+            self.$errorButton.hide();
+            self.$message.text("Click to compile the current file");
+            self.$error.hide();
+        },
+        working: function () {
+            var self = this;
+            self.$button.hide();
+            self.$message.text("Working....");
+        },
+        end: function () {
+            var self = this;
+            self.$message.text("Compiled successfully");
+            setTimeout(self.reset.bind(self), 3000);
+        },
+        reset: function () {
+            var self = this;
+            self.start();
+            self.toggle();
+        },
+        showError: function (error) {
+            this.$message.text("");
+            this.$error.text(error).show();
+            this.$errorButton.show();
+        },
+        showLessBuilder: function () {
+            var self = this;
+
+            if (self.app.lessPaths["save"] === undefined) {
+                self.showError("Error: invalid filetype");
+                return false;
+            }
+
+            self.working();
+
+            var config = {
+                less: [
+                    self.app.lessVariableUrl,
+                    self.app.lessPaths["less"],
+                    self.app.lessUrl,
+                ],
+            };
+
+            var iframe = new IFrame({
+                name: "lessc",
+                resources: config.less,
+                callback: self.app.saveThemeCSS,
+                env: self.app,
+                configure: function (iframe) {
+                    iframe.window.lessErrorReporting = function (
+                        what,
+                        error,
+                        href
+                    ) {
+                        if (error.href !== undefined) {
+                            self.app.fileManager.ace.editor.scrollToLine(
+                                error.line,
+                                true
+                            );
+                            if (error.type == "Name") {
+                                var reg = new RegExp(".*(@\\S+)\\s.*");
+                                var matches = reg.exec(error.message);
+                                if (matches !== null) {
+                                    var varName = matches[1];
+                                    var result = self.app.fileManager.ace.editor.findAll(
+                                        varName
+                                    );
+                                }
+                            } else {
+                                //The line number is always off by 1? (and LESS indexes from 0) so -2
+                                self.app.fileManager.ace.editor.moveCursorToPosition(
+                                    {
+                                        row: error.line - 2,
+                                        column: error.column,
+                                    }
+                                );
+                                self.app.fileManager.ace.editor.focus();
+                            }
+                            self.showError(error);
+                        }
+                    };
+                    iframe.styles = [];
+                },
+                onLoad: function (iframe) {
+                    iframe.window.less.pageLoadFinished.then(function () {
+                        var $ = window.parent.$;
+                        var iframe = window.iframe["lessc"];
+                        var styles = $("style", iframe.document);
+
+                        var css = "";
+
+                        $(styles).each(function () {
+                            css += this.innerHTML;
+                        });
+
+                        iframe.options.callback(css);
+                    });
+                },
+            });
+        },
+    });
+
+    return LessBuilderView;
 });
 
 define('mockup-patterns-thememapper-url/js/cacheview',[
-  'jquery',
-  'underscore',
-  'mockup-patterns-filemanager-url/js/basepopover',
-  'mockup-utils'
-], function($, _, PopoverView, utils) {
-  'use strict';
-  var template = _.template(
-    '<div>' +
-      '<span id="clearMessage">Click to clear the site\'s theme cache, forcing a reload from the source.</span>' +
-      '<span style="display: none;" id="clearSuccess">Cache cleared successfully.</span>' +
-      '<a href="#" id="clearBtn" class="btn btn-block btn-primary">Clear</a>' +
-    '</div>'
-  );
+    "jquery",
+    "underscore",
+    "mockup-patterns-filemanager-url/js/basepopover",
+    "mockup-utils",
+], function ($, _, PopoverView, utils) {
+    "use strict";
+    var template = _.template(
+        "<div>" +
+            '<span id="clearMessage">Click to clear the site\'s theme cache, forcing a reload from the source.</span>' +
+            '<span style="display: none;" id="clearSuccess">Cache cleared successfully.</span>' +
+            '<a href="#" id="clearBtn" class="btn btn-block btn-primary">Clear</a>' +
+            "</div>"
+    );
 
-  var CacheView = PopoverView.extend({
-    className: 'popover',
-    title: _.template('<%= _t("Clear Cache") %>'),
-    content: template,
-    render: function() {
-      var self = this;
-      PopoverView.prototype.render.call(this);
-      self.$clear = $('#clearBtn', this.$el);
-      self.$message = $('#clearMessage', this.$el);
-      self.$success = $('#clearSuccess', this.$el);
+    var CacheView = PopoverView.extend({
+        className: "popover",
+        title: _.template('<%= _t("Clear Cache") %>'),
+        content: template,
+        render: function () {
+            var self = this;
+            PopoverView.prototype.render.call(this);
+            self.$clear = $("#clearBtn", this.$el);
+            self.$message = $("#clearMessage", this.$el);
+            self.$success = $("#clearSuccess", this.$el);
 
-      self.$clear.on('click', function() {
+            self.$clear.on("click", function () {
+                var url = self.app.options.themeUrl;
+                url = url.substr(0, url.indexOf("portal_resource"));
+                url += "/theming-controlpanel";
 
-        var url = self.app.options.themeUrl;
-        url = url.substr(0, url.indexOf('portal_resource'));
-        url += '/theming-controlpanel';
+                $.ajax({
+                    url: url,
+                    data: {
+                        "form.button.InvalidateCache": true,
+                        "_authenticator": utils.getAuthenticator(),
+                    },
+                    success: function () {
+                        self.$message.hide();
+                        self.$success.show();
+                        self.$clear.hide();
 
-        $.ajax({
-          url: url,
-          data: {
-            'form.button.InvalidateCache': true,
-            '_authenticator': utils.getAuthenticator()
-          },
-          success: function() {
-            self.$message.hide();
-            self.$success.show();
-            self.$clear.hide();
+                        setTimeout(function () {
+                            self.$message.show();
+                            self.$success.hide();
+                            self.$clear.show();
+                            self.triggerView.el.click();
+                        }, 3000);
+                    },
+                });
+            });
+            return this;
+        },
+        toggle: function (button, e) {
+            PopoverView.prototype.toggle.apply(this, [button, e]);
+        },
+    });
 
-            setTimeout(function() {
-              self.$message.show();
-              self.$success.hide();
-              self.$clear.show();
-              self.triggerView.el.click();
-            }, 3000);
-          }
-        });
-      });
-      return this;
-    },
-    toggle: function(button, e) {
-      PopoverView.prototype.toggle.apply(this, [button, e]);
-    }
-
-  });
-
-  return CacheView;
+    return CacheView;
 });
 
 /* Theme Mapper pattern.
@@ -37581,604 +37550,667 @@ define('mockup-patterns-thememapper-url/js/cacheview',[
  */
 
 define('mockup-patterns-thememapper',[
-  'jquery',
-  'pat-base',
-  'underscore',
-  'translate',
-  'text!mockup-patterns-thememapper-url/templates/inspector.xml',
-  'mockup-patterns-filemanager',
-  'mockup-patterns-thememapper-url/js/rulebuilder',
-  'mockup-patterns-thememapper-url/js/rulebuilderview',
-  'mockup-patterns-thememapper-url/js/lessbuilderview',
-  'mockup-patterns-thememapper-url/js/cacheview',
-  'mockup-ui-url/views/button',
-  'mockup-ui-url/views/buttongroup',
-  'mockup-ui-url/views/anchor',
-  'mockup-ui-url/views/dropdown',
-  'mockup-utils'
-], function($, Base, _, _t, InspectorTemplate, FileManager, RuleBuilder, RuleBuilderView,
-            LessBuilderView, CacheView, ButtonView, ButtonGroup,
-            AnchorView, DropdownView, utils) {
-  'use strict';
+    "jquery",
+    "pat-base",
+    "underscore",
+    "translate",
+    "text!mockup-patterns-thememapper-url/templates/inspector.xml",
+    "mockup-patterns-filemanager",
+    "mockup-patterns-thememapper-url/js/rulebuilder",
+    "mockup-patterns-thememapper-url/js/rulebuilderview",
+    "mockup-patterns-thememapper-url/js/lessbuilderview",
+    "mockup-patterns-thememapper-url/js/cacheview",
+    "mockup-ui-url/views/button",
+    "mockup-ui-url/views/buttongroup",
+    "mockup-ui-url/views/anchor",
+    "mockup-ui-url/views/dropdown",
+    "mockup-utils",
+], function (
+    $,
+    Base,
+    _,
+    _t,
+    InspectorTemplate,
+    FileManager,
+    RuleBuilder,
+    RuleBuilderView,
+    LessBuilderView,
+    CacheView,
+    ButtonView,
+    ButtonGroup,
+    AnchorView,
+    DropdownView,
+    utils
+) {
+    "use strict";
 
-  var inspectorTemplate = _.template(InspectorTemplate);
+    var inspectorTemplate = _.template(InspectorTemplate);
 
-  var Inspector = Base.extend({
-    name: 'thememapper-inspector',
-    trigger: '.pat-thememapper-inspector-dummy',
-    defaults: {
-      name: 'name',
-      ruleBuilder: null,
-      showReload: false
-    },
-    init: function() {
-      var self = this;
-      self.enabled = true;
-      self.currentOutline = null;
-      self.activeClass = '_theming-highlighted';
-      self.saved = null;
-      self.ruleBuilder = self.options.ruleBuilder;
-
-      self.$el.html(inspectorTemplate(self.options));
-      self.$on = $('.turnon', self.$el);
-      self.$off = $('.turnoff', self.$el);
-      self.$frame = $('iframe', self.$el);
-      self.$frameInfo = $('.frame-info', self.$el);
-      self.$frameShelfContainer = $('.frame-shelf-container', self.$el);
-      self.$selectorInfo = $('.selector-info', self.$frameShelfContainer);
-      self.$currentSelector = $('.current-selector', self.$frameInfo);
-
-      self.$reloadBtn = $('a.refresh', self.$el);
-
-      $('a.clearInspector', self.$frameShelfContainer).click(function(e) {
-        e.preventDefault();
-        self.save(null);
-      });
-      self.$reloadBtn.click(function(e) {
-        e.preventDefault();
-        self.$frame.attr('src', self.$frame.attr('src'));
-        self.setupFrame();
-      });
-      $('a.fullscreen', self.$el).click(function(e){
-        e.preventDefault();
-        if (self.$el.hasClass('show-fullscreen')){
-          self.$el.removeClass('show-fullscreen');
-        } else {
-          self.$el.addClass('show-fullscreen');
-        }
-      });
-
-      if (!self.options.showReload){
-        self.$reloadBtn.hide();
-      }
-
-      self.$on.click(function() {
-        self.on();
-      });
-      self.$off.click(function() {
-        self.off();
-      });
-
-      self.setupFrame();
-    },
-    on: function() {
-      var self = this;
-      self.$off.prop('disabled', false);
-      self.$on.prop('disabled', true);
-      self.enabled = true;
-    },
-    off: function() {
-      var self = this;
-      self.$on.prop('disabled', false);
-      self.$off.prop('disabled', true);
-      self.enabled = false;
-    },
-    setupFrame: function() {
-      var self = this;
-      /* messy way to check if iframe is loaded */
-      var checkit = function() {
-        if (self.$frame.contents().find('body').find('*').length > 0){
-          self._setupFrame();
-        } else {
-          setTimeout(checkit, 100);
-        }
-      };
-      setTimeout(checkit, 200);
-    },
-    _setupFrame: function() {
-      var self = this;
-
-      self.$frame.contents().find('*').hover(function(e) {
-        if(self.enabled) {
-          e.stopPropagation();
-          self.$frame.focus();
-          self.setOutline(this);
-        }
-      }, function() {
-        if($(this).hasClass(self.activeClass)) {
-          self.clearOutline(this);
-        }
-      }).click(function (e) {
-        if(self.enabled) {
-          e.stopPropagation();
-          e.preventDefault();
-
-          self.setOutline(this);
-          self.save(this);
-          return false;
-        }
-        return true;
-      });
-
-      self.$frame.contents().keyup(function(e) {
-        if (!self.enabled){
-          return true;
-        }
-
-        // ESC -> Move selection to parent node
-        if(e.keyCode === 27 && self.currentOutline !== null) {
-          e.stopPropagation();
-          e.preventDefault();
-
-          var parent = self.currentOutline.parentNode;
-          if(parent !== null && parent.tagName !== undefined) {
-            self.setOutline(parent);
-          }
-        }
-
-        // Enter -> Equivalent to clicking on selected node
-        if(e.keyCode === 13 && self.currentOutline !== null) {
-          e.stopPropagation();
-          e.preventDefault();
-
-          self.save(self.currentOutline);
-
-          return false;
-        }
-      });
-    },
-    save: function(element) {
-      var self = this;
-      this.saved = element;
-      if(element === null) {
-        self.$frameShelfContainer.hide();
-      } else {
-        self.$frameShelfContainer.show();
-      }
-
-      self.animateSelector();
-      self.$selectorInfo.text(element === null ? '' : self.ruleBuilder.bestSelector(element));
-
-      self.onsave(this, element);
-    },
-    clearOutline: function(element){
-      var self = this;
-      $(element).css('outline', '');
-      $(element).css('cursor', '');
-
-      $(element).removeClass(self.activeClass);
-
-      self.currentOutline = null;
-      self.$currentSelector.text('');
-      self.onselect(self, null);
-    },
-    setOutline: function(element) {
-      var self = this;
-      var $el = $(element);
-
-      $el.css('outline', 'solid red 1px');
-      $el.css('cursor', 'crosshair');
-
-      $el.addClass(self.activeClass);
-
-      if(self.currentOutline !== null) {
-        self.clearOutline(self.currentOutline);
-      }
-      self.currentOutline = element;
-      self.$currentSelector.text(self.ruleBuilder.bestSelector(element));
-
-      self.onselect(self, element);
-    },
-    animateSelector: function(highlightColor, duration) {
-      var self = this;
-      var highlightBg = highlightColor || '#FFFFE3';
-      var animateMs = duration || 750;
-      var originalBg = self.$frameInfo.css('background-color');
-
-      if (!originalBg || originalBg === highlightBg){
-        originalBg = '#FFFFFF'; // default to white
-      }
-
-      self.$frameInfo
-        .css('backgroundColor', highlightBg)
-        .animate({ backgroundColor: originalBg }, animateMs, null, function () {
-          self.$frameInfo.css('backgroundColor', originalBg);
-        });
-    },
-    onsave: function(highlighter, node) {
-      var self = this;
-      if(node == null) {
-        self.$el.find('.frame-shelf-container').hide();
-      } else {
-        self.$el.find('.frame-shelf-container').show();
-      }
-
-      self.animateSelector(self.$el.find('.frame-info'));
-      self.$el.find('.selector-info').text(node == null? '': self.ruleBuilder.bestSelector(node));
-
-      if(self.ruleBuilder.active) {
-        self.ruleBuilder.select(node);
-        self.ruleBuilder.next();
-      }
-
-    },
-    onselect: function(highlighter, node) {
-      var self = this;
-      self.$currentSelector.text(node == null? '': self.ruleBuilder.bestSelector(node));
-    }
-  });
-
-
-  var ThemeMapper = Base.extend({
-    name: 'thememapper',
-    trigger: '.pat-thememapper',
-    parser: 'mockup',
-    defaults: {
-      filemanagerConfig: {},
-      themeUrl: null,
-      mockupUrl: null,
-      unthemedUrl: null,
-      helpUrl: null,
-      previewUrl: null,
-      editable: false
-    },
-    buttonGroup: null,
-    showInspectorsButton: null,
-    buildRuleButton: null,
-    previewThemeButton: null,
-    helpButton: null,
-    hidden: true,
-    fileManager: null,
-    mockupInspector: null,
-    unthemedInspector: null,
-    ruleBuilder: null,
-    rulebuilderView: null,
-    devPath: null,
-    prodPath: null,
-    lessUrl: null,
-    lessPaths: {},
-    lessVariableUrl: null,
-    $fileManager: null,
-    $container: null,
-    $inspectorContainer: null,
-    $mockupInspector: null,
-    $unthemedInspector: null,
-    init: function() {
-      var self = this;
-      if(typeof(self.options.filemanagerConfig) === 'string'){
-        self.options.filemanagerConfig = $.parseJSON(self.options.filemanagerConfig);
-      }
-      self.$fileManager = $('<div class="pat-filemanager"/>').appendTo(self.$el);
-      self.$container = $('<div class="row"></div>').appendTo(self.$el);
-      self.$styleBox = $('<div id="styleBox"></div>').appendTo(self.$el);
-      self.$inspectorContainer = $('<div id="inspectors"></div>').appendTo(self.$container);
-      self.$mockupInspector = $('<div class="mockup-inspector"/>').appendTo(self.$inspectorContainer);
-      self.$unthemedInspector = $('<div class="unthemed-inspector"/>').appendTo(self.$inspectorContainer);
-
-      // initialize patterns now
-      self.lessUrl = (self.options.lessUrl !== undefined ) ? self.options.lessUrl : false;
-      self.lessVariableUrl = (self.options.lessVariables !== undefined ) ? self.options.lessVariables : false;
-
-      self.devPath = [];
-      self.prodPath = [];
-
-      self.options.filemanagerConfig.uploadUrl = self.options.themeUrl;
-      self.options.filemanagerConfig.theme = true;
-      self.fileManager = new FileManager(self.$fileManager, self.options.filemanagerConfig);
-      self.fileManager.setUploadUrl();
-
-      self.btns = {};
-      self.menus = {};
-      self.setupButtons();
-
-      self.ruleBuilder = new RuleBuilder(self, self.ruleBuilderCallback);
-
-      self.fileManager.on('fileChange', function() {
-        var node = self.fileManager.getSelectedNode();
-        self.setLessPaths(node);
-      });
-
-      self.mockupInspector = new Inspector(self.$mockupInspector, {
-        name: _t('HTML mockup'),
-        ruleBuilder: self.ruleBuilder,
-        url: self.options.mockupUrl,
-        showReload: true,
-      });
-      self.unthemedInspector = new Inspector(self.$unthemedInspector, {
-        name: _t('Unthemed content'),
-        ruleBuilder: self.ruleBuilder,
-        url: self.options.unthemedUrl,
-      });
-      self.btns.buildLessButton.disable();
-
-      if(!self.options.editable) {
-        if(self.fileManager.toolbar) {
-          var items = self.fileManager.toolbar.items;
-          $(items).each(function() {
-            this.disable();
-          });
-          self.lessbuilderView.triggerView.disable();
-        }
-      }
-
-      // initially, let's hide the panels
-      self.hideInspectors();
-      self.getManifest();
-    },
-    getManifest: function() {
-      var self = this;
-
-      self.fileManager.doAction('getFile', {
-        datatype: 'json',
-        data: {
-          path: 'manifest.cfg'
+    var Inspector = Base.extend({
+        name: "thememapper-inspector",
+        trigger: ".pat-thememapper-inspector-dummy",
+        defaults: {
+            name: "name",
+            ruleBuilder: null,
+            showReload: false,
         },
-        success: function(data) { this.setDefaultPaths(data); }.bind(self)
-      });
-    },
-    setSavePath: function() {
-      var self = this;
-      var filename = self.lessbuilderView.$filename.val();
+        init: function () {
+            var self = this;
+            self.enabled = true;
+            self.currentOutline = null;
+            self.activeClass = "_theming-highlighted";
+            self.saved = null;
+            self.ruleBuilder = self.options.ruleBuilder;
 
-      if(filename === '') {
-        filename = self.lessbuilderView.$filename.attr('placeholder');
-      }
+            self.$el.html(inspectorTemplate(self.options));
+            self.$on = $(".turnon", self.$el);
+            self.$off = $(".turnoff", self.$el);
+            self.$frame = $("iframe", self.$el);
+            self.$frameInfo = $(".frame-info", self.$el);
+            self.$frameShelfContainer = $(".frame-shelf-container", self.$el);
+            self.$selectorInfo = $(".selector-info", self.$frameShelfContainer);
+            self.$currentSelector = $(".current-selector", self.$frameInfo);
 
-      var s = self.lessPaths['save'];
-      var folder = s.substr(0, s.lastIndexOf('/'));
+            self.$reloadBtn = $("a.refresh", self.$el);
 
-      var savePath = folder + '/' + filename;
-      self.lessPaths['save'] = savePath;
-    },
-    setLessPaths: function(node) {
-      var self = this;
-
-      if(node.fileType === 'less'){
-        self.btns.buildLessButton.enable();
-      }
-      else {
-        self.btns.buildLessButton.disable();
-      }
-
-      if (node.path !== '') {
-        var reg = new RegExp('/(.*\\.)less$', 'm');
-        var path = reg.exec(node.path);
-
-        if( path === null ) {
-          self.lessPaths = {};
-          return false;
-        }
-        var lessPath = path[1] + 'less';
-        var cssPath = path[1] + 'css';
-
-        //file paths should be in the form of:
-        // "[directory/]filename.less"
-        self.lessPaths = {
-          'less': lessPath,
-          'save': cssPath
-        };
-
-        return true;
-      }
-      else {
-        self.lessPaths = {};
-        return false;
-      }
-    },
-    setDefaultPaths: function(manifest) {
-      var self = this;
-      var dev = new RegExp('development-css\\s*=\\s*\\/\\+\\+theme\\+\\+.*?\\/(.*)');
-      var prod = new RegExp('production-css\\s*=\\s*\\/\\+\\+theme\\+\\+.*?\\/(.*)');
-
-      var devUrl = dev.exec(manifest.contents)[1];
-      var prodUrl = prod.exec(manifest.contents)[1];
-
-      //The array lets us get around scoping issues.
-      self.devPath[0] = devUrl;
-      self.prodPath[0] = prodUrl;
-    },
-    saveThemeCSS: function(styles) {
-      var self = this.env;
-
-      if(styles === '' || styles === undefined) {
-        //There was probably a problem during compilation
-        return false;
-      }
-
-      self.setSavePath();
-
-      self.fileManager.doAction('saveFile', {
-        type: 'POST',
-        data: {
-          path: self.lessPaths['save'],
-          relativeUrls: true,
-          data: styles,
-          _authenticator: utils.getAuthenticator()
-        },
-        success: function(data) {
-          if (data.success === 'tmp') {
-            self.fileManager.fileData['_generated_.css'] = {
-              contents: data.value,
-              ext: 'css'
-            };
-            self.fileManager.openEditor('_generated_.css');
-          } else {
-            self.fileManager.refreshTree(function() {
-              //We need to make sure we open the newest version
-              delete self.fileManager.fileData['/' + self.lessPaths['save']];
-              self.fileManager.selectItem(self.lessPaths['save']);
+            $("a.clearInspector", self.$frameShelfContainer).click(function (
+                e
+            ) {
+                e.preventDefault();
+                self.save(null);
             });
-          }
-          self.lessbuilderView.end();
-        }
-      });
+            self.$reloadBtn.click(function (e) {
+                e.preventDefault();
+                self.$frame.attr("src", self.$frame.attr("src"));
+                self.setupFrame();
+            });
+            $("a.fullscreen", self.$el).click(function (e) {
+                e.preventDefault();
+                if (self.$el.hasClass("show-fullscreen")) {
+                    self.$el.removeClass("show-fullscreen");
+                } else {
+                    self.$el.addClass("show-fullscreen");
+                }
+            });
 
-      window.iframe['lessc'].destroy();
+            if (!self.options.showReload) {
+                self.$reloadBtn.hide();
+            }
 
-    },
-    showInspectors: function(){
-      var self = this;
-      var $parent = self.$mockupInspector.parent();
-      $parent.slideDown();
-      self.hidden = false;
-      self.btns.showInspectorsButton.options.title = 'Hide inspectors';
-      self.btns.showInspectorsButton.applyTemplate();
-      $('html, body').animate({
-        scrollTop: $parent.offset().top - 50
-      }, 500);
-    },
-    hideInspectors: function(){
-      var self = this;
-      var $parent = self.$mockupInspector.parent();
-      $parent.slideUp();
-      self.hidden = true;
-      self.btns.showInspectorsButton.options.title = 'Show inspectors';
-      self.btns.showInspectorsButton.applyTemplate();
-    },
-    setupButtons: function(){
-      var self = this;
-      self.btns.showInspectorsButton = new ButtonView({
-        id: 'showinspectors',
-        title: _t('Show inspectors'),
-        icon: 'search',
-        tooltip: _t('Show inspector panels'),
-        context: 'default'
-      });
-      self.btns.showInspectorsButton.on('button:click', function(){
-        if (self.hidden) {
-          self.showInspectors();
-        } else {
-          self.hideInspectors();
-        }
-      });
+            self.$on.click(function () {
+                self.on();
+            });
+            self.$off.click(function () {
+                self.off();
+            });
 
-      self.btns.buildRuleButton = new AnchorView({
-        id: 'buildrule',
-        title: _t('Build rule'),
-        icon: 'wrench',
-        tooltip: _t('rule building wizard'),
-        context: 'default'
-      });
-      self.btns.fullscreenButton = new ButtonView({
-        id: 'fullscreenEditor',
-        title: _t('Fullscreen'),
-        icon: 'fullscreen',
-        tooltip: _t('view the editor in fullscreen'),
-        context: 'default'
-      });
-      self.btns.fullscreenButton.on('button:click', function() {
-        var btn = $('<a href="#">'+
-            '<span class="btn btn-danger closeeditor">' + _t('Close Fullscreen') + '</span>'+
-            '</a>').prependTo($('.tree'));
+            self.setupFrame();
+        },
+        on: function () {
+            var self = this;
+            self.$off.prop("disabled", false);
+            self.$on.prop("disabled", true);
+            self.enabled = true;
+        },
+        off: function () {
+            var self = this;
+            self.$on.prop("disabled", false);
+            self.$off.prop("disabled", true);
+            self.enabled = false;
+        },
+        setupFrame: function () {
+            var self = this;
+            /* messy way to check if iframe is loaded */
+            var checkit = function () {
+                if (self.$frame.contents().find("body").find("*").length > 0) {
+                    self._setupFrame();
+                } else {
+                    setTimeout(checkit, 100);
+                }
+            };
+            setTimeout(checkit, 200);
+        },
+        _setupFrame: function () {
+            var self = this;
 
-        $(btn).click(function() {
-          $('.container').removeClass('fullscreen').trigger('resize');
-          $(btn).remove();
-        });
-        //resize tells the editor window to resize as well.
-        $('.container').addClass('fullscreen').trigger('resize');
-      });
-      self.previewThemeButton = new ButtonView({
-        id: 'previewtheme',
-        title: _t('Preview theme'),
-        icon: 'new-window',
-        tooltip: _t('preview theme in a new window'),
-        context: 'default'
-      });
-      self.previewThemeButton.on('button:click', function(){
-        window.open(self.options.previewUrl);
-      });
-      self.btns.buildLessButton = new AnchorView({
-        id: 'buildless',
-        title: _t('Build CSS'),
-        icon: 'cog',
-        tooltip: _t('Compile LESS file'),
-        context: 'default'
-      });
-      self.btns.refreshButton = new ButtonView({
-        id: 'refreshButton ',
-        title: _t('Refresh'),
-        icon: 'refresh',
-        tooltip: _t('Reload the current file'),
-        context: 'default'
-      });
-      self.btns.refreshButton.on('button:click', function() {
-        self.fileManager.refreshFile();
-      });
-      self.btns.cacheButton = new ButtonView({
-        id: 'cachebutton',
-        title: _t('Clear cache'),
-        icon: 'floppy-remove',
-        tooltip: _t('Clear site\'s theme cache'),
-        context: 'default'
-      });
-      self.btns.helpButton = new ButtonView({
-        id: 'helpbutton',
-        title: _t('Help'),
-        icon: 'question-sign',
-        tooltip: _t('Show help'),
-        context: 'default'
-      });
-      self.btns.helpButton.on('button:click', function(){
-        window.open(self.options.helpUrl);
-      });
-      self.rulebuilderView = new RuleBuilderView({
-        triggerView: self.btns.buildRuleButton,
-        app: self
-      });
-      self.cacheView = new CacheView({
-        triggerView: self.btns.cacheButton,
-        app: self
-      });
-      self.lessbuilderView = new LessBuilderView({
-        triggerView: self.btns.buildLessButton,
-        app: self
-      });
+            self.$frame
+                .contents()
+                .find("*")
+                .hover(
+                    function (e) {
+                        if (self.enabled) {
+                            e.stopPropagation();
+                            self.$frame.focus();
+                            self.setOutline(this);
+                        }
+                    },
+                    function () {
+                        if ($(this).hasClass(self.activeClass)) {
+                            self.clearOutline(this);
+                        }
+                    }
+                )
+                .click(function (e) {
+                    if (self.enabled) {
+                        e.stopPropagation();
+                        e.preventDefault();
 
+                        self.setOutline(this);
+                        self.save(this);
+                        return false;
+                    }
+                    return true;
+                });
 
-      self.menus.tools = new DropdownView({
-        title: _t('Tools'),
-        items: [
-          self.btns.buildRuleButton,
-          self.btns.buildLessButton,
-        ],
-        id: 'file_menu',
-        app: self,
-        icon: 'file',
-        disable: function() {}
-      });
+            self.$frame.contents().keyup(function (e) {
+                if (!self.enabled) {
+                    return true;
+                }
 
-      self.buttonGroup = new ButtonGroup({
-        items: [
-          self.menus.tools,
-          self.btns.showInspectorsButton,
-          self.previewThemeButton,
-          self.btns.fullscreenButton,
-          self.btns.refreshButton,
-          self.btns.cacheButton,
-          self.btns.helpButton
-        ],
-        id: 'mapper'
-      });
-      $('#toolbar .navbar', self.$el).append(self.buttonGroup.render().el);
-      $('#toolbar .navbar', self.$el).append(self.rulebuilderView.render().el);
-      $('#toolbar .navbar', self.$el).append(self.cacheView.render().el);
-      $('#toolbar .navbar', self.$el).append(self.lessbuilderView.render().el);
-    }
-  });
+                // ESC -> Move selection to parent node
+                if (e.keyCode === 27 && self.currentOutline !== null) {
+                    e.stopPropagation();
+                    e.preventDefault();
 
-  return ThemeMapper;
+                    var parent = self.currentOutline.parentNode;
+                    if (parent !== null && parent.tagName !== undefined) {
+                        self.setOutline(parent);
+                    }
+                }
 
+                // Enter -> Equivalent to clicking on selected node
+                if (e.keyCode === 13 && self.currentOutline !== null) {
+                    e.stopPropagation();
+                    e.preventDefault();
+
+                    self.save(self.currentOutline);
+
+                    return false;
+                }
+            });
+        },
+        save: function (element) {
+            var self = this;
+            this.saved = element;
+            if (element === null) {
+                self.$frameShelfContainer.hide();
+            } else {
+                self.$frameShelfContainer.show();
+            }
+
+            self.animateSelector();
+            self.$selectorInfo.text(
+                element === null ? "" : self.ruleBuilder.bestSelector(element)
+            );
+
+            self.onsave(this, element);
+        },
+        clearOutline: function (element) {
+            var self = this;
+            $(element).css("outline", "");
+            $(element).css("cursor", "");
+
+            $(element).removeClass(self.activeClass);
+
+            self.currentOutline = null;
+            self.$currentSelector.text("");
+            self.onselect(self, null);
+        },
+        setOutline: function (element) {
+            var self = this;
+            var $el = $(element);
+
+            $el.css("outline", "solid red 1px");
+            $el.css("cursor", "crosshair");
+
+            $el.addClass(self.activeClass);
+
+            if (self.currentOutline !== null) {
+                self.clearOutline(self.currentOutline);
+            }
+            self.currentOutline = element;
+            self.$currentSelector.text(self.ruleBuilder.bestSelector(element));
+
+            self.onselect(self, element);
+        },
+        animateSelector: function (highlightColor, duration) {
+            var self = this;
+            var highlightBg = highlightColor || "#FFFFE3";
+            var animateMs = duration || 750;
+            var originalBg = self.$frameInfo.css("background-color");
+
+            if (!originalBg || originalBg === highlightBg) {
+                originalBg = "#FFFFFF"; // default to white
+            }
+
+            self.$frameInfo
+                .css("backgroundColor", highlightBg)
+                .animate(
+                    { backgroundColor: originalBg },
+                    animateMs,
+                    null,
+                    function () {
+                        self.$frameInfo.css("backgroundColor", originalBg);
+                    }
+                );
+        },
+        onsave: function (highlighter, node) {
+            var self = this;
+            if (node == null) {
+                self.$el.find(".frame-shelf-container").hide();
+            } else {
+                self.$el.find(".frame-shelf-container").show();
+            }
+
+            self.animateSelector(self.$el.find(".frame-info"));
+            self.$el
+                .find(".selector-info")
+                .text(node == null ? "" : self.ruleBuilder.bestSelector(node));
+
+            if (self.ruleBuilder.active) {
+                self.ruleBuilder.select(node);
+                self.ruleBuilder.next();
+            }
+        },
+        onselect: function (highlighter, node) {
+            var self = this;
+            self.$currentSelector.text(
+                node == null ? "" : self.ruleBuilder.bestSelector(node)
+            );
+        },
+    });
+
+    var ThemeMapper = Base.extend({
+        name: "thememapper",
+        trigger: ".pat-thememapper",
+        parser: "mockup",
+        defaults: {
+            filemanagerConfig: {},
+            themeUrl: null,
+            mockupUrl: null,
+            unthemedUrl: null,
+            helpUrl: null,
+            previewUrl: null,
+            editable: false,
+        },
+        buttonGroup: null,
+        showInspectorsButton: null,
+        buildRuleButton: null,
+        previewThemeButton: null,
+        helpButton: null,
+        hidden: true,
+        fileManager: null,
+        mockupInspector: null,
+        unthemedInspector: null,
+        ruleBuilder: null,
+        rulebuilderView: null,
+        devPath: null,
+        prodPath: null,
+        lessUrl: null,
+        lessPaths: {},
+        lessVariableUrl: null,
+        $fileManager: null,
+        $container: null,
+        $inspectorContainer: null,
+        $mockupInspector: null,
+        $unthemedInspector: null,
+        init: function () {
+            var self = this;
+            if (typeof self.options.filemanagerConfig === "string") {
+                self.options.filemanagerConfig = $.parseJSON(
+                    self.options.filemanagerConfig
+                );
+            }
+            self.$fileManager = $('<div class="pat-filemanager"/>').appendTo(
+                self.$el
+            );
+            self.$container = $('<div class="row"></div>').appendTo(self.$el);
+            self.$styleBox = $('<div id="styleBox"></div>').appendTo(self.$el);
+            self.$inspectorContainer = $(
+                '<div id="inspectors"></div>'
+            ).appendTo(self.$container);
+            self.$mockupInspector = $(
+                '<div class="mockup-inspector"/>'
+            ).appendTo(self.$inspectorContainer);
+            self.$unthemedInspector = $(
+                '<div class="unthemed-inspector"/>'
+            ).appendTo(self.$inspectorContainer);
+
+            // initialize patterns now
+            self.lessUrl =
+                self.options.lessUrl !== undefined
+                    ? self.options.lessUrl
+                    : false;
+            self.lessVariableUrl =
+                self.options.lessVariables !== undefined
+                    ? self.options.lessVariables
+                    : false;
+
+            self.devPath = [];
+            self.prodPath = [];
+
+            self.options.filemanagerConfig.uploadUrl = self.options.themeUrl;
+            self.options.filemanagerConfig.theme = true;
+            self.fileManager = new FileManager(
+                self.$fileManager,
+                self.options.filemanagerConfig
+            );
+            self.fileManager.setUploadUrl();
+
+            self.btns = {};
+            self.menus = {};
+            self.setupButtons();
+
+            self.ruleBuilder = new RuleBuilder(self, self.ruleBuilderCallback);
+
+            self.fileManager.on("fileChange", function () {
+                var node = self.fileManager.getSelectedNode();
+                self.setLessPaths(node);
+            });
+
+            self.mockupInspector = new Inspector(self.$mockupInspector, {
+                name: _t("HTML mockup"),
+                ruleBuilder: self.ruleBuilder,
+                url: self.options.mockupUrl,
+                showReload: true,
+            });
+            self.unthemedInspector = new Inspector(self.$unthemedInspector, {
+                name: _t("Unthemed content"),
+                ruleBuilder: self.ruleBuilder,
+                url: self.options.unthemedUrl,
+            });
+            self.btns.buildLessButton.disable();
+
+            if (!self.options.editable) {
+                if (self.fileManager.toolbar) {
+                    var items = self.fileManager.toolbar.items;
+                    $(items).each(function () {
+                        this.disable();
+                    });
+                    self.lessbuilderView.triggerView.disable();
+                }
+            }
+
+            // initially, let's hide the panels
+            self.hideInspectors();
+            self.getManifest();
+        },
+        getManifest: function () {
+            var self = this;
+
+            self.fileManager.doAction("getFile", {
+                datatype: "json",
+                data: {
+                    path: "manifest.cfg",
+                },
+                success: function (data) {
+                    this.setDefaultPaths(data);
+                }.bind(self),
+            });
+        },
+        setSavePath: function () {
+            var self = this;
+            var filename = self.lessbuilderView.$filename.val();
+
+            if (filename === "") {
+                filename = self.lessbuilderView.$filename.attr("placeholder");
+            }
+
+            var s = self.lessPaths["save"];
+            var folder = s.substr(0, s.lastIndexOf("/"));
+
+            var savePath = folder + "/" + filename;
+            self.lessPaths["save"] = savePath;
+        },
+        setLessPaths: function (node) {
+            var self = this;
+
+            if (node.fileType === "less") {
+                self.btns.buildLessButton.enable();
+            } else {
+                self.btns.buildLessButton.disable();
+            }
+
+            if (node.path !== "") {
+                var reg = new RegExp("/(.*\\.)less$", "m");
+                var path = reg.exec(node.path);
+
+                if (path === null) {
+                    self.lessPaths = {};
+                    return false;
+                }
+                var lessPath = path[1] + "less";
+                var cssPath = path[1] + "css";
+
+                //file paths should be in the form of:
+                // "[directory/]filename.less"
+                self.lessPaths = {
+                    less: lessPath,
+                    save: cssPath,
+                };
+
+                return true;
+            } else {
+                self.lessPaths = {};
+                return false;
+            }
+        },
+        setDefaultPaths: function (manifest) {
+            var self = this;
+            var dev = new RegExp(
+                "development-css\\s*=\\s*\\/\\+\\+theme\\+\\+.*?\\/(.*)"
+            );
+            var prod = new RegExp(
+                "production-css\\s*=\\s*\\/\\+\\+theme\\+\\+.*?\\/(.*)"
+            );
+
+            var devUrl = dev.exec(manifest.contents)[1];
+            var prodUrl = prod.exec(manifest.contents)[1];
+
+            //The array lets us get around scoping issues.
+            self.devPath[0] = devUrl;
+            self.prodPath[0] = prodUrl;
+        },
+        saveThemeCSS: function (styles) {
+            var self = this.env;
+
+            if (styles === "" || styles === undefined) {
+                //There was probably a problem during compilation
+                return false;
+            }
+
+            self.setSavePath();
+
+            self.fileManager.doAction("saveFile", {
+                type: "POST",
+                data: {
+                    path: self.lessPaths["save"],
+                    relativeUrls: true,
+                    data: styles,
+                    _authenticator: utils.getAuthenticator(),
+                },
+                success: function (data) {
+                    if (data.success === "tmp") {
+                        self.fileManager.fileData["_generated_.css"] = {
+                            contents: data.value,
+                            ext: "css",
+                        };
+                        self.fileManager.openEditor("_generated_.css");
+                    } else {
+                        self.fileManager.refreshTree(function () {
+                            //We need to make sure we open the newest version
+                            delete self
+                                .fileManager.fileData["/" + self.lessPaths["save"]];
+                            self.fileManager.selectItem(self.lessPaths["save"]);
+                        });
+                    }
+                    self.lessbuilderView.end();
+                },
+            });
+
+            window.iframe["lessc"].destroy();
+        },
+        showInspectors: function () {
+            var self = this;
+            var $parent = self.$mockupInspector.parent();
+            $parent.slideDown();
+            self.hidden = false;
+            self.btns.showInspectorsButton.options.title = "Hide inspectors";
+            self.btns.showInspectorsButton.applyTemplate();
+            $("html, body").animate(
+                {
+                    scrollTop: $parent.offset().top - 50,
+                },
+                500
+            );
+        },
+        hideInspectors: function () {
+            var self = this;
+            var $parent = self.$mockupInspector.parent();
+            $parent.slideUp();
+            self.hidden = true;
+            self.btns.showInspectorsButton.options.title = "Show inspectors";
+            self.btns.showInspectorsButton.applyTemplate();
+        },
+        setupButtons: function () {
+            var self = this;
+            self.btns.showInspectorsButton = new ButtonView({
+                id: "showinspectors",
+                title: _t("Show inspectors"),
+                icon: "search",
+                tooltip: _t("Show inspector panels"),
+                context: "default",
+            });
+            self.btns.showInspectorsButton.on("button:click", function () {
+                if (self.hidden) {
+                    self.showInspectors();
+                } else {
+                    self.hideInspectors();
+                }
+            });
+
+            self.btns.buildRuleButton = new AnchorView({
+                id: "buildrule",
+                title: _t("Build rule"),
+                icon: "wrench",
+                tooltip: _t("rule building wizard"),
+                context: "default",
+            });
+            self.btns.fullscreenButton = new ButtonView({
+                id: "fullscreenEditor",
+                title: _t("Fullscreen"),
+                icon: "fullscreen",
+                tooltip: _t("view the editor in fullscreen"),
+                context: "default",
+            });
+            self.btns.fullscreenButton.on("button:click", function () {
+                var btn = $(
+                    '<a href="#">' +
+                        '<span class="btn btn-danger closeeditor">' +
+                        _t("Close Fullscreen") +
+                        "</span>" +
+                        "</a>"
+                ).prependTo($(".tree"));
+
+                $(btn).click(function () {
+                    $(".container").removeClass("fullscreen").trigger("resize");
+                    $(btn).remove();
+                });
+                //resize tells the editor window to resize as well.
+                $(".container").addClass("fullscreen").trigger("resize");
+            });
+            self.previewThemeButton = new ButtonView({
+                id: "previewtheme",
+                title: _t("Preview theme"),
+                icon: "new-window",
+                tooltip: _t("preview theme in a new window"),
+                context: "default",
+            });
+            self.previewThemeButton.on("button:click", function () {
+                window.open(self.options.previewUrl);
+            });
+            self.btns.buildLessButton = new AnchorView({
+                id: "buildless",
+                title: _t("Build CSS"),
+                icon: "cog",
+                tooltip: _t("Compile LESS file"),
+                context: "default",
+            });
+            self.btns.refreshButton = new ButtonView({
+                id: "refreshButton ",
+                title: _t("Refresh"),
+                icon: "refresh",
+                tooltip: _t("Reload the current file"),
+                context: "default",
+            });
+            self.btns.refreshButton.on("button:click", function () {
+                self.fileManager.refreshFile();
+            });
+            self.btns.cacheButton = new ButtonView({
+                id: "cachebutton",
+                title: _t("Clear cache"),
+                icon: "floppy-remove",
+                tooltip: _t("Clear site's theme cache"),
+                context: "default",
+            });
+            self.btns.helpButton = new ButtonView({
+                id: "helpbutton",
+                title: _t("Help"),
+                icon: "question-sign",
+                tooltip: _t("Show help"),
+                context: "default",
+            });
+            self.btns.helpButton.on("button:click", function () {
+                window.open(self.options.helpUrl);
+            });
+            self.rulebuilderView = new RuleBuilderView({
+                triggerView: self.btns.buildRuleButton,
+                app: self,
+            });
+            self.cacheView = new CacheView({
+                triggerView: self.btns.cacheButton,
+                app: self,
+            });
+            self.lessbuilderView = new LessBuilderView({
+                triggerView: self.btns.buildLessButton,
+                app: self,
+            });
+
+            self.menus.tools = new DropdownView({
+                title: _t("Tools"),
+                items: [self.btns.buildRuleButton, self.btns.buildLessButton],
+                id: "file_menu",
+                app: self,
+                icon: "file",
+                disable: function () {},
+            });
+
+            self.buttonGroup = new ButtonGroup({
+                items: [
+                    self.menus.tools,
+                    self.btns.showInspectorsButton,
+                    self.previewThemeButton,
+                    self.btns.fullscreenButton,
+                    self.btns.refreshButton,
+                    self.btns.cacheButton,
+                    self.btns.helpButton,
+                ],
+                id: "mapper",
+            });
+            $("#toolbar .navbar", self.$el).append(
+                self.buttonGroup.render().el
+            );
+            $("#toolbar .navbar", self.$el).append(
+                self.rulebuilderView.render().el
+            );
+            $("#toolbar .navbar", self.$el).append(self.cacheView.render().el);
+            $("#toolbar .navbar", self.$el).append(
+                self.lessbuilderView.render().el
+            );
+        },
+    });
+
+    return ThemeMapper;
 });
 
 /* globals requirejs */
@@ -38211,5 +38243,5 @@ require([
   'use strict';
 });
 
-define("/Users/fred/buildouts/coredev-plone5.2/src/plone.staticresources/src/plone/staticresources/static/thememapper.js", function(){});
+define("/Volumes/WORKSPACE2/kinderdorf_plone5/srccore/plone.staticresources/src/plone/staticresources/static/thememapper.js", function(){});
 
