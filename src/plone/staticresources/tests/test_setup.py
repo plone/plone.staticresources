@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Setup tests for this package."""
 from plone.registry.interfaces import IRegistry
 from plone.staticresources.testing import (
