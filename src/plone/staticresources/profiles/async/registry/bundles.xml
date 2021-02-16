@@ -1,88 +1,9 @@
 <?xml version="1.0"?>
 <registry>
 
-  <!-- Bundles -->
-  <records prefix="plone.bundles/plone-base"
-            interface='Products.CMFPlone.interfaces.IBundleRegistry'>
-    <value key="merge_with">default</value>
-    <value key="load_async">False</value>
-    <value key="load_defer">False</value>
-  </records>
-
-  <records prefix="plone.bundles/plone"
-            interface='Products.CMFPlone.interfaces.IBundleRegistry'>
-    <value key="merge_with"></value>
+  <records prefix="plone.bundles/plone" interface='Products.CMFPlone.interfaces.IBundleRegistry'>
     <value key="load_async">True</value>
     <value key="load_defer">False</value>
   </records>
-
-  <records prefix="plone.bundles/plone-moment"
-            interface='Products.CMFPlone.interfaces.IBundleRegistry'>
-    <value key="merge_with"></value>
-    <value key="load_async">True</value>
-    <value key="load_defer">False</value>
-  </records>
-
-  <records prefix="plone.bundles/plone-logged-in"
-            interface='Products.CMFPlone.interfaces.IBundleRegistry'>
-    <value key="merge_with"></value>
-    <value key="load_async">True</value>
-    <value key="load_defer">False</value>
-  </records>
-
-  <records prefix="plone.bundles/plone-editor-tools"
-            interface='Products.CMFPlone.interfaces.IBundleRegistry'>
-    <value key="merge_with"></value>
-    <value key="load_async">True</value>
-    <value key="load_defer">False</value>
-  </records>
-
-  <records prefix="plone.bundles/plone-tinymce"
-            interface='Products.CMFPlone.interfaces.IBundleRegistry'>
-    <value key="merge_with"></value>
-    <value key="load_async">True</value>
-    <value key="load_defer">False</value>
-  </records>
-
-  <records prefix="plone.bundles/plone-datatables"
-            interface='Products.CMFPlone.interfaces.IBundleRegistry'>
-    <value key="merge_with"></value>
-    <value key="load_async">True</value>
-    <value key="load_defer">False</value>
-  </records>
-
-  <records prefix="plone.bundles/plone-legacy"
-            interface='Products.CMFPlone.interfaces.IBundleRegistry'>
-    <value key="merge_with"></value>
-    <value key="load_async">True</value>
-    <value key="load_defer">False</value>
-  </records>
-
-  <records prefix="plone.bundles/resourceregistry"
-            interface='Products.CMFPlone.interfaces.IBundleRegistry'>
-    <value key="load_async">True</value>
-    <value key="load_defer">False</value>
-  </records>
-
-  <records prefix="plone.bundles/thememapper"
-            interface='Products.CMFPlone.interfaces.IBundleRegistry'>
-    <value key="load_async">True</value>
-    <value key="load_defer">False</value>
-  </records>
-
-  <records prefix="plone.bundles/filemanager"
-            interface='Products.CMFPlone.interfaces.IBundleRegistry'>
-    <value key="load_async">True</value>
-    <value key="load_defer">False</value>
-  </records>
-
-  <!-- legacy js -->
-  <record name="plone.resources.last_legacy_import">
-    <field type="plone.registry.field.Datetime">
-      <title>Last legacy js/css import date</title>
-      <description>It's used to decide if its needed to compile or not the production css/js</description>
-    </field>
-    <value>2014-08-14 00:00:00</value>
-  </record>
 
 </registry>
