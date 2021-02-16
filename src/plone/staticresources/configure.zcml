@@ -1,6 +1,5 @@
 <configure
     xmlns="http://namespaces.zope.org/zope"
-    xmlns:browser="http://namespaces.zope.org/browser"
     xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
     xmlns:plone="http://namespaces.plone.org/plone">
 
@@ -14,52 +13,6 @@
     type="plone"
     name="static"
     />
-
-  <browser:resource
-    name="plone-base.js"
-    file="static/plone-base.js"
-    />
-
-  <browser:resource
-    name="plone.js"
-    file="static/plone.js"
-    />
-
-  <browser:resource
-    name="plone-moment.js"
-    file="static/plone-moment.js"
-    />
-
-  <browser:resource
-    name="plone-logged-in.js"
-    file="static/plone-logged-in.js"
-    />
-
-  <browser:resource
-    name="plone-editor-tools.js"
-    file="static/plone-editor-tools.js"
-    />
-
-  <browser:resource
-    name="plone-tinymce.js"
-    file="static/plone-tinymce.js"
-    />
-
-  <browser:resource
-    name="plone-datatables.js"
-    file="static/plone-datatables.js"
-    />
-
-  <browser:resource
-    name="plone.less"
-    file="static/plone.less"
-    />
-
-  <browser:resource
-    name="plone-logged-in.less"
-    file="static/plone-logged-in.less"
-    />
-
 
   <genericsetup:registerProfile
       name="default"
