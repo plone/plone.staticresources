@@ -6,13 +6,33 @@
   <include package="plone.resource"/>
   <include package=".upgrades"/>
 
-  <include file="configure-resources.zcml" />
-
   <plone:static
     directory="static"
     type="plone"
     name="static"
     />
+
+  <plone:static
+    directory="static/icons"
+    type="plone"
+    name="icons"
+    />
+
+  <plone:static
+    directory="static/icons-bootstrap"
+    type="plone"
+    name="bootstrap-icons"
+    />
+
+  <plone:static
+      directory="static/icons/country-flags/svg"
+      type="plone"
+      name="country-flag-icons" />
+
+  <plone:static
+      directory="static/icons/language-flags/svg"
+      type="plone"
+      name="language-flag-icons" />
 
   <genericsetup:registerProfile
       name="default"
