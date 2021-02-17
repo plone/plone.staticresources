@@ -8,6 +8,43 @@ Changelog
 
 .. towncrier release notes start
 
+3.2.4 (2020-11-11)
+------------------
+
+Bug fixes:
+
+
+- Don't depend on #edit-bar being present to update the toolbar after folder_contents navigation. Projects using plonetheme.barceloneta's backend.xml might not have that div/id in their html because of an error in the rules.xml. [fredvd] (#3191)
+- Prevent a folder_contents navigation from triggering the double amount of XHR requests through the text filter. Also correctly unregister/register events with a namespace in the structure pattern.[fredvd] (#3203)
+
+
+3.2.3 (2020-10-30)
+------------------
+
+Bug fixes:
+
+
+- Fix building of the docs bundle.
+  [thet] (#980)
+- Fix external description text in tinymce link popup
+  [parruc] (#1010)
+- Bump bl from 4.0.2 to 4.0.3 [dependabot, jensens] (#1014)
+- Bumps lodash from 4.17.15 to 4.17.20. [dependabot, jensens] (#1015)
+- Fix plone toolbar action links being updated only on the first navigation action in the folder_contents structure pattern. [fredvd] (#3191)
+
+
+3.2.2 (2020-08-14)
+------------------
+
+Bug fixes:
+
+
+- Respect default_page_types in actionmenu if folder_contents. Fixes https://github.com/plone/Products.CMFPlone/issues/2700
+  [pbauer] (#1005)
+- Put back content type icons in the Add new... menu. This fixes https://github.com/plone/Products.CMFPlone/issues/3163
+  [vincentfretin] (#1009)
+
+
 3.2.1 (2020-07-17)
 ------------------
 

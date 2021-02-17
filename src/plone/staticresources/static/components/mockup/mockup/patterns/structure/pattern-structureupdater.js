@@ -27,6 +27,7 @@ define([
     init: function() {
 
       $('body').on('context-info-loaded', function (e, data) {
+
         if (this.options.titleSelector) {
             $(this.options.titleSelector, this.$el).html(data.object && data.object.Title || '&nbsp;');
         }

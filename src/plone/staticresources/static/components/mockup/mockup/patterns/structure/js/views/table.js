@@ -32,6 +32,7 @@ define([
       self.contextInfo = null;
 
       $('body').on('context-info-loaded', function(event, data) {
+        
         self.contextInfo = data;
         /* set default page info */
         self.setContextInfo();
