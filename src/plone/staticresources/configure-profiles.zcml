@@ -1,0 +1,34 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:genericsetup="http://namespaces.zope.org/genericsetup">
+
+  <genericsetup:registerProfile
+      name="default"
+      title="plone.staticresources"
+      directory="profiles/default"
+      description="Installs the plone.staticresources for Plone."
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      />
+
+  <genericsetup:registerProfile
+      name="async"
+      title="plone.staticresources EXPERIMENTAL: Async Resource Loading"
+      directory="profiles/async"
+      description="plone.staticresources with asynchronous loading of resources"
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      />
+
+  <genericsetup:registerProfile
+      name="uninstall"
+      title="plone.staticresources (uninstall)"
+      directory="profiles/uninstall"
+      description="Uninstalls the plone.staticresources add-on."
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      />
+
+  <utility
+      factory=".setuphandlers.HiddenProfiles"
+      name="plone.staticresources-hiddenprofiles"
+      />
+
+</configure>

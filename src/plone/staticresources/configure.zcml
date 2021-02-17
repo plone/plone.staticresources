@@ -1,10 +1,10 @@
 <configure
     xmlns="http://namespaces.zope.org/zope"
-    xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
     xmlns:plone="http://namespaces.plone.org/plone">
 
   <include package="plone.resource"/>
   <include package=".upgrades"/>
+  <include file="configure-profiles.zcml"/>
 
   <plone:static
     directory="static"
@@ -33,41 +33,5 @@
       directory="static/icons/language-flags/svg"
       type="plone"
       name="language-flag-icons" />
-
-  <genericsetup:registerProfile
-      name="default"
-      title="plone.staticresources"
-      directory="profiles/default"
-      description="Installs the plone.staticresources for Plone."
-      provides="Products.GenericSetup.interfaces.EXTENSION"
-      />
-
-  <genericsetup:registerProfile
-      name="last_compilation"
-      title="plone.staticresources last_compilation"
-      directory="profiles/last_compilation"
-      provides="Products.GenericSetup.interfaces.EXTENSION"
-      />
-
-  <genericsetup:registerProfile
-      name="async"
-      title="plone.staticresources EXPERIMENTAL: Async Resource Loading"
-      directory="profiles/async"
-      description="plone.staticresources with asynchronous loading of resources"
-      provides="Products.GenericSetup.interfaces.EXTENSION"
-      />
-
-  <genericsetup:registerProfile
-      name="uninstall"
-      title="plone.staticresources (uninstall)"
-      directory="profiles/uninstall"
-      description="Uninstalls the plone.staticresources add-on."
-      provides="Products.GenericSetup.interfaces.EXTENSION"
-      />
-
-  <utility
-      factory=".setuphandlers.HiddenProfiles"
-      name="plone.staticresources-hiddenprofiles"
-      />
 
 </configure>
