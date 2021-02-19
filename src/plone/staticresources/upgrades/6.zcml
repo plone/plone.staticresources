@@ -1,20 +1,15 @@
 <configure xmlns="http://namespaces.zope.org/zope"
   xmlns:gs="http://namespaces.zope.org/genericsetup">
 
-  <gs:registerProfile name="6"
-    title="Update Bundles"
-    description='Configuration for version 6'
-    directory="profiles/6"
-    for="Products.CMFPlone.interfaces.IMigratingPloneSiteRoot"
-    provides="Products.GenericSetup.interfaces.EXTENSION" />
-
-  <gs:upgradeSteps source="5"
+  <gs:upgradeSteps
+    source="5"
     destination="6"
     profile="plone.staticresources:default">
 
     <gs:upgradeDepends
-      title="Update Bundles"
-      import_profile="plone.staticresources.upgrades:6" />
+      title="Update last_compilation timestamp of bundles"
+      import_profile="plone.staticresources:last_compilation"
+      import_steps="plone.app.registry" />
 
   </gs:upgradeSteps>
 

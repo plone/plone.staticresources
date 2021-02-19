@@ -49,12 +49,11 @@ How to upgrade the resources in this package
 
 4. Run ``./bin/plone-compile-resources -b plone`` or ``./bin/plone-compile-resources -b plone-logged-in`` (whichever bundle you need to re-build). If you are unsure, build them all: ``./bin/plone-compile-resources``
 
-5. Increase the ``last_compilation`` date in ``src/plone/staticresources/profiles/default/registry/bundles.xml``.
+5. Increase the ``last_compilation`` date in ``src/plone/staticresources/profiles/last_compilation/registry/bundles.xml``.
 
 6. Create an upgrade step in ``plone.staticresources`` (most probably increasing ``last_compilation`` date).
-   Add the upgrade step to the hidden profiles in ``getNonInstallableProfiles`` in ``setuphandlers.py`` and
-   increment the version in ``src/plone/staticresources/profiles/default/metadata.xml``.
-   See `PR 91 <https://github.com/plone/plone.staticresources/pull/91>`_ for a full example.
+   See ``upgrades/14.zcml`` for an example.
+   Increment the version in ``src/plone/staticresources/profiles/default/metadata.xml``.
 
 7. Submit a Pull Request and run the tests on Jenkins.
 
