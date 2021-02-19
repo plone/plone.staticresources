@@ -70,6 +70,13 @@
       />
 
   <genericsetup:registerProfile
+      name="last_compilation"
+      title="plone.staticresources last_compilation"
+      directory="profiles/last_compilation"
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      />
+
+  <genericsetup:registerProfile
       name="async"
       title="plone.staticresources EXPERIMENTAL: Async Resource Loading"
       directory="profiles/async"

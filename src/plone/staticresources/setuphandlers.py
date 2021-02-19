@@ -17,6 +17,7 @@ class HiddenProfiles(object):
         """Hide all profiles from site-creation and quickinstaller."""
         return [
             "plone.staticresources:default",
+            "plone.staticresources:last_compilation",
             "plone.staticresources:async",
             "plone.staticresources:uninstall",
             "plone.staticresources.upgrades:2",
