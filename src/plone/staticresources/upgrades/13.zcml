@@ -1,0 +1,19 @@
+<configure xmlns="http://namespaces.zope.org/zope"
+  xmlns:gs="http://namespaces.zope.org/genericsetup">
+
+  <gs:registerProfile name="13"
+    title="Update bundles"
+    description='Configuration for version 13'
+    directory="profiles/13"
+    for="Products.CMFPlone.interfaces.IMigratingPloneSiteRoot"
+    provides="Products.GenericSetup.interfaces.EXTENSION" />
+
+  <gs:upgradeDepends
+    source="12"
+    destination="13"
+    profile="plone.staticresources:default"
+    title="Remove wrong bundle from upgrade profile 11"
+    import_profile="plone.staticresources.upgrades:13"
+    />
+
+</configure>
