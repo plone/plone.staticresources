@@ -1,6 +1,0 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<registry>
-  <records prefix="plone.bundles/plone-editor-tools" interface='Products.CMFPlone.interfaces.IBundleRegistry'>
-    <value key="last_compilation">2021-02-19 14:44:00</value>
-  </records>
-</registry>
