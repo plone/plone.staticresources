@@ -8,6 +8,27 @@ Changelog
 
 .. towncrier release notes start
 
+1.4.2 (2021-02-19)
+------------------
+
+New features:
+
+
+- Upgrade to latest mockup from 3.x branch with structure fixes, 3.2.5.
+  [thet] (#125)
+
+
+Bug fixes:
+
+
+- Remove bundle with typo.
+  [petschki] (#123)
+- Include upgrade step 12, which was missing.
+  [thet] (#123)
+- Replaced most upgrade profiles with one last_compilation profile.
+  [maurits] (#126)
+
+
 1.4.1 (2020-11-11)
 ------------------
 
