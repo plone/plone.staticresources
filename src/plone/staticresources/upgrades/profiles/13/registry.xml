@@ -1,0 +1,4 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<registry>
+  <records remove="True" prefix="plone.bundles/resourceregistryt" interface='Products.CMFPlone.interfaces.IBundleRegistry' />
+</registry>
