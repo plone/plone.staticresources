@@ -1,20 +1,20 @@
 <configure xmlns="http://namespaces.zope.org/zope"
   xmlns:gs="http://namespaces.zope.org/genericsetup">
 
-  <gs:registerProfile name="12"
+  <gs:registerProfile name="200"
     title="Update bundles"
-    description='Configuration for version 12'
-    directory="profiles/12"
+    description='Configuration for version 200'
+    directory="profiles/200"
     for="Products.CMFPlone.interfaces.IMigratingPloneSiteRoot"
     provides="Products.GenericSetup.interfaces.EXTENSION" />
 
   <gs:upgradeSteps source="11"
-    destination="12"
+    destination="200"
     profile="plone.staticresources:default">
 
     <gs:upgradeDepends
       title="Add Bootstrap 5 Javascript bundle"
-      import_profile="plone.staticresources.upgrades:12" />
+      import_profile="plone.staticresources.upgrades:200" />
 
   </gs:upgradeSteps>
 
