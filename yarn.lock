@@ -14,11 +14,6 @@ ajv@^4.9.1:
     co "^4.6.0"
     json-stable-stringify "^1.0.1"
 
-amdefine@>=0.0.4:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/amdefine/-/amdefine-1.0.1.tgz#4a5282ac164729e93619bcfd3ad151f817ce91f5"
-  integrity sha1-SlKCrBZHKek2Gbz9OtFR+BfOkfU=
-
 asap@~2.0.3:
   version "2.0.6"
   resolved "https://registry.yarnpkg.com/asap/-/asap-2.0.6.tgz#e50347611d7e690943208bbdafebcbc2fb866d46"
@@ -40,13 +35,6 @@ assert-plus@^0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/assert-plus/-/assert-plus-0.2.0.tgz#d74e1b87e7affc0db8aadb7021f3fe48101ab234"
   integrity sha1-104bh+ev/A24qttwIfP+SBAasjQ=
-
-ast-types@~0.4.7:
-  version "0.4.13"
-  resolved "https://registry.yarnpkg.com/ast-types/-/ast-types-0.4.13.tgz#445bd0b0f235028f5dc5b532fca27dc7b19ed754"
-  integrity sha1-RFvQsPI1Ao9dxbUy/KJ9x7Ge11Q=
-  dependencies:
-    depd "~1.0.0"
 
 asynckit@^0.4.0:
   version "0.4.0"
@@ -76,11 +64,6 @@ aws4@^1.2.1:
   dependencies:
     underscore ">=1.5.0"
 
-base62@0.1.1:
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/base62/-/base62-0.1.1.tgz#7b4174c2f94449753b11c2651c083da841a7b084"
-  integrity sha1-e0F0wvlESXU7EcJlHAg9qEGnsIQ=
-
 bcrypt-pbkdf@^1.0.0:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/bcrypt-pbkdf/-/bcrypt-pbkdf-1.0.2.tgz#a4301d389b6a43f9b67ff3ca11a3f6637e360e9e"
@@ -109,11 +92,6 @@ caseless@~0.12.0:
   resolved "https://registry.yarnpkg.com/caseless/-/caseless-0.12.0.tgz#1b681c21ff84033c826543090689420d187151dc"
   integrity sha1-G2gcIf+EAzyCZUMJBolCDRhxUdw=
 
-cls@~0.1.3:
-  version "0.1.5"
-  resolved "https://registry.yarnpkg.com/cls/-/cls-0.1.5.tgz#df3218cf9d1480747f584d88b19b74c6b281317b"
-  integrity sha1-3zIYz50UgHR/WE2IsZt0xrKBMXs=
-
 co@^4.6.0:
   version "4.6.0"
   resolved "https://registry.yarnpkg.com/co/-/co-4.6.0.tgz#6ea6bdf3d853ae54ccb8e47bfa0bf3f9031fb184"
@@ -125,26 +103,6 @@ combined-stream@^1.0.5, combined-stream@~1.0.5:
   integrity sha512-FQN4MRfuJeHf7cBbBMJFXhKSDq+2kAArBlmRBvcvFE5BB1HZKXtSFASDhdlz9zOYwxh8lDdnvmMOe/+5cdoEdg==
   dependencies:
     delayed-stream "~1.0.0"
-
-commander@~2.2.0:
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/commander/-/commander-2.2.0.tgz#175ad4b9317f3ff615f201c1e57224f55a3e91df"
-  integrity sha1-F1rUuTF/P/YV8gHB5XIk9Vo+kd8=
-
-commoner@^0.9.2:
-  version "0.9.8"
-  resolved "https://registry.yarnpkg.com/commoner/-/commoner-0.9.8.tgz#22f59588f134a3afa04aaea97e8bb574972acded"
-  integrity sha1-IvWViPE0o6+gSq6pfou1dJcqze0=
-  dependencies:
-    commander "~2.2.0"
-    glob "~3.2.9"
-    graceful-fs "~2.0.3"
-    iconv-lite "~0.2.11"
-    install "~0.1.7"
-    mkdirp "~0.3.5"
-    private "~0.1.2"
-    q "~1.0.1"
-    recast "~0.7.0"
 
 core-util-is@1.0.2:
   version "1.0.2"
@@ -339,11 +297,6 @@ delayed-stream@~1.0.0:
   resolved "https://registry.yarnpkg.com/delayed-stream/-/delayed-stream-1.0.0.tgz#df3ae199acadfb7d440aaae0b29e2272b24ec619"
   integrity sha1-3zrhmayt+31ECqrgsp4icrJOxhk=
 
-depd@~1.0.0:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/depd/-/depd-1.0.1.tgz#80aec64c9d6d97e65cc2a9caa93c0aa6abf73aaa"
-  integrity sha1-gK7GTJ1tl+ZcwqnKqTwKpqv3Oqo=
-
 "dropzone@https://github.com/enyo/dropzone.git#v4.3.0":
   version "4.3.0"
   resolved "https://github.com/enyo/dropzone.git#d8ef7a82e6ab5447c1f2d9512c8e1bfd4de5ac9e"
@@ -362,16 +315,6 @@ errno@^0.1.1:
   integrity sha512-MfrRBDWzIWifgq6tJj60gkAwtLNb6sQPlcFrSOflcP1aFmmruKQ2wRnze/8V6kgyz7H3FF8Npzv78mZ7XLLflg==
   dependencies:
     prr "~1.0.1"
-
-esprima-fb@~3001.1.0-dev-harmony-fb:
-  version "3001.1.0-dev-harmony-fb"
-  resolved "https://registry.yarnpkg.com/esprima-fb/-/esprima-fb-3001.0001.0000-dev-harmony-fb.tgz#b77d37abcd38ea0b77426bb8bc2922ce6b426411"
-  integrity sha1-t303q8046gt3Qmu4vCkizmtCZBE=
-
-esprima-fb@~6001.1001.0-dev-harmony-fb:
-  version "6001.1001.0-dev-harmony-fb"
-  resolved "https://registry.yarnpkg.com/esprima-fb/-/esprima-fb-6001.1001.0-dev-harmony-fb.tgz#a98821750fabadb164cdd199a94347a3919d1ac5"
-  integrity sha1-qYghdQ+rrbFkzdGZqUNHo5GdGsU=
 
 extend@~3.0.0:
   version "3.0.2"
@@ -409,23 +352,10 @@ getpass@^0.1.1:
   dependencies:
     assert-plus "^1.0.0"
 
-glob@~3.2.9:
-  version "3.2.11"
-  resolved "https://registry.yarnpkg.com/glob/-/glob-3.2.11.tgz#4a973f635b9190f715d10987d5c00fd2815ebe3d"
-  integrity sha1-Spc/Y1uRkPcV0QmH1cAP0oFevj0=
-  dependencies:
-    inherits "2"
-    minimatch "0.3"
-
 graceful-fs@^4.1.2:
   version "4.2.4"
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.4.tgz#2256bde14d3632958c465ebc96dc467ca07a29fb"
   integrity sha512-WjKPNJF79dtJAVniUlGGWHYGz2jWxT6VhN/4m1NdkbZ2nOsEF+cI1Edgql5zCRhs/VsQYRvrXctxktVXZUkixw==
-
-graceful-fs@~2.0.3:
-  version "2.0.3"
-  resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-2.0.3.tgz#7cd2cdb228a4a3f36e95efa6cc142de7d1a136d0"
-  integrity sha1-fNLNsiiko/Nule+mzBQt59GhNtA=
 
 har-schema@^1.0.5:
   version "1.0.5"
@@ -464,25 +394,10 @@ http-signature@~1.1.0:
     jsprim "^1.2.2"
     sshpk "^1.7.0"
 
-iconv-lite@~0.2.11:
-  version "0.2.11"
-  resolved "https://registry.yarnpkg.com/iconv-lite/-/iconv-lite-0.2.11.tgz#1ce60a3a57864a292d1321ff4609ca4bb965adc8"
-  integrity sha1-HOYKOleGSiktEyH/RgnKS7llrcg=
-
 image-size@~0.5.0:
   version "0.5.5"
   resolved "https://registry.yarnpkg.com/image-size/-/image-size-0.5.5.tgz#09dfd4ab9d20e29eb1c3e80b8990378df9e3cb9c"
   integrity sha1-Cd/Uq50g4p6xw+gLiZA3jfnjy5w=
-
-inherits@2:
-  version "2.0.4"
-  resolved "https://registry.yarnpkg.com/inherits/-/inherits-2.0.4.tgz#0fa2c64f932917c3433a0ded55363aae37416b7c"
-  integrity sha512-k/vGaX4/Yla3WzyMCvTQOXYeIHvqOKtnqBduzTHpzpQZzAskKMhZ2K+EnBiSM9zGSoIFeMpXKxa4dYeZIQqewQ==
-
-install@~0.1.7:
-  version "0.1.8"
-  resolved "https://registry.yarnpkg.com/install/-/install-0.1.8.tgz#9980ef93e30dfb534778d163bc86ddd472ad5fe8"
-  integrity sha1-mYDvk+MN+1NHeNFjvIbd1HKtX+g=
 
 is-typedarray@~1.0.0:
   version "1.0.0"
@@ -563,15 +478,6 @@ jsprim@^1.2.2:
     json-schema "0.2.3"
     verror "1.10.0"
 
-jstransform@~3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/jstransform/-/jstransform-3.0.0.tgz#a2591ab6cee8d97bf3be830dbfa2313b87cd640b"
-  integrity sha1-olkats7o2XvzvoMNv6IxO4fNZAs=
-  dependencies:
-    base62 "0.1.1"
-    esprima-fb "~3001.1.0-dev-harmony-fb"
-    source-map "0.1.31"
-
 "less@https://github.com/less/less.git#v2.7.3":
   version "2.7.3"
   resolved "https://github.com/less/less.git#60a5c3bd1f6807615d017a5019031da47e1f480d"
@@ -589,10 +495,9 @@ jstransform@~3.0.0:
   version "1.0.2"
   resolved "https://github.com/Patternslib/logging.git#a31a550c2083089de2c677c169d7e0b0fb7a7967"
 
-lru-cache@2:
-  version "2.7.3"
-  resolved "https://registry.yarnpkg.com/lru-cache/-/lru-cache-2.7.3.tgz#6d4524e8b955f95d4f5b58851ce21dd72fb4e952"
-  integrity sha1-bUUk6LlV+V1PW1iFHOId1y+06VI=
+"marked@https://github.com/chjj/marked.git#0.3.5":
+  version "0.3.5"
+  resolved "https://github.com/chjj/marked.git#88ce4df47c4d994dc1b1df1477a21fb893e11ddc"
 
 mime-db@1.44.0:
   version "1.44.0"
@@ -611,14 +516,6 @@ mime@^1.2.11:
   resolved "https://registry.yarnpkg.com/mime/-/mime-1.6.0.tgz#32cd9e5c64553bd58d19a568af452acff04981b1"
   integrity sha512-x0Vn8spI+wuJ1O6S7gnbaQg8Pxh4NNHb7KSINmEWKiPE4RKOplvijn+NkmYmmRgP68mc70j2EbeTFRsrswaQeg==
 
-minimatch@0.3:
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-0.3.0.tgz#275d8edaac4f1bb3326472089e7949c8394699dd"
-  integrity sha1-J12O2qxPG7MyZHIInnlJyDlGmd0=
-  dependencies:
-    lru-cache "2"
-    sigmund "~1.0.0"
-
 minimist@^1.2.5:
   version "1.2.5"
   resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.5.tgz#67d66014b66a6a8aaa0c083c5fd58df4e4e97602"
@@ -631,14 +528,9 @@ mkdirp@^0.5.0:
   dependencies:
     minimist "^1.2.5"
 
-mkdirp@~0.3.5:
-  version "0.3.5"
-  resolved "https://registry.yarnpkg.com/mkdirp/-/mkdirp-0.3.5.tgz#de3e5f8961c88c787ee1368df849ac4413eca8d7"
-  integrity sha1-3j5fiWHIjHh+4TaN+EmsRBPsqNc=
-
-"mockup@https://github.com/plone/mockup.git#e69dad0c4bd9c8df1e9f558474a9661578608cf2":
-  version "3.2.2"
-  resolved "https://github.com/plone/mockup.git#e69dad0c4bd9c8df1e9f558474a9661578608cf2"
+"mockup@https://github.com/plone/mockup.git#c6cd47201bb1062446ce1d12a1382b33e78f733f":
+  version "3.2.5"
+  resolved "https://github.com/plone/mockup.git#c6cd47201bb1062446ce1d12a1382b33e78f733f"
   dependencies:
     ace-builds "https://github.com/ajaxorg/ace-builds.git#v1.2.6"
     backbone "https://github.com/jashkenas/backbone.git#1.1.2"
@@ -675,10 +567,11 @@ mkdirp@~0.3.5:
     jquery.cookie "https://github.com/carhartl/jquery-cookie.git#v1.4.1"
     jquery.recurrenceinput.js "https://github.com/collective/jquery.recurrenceinput.js.git#master"
     logging "https://github.com/Patternslib/logging.git#1.0.2"
+    marked "https://github.com/chjj/marked.git#0.3.5"
     moment "2.24.0"
     patternslib "https://github.com/Patternslib/Patterns.git#2.1.3"
     pickadate "https://github.com/amsul/pickadate.js.git#3.6.4"
-    react "https://github.com/facebook/react.git#v0.10.0"
+    react "https://github.com/reactjs/react-bower.git#v0.10.0"
     requirejs-text "https://github.com/requirejs/text.git#2.0.15"
     select2 "https://github.com/ivaynberg/select2.git#3.5.4"
     tinymce-builded "https://github.com/artursmirnov/tinymce_builded.git#4.7.13"
@@ -708,11 +601,6 @@ performance-now@^0.2.0:
   dependencies:
     jquery ">=1.7"
 
-private@~0.1.2, private@~0.1.5:
-  version "0.1.8"
-  resolved "https://registry.yarnpkg.com/private/-/private-0.1.8.tgz#2381edb3689f7a53d653190060fcf822d2f368ff"
-  integrity sha512-VvivMrbvd2nKkiG38qjULzlc+4Vx4wm/whI9pQD35YrARNnhxeiRktSOhSukRLFNlzg6Br/cJPet5J/u19r/mg==
-
 promise@^7.1.1:
   version "7.3.1"
   resolved "https://registry.yarnpkg.com/promise/-/promise-7.3.1.tgz#064b72602b18f90f29192b8b1bc418ffd1ebd3bf"
@@ -730,34 +618,14 @@ punycode@^1.4.1:
   resolved "https://registry.yarnpkg.com/punycode/-/punycode-1.4.1.tgz#c0d5a63b2718800ad8e1eb0fa5269c84dd41845e"
   integrity sha1-wNWmOycYgArY4esPpSachN1BhF4=
 
-q@~1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/q/-/q-1.0.1.tgz#11872aeedee89268110b10a718448ffb10112a14"
-  integrity sha1-EYcq7t7okmgRCxCnGESP+xARKhQ=
-
 qs@~6.4.0:
   version "6.4.0"
   resolved "https://registry.yarnpkg.com/qs/-/qs-6.4.0.tgz#13e26d28ad6b0ffaa91312cd3bf708ed351e7233"
   integrity sha1-E+JtKK1rD/qpExLNO/cI7TUecjM=
 
-"react@https://github.com/facebook/react.git#v0.10.0":
-  version "0.10.0"
-  resolved "https://github.com/facebook/react.git#dedf0c20da67872b5dff21a25cb9075e6019c12e"
-  dependencies:
-    commoner "^0.9.2"
-    esprima-fb "~3001.1.0-dev-harmony-fb"
-    jstransform "~3.0.0"
-
-recast@~0.7.0:
-  version "0.7.5"
-  resolved "https://registry.yarnpkg.com/recast/-/recast-0.7.5.tgz#124e7cf63e2a737cd69243e379196c45549b1f2e"
-  integrity sha1-Ek589j4qc3zWkkPjeRlsRVSbHy4=
-  dependencies:
-    ast-types "~0.4.7"
-    cls "~0.1.3"
-    esprima-fb "~6001.1001.0-dev-harmony-fb"
-    private "~0.1.5"
-    source-map "0.1.32"
+"react@https://github.com/reactjs/react-bower.git#v0.10.0":
+  version "0.0.0"
+  resolved "https://github.com/reactjs/react-bower.git#4862309b39ceef32a65c160cd9987eccdfb29c38"
 
 request@2.81.0:
   version "2.81.0"
@@ -810,31 +678,12 @@ safer-buffer@^2.0.2, safer-buffer@^2.1.0, safer-buffer@~2.1.0:
   version "3.5.4"
   resolved "https://github.com/ivaynberg/select2.git#95a977f674b6938af55ec5f28b7772df93786c5c"
 
-sigmund@~1.0.0:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/sigmund/-/sigmund-1.0.1.tgz#3ff21f198cad2175f9f3b781853fd94d0d19b590"
-  integrity sha1-P/IfGYytIXX587eBhT/ZTQ0ZtZA=
-
 sntp@1.x.x:
   version "1.0.9"
   resolved "https://registry.yarnpkg.com/sntp/-/sntp-1.0.9.tgz#6541184cc90aeea6c6e7b35e2659082443c66198"
   integrity sha1-ZUEYTMkK7qbG57NeJlkIJEPGYZg=
   dependencies:
     hoek "2.x.x"
-
-source-map@0.1.31:
-  version "0.1.31"
-  resolved "https://registry.yarnpkg.com/source-map/-/source-map-0.1.31.tgz#9f704d0d69d9e138a81badf6ebb4fde33d151c61"
-  integrity sha1-n3BNDWnZ4TioG63267T94z0VHGE=
-  dependencies:
-    amdefine ">=0.0.4"
-
-source-map@0.1.32:
-  version "0.1.32"
-  resolved "https://registry.yarnpkg.com/source-map/-/source-map-0.1.32.tgz#c8b6c167797ba4740a8ea33252162ff08591b266"
-  integrity sha1-yLbBZ3l7pHQKjqMyUhYv8IWRsmY=
-  dependencies:
-    amdefine ">=0.0.4"
 
 source-map@^0.5.3:
   version "0.5.7"

@@ -25043,6 +25043,13 @@ define('mockup-patterns-structure-url/js/views/table',[
   var TableView = BaseView.extend({
     tagName: 'div',
     template: _.template(TableTemplate),
+
+    context_info_loaded_handler: function(event, data) {
+      this.contextInfo = data;
+      /* set default page info */
+      this.setContextInfo();
+    },
+
     initialize: function(options) {
       var self = this;
       BaseView.prototype.initialize.apply(self, [options]);
@@ -25055,12 +25062,9 @@ define('mockup-patterns-structure-url/js/views/table',[
       self.subsetIds = [];
       self.contextInfo = null;
 
-      $('body').off('context-info-loaded').on('context-info-loaded', function(event, data) {
-
-        self.contextInfo = data;
-        /* set default page info */
-        self.setContextInfo();
-      });
+      $('body')
+        .off('context-info-loaded', this.context_info_loaded_handler.bind(this))
+        .on('context-info-loaded', this.context_info_loaded_handler.bind(this));
 
       self.dateColumns = [
         'ModificationDate',
@@ -28545,14 +28549,18 @@ define('mockup-patterns-structure-url/js/views/upload',[
       '<input type="text" name="upload" style="display:none" />' +
       '<div class="uploadify-me"></div>'),
 
+    context_info_loaded_handler: function(event, data) {
+      this.currentPathData = data;
+    },
+
     initialize: function(options) {
       var self = this;
       self.app = options.app;
       PopoverView.prototype.initialize.apply(self, [options]);
       self.currentPathData = null;
-      $('body').on('context-info-loaded', function(event, data) {
-        self.currentPathData = data;
-      });
+      $('body')
+        .off('context-info-loaded', this.context_info_loaded_handler.bind(this))
+        .on('context-info-loaded', this.context_info_loaded_handler.bind(this));
     },
 
     render: function() {
@@ -30659,18 +30667,19 @@ define('mockup-patterns-structureupdater',[
       descriptionSelector: ''
     },
 
+    context_info_loaded_handler: function (e, data) {
+      if (this.options.titleSelector) {
+        $(this.options.titleSelector, this.$el).html(data.object && data.object.Title || '&nbsp;');
+      }
+      if (this.options.descriptionSelector) {
+        $(this.options.descriptionSelector, this.$el).html(data.object && data.object.Description || '&nbsp;');
+      }
+    },
+
     init: function() {
-
-      $('body').off('context-info-loaded').on('context-info-loaded', function (e, data) {
-
-        if (this.options.titleSelector) {
-            $(this.options.titleSelector, this.$el).html(data.object && data.object.Title || '&nbsp;');
-        }
-        if (this.options.descriptionSelector) {
-            $(this.options.descriptionSelector, this.$el).html(data.object && data.object.Description || '&nbsp;');
-        }
-      }.bind(this));
-
+      $('body')
+        .off('context-info-loaded', this.context_info_loaded_handler.bind(this))
+        .on('context-info-loaded', this.context_info_loaded_handler.bind(this));
     }
 
   });
@@ -30705,5 +30714,5 @@ require([
   'use strict';
 });
 
-define("/Users/maurits/community/plone-coredev/5.2/src/plone.staticresources/src/plone/staticresources/static/plone-editor-tools.js", function(){});
+define("/home/_thet/data/dev/plone/buildout.coredev/src/plone.staticresources/src/plone/staticresources/static/plone-editor-tools.js", function(){});
 
