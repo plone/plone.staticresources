@@ -1,2 +1,3 @@
 Increase Python package version number to 2.0.dev0.
+Start with the 2.x version numbers from 200 to not have same version numbers for multiple branches and stay aligned with the python package version.
 [thet]
