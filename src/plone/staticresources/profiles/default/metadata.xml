@@ -3,5 +3,6 @@
   <version>207</version>
   <dependencies>
     <dependency>profile-plone.resource:default</dependency>
+    <dependency>profile-plone.staticresources:last_compilation</dependency>
   </dependencies>
 </metadata>

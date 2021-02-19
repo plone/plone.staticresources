@@ -1,0 +1,35 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<registry>
+  <records prefix="plone.bundles/plone-base" interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+    <value key="last_compilation">2020-10-28 14:00:00</value>
+  </records>
+  <records prefix="plone.bundles/plone" interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+    <value key="last_compilation">2020-10-28 14:00:00</value>
+  </records>
+  <records prefix="plone.bundles/plone-moment" interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+    <value key="last_compilation">2020-10-28 14:00:00</value>
+  </records>
+  <records prefix="plone.bundles/plone-logged-in" interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+    <value key="last_compilation">2020-11-09 13:00:00</value>
+  </records>
+  <records prefix="plone.bundles/plone-editor-tools" interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+    <value key="last_compilation">2021-02-19 14:44:00</value>
+  </records>
+  <records prefix="plone.bundles/plone-tinymce" interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+    <value key="last_compilation">2020-10-28 14:00:00</value>
+  </records>
+  <records prefix="plone.bundles/plone-datatables" interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+    <value key="last_compilation">2020-10-28 14:00:00</value>
+  </records>
+  <records prefix="plone.bundles/resourceregistry" interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+    <value key="last_compilation">2020-10-28 14:00:00</value>
+  </records>
+  <records prefix="plone.bundles/thememapper" interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+    <value key="last_compilation">2020-10-28 14:00:00</value>
+  </records>
+  <records prefix="plone.bundles/filemanager" interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+    <value key="last_compilation">2020-10-28 14:00:00</value>
+  </records>
+  <!-- Note: plone-legacy is not in here, as its last_compilation should not be updated by us,
+       but only when legacy css and javascript change. -->
+</registry>
