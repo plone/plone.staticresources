@@ -25055,8 +25055,8 @@ define('mockup-patterns-structure-url/js/views/table',[
       self.subsetIds = [];
       self.contextInfo = null;
 
-      $('body').off('context-info-loaded').on('context-info-loaded', function(event, data) {
-
+      $('body').on('context-info-loaded', function(event, data) {
+        
         self.contextInfo = data;
         /* set default page info */
         self.setContextInfo();
@@ -30661,7 +30661,7 @@ define('mockup-patterns-structureupdater',[
 
     init: function() {
 
-      $('body').off('context-info-loaded').on('context-info-loaded', function (e, data) {
+      $('body').on('context-info-loaded', function (e, data) {
 
         if (this.options.titleSelector) {
             $(this.options.titleSelector, this.$el).html(data.object && data.object.Title || '&nbsp;');
@@ -30705,5 +30705,5 @@ require([
   'use strict';
 });
 
-define("/Users/maurits/community/plone-coredev/5.2/src/plone.staticresources/src/plone/staticresources/static/plone-editor-tools.js", function(){});
+define("/Users/maurits/community/plone-coredev/py3/src/plone.staticresources/src/plone/staticresources/static/plone-editor-tools.js", function(){});
 
