@@ -25,4 +25,5 @@ class HiddenProfiles(object):
             "plone.staticresources.upgrades:4",
             "plone.staticresources.upgrades:5",
             "plone.staticresources.upgrades:13",
+            "plone.staticresources.upgrades:15",
         ]
