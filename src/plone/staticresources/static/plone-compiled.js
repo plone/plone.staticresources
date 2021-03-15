@@ -7028,5 +7028,5 @@ require([
   'use strict';
 });
 
-define("/Users/fred/buildouts/coredev-plone5.2/src/plone.staticresources/src/plone/staticresources/static/plone.js", function(){});
+define("/home/_thet/data/dev/plone/buildout.coredev/src/plone.staticresources/src/plone/staticresources/static/plone.js", function(){});
 

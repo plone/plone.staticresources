@@ -528,9 +528,9 @@ mkdirp@^0.5.0:
   dependencies:
     minimist "^1.2.5"
 
-"mockup@https://github.com/plone/mockup.git#c6cd47201bb1062446ce1d12a1382b33e78f733f":
-  version "3.2.5"
-  resolved "https://github.com/plone/mockup.git#c6cd47201bb1062446ce1d12a1382b33e78f733f"
+"mockup@https://github.com/plone/mockup.git#346780be65d2cda0d3204510a90966e80d9b8920":
+  version "3.2.6"
+  resolved "https://github.com/plone/mockup.git#346780be65d2cda0d3204510a90966e80d9b8920"
   dependencies:
     ace-builds "https://github.com/ajaxorg/ace-builds.git#v1.2.6"
     backbone "https://github.com/jashkenas/backbone.git#1.1.2"
