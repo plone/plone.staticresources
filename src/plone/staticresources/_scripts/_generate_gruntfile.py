@@ -32,6 +32,9 @@ else:
     import plonetheme.barceloneta
 
 
+LESS_NO_EMBED_BUNDLES = ["plone-fontello", "plone-glyphicons"]
+
+
 def applyBrowserLayers(site):
     request = aq_acquire(site, "REQUEST")
     sm = getSiteManager(site)
@@ -157,6 +160,26 @@ LESS_CONFIG_TEMPLATE = """
                     outputSourceFiles: true,
                     paths: lessPaths,
                     plugins: [new require("less-plugin-inline-urls"),],
+                    relativeUrls: true,
+                    sourceMap: true,
+                    sourceMapBasepath: "{base_path}",
+                    sourceMapURL: "{sourcemap_url}",
+                    strictImports: false,
+                    strictMath: false
+                }}
+            }}\
+"""
+
+LESS_NO_EMBED_CONFIG_TEMPLATE = """
+            "{name}": {{
+                files: [
+                    {files}
+                ],
+                options: {{
+                    compress: true,
+                    modifyVars: modifyVars,
+                    outputSourceFiles: true,
+                    paths: lessPaths,
                     relativeUrls: true,
                     sourceMap: true,
                     sourceMapBasepath: "{base_path}",
@@ -473,14 +496,24 @@ for bkey, bundle in bundles.items():
                     sed_count += 1
 
         if less_files:
-            less_cfgs_final.append(
-                LESS_CONFIG_TEMPLATE.format(
-                    name=bkey,
-                    files=json.dumps(less_files, indent=16),
-                    sourcemap_url=sourceMap_url,
-                    base_path=os.getcwd(),
+            if bkey in LESS_NO_EMBED_BUNDLES:
+                less_cfgs_final.append(
+                    LESS_NO_EMBED_CONFIG_TEMPLATE.format(
+                        name=bkey,
+                        files=json.dumps(less_files, indent=16),
+                        sourcemap_url=sourceMap_url,
+                        base_path=os.getcwd(),
+                    )
                 )
-            )
+            else:
+                less_cfgs_final.append(
+                    LESS_CONFIG_TEMPLATE.format(
+                        name=bkey,
+                        files=json.dumps(less_files, indent=16),
+                        sourcemap_url=sourceMap_url,
+                        base_path=os.getcwd(),
+                    )
+                )
 
         if js_files:
             if not js_target_path:
