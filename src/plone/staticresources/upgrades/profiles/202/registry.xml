@@ -1,0 +1,46 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<registry>
+
+  <records prefix="plone.resources/plone-fontello"
+            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
+      <value key="css">
+        <element>++plone++static/plone-fontello.less</element>
+      </value>
+  </records>
+
+  <records prefix="plone.resources/plone-glyphicons"
+            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
+      <value key="css">
+        <element>++plone++static/plone-glyphicons.less</element>
+      </value>
+  </records>
+
+  <records prefix="plone.bundles/plone-fontello"
+            interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+    <value key="depends">plone</value>
+    <value key="merge_with">default</value>
+    <value key="resources">
+      <element>plone-fontello</element>
+    </value>
+    <value key="enabled">True</value>
+    <value key="csscompilation">++plone++static/plone-fontello-compiled.css</value>
+    <value key="load_async">False</value>
+    <value key="load_defer">False</value>
+    <value key="last_compilation">2021-03-17 15:00:00</value>
+  </records>
+
+  <records prefix="plone.bundles/plone-glyphicons"
+            interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+    <value key="depends">plone</value>
+    <value key="merge_with">default</value>
+    <value key="resources">
+      <element>plone-glyphicons</element>
+    </value>
+    <value key="enabled">True</value>
+    <value key="csscompilation">++plone++static/plone-glyphicons-compiled.css</value>
+    <value key="load_async">False</value>
+    <value key="load_defer">False</value>
+    <value key="last_compilation">2021-03-17 15:00:00</value>
+  </records>
+
+</registry>
