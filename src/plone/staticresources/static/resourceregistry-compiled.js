@@ -32089,7 +32089,7 @@ define('mockup-patterns-modal',[
                 timeout: 5000,
                 displayInModal: true,
                 reloadWindowOnClose: true,
-                error: ".portalMessage.error, .alert-danger",
+                error: ".portalMessage.error, .statusmessage-error",
                 formFieldError: ".field.error",
                 onSuccess: null,
                 onError: null,
@@ -34549,5 +34549,5 @@ require([
   'use strict';
 });
 
-define("/Volumes/WORKSPACE2/kinderdorf_plone5/srccore/plone.staticresources/src/plone/staticresources/static/resourceregistry.js", function(){});
+define("/Users/peter/workspace/buildout.coredev6/src/plone.staticresources/src/plone/staticresources/static/resourceregistry.js", function(){});
 
