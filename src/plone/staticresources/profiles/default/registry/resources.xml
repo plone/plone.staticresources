@@ -31,6 +31,21 @@
     </value>
   </records>
 
+  <records prefix="plone.resources/plone-fontello"
+            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
+      <value key="css">
+        <element>++plone++static/plone-fontello.less</element>
+      </value>
+  </records>
+
+  <records prefix="plone.resources/plone-glyphicons"
+            interface='Products.CMFPlone.interfaces.IResourceRegistry'>
+      <value key="css">
+        <element>++plone++static/plone-glyphicons.less</element>
+      </value>
+  </records>
+
+
   <!-- mockup core reqs -->
   <records prefix="plone.resources/mockup-patterns-base"
             interface='Products.CMFPlone.interfaces.IResourceRegistry'>

@@ -8066,12 +8066,12 @@ define('mockup-patterns-querystring',[
                     self.refreshPreviewEvent.call(self);
                     if ($(this).prop("checked")) {
                         $(
-                            'input[type="checkbox"]',
+                            '.option input[type="checkbox"]',
                             existingSortOrder
                         ).prop("checked", true);
                     } else {
                         $(
-                            'input[type="checkbox"]',
+                            '.option input[type="checkbox"]',
                             existingSortOrder
                         ).prop("checked", false);
                     }
@@ -8091,7 +8091,7 @@ define('mockup-patterns-querystring',[
             // will be synced back and forth between the querystring's form elements
             if (existingSortOn.length >= 1 && existingSortOrder.length >= 1) {
                 var reversed = $(
-                    'input[type="checkbox"]',
+                    '.option input[type="checkbox"]',
                     existingSortOrder
                 ).prop("checked");
                 var sortOn = $('[id$="-sort_on"]', existingSortOn).val();
@@ -31453,5 +31453,5 @@ require([
   'use strict';
 });
 
-define("/Volumes/WORKSPACE2/kinderdorf_plone5/srccore/plone.staticresources/src/plone/staticresources/static/plone-editor-tools.js", function(){});
+define("/Users/peter/workspace/buildout.coredev6/src/plone.staticresources/src/plone/staticresources/static/plone-editor-tools.js", function(){});
 

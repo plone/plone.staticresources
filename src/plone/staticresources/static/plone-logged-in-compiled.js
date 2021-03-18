@@ -14526,5 +14526,5 @@ require([
   'use strict';
 });
 
-define("/Volumes/WORKSPACE2/buildout.coredev.barceloneta-lts/src/plone.staticresources/src/plone/staticresources/static/plone-logged-in.js", function(){});
+define("/Users/peter/workspace/buildout.coredev6/src/plone.staticresources/src/plone/staticresources/static/plone-logged-in.js", function(){});
 

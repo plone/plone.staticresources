@@ -3862,5 +3862,5 @@ require([
 
 });
 
-define("/Volumes/WORKSPACE2/kinderdorf_plone5/srccore/plone.staticresources/src/plone/staticresources/static/plone-base.js", function(){});
+define("/Users/peter/workspace/buildout.coredev6/src/plone.staticresources/src/plone/staticresources/static/plone-base.js", function(){});
 
