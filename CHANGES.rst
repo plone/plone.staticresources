@@ -8,6 +8,17 @@ Changelog
 
 .. towncrier release notes start
 
+1.4.3 (2021-03-22)
+------------------
+
+Bug fixes:
+
+
+- Reduce bundle sizes by not inlining fonts in each bundle - moved plone-fontello and glyphicons to their own bundle. Icon font bundles use fonts from ++plone++static/fonts/.
+  Based on mockup 1.2.6.
+  [agitator] (#131)
+
+
 1.4.2 (2021-02-19)
 ------------------
 

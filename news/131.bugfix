@@ -1,3 +1,0 @@
-Reduce bundle sizes by not inlining fonts in each bundle - moved plone-fontello and glyphicons to their own bundle. Icon font bundles use fonts from ++plone++static/fonts/.
-Based on mockup 1.2.6.
-[agitator]
