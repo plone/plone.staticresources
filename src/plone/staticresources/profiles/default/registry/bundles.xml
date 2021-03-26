@@ -19,4 +19,12 @@
     <value key="load_defer">False</value>
   </records>
 
+  <record name="plone.resources.last_legacy_import">
+    <field type="plone.registry.field.Datetime">
+      <title>Last legacy js/css import date</title>
+      <description>It's used to decide if its needed to compile or not the production css/js</description>
+    </field>
+    <value>2021-01-01 01:01:01</value>
+  </record>
+
 </registry>
