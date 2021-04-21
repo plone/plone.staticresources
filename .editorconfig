@@ -1,14 +1,14 @@
 [*]
-indent_style = space
+charset = utf-8
 end_of_line = lf
+indent_style = space
 insert_final_newline = true
 trim_trailing_whitespace = true
-charset = utf-8
 
-[{*.py,*.cfg}]
+[*{js,jsx,vue,ts,py,cfg}]
 indent_size = 4
 
-[{*.html,*.dtml,*.pt,*.zpt,*.xml,*.zcml,*.js}]
+[*.{css,scss,xml,html,yml,dtml,pt,zpt,zcml}]
 indent_size = 2
 
 [Makefile]
