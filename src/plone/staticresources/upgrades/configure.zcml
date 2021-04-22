@@ -16,5 +16,6 @@
   <include file="201.zcml" />
   <include file="202.zcml" />
   <include file="203.zcml" />
+  <include file="204.zcml" />
 
 </configure>
