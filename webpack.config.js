@@ -3,8 +3,8 @@ const path = require("path");
 const mockup_config = require("mockup/webpack.config.js");
 const CopyPlugin = require("copy-webpack-plugin");
 
-module.exports = async (env) => {
-    const config = await mockup_config(env);
+module.exports = async (env, argv) => {
+    const config = await mockup_config(env, argv);
 
     config.output.path = path.resolve(
         __dirname,
@@ -25,6 +25,11 @@ module.exports = async (env) => {
             ],
         })
     );
+
+    // Fix paths
+    config.entry["bundle-polyfills"] = path.resolve(__dirname, "node_modules/@patternslib/patternslib/src/polyfills.js"); // prettier-ignore
+    config.entry["bundle-polyfills.min"] = config.entry["bundle-polyfills"];
+    config.resolve.alias.moment = path.resolve(__dirname, "node_modules/moment"); // prettier-ignore
 
     return config;
 };
