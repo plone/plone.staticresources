@@ -1,0 +1,19 @@
+<configure xmlns="http://namespaces.zope.org/zope"
+  xmlns:gs="http://namespaces.zope.org/genericsetup">
+
+  <gs:registerProfile name="203"
+    title="Update bundles"
+    description='Configuration for version 203'
+    directory="profiles/203"
+    for="Products.CMFPlone.interfaces.IMigratingPloneSiteRoot"
+    provides="Products.GenericSetup.interfaces.EXTENSION" />
+
+  <gs:upgradeDepends
+    source="202"
+    destination="203"
+    profile="plone.staticresources:default"
+    title="Update Plone icons"
+    import_profile="plone.staticresources.upgrades:203"
+    />
+
+</configure>
