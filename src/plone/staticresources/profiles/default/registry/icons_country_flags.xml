@@ -1,0 +1,1802 @@
+<?xml version="1.0"?>
+<registry>
+<record name="plone.icon.countryflag">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag Default</title>
+  </field>
+  <value key="resource">++plone++bootstrap-icons/flag.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/ad">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag andorra</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/ad.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/ae">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag united arab emirates</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/ae.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/af">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag afghanistan</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/af.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/ag">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag antigua and barbuda</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/ag.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/ai">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag anguilla</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/ai.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/al">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag albania</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/al.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/am">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag armenia</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/am.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/an">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag netherlands antilles</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/an.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/ao">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag angola</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/ao.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/aq">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag antarctica</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/aq.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/ar">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag argentina</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/ar.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/as">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag american samoa</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/as.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/at">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag austria</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/at.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/au">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag australia</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/au.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/aw">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag aruba</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/aw.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/ax">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag åland islands</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/ax.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/az">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag azerbaijan</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/az.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/ba">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag bosnia and herzegovina</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/ba.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/bb">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag barbados</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/bb.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/bd">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag bangladesh</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/bd.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/be">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag belgium</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/be.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/bf">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag burkina faso</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/bf.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/bg">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag bulgaria</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/bg.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/bh">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag bahrain</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/bh.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/bi">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag burundi</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/bi.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/bj">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag benin</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/bj.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/bl">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag saint barthélemy</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/bl.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/bm">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag bermuda</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/bm.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/bn">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag brunei darussalam</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/bn.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/bo">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag bolivia, plurinational state of</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/bo.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/bq">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag caribbean netherlands</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/bq.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/br">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag brazil</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/br.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/bs">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag bahamas</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/bs.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/bt">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag bhutan</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/bt.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/bv">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag bouvet island</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/bv.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/bw">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag botswana</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/bw.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/by">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag belarus</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/by.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/bz">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag belize</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/bz.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/ca">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag canada</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/ca.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/cc">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag cocos (keeling) islands</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/cc.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/cd">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag congo, the democratic republic of the</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/cd.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/cf">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag central african republic</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/cf.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/cg">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag congo</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/cg.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/ch">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag switzerland</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/ch.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/ci">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag côte d'ivoire</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/ci.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/ck">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag cook islands</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/ck.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/cl">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag chile</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/cl.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/cm">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag cameroon</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/cm.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/cn">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag china</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/cn.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/co">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag colombia</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/co.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/cr">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag costa rica</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/cr.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/cu">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag cuba</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/cu.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/cv">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag cape verde</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/cv.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/cw">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag curaçao</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/cw.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/cx">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag christmas island</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/cx.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/cy">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag cyprus</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/cy.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/cz">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag czech republic</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/cz.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/de">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag germany</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/de.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/dj">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag djibouti</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/dj.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/dk">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag denmark</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/dk.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/dm">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag dominica</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/dm.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/do">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag dominican republic</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/do.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/dz">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag algeria</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/dz.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/ec">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag ecuador</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/ec.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/ee">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag estonia</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/ee.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/eg">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag egypt</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/eg.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/eh">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag western sahara</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/eh.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/er">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag eritrea</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/er.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/es">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag spain</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/es.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/et">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag ethiopia</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/et.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/eu">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag europe</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/eu.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/fi">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag finland</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/fi.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/fj">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag fiji</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/fj.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/fk">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag falkland islands (malvinas)</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/fk.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/fm">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag micronesia, federated states of</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/fm.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/fo">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag faroe islands</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/fo.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/fr">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag france</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/fr.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/ga">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag gabon</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/ga.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/gb-eng">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag england</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/gb-eng.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/gb-nir">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag northern ireland</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/gb-nir.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/gb-sct">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag scotland</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/gb-sct.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/gb-wls">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag wales</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/gb-wls.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/gb">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag united kingdom</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/gb.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/gd">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag grenada</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/gd.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/ge">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag georgia</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/ge.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/gf">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag french guiana</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/gf.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/gg">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag guernsey</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/gg.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/gh">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag ghana</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/gh.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/gi">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag gibraltar</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/gi.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/gl">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag greenland</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/gl.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/gm">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag gambia</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/gm.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/gn">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag guinea</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/gn.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/gp">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag guadeloupe</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/gp.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/gq">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag equatorial guinea</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/gq.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/gr">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag greece</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/gr.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/gs">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag south georgia and the south sandwich islands</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/gs.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/gt">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag guatemala</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/gt.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/gu">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag guam</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/gu.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/gw">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag guinea-bissau</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/gw.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/gy">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag guyana</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/gy.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/hk">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag hong kong</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/hk.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/hm">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag heard island and mcdonald islands</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/hm.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/hn">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag honduras</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/hn.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/hr">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag croatia</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/hr.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/ht">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag haiti</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/ht.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/hu">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag hungary</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/hu.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/id">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag indonesia</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/id.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/ie">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag ireland</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/ie.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/il">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag israel</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/il.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/im">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag isle of man</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/im.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/in">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag india</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/in.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/io">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag british indian ocean territory</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/io.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/iq">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag iraq</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/iq.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/ir">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag iran, islamic republic of</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/ir.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/is">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag iceland</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/is.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/it">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag italy</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/it.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/je">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag jersey</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/je.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/jm">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag jamaica</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/jm.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/jo">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag jordan</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/jo.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/jp">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag japan</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/jp.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/ke">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag kenya</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/ke.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/kg">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag kyrgyzstan</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/kg.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/kh">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag cambodia</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/kh.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/ki">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag kiribati</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/ki.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/km">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag comoros</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/km.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/kn">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag saint kitts and nevis</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/kn.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/kp">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag korea, democratic people's republic of</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/kp.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/kr">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag korea, republic of</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/kr.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/kw">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag kuwait</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/kw.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/ky">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag cayman islands</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/ky.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/kz">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag kazakhstan</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/kz.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/la">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag lao people's democratic republic</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/la.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/lb">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag lebanon</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/lb.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/lc">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag saint lucia</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/lc.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/li">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag liechtenstein</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/li.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/lk">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag sri lanka</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/lk.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/lr">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag liberia</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/lr.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/ls">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag lesotho</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/ls.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/lt">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag lithuania</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/lt.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/lu">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag luxembourg</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/lu.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/lv">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag latvia</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/lv.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/ly">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag libya</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/ly.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/ma">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag morocco</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/ma.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/mc">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag monaco</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/mc.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/md">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag moldova, republic of</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/md.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/me">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag montenegro</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/me.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/mf">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag saint martin</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/mf.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/mg">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag madagascar</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/mg.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/mh">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag marshall islands</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/mh.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/mk">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag macedonia, the former yugoslav republic of</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/mk.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/ml">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag mali</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/ml.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/mm">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag myanmar</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/mm.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/mn">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag mongolia</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/mn.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/mo">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag macao</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/mo.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/mp">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag northern mariana islands</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/mp.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/mq">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag martinique</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/mq.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/mr">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag mauritania</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/mr.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/ms">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag montserrat</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/ms.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/mt">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag malta</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/mt.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/mu">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag mauritius</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/mu.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/mv">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag maldives</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/mv.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/mw">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag malawi</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/mw.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/mx">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag mexico</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/mx.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/my">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag malaysia</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/my.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/mz">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag mozambique</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/mz.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/na">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag namibia</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/na.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/nc">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag new caledonia</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/nc.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/ne">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag niger</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/ne.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/nf">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag norfolk island</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/nf.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/ng">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag nigeria</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/ng.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/ni">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag nicaragua</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/ni.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/nl">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag netherlands</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/nl.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/no">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag norway</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/no.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/np">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag nepal</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/np.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/nr">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag nauru</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/nr.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/nu">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag niue</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/nu.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/nz">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag new zealand</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/nz.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/om">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag oman</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/om.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/pa">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag panama</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/pa.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/pe">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag peru</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/pe.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/pf">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag french polynesia</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/pf.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/pg">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag papua new guinea</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/pg.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/ph">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag philippines</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/ph.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/pk">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag pakistan</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/pk.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/pl">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag poland</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/pl.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/pm">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag saint pierre and miquelon</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/pm.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/pn">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag pitcairn</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/pn.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/pr">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag puerto rico</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/pr.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/ps">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag palestine</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/ps.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/pt">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag portugal</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/pt.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/pw">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag palau</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/pw.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/py">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag paraguay</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/py.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/qa">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag qatar</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/qa.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/re">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag réunion</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/re.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/ro">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag romania</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/ro.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/rs">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag serbia</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/rs.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/ru">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag russian federation</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/ru.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/rw">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag rwanda</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/rw.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/sa">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag saudi arabia</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/sa.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/sb">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag solomon islands</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/sb.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/sc">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag seychelles</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/sc.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/sd">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag sudan</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/sd.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/se">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag sweden</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/se.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/sg">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag singapore</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/sg.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/sh">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag saint helena, ascension and tristan da cunha</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/sh.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/si">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag slovenia</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/si.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/sj">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag svalbard and jan mayen islands</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/sj.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/sk">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag slovakia</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/sk.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/sl">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag sierra leone</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/sl.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/sm">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag san marino</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/sm.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/sn">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag senegal</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/sn.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/so">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag somalia</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/so.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/sr">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag suriname</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/sr.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/ss">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag south sudan</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/ss.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/st">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag sao tome and principe</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/st.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/sv">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag el salvador</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/sv.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/sx">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag sint maarten (dutch part)</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/sx.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/sy">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag syrian arab republic</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/sy.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/sz">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag swaziland</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/sz.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/tc">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag turks and caicos islands</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/tc.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/td">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag chad</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/td.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/tf">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag french southern territories</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/tf.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/tg">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag togo</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/tg.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/th">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag thailand</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/th.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/tj">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag tajikistan</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/tj.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/tk">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag tokelau</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/tk.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/tl">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag timor-leste</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/tl.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/tm">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag turkmenistan</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/tm.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/tn">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag tunisia</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/tn.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/to">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag tonga</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/to.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/tr">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag turkey</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/tr.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/tt">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag trinidad and tobago</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/tt.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/tv">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag tuvalu</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/tv.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/tw">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag taiwan</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/tw.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/tz">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag tanzania, united republic of</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/tz.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/ua">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag ukraine</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/ua.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/ug">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag uganda</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/ug.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/um">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag us minor outlying islands</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/um.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/us">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag united states</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/us.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/uy">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag uruguay</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/uy.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/uz">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag uzbekistan</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/uz.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/va">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag holy see (vatican city state)</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/va.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/vc">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag saint vincent and the grenadines</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/vc.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/ve">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag venezuela, bolivarian republic of</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/ve.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/vg">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag virgin islands, british</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/vg.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/vi">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag virgin islands, u.s.</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/vi.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/vn">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag viet nam</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/vn.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/vu">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag vanuatu</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/vu.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/wf">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag wallis and futuna islands</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/wf.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/xk">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag kosovo</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/xk.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/ws">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag samoa</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/ws.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/ye">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag yemen</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/ye.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/yt">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag mayotte</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/yt.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/za">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag south africa</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/za.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/zm">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag zambia</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/zm.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/zw">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag zimbabwe</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/zw.svg</value>
+</record>
+
+</registry>

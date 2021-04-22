@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<registry>
+<record name="plone.icon.languageflag">
+  <field type="plone.registry.field.TextLine">
+    <title>Language Icon Flag Default</title>
+  </field>
+  <value key="resource">++plone++bootstrap-icons/flag.svg</value>
+</record>
+
+<record name="plone.icon.languageflag/ar">
+  <field type="plone.registry.field.TextLine">
+    <title>Language Icon Flag arabic</title>
+  </field>
+  <value key="resource">++plone++language-flag-icons/ar.svg</value>
+</record>
+
+<record name="plone.icon.languageflag/ca">
+  <field type="plone.registry.field.TextLine">
+    <title>Language Icon Flag catalan</title>
+  </field>
+  <value key="resource">++plone++language-flag-icons/ca.svg</value>
+</record>
+
+<record name="plone.icon.languageflag/cy">
+  <field type="plone.registry.field.TextLine">
+    <title>Language Icon Flag welsh</title>
+  </field>
+  <value key="resource">++plone++language-flag-icons/cy.svg</value>
+</record>
+
+<record name="plone.icon.languageflag/eo">
+  <field type="plone.registry.field.TextLine">
+    <title>Language Icon Flag esperanto</title>
+  </field>
+  <value key="resource">++plone++language-flag-icons/eo.svg</value>
+</record>
+
+<record name="plone.icon.languageflag/eu">
+  <field type="plone.registry.field.TextLine">
+    <title>Language Icon Flag basque</title>
+  </field>
+  <value key="resource">++plone++language-flag-icons/eu.svg</value>
+</record>
+
+</registry>
