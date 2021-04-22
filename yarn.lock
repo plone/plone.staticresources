@@ -1257,9 +1257,9 @@ mkdirp@0.5.5, mkdirp@^0.5.0, mkdirp@^0.5.1:
   dependencies:
     minimist "^1.2.5"
 
-"mockup@https://github.com/plone/mockup.git#barceloneta-lts":
+"mockup@https://github.com/plone/mockup.git#4c449876d35ded6ffaf9904734f5c881581b686a":
   version "4.0.0"
-  resolved "https://github.com/plone/mockup.git#fe616752a3ad1bddf58d162da518323c0c7f17ac"
+  resolved "https://github.com/plone/mockup.git#4c449876d35ded6ffaf9904734f5c881581b686a"
   dependencies:
     ace-builds "1.2.6"
     backbone "1.1.2"
@@ -1803,6 +1803,11 @@ supports-color@^7.1.0:
   integrity sha512-qpCAvRl9stuOHveKsn7HncJRvv501qIacKzQlO/+Lwxc9+0q2wLyv4Dfvt80/DPn2pqOBsJdDiogXGR9+OvwRw==
   dependencies:
     has-flag "^4.0.0"
+
+svg-country-flags@^1.2.10:
+  version "1.2.10"
+  resolved "https://registry.yarnpkg.com/svg-country-flags/-/svg-country-flags-1.2.10.tgz#b1b94e9f08f065d7b3d0ff9ab359898edd4dd3b0"
+  integrity sha512-xrqwo0TYf/h2cfPvGpjdSuSguUbri4vNNizBnwzoZnX0xGo3O5nGJMlbYEp7NOYcnPGBm6LE2axqDWSB847bLw==
 
 table@^5.2.3:
   version "5.4.6"
