@@ -34549,5 +34549,5 @@ require([
   'use strict';
 });
 
-define("/Users/peter/workspace/buildout.coredev6/src/plone.staticresources/src/plone/staticresources/static/resourceregistry.js", function(){});
+define("/home/_thet/data/dev/plone/buildout.coredev-60/src/plone.staticresources/src/plone/staticresources/static/resourceregistry.js", function(){});
 

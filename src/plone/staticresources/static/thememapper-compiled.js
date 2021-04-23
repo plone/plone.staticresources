@@ -38243,5 +38243,5 @@ require([
   'use strict';
 });
 
-define("/Volumes/WORKSPACE2/kinderdorf_plone5/srccore/plone.staticresources/src/plone/staticresources/static/thememapper.js", function(){});
+define("/home/_thet/data/dev/plone/buildout.coredev-60/src/plone.staticresources/src/plone/staticresources/static/thememapper.js", function(){});
 
