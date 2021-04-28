@@ -8,6 +8,7 @@
     <value key="last_compilation"></value>
     <value key="load_async">False</value>
     <value key="load_defer">False</value>
+    <value key="compile">False</value>
   </records>
 
   <records prefix="plone.bundles/plone" interface='Products.CMFPlone.interfaces.IBundleRegistry'>
@@ -17,6 +18,7 @@
     <value key="last_compilation"></value>
     <value key="load_async">False</value>
     <value key="load_defer">False</value>
+    <value key="compile">False</value>
   </records>
 
   <record name="plone.resources.last_legacy_import">
