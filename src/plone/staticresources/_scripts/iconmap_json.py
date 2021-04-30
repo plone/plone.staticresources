@@ -15,16 +15,11 @@ PATH_ICONMAP = "../static/iconmap.json"
 
 
 def main():
-    iconmap = []
+    iconmap = {}
     for file in FILES:
         root = etree.parse(file)
         for record in root.xpath("//record"):
-            # fmt: off
-            iconmap.append({
-                "name": record.get("name"),
-                "value": record.xpath("value")[0].text
-            })
-            # fmt: on
+            iconmap[record.get("name")] = record.xpath("value")[0].text
 
     with open(PATH_ICONMAP, "w") as f:
         f.write(json.dumps(iconmap, indent=4, sort_keys=True))
