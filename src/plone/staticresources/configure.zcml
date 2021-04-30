@@ -25,12 +25,12 @@
     />
 
   <plone:static
-      directory="static/icons/country-flags/svg"
+      directory="static/icons-country-flags/svg"
       type="plone"
       name="country-flag-icons" />
 
   <plone:static
-      directory="static/icons/language-flags/svg"
+      directory="static/icons-language-flags/svg"
       type="plone"
       name="language-flag-icons" />
 

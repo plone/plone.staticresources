@@ -22,6 +22,13 @@ module.exports = async (env, argv) => {
                     from: path.resolve(__dirname, "node_modules/bootstrap/dist"),
                     to: path.resolve(__dirname, "src/plone/staticresources/static/bundle-bootstrap"), // prettier-ignore
                 },
+                {
+                    from: path.resolve(__dirname, "node_modules/svg-country-flags"),
+                    to: path.resolve(__dirname, "src/plone/staticresources/static/icons-country-flags"), // prettier-ignore
+                    globOptions: {
+                        ignore: ["**/png*/*", "**/scripts/*"],
+                    },
+                },
             ],
         })
     );
