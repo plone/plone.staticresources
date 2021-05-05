@@ -21,6 +21,15 @@
     <value key="compile">False</value>
   </records>
 
+  <records prefix="plone.bundles/resourceregistry" interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+    <value key="enabled">False</value>
+    <value key="jscompilation">++plone++static/bundle-resourceregistry/resourceregistry-compiled.min.js</value>
+    <value key="csscompilation">++plone++static/bundle-resourceregistry/resourceregistry-compiled.css</value>
+    <value key="last_compilation">2021-01-21 11:40:00</value>
+    <value key="load_async">False</value>
+    <value key="load_defer">False</value>
+  </records>
+
   <record name="plone.resources.last_legacy_import">
     <field type="plone.registry.field.Datetime">
       <title>Last legacy js/css import date</title>
