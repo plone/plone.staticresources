@@ -1,19 +1,20 @@
 /*!
-  * Bootstrap modal.js v5.0.1 (https://getbootstrap.com/)
+  * Bootstrap offcanvas.js v5.0.1 (https://getbootstrap.com/)
   * Copyright 2011-2021 The Bootstrap Authors (https://github.com/twbs/bootstrap/graphs/contributors)
   * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
   */
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('./dom/selector-engine.js'), require('./dom/event-handler.js'), require('./dom/manipulator.js'), require('./base-component.js')) :
-  typeof define === 'function' && define.amd ? define(['./dom/selector-engine', './dom/event-handler', './dom/manipulator', './base-component'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.Modal = factory(global.SelectorEngine, global.EventHandler, global.Manipulator, global.Base));
-}(this, (function (SelectorEngine, EventHandler, Manipulator, BaseComponent) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('./dom/selector-engine.js'), require('./dom/manipulator.js'), require('./dom/data.js'), require('./dom/event-handler.js'), require('./base-component.js')) :
+  typeof define === 'function' && define.amd ? define(['./dom/selector-engine', './dom/manipulator', './dom/data', './dom/event-handler', './base-component'], factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.Offcanvas = factory(global.SelectorEngine, global.Manipulator, global.Data, global.EventHandler, global.Base));
+}(this, (function (SelectorEngine, Manipulator, Data, EventHandler, BaseComponent) { 'use strict';
 
   function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
   var SelectorEngine__default = /*#__PURE__*/_interopDefaultLegacy(SelectorEngine);
-  var EventHandler__default = /*#__PURE__*/_interopDefaultLegacy(EventHandler);
   var Manipulator__default = /*#__PURE__*/_interopDefaultLegacy(Manipulator);
+  var Data__default = /*#__PURE__*/_interopDefaultLegacy(Data);
+  var EventHandler__default = /*#__PURE__*/_interopDefaultLegacy(EventHandler);
   var BaseComponent__default = /*#__PURE__*/_interopDefaultLegacy(BaseComponent);
 
   const MILLISECONDS_MULTIPLIER = 1000;
@@ -139,6 +140,22 @@
     return false;
   };
 
+  const isDisabled = element => {
+    if (!element || element.nodeType !== Node.ELEMENT_NODE) {
+      return true;
+    }
+
+    if (element.classList.contains('disabled')) {
+      return true;
+    }
+
+    if (typeof element.disabled !== 'undefined') {
+      return element.disabled;
+    }
+
+    return element.hasAttribute('disabled') && element.getAttribute('disabled') !== 'false';
+  };
+
   const reflow = element => element.offsetHeight;
 
   const getjQuery = () => {
@@ -160,8 +177,6 @@
       callback();
     }
   };
-
-  const isRTL = () => document.documentElement.dir === 'rtl';
 
   const defineJQueryPlugin = plugin => {
     onDOMContentLoaded(() => {
@@ -284,7 +299,7 @@
   };
   const NAME$1 = 'backdrop';
   const CLASS_NAME_BACKDROP = 'modal-backdrop';
-  const CLASS_NAME_FADE$1 = 'fade';
+  const CLASS_NAME_FADE = 'fade';
   const CLASS_NAME_SHOW$1 = 'show';
   const EVENT_MOUSEDOWN = `mousedown.bs.${NAME$1}`;
 
@@ -335,7 +350,7 @@
         backdrop.className = CLASS_NAME_BACKDROP;
 
         if (this._config.isAnimated) {
-          backdrop.classList.add(CLASS_NAME_FADE$1);
+          backdrop.classList.add(CLASS_NAME_FADE);
         }
 
         this._element = backdrop;
@@ -393,8 +408,8 @@
 
   /**
    * --------------------------------------------------------------------------
-   * Bootstrap (v5.0.1): modal.js
-   * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
+   * Bootstrap (v5.0.1): offcanvas.js
+   * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
    * --------------------------------------------------------------------------
    */
   /**
@@ -403,65 +418,57 @@
    * ------------------------------------------------------------------------
    */
 
-  const NAME = 'modal';
-  const DATA_KEY = 'bs.modal';
+  const NAME = 'offcanvas';
+  const DATA_KEY = 'bs.offcanvas';
   const EVENT_KEY = `.${DATA_KEY}`;
   const DATA_API_KEY = '.data-api';
+  const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`;
   const ESCAPE_KEY = 'Escape';
   const Default = {
     backdrop: true,
     keyboard: true,
-    focus: true
+    scroll: false
   };
   const DefaultType = {
-    backdrop: '(boolean|string)',
+    backdrop: 'boolean',
     keyboard: 'boolean',
-    focus: 'boolean'
+    scroll: 'boolean'
   };
-  const EVENT_HIDE = `hide${EVENT_KEY}`;
-  const EVENT_HIDE_PREVENTED = `hidePrevented${EVENT_KEY}`;
-  const EVENT_HIDDEN = `hidden${EVENT_KEY}`;
+  const CLASS_NAME_SHOW = 'show';
+  const OPEN_SELECTOR = '.offcanvas.show';
   const EVENT_SHOW = `show${EVENT_KEY}`;
   const EVENT_SHOWN = `shown${EVENT_KEY}`;
+  const EVENT_HIDE = `hide${EVENT_KEY}`;
+  const EVENT_HIDDEN = `hidden${EVENT_KEY}`;
   const EVENT_FOCUSIN = `focusin${EVENT_KEY}`;
-  const EVENT_RESIZE = `resize${EVENT_KEY}`;
+  const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`;
   const EVENT_CLICK_DISMISS = `click.dismiss${EVENT_KEY}`;
   const EVENT_KEYDOWN_DISMISS = `keydown.dismiss${EVENT_KEY}`;
-  const EVENT_MOUSEUP_DISMISS = `mouseup.dismiss${EVENT_KEY}`;
-  const EVENT_MOUSEDOWN_DISMISS = `mousedown.dismiss${EVENT_KEY}`;
-  const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`;
-  const CLASS_NAME_OPEN = 'modal-open';
-  const CLASS_NAME_FADE = 'fade';
-  const CLASS_NAME_SHOW = 'show';
-  const CLASS_NAME_STATIC = 'modal-static';
-  const SELECTOR_DIALOG = '.modal-dialog';
-  const SELECTOR_MODAL_BODY = '.modal-body';
-  const SELECTOR_DATA_TOGGLE = '[data-bs-toggle="modal"]';
-  const SELECTOR_DATA_DISMISS = '[data-bs-dismiss="modal"]';
+  const SELECTOR_DATA_DISMISS = '[data-bs-dismiss="offcanvas"]';
+  const SELECTOR_DATA_TOGGLE = '[data-bs-toggle="offcanvas"]';
   /**
    * ------------------------------------------------------------------------
    * Class Definition
    * ------------------------------------------------------------------------
    */
 
-  class Modal extends BaseComponent__default['default'] {
+  class Offcanvas extends BaseComponent__default['default'] {
     constructor(element, config) {
       super(element);
       this._config = this._getConfig(config);
-      this._dialog = SelectorEngine__default['default'].findOne(SELECTOR_DIALOG, this._element);
-      this._backdrop = this._initializeBackDrop();
       this._isShown = false;
-      this._ignoreBackdropClick = false;
-      this._isTransitioning = false;
+      this._backdrop = this._initializeBackDrop();
+
+      this._addEventListeners();
     } // Getters
 
 
-    static get Default() {
-      return Default;
-    }
-
     static get NAME() {
       return NAME;
+    }
+
+    static get Default() {
+      return Default;
     } // Public
 
 
@@ -470,50 +477,48 @@
     }
 
     show(relatedTarget) {
-      if (this._isShown || this._isTransitioning) {
+      if (this._isShown) {
         return;
-      }
-
-      if (this._isAnimated()) {
-        this._isTransitioning = true;
       }
 
       const showEvent = EventHandler__default['default'].trigger(this._element, EVENT_SHOW, {
         relatedTarget
       });
 
-      if (this._isShown || showEvent.defaultPrevented) {
+      if (showEvent.defaultPrevented) {
         return;
       }
 
       this._isShown = true;
-      hide();
-      document.body.classList.add(CLASS_NAME_OPEN);
+      this._element.style.visibility = 'visible';
 
-      this._adjustDialog();
+      this._backdrop.show();
 
-      this._setEscapeEvent();
+      if (!this._config.scroll) {
+        hide();
 
-      this._setResizeEvent();
-
-      EventHandler__default['default'].on(this._element, EVENT_CLICK_DISMISS, SELECTOR_DATA_DISMISS, event => this.hide(event));
-      EventHandler__default['default'].on(this._dialog, EVENT_MOUSEDOWN_DISMISS, () => {
-        EventHandler__default['default'].one(this._element, EVENT_MOUSEUP_DISMISS, event => {
-          if (event.target === this._element) {
-            this._ignoreBackdropClick = true;
-          }
-        });
-      });
-
-      this._showBackdrop(() => this._showElement(relatedTarget));
-    }
-
-    hide(event) {
-      if (event) {
-        event.preventDefault();
+        this._enforceFocusOnElement(this._element);
       }
 
-      if (!this._isShown || this._isTransitioning) {
+      this._element.removeAttribute('aria-hidden');
+
+      this._element.setAttribute('aria-modal', true);
+
+      this._element.setAttribute('role', 'dialog');
+
+      this._element.classList.add(CLASS_NAME_SHOW);
+
+      const completeCallBack = () => {
+        EventHandler__default['default'].trigger(this._element, EVENT_SHOWN, {
+          relatedTarget
+        });
+      };
+
+      this._queueCallback(completeCallBack, this._element, true);
+    }
+
+    hide() {
+      if (!this._isShown) {
         return;
       }
 
@@ -523,260 +528,95 @@
         return;
       }
 
-      this._isShown = false;
-
-      const isAnimated = this._isAnimated();
-
-      if (isAnimated) {
-        this._isTransitioning = true;
-      }
-
-      this._setEscapeEvent();
-
-      this._setResizeEvent();
-
       EventHandler__default['default'].off(document, EVENT_FOCUSIN);
+
+      this._element.blur();
+
+      this._isShown = false;
 
       this._element.classList.remove(CLASS_NAME_SHOW);
 
-      EventHandler__default['default'].off(this._element, EVENT_CLICK_DISMISS);
-      EventHandler__default['default'].off(this._dialog, EVENT_MOUSEDOWN_DISMISS);
+      this._backdrop.hide();
 
-      this._queueCallback(() => this._hideModal(), this._element, isAnimated);
+      const completeCallback = () => {
+        this._element.setAttribute('aria-hidden', true);
+
+        this._element.removeAttribute('aria-modal');
+
+        this._element.removeAttribute('role');
+
+        this._element.style.visibility = 'hidden';
+
+        if (!this._config.scroll) {
+          reset();
+        }
+
+        EventHandler__default['default'].trigger(this._element, EVENT_HIDDEN);
+      };
+
+      this._queueCallback(completeCallback, this._element, true);
     }
 
     dispose() {
-      [window, this._dialog].forEach(htmlElement => EventHandler__default['default'].off(htmlElement, EVENT_KEY));
-
       this._backdrop.dispose();
 
       super.dispose();
-      /**
-       * `document` has 2 events `EVENT_FOCUSIN` and `EVENT_CLICK_DATA_API`
-       * Do not move `document` in `htmlElements` array
-       * It will remove `EVENT_CLICK_DATA_API` event that should remain
-       */
-
       EventHandler__default['default'].off(document, EVENT_FOCUSIN);
-    }
-
-    handleUpdate() {
-      this._adjustDialog();
     } // Private
 
-
-    _initializeBackDrop() {
-      return new Backdrop({
-        isVisible: Boolean(this._config.backdrop),
-        // 'static' option will be translated to true, and booleans will keep their value
-        isAnimated: this._isAnimated()
-      });
-    }
 
     _getConfig(config) {
       config = { ...Default,
         ...Manipulator__default['default'].getDataAttributes(this._element),
-        ...config
+        ...(typeof config === 'object' ? config : {})
       };
       typeCheckConfig(NAME, config, DefaultType);
       return config;
     }
 
-    _showElement(relatedTarget) {
-      const isAnimated = this._isAnimated();
-
-      const modalBody = SelectorEngine__default['default'].findOne(SELECTOR_MODAL_BODY, this._dialog);
-
-      if (!this._element.parentNode || this._element.parentNode.nodeType !== Node.ELEMENT_NODE) {
-        // Don't move modal's DOM position
-        document.body.appendChild(this._element);
-      }
-
-      this._element.style.display = 'block';
-
-      this._element.removeAttribute('aria-hidden');
-
-      this._element.setAttribute('aria-modal', true);
-
-      this._element.setAttribute('role', 'dialog');
-
-      this._element.scrollTop = 0;
-
-      if (modalBody) {
-        modalBody.scrollTop = 0;
-      }
-
-      if (isAnimated) {
-        reflow(this._element);
-      }
-
-      this._element.classList.add(CLASS_NAME_SHOW);
-
-      if (this._config.focus) {
-        this._enforceFocus();
-      }
-
-      const transitionComplete = () => {
-        if (this._config.focus) {
-          this._element.focus();
-        }
-
-        this._isTransitioning = false;
-        EventHandler__default['default'].trigger(this._element, EVENT_SHOWN, {
-          relatedTarget
-        });
-      };
-
-      this._queueCallback(transitionComplete, this._dialog, isAnimated);
+    _initializeBackDrop() {
+      return new Backdrop({
+        isVisible: this._config.backdrop,
+        isAnimated: true,
+        rootElement: this._element.parentNode,
+        clickCallback: () => this.hide()
+      });
     }
 
-    _enforceFocus() {
+    _enforceFocusOnElement(element) {
       EventHandler__default['default'].off(document, EVENT_FOCUSIN); // guard against infinite focus loop
 
       EventHandler__default['default'].on(document, EVENT_FOCUSIN, event => {
-        if (document !== event.target && this._element !== event.target && !this._element.contains(event.target)) {
-          this._element.focus();
+        if (document !== event.target && element !== event.target && !element.contains(event.target)) {
+          element.focus();
         }
       });
+      element.focus();
     }
 
-    _setEscapeEvent() {
-      if (this._isShown) {
-        EventHandler__default['default'].on(this._element, EVENT_KEYDOWN_DISMISS, event => {
-          if (this._config.keyboard && event.key === ESCAPE_KEY) {
-            event.preventDefault();
-            this.hide();
-          } else if (!this._config.keyboard && event.key === ESCAPE_KEY) {
-            this._triggerBackdropTransition();
-          }
-        });
-      } else {
-        EventHandler__default['default'].off(this._element, EVENT_KEYDOWN_DISMISS);
-      }
-    }
-
-    _setResizeEvent() {
-      if (this._isShown) {
-        EventHandler__default['default'].on(window, EVENT_RESIZE, () => this._adjustDialog());
-      } else {
-        EventHandler__default['default'].off(window, EVENT_RESIZE);
-      }
-    }
-
-    _hideModal() {
-      this._element.style.display = 'none';
-
-      this._element.setAttribute('aria-hidden', true);
-
-      this._element.removeAttribute('aria-modal');
-
-      this._element.removeAttribute('role');
-
-      this._isTransitioning = false;
-
-      this._backdrop.hide(() => {
-        document.body.classList.remove(CLASS_NAME_OPEN);
-
-        this._resetAdjustments();
-
-        reset();
-        EventHandler__default['default'].trigger(this._element, EVENT_HIDDEN);
-      });
-    }
-
-    _showBackdrop(callback) {
-      EventHandler__default['default'].on(this._element, EVENT_CLICK_DISMISS, event => {
-        if (this._ignoreBackdropClick) {
-          this._ignoreBackdropClick = false;
-          return;
-        }
-
-        if (event.target !== event.currentTarget) {
-          return;
-        }
-
-        if (this._config.backdrop === true) {
+    _addEventListeners() {
+      EventHandler__default['default'].on(this._element, EVENT_CLICK_DISMISS, SELECTOR_DATA_DISMISS, () => this.hide());
+      EventHandler__default['default'].on(this._element, EVENT_KEYDOWN_DISMISS, event => {
+        if (this._config.keyboard && event.key === ESCAPE_KEY) {
           this.hide();
-        } else if (this._config.backdrop === 'static') {
-          this._triggerBackdropTransition();
         }
       });
-
-      this._backdrop.show(callback);
-    }
-
-    _isAnimated() {
-      return this._element.classList.contains(CLASS_NAME_FADE);
-    }
-
-    _triggerBackdropTransition() {
-      const hideEvent = EventHandler__default['default'].trigger(this._element, EVENT_HIDE_PREVENTED);
-
-      if (hideEvent.defaultPrevented) {
-        return;
-      }
-
-      const isModalOverflowing = this._element.scrollHeight > document.documentElement.clientHeight;
-
-      if (!isModalOverflowing) {
-        this._element.style.overflowY = 'hidden';
-      }
-
-      this._element.classList.add(CLASS_NAME_STATIC);
-
-      const modalTransitionDuration = getTransitionDurationFromElement(this._dialog);
-      EventHandler__default['default'].off(this._element, 'transitionend');
-      EventHandler__default['default'].one(this._element, 'transitionend', () => {
-        this._element.classList.remove(CLASS_NAME_STATIC);
-
-        if (!isModalOverflowing) {
-          EventHandler__default['default'].one(this._element, 'transitionend', () => {
-            this._element.style.overflowY = '';
-          });
-          emulateTransitionEnd(this._element, modalTransitionDuration);
-        }
-      });
-      emulateTransitionEnd(this._element, modalTransitionDuration);
-
-      this._element.focus();
-    } // ----------------------------------------------------------------------
-    // the following methods are used to handle overflowing modals
-    // ----------------------------------------------------------------------
-
-
-    _adjustDialog() {
-      const isModalOverflowing = this._element.scrollHeight > document.documentElement.clientHeight;
-      const scrollbarWidth = getWidth();
-      const isBodyOverflowing = scrollbarWidth > 0;
-
-      if (!isBodyOverflowing && isModalOverflowing && !isRTL() || isBodyOverflowing && !isModalOverflowing && isRTL()) {
-        this._element.style.paddingLeft = `${scrollbarWidth}px`;
-      }
-
-      if (isBodyOverflowing && !isModalOverflowing && !isRTL() || !isBodyOverflowing && isModalOverflowing && isRTL()) {
-        this._element.style.paddingRight = `${scrollbarWidth}px`;
-      }
-    }
-
-    _resetAdjustments() {
-      this._element.style.paddingLeft = '';
-      this._element.style.paddingRight = '';
     } // Static
 
 
-    static jQueryInterface(config, relatedTarget) {
+    static jQueryInterface(config) {
       return this.each(function () {
-        const data = Modal.getInstance(this) || new Modal(this, typeof config === 'object' ? config : {});
+        const data = Data__default['default'].get(this, DATA_KEY) || new Offcanvas(this, typeof config === 'object' ? config : {});
 
         if (typeof config !== 'string') {
           return;
         }
 
-        if (typeof data[config] === 'undefined') {
+        if (data[config] === undefined || config.startsWith('_') || config === 'constructor') {
           throw new TypeError(`No method named "${config}"`);
         }
 
-        data[config](relatedTarget);
+        data[config](this);
       });
     }
 
@@ -795,31 +635,38 @@
       event.preventDefault();
     }
 
-    EventHandler__default['default'].one(target, EVENT_SHOW, showEvent => {
-      if (showEvent.defaultPrevented) {
-        // only register focus restorer if modal will actually get shown
-        return;
-      }
+    if (isDisabled(this)) {
+      return;
+    }
 
-      EventHandler__default['default'].one(target, EVENT_HIDDEN, () => {
-        if (isVisible(this)) {
-          this.focus();
-        }
-      });
-    });
-    const data = Modal.getInstance(target) || new Modal(target);
+    EventHandler__default['default'].one(target, EVENT_HIDDEN, () => {
+      // focus on trigger when it is closed
+      if (isVisible(this)) {
+        this.focus();
+      }
+    }); // avoid conflict when clicking a toggler of an offcanvas, while another is open
+
+    const allReadyOpen = SelectorEngine__default['default'].findOne(OPEN_SELECTOR);
+
+    if (allReadyOpen && allReadyOpen !== target) {
+      Offcanvas.getInstance(allReadyOpen).hide();
+    }
+
+    const data = Data__default['default'].get(target, DATA_KEY) || new Offcanvas(target);
     data.toggle(this);
+  });
+  EventHandler__default['default'].on(window, EVENT_LOAD_DATA_API, () => {
+    SelectorEngine__default['default'].find(OPEN_SELECTOR).forEach(el => (Data__default['default'].get(el, DATA_KEY) || new Offcanvas(el)).show());
   });
   /**
    * ------------------------------------------------------------------------
    * jQuery
    * ------------------------------------------------------------------------
-   * add .Modal to jQuery only if jQuery is present
    */
 
-  defineJQueryPlugin(Modal);
+  defineJQueryPlugin(Offcanvas);
 
-  return Modal;
+  return Offcanvas;
 
 })));
-//# sourceMappingURL=modal.js.map
+//# sourceMappingURL=offcanvas.js.map
