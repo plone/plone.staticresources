@@ -8,6 +8,42 @@ Changelog
 
 .. towncrier release notes start
 
+2.0.0a1 (2021-06-14)
+--------------------
+
+New features:
+
+
+- Upgrade Mockup to version 4, patternslib to version 3 and jQuery to 3.5.1.
+  [thet] (#102)
+- Update Bootstrap to 5.0.0-alpha2
+  Add bootstrap-js bundle
+  [agitator] (#111)
+- Provide a wide variety of SVG  based flags using the icon infrastructure
+  Register new Resources
+  Add NPM Package as source for Country Flags
+  Add Custom SVG Language Flags
+  [1letter] (#140)
+- Update link type icons.
+  [agitator] (#144)
+- Update Bootstrap to 5.0.1
+  [agitator] (#157)
+
+
+Bug fixes:
+
+
+- Remove bundle with typo
+  [petschki] (#121)
+- Increase Python package version number to 2.0.dev0.
+  Start with the 2.x version numbers from 200 to not have same version numbers for multiple branches and stay aligned with the python package version.
+  [thet] (#124)
+- Fix selectors for ``sort_reversed`` checkbox in ``pat-querystring``
+  [petschki] (#132, #145)
+- Reduce bundle sizes by not inlining fonts in each bundle - moved plone-fontello and glyphicons to their own bundle. Icon font bundles use fonts from ++plone++static/fonts/.
+  [agitator] (#134)
+
+
 1.4.0 (2020-10-30)
 ------------------
 
