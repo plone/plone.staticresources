@@ -315,7 +315,7 @@
     </value>
     <value key="jscompilation">++plone++static/plone-legacy-compiled.js</value>
     <value key="csscompilation">++plone++static/plone-legacy-compiled.css</value>
-    <value key="last_compilation">2021-06-02 11:00:00</value>
+    <value key="last_compilation">2021-09-08 07:30:00</value>
     <value key="compile">False</value>
     <value key="enabled">True</value>
     <value key="load_async">False</value>

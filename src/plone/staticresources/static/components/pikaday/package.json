@@ -1,6 +1,6 @@
 {
   "name": "pikaday",
-  "version": "1.8.0",
+  "version": "1.8.2",
   "description": "A refreshing JavaScript Datepicker — lightweight, no dependencies, modular CSS",
   "keywords": [
     "datepicker",
@@ -17,8 +17,8 @@
   },
   "devDependencies": {
     "expect.js": "^0.3.1",
-    "jshint": "^2.9.6",
-    "mocha": "^5.2.0"
+    "jshint": "^2.12.0",
+    "mocha": "^8.2.0"
   },
   "testling": {
     "harness": "mocha",

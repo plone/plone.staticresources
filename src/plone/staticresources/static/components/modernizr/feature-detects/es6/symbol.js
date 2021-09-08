@@ -19,8 +19,8 @@
 Check if browser implements ECMAScript 6 Symbol per specification.
 */
 define(['Modernizr'], function(Modernizr) {
-  Modernizr.addTest('es6symbol', !!(Symbol &&
-    Symbol.for &&
+  Modernizr.addTest('es6symbol', !!(typeof(Symbol)==="function" &&
+    Symbol['for'] &&
     Symbol.hasInstance &&
     Symbol.isConcatSpreadable &&
     Symbol.iterator &&
