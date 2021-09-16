@@ -250,36 +250,6 @@ For Mockup, the original repository is: https://github.com/plone/mockup/
 For Patternslib, visit: http://github.com/patternslib/Patterns
 
 
-Generating the ``plone-compile-resources`` script
--------------------------------------------------
-
-The ``plone-compile-resources`` script can be used to compile bundles from the command line.
-In short, the script starts up a Plone instance, reads the resources and bundles configured in the registry and compiles a JS/CSS bundle based on that configuration.
-See ``plone-compile-resources --help`` for more information.
-
-When using buildout, ``plone-compile-resources`` script is automatically generated.
-If you use a custom buildout, you might need to add something similar to:
-
-.. code-block:: ini
-
-  [buildout]
-  parts =
-    # ...
-    zopepy
-  # ...
-  [instance]
-  # ...
-
-  [zopepy]
-  recipe = zc.recipe.egg
-  eggs =
-      ${instance:eggs}
-  interpreter = zopepy
-  scripts =
-      zopepy
-      plone-compile-resources
-
-
 More on the Resource Registry and its modes
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -298,6 +268,45 @@ In the resource registry:
 For more information on the Plone resource registry see the documentation at:
 
 - https://docs.plone.org/adapt-and-extend/theming/resourceregistry.html
+
+
+Generating the ``console_scripts``
+----------------------------------
+
+When using buildout, ``console_scripts`` are automatically generated in your bin/ directory.
+If you use a custom buildout, you might need to add something similar to:
+
+.. code-block:: ini
+
+  [buildout]
+  eggs +=
+    # ...
+    plone.staticresources
+
+
+bin/plone-compile-resources
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This script can be used to compile bundles from the command line.
+In short, the script starts up a Plone instance, reads the resources and bundles configured in the registry and compiles a JS/CSS bundle based on that configuration.
+See ``plone-compile-resources --help`` for more information.
+
+
+bin/plone-register-icons
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+This script is used to generate the file
+``src/plone/staticresources/profiles/default/registry/icons_bootstrap.xml``
+which holds all information to Bootstrap Icon resources for the icon resolver.
+Bootstrap icon resources are installed via yarn in ``src/plone/staticresources/static/components/bootstrap-icons```
+
+
+bin/plone-register-flags
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+This script is used to generate profile XML files for country flag and language svg resources
+``src/plone/staticresources/profiles/default/registry/icons_country_flags.xml``
+``src/plone/staticresources/profiles/default/registry/icons_language_flags.xml``
 
 
 License
