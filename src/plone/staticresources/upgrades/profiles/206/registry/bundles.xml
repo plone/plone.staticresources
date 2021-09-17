@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<registry>
+
+  <records prefix="plone.bundles/plone-legacy"
+            interface="Products.CMFPlone.interfaces.IBundleRegistry"
+            purge="False">
+    <value key="resources" purge="false">
+      <element>bootstrap-js</element>
+    </value>
+    <value key="last_compilation">2021-09-08 07:30:00</value>
+  </records>
+
+</registry>
