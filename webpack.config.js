@@ -4,7 +4,7 @@ const mockup_config = require("mockup/webpack.config.js");
 const CopyPlugin = require("copy-webpack-plugin");
 
 module.exports = async (env, argv) => {
-    const config = await mockup_config(env, argv);
+    const config = await mockup_config(env, argv, __dirname);
 
     config.output.path = path.resolve(
         __dirname,
