@@ -1,12 +1,1 @@
-module.exports = {
-    presets: [
-        [
-            "@babel/preset-env",
-            {
-                useBuiltIns: "entry",
-                corejs: 3,
-            },
-        ],
-    ],
-    plugins: ["@babel/plugin-proposal-optional-chaining"],
-};
+module.exports = require("@patternslib/patternslib/babel.config.js");
