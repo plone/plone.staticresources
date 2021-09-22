@@ -33,10 +33,5 @@ module.exports = async (env, argv) => {
         })
     );
 
-    // Fix paths
-    config.entry["bundle-polyfills"] = path.resolve(__dirname, "node_modules/@patternslib/patternslib/src/polyfills.js"); // prettier-ignore
-    config.entry["bundle-polyfills.min"] = config.entry["bundle-polyfills"];
-    config.resolve.alias.moment = path.resolve(__dirname, "node_modules/moment"); // prettier-ignore
-
     return config;
 };
