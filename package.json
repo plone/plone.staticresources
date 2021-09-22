@@ -1,5 +1,5 @@
 {
-    "name": "plone.staticresource",
+    "name": "plone.staticresources",
     "version": "2.0.0",
     "description": "Static resources for Plone",
     "repository": "git@github.com:plone/plone.staticresources.git",
