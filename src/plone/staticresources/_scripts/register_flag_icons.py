@@ -5,13 +5,11 @@ import json
 this_dir = os.path.dirname(os.path.realpath(__file__))
 
 # Part Register Country Flag Icons
-DATA_FILE_COUNTRY = "{dir}/../static/components/svg-country-flags/countries.json".format(
-        dir=this_dir
+DATA_FILE_COUNTRY = "{dir}/../static/icons-country-flags/countries.json".format(
+    dir=this_dir
 )
 OUTPUT_FILE_COUNTRY = (
-    "{dir}/../profiles/default/registry/icons_country_flags.xml".format(
-        dir=this_dir
-    )
+    "{dir}/../profiles/default/registry/icons_country_flags.xml".format(dir=this_dir)
 )
 
 DEFAULT_PATTERN_COUNTRY = """
@@ -34,7 +32,7 @@ PATTERN_COUNTRY = """
 
 
 # Part Register Language Flag Icons
-DATA_FILE_LANGUAGE = "{dir}/../static/icons/language-flags/languages.json".format(
+DATA_FILE_LANGUAGE = "{dir}/../static/icons-language-flags/languages.json".format(
     dir=this_dir
 )
 OUTPUT_FILE_LANGUAGE = (
