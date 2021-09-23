@@ -44,9 +44,30 @@
     <value key="resource">++plone++bootstrap-icons/eye.svg</value>
   </record>
 
-  <record name="plone.icon.toolbar-action/portlet">
+  <record name="plone.icon.toolbar-action/factories">
     <field type="plone.registry.field.TextLine">
-      <title>Plone Toolbar Action Portlet</title>
+      <title>Plone Toolbar Action Factories</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/plus-square.svg</value>
+  </record>
+
+  <record name="plone.icon.toolbar-action/actions">
+    <field type="plone.registry.field.TextLine">
+      <title>Plone Toolbar Action Actions</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/lightning.svg</value>
+  </record>
+
+  <record name="plone.icon.toolbar-action/workflow">
+    <field type="plone.registry.field.TextLine">
+      <title>Plone Toolbar Action Workflow</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/bezier2.svg</value>
+  </record>
+
+  <record name="plone.icon.toolbar-action/portlets">
+    <field type="plone.registry.field.TextLine">
+      <title>Plone Toolbar Action Portlets</title>
     </field>
     <value key="resource">++plone++bootstrap-icons/window.svg</value>
   </record>
