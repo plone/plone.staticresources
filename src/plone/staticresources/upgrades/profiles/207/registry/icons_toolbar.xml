@@ -1,0 +1,110 @@
+<?xml version="1.0"?>
+
+<registry>
+
+  <!-- <record name="plone.icon.mimetype-application">
+    <field type="plone.registry.field.TextLine">
+      <title>Mimetype Application (generic)</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/file-earmark-code.svg</value>
+  </record> -->
+
+  <!-- <record name="plone.icon.mimetype-application/pdf">
+    <field type="plone.registry.field.TextLine">
+      <title>Mimetype application/pdf</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/file-earmark-richtext.svg</value>
+  </record> -->
+
+  <record name="plone.icon.toolbar-action">
+    <field type="plone.registry.field.TextLine">
+      <title>Plone Toolbar Action Default</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/command.svg</value>
+  </record>
+
+  <record name="plone.icon.toolbar-action/folderContents">
+    <field type="plone.registry.field.TextLine">
+      <title>Plone Toolbar Action Folder Contents</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/folder2-open.svg</value>
+  </record>
+
+  <record name="plone.icon.toolbar-action/edit">
+    <field type="plone.registry.field.TextLine">
+      <title>Plone Toolbar Action Edit</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/pencil.svg</value>
+  </record>
+
+  <record name="plone.icon.toolbar-action/view">
+    <field type="plone.registry.field.TextLine">
+      <title>Plone Toolbar Action View</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/eye.svg</value>
+  </record>
+
+  <record name="plone.icon.toolbar-action/factories">
+    <field type="plone.registry.field.TextLine">
+      <title>Plone Toolbar Action Factories</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/plus-square.svg</value>
+  </record>
+
+  <record name="plone.icon.toolbar-action/actions">
+    <field type="plone.registry.field.TextLine">
+      <title>Plone Toolbar Action Actions</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/lightning.svg</value>
+  </record>
+
+  <record name="plone.icon.toolbar-action/workflow">
+    <field type="plone.registry.field.TextLine">
+      <title>Plone Toolbar Action Workflow</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/bezier2.svg</value>
+  </record>
+
+  <record name="plone.icon.toolbar-action/portlets">
+    <field type="plone.registry.field.TextLine">
+      <title>Plone Toolbar Action Portlets</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/window.svg</value>
+  </record>
+
+  <record name="plone.icon.toolbar-action/state">
+    <field type="plone.registry.field.TextLine">
+      <title>Plone Toolbar Action Portlet</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/shield-lock.svg</value>
+  </record>
+
+  <record name="plone.icon.toolbar-action/display">
+    <field type="plone.registry.field.TextLine">
+      <title>Plone Toolbar Action Display</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/layers-half.svg</value>
+  </record>
+
+  <record name="plone.icon.toolbar-action/history">
+    <field type="plone.registry.field.TextLine">
+      <title>Plone Toolbar Action History</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/clock.svg</value>
+  </record>
+
+  <record name="plone.icon.toolbar-action/sharing">
+    <field type="plone.registry.field.TextLine">
+      <title>Plone Toolbar Action History</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/people.svg</value>
+  </record>
+
+  <record name="plone.icon.toolbar-action/personaltools">
+    <field type="plone.registry.field.TextLine">
+      <title>Plone Toolbar Action Personal Tools</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/person.svg</value>
+  </record>
+
+</registry>

@@ -1,0 +1,21 @@
+<configure xmlns="http://namespaces.zope.org/zope"
+  xmlns:gs="http://namespaces.zope.org/genericsetup">
+
+  <gs:registerProfile name="207"
+    title="Update svg toolbar icons"
+    description='Configuration for version 207'
+    directory="profiles/207"
+    for="Products.CMFPlone.interfaces.IMigratingPloneSiteRoot"
+    provides="Products.GenericSetup.interfaces.EXTENSION" />
+
+  <gs:upgradeSteps source="206"
+    destination="207"
+    profile="plone.staticresources:default">
+
+    <gs:upgradeDepends
+      title="Update svg toolbar icons"
+      import_profile="plone.staticresources.upgrades:207" />
+
+  </gs:upgradeSteps>
+
+</configure>
