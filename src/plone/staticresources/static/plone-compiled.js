@@ -5118,7 +5118,7 @@ define('mockup-patterns-modal',[
             content: "#content",
             automaticallyAddButtonActions: true,
             loadLinksWithinModal: true,
-            prependContent: ".portalMessage, #global_statusmessage",
+            prependContent: "#global_statusmessage",
             onRender: null,
             templateOptions: {
                 className: "plone-modal fade",
