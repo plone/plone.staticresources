@@ -3934,7 +3934,7 @@ define('translate',["mockup-i18n"], function (I18N) {
 });
 
 /**
- * @license text 2.0.15 Copyright jQuery Foundation and other contributors.
+ * @license text 2.0.16 Copyright jQuery Foundation and other contributors.
  * Released under MIT license, http://github.com/requirejs/text/LICENSE
  */
 /*jslint regexp: true */
@@ -3975,7 +3975,7 @@ define('text',['module'], function (module) {
     }
 
     text = {
-        version: '2.0.15',
+        version: '2.0.16',
 
         strip: function (content) {
             //Strips <?xml ...?> declarations so that external SVG and XML
@@ -4151,6 +4151,10 @@ define('text',['module'], function (module) {
                 req([nonStripName], function (content) {
                     text.finishLoad(parsed.moduleName + '.' + parsed.ext,
                                     parsed.strip, content, onLoad);
+                }, function (err) {
+                    if (onLoad.error) {
+                        onLoad.error(err);
+                    }
                 });
             }
         },
