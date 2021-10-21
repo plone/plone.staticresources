@@ -6,35 +6,6 @@
 
 #### [Demo](https://sindresorhus.com/screenfull.js)
 
-<br>
-
----
-
-<div align="center">
-	<p>
-		<p>
-			<sup>
-				<a href="https://github.com/sponsors/sindresorhus">My open source work is supported by the community</a>
-			</sup>
-		</p>
-		<sup>Special thanks to:</sup>
-		<br>
-		<br>
-		<a href="https://github.com/botpress/botpress">
-			<img src="https://sindresorhus.com/assets/thanks/botpress-logo.svg" width="260" alt="Botpress">
-		</a>
-		<br>
-		<sub><b>Botpress is an open-source conversational assistant creation platform.</b></sub>
-		<br>
-		<sub>They <a href="https://github.com/botpress/botpress/blob/master/.github/CONTRIBUTING.md">welcome contributions</a> from anyone, whether you're into machine learning,<br>want to get started in open-source, or just have an improvement idea.</sub>
-		<br>
-	</p>
-</div>
-
----
-
-<br>
-
 ## Install
 
 Only 0.7 kB gzipped.
@@ -87,7 +58,7 @@ if (document.fullscreenEnabled) {
 
 ## Support
 
-[Supported browsers](http://caniuse.com/fullscreen)
+[Supported browsers](https://caniuse.com/#feat=fullscreen)
 
 **Note:** In order to use this package in Internet Explorer, you need a [`Promise` polyfill](https://github.com/stefanpenner/es6-promise).
 
@@ -117,6 +88,18 @@ const element = document.getElementById('target');
 document.getElementById('button').addEventListener('click', () => {
 	if (screenfull.isEnabled) {
 		screenfull.request(element);
+	}
+});
+```
+
+#### Hide navigation user-interface on mobile devices
+
+```js
+const element = document.getElementById('target');
+
+document.getElementById('button').addEventListener('click', () => {
+	if (screenfull.isEnabled) {
+		screenfull.request(element, {navigationUI: 'hide'});
 	}
 });
 ```
@@ -206,11 +189,13 @@ export class ToggleFullscreenDirective {
 
 ### API
 
-#### .request()
+#### .request(element, options?)
 
 Make an element fullscreen.
 
-Accepts a DOM element. Default is `<html>`. If called with another element than the currently active, it will switch to that if it's a decendant.
+Accepts a DOM element and [`FullscreenOptions`](https://developer.mozilla.org/en-US/docs/Web/API/FullscreenOptions).
+
+The default element is `<html>`. If called with another element than the currently active, it will switch to that if it's a decendant.
 
 If your page is inside an `<iframe>` you will need to add a `allowfullscreen` attribute (+ `webkitallowfullscreen` and `mozallowfullscreen`).
 
@@ -224,9 +209,11 @@ Brings you out of fullscreen.
 
 Returns a promise that resolves after the element exits fullscreen.
 
-#### .toggle()
+#### .toggle(element, options?)
 
 Requests fullscreen if not active, otherwise exits.
+
+Accepts a DOM element and [`FullscreenOptions`](https://developer.mozilla.org/en-US/docs/Web/API/FullscreenOptions).
 
 Returns a promise that resolves after the element enters/exits fullscreen.
 
@@ -275,7 +262,7 @@ $('#new-page-btn').click(() => {
 	const iframe = document.createElement('iframe')
 
 	iframe.setAttribute('id', 'external-iframe');
-	iframe.setAttribute('src', 'http://new-page-website.com');
+	iframe.setAttribute('src', 'https://new-page-website.com');
 	iframe.setAttribute('frameborder', 'no');
 	iframe.style.position = 'absolute';
 	iframe.style.top = '0';
@@ -292,7 +279,7 @@ $('#new-page-btn').click(() => {
 
 ## Resources
 
-- [Using the Fullscreen API in web browsers](http://hacks.mozilla.org/2012/01/using-the-fullscreen-api-in-web-browsers/)
+- [Using the Fullscreen API in web browsers](https://hacks.mozilla.org/2012/01/using-the-fullscreen-api-in-web-browsers/)
 - [MDN - Fullscreen API](https://developer.mozilla.org/en/DOM/Using_full-screen_mode)
-- [W3C Fullscreen spec](http://dvcs.w3.org/hg/fullscreen/raw-file/tip/Overview.html)
-- [Building an amazing fullscreen mobile experience](http://www.html5rocks.com/en/mobile/fullscreen/)
+- [W3C Fullscreen spec](https://fullscreen.spec.whatwg.org/)
+- [Building an amazing fullscreen mobile experience](https://developers.google.com/web/fundamentals/native-hardware/fullscreen/)
