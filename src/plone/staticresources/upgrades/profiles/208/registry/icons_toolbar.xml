@@ -1,0 +1,256 @@
+<?xml version="1.0"?>
+<registry>
+
+  <record name="plone.icon.activity">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon activity</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/activity.svg</value>
+  </record>
+
+  <record name="plone.icon.apple">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon apple</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/apple.svg</value>
+  </record>
+
+  <record name="plone.icon.behance">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon behance</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/behance.svg</value>
+  </record>
+
+  <record name="plone.icon.dribbble">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon dribbble</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/dribbble.svg</value>
+  </record>
+
+  <record name="plone.icon.easel2-fill">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon easel2-fill</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/easel2-fill.svg</value>
+  </record>
+
+  <record name="plone.icon.easel2">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon easel2</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/easel2.svg</value>
+  </record>
+
+  <record name="plone.icon.easel3-fill">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon easel3-fill</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/easel3-fill.svg</value>
+  </record>
+
+  <record name="plone.icon.easel3">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon easel3</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/easel3.svg</value>
+  </record>
+
+  <record name="plone.icon.fan">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon fan</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/fan.svg</value>
+  </record>
+
+  <record name="plone.icon.fingerprint">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon fingerprint</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/fingerprint.svg</value>
+  </record>
+
+  <record name="plone.icon.graph-down-arrow">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon graph-down-arrow</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/graph-down-arrow.svg</value>
+  </record>
+
+  <record name="plone.icon.graph-up-arrow">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon graph-up-arrow</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/graph-up-arrow.svg</value>
+  </record>
+
+  <record name="plone.icon.hypnotize">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon hypnotize</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/hypnotize.svg</value>
+  </record>
+
+  <record name="plone.icon.line">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon line</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/line.svg</value>
+  </record>
+
+  <record name="plone.icon.magic">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon magic</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/magic.svg</value>
+  </record>
+
+  <record name="plone.icon.medium">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon medium</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/medium.svg</value>
+  </record>
+
+  <record name="plone.icon.microsoft">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon microsoft</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/microsoft.svg</value>
+  </record>
+
+  <record name="plone.icon.paypal">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon paypal</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/paypal.svg</value>
+  </record>
+
+  <record name="plone.icon.person-rolodex">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon person-rolodex</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/person-rolodex.svg</value>
+  </record>
+
+  <record name="plone.icon.person-video">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon person-video</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/person-video.svg</value>
+  </record>
+
+  <record name="plone.icon.person-video2">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon person-video2</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/person-video2.svg</value>
+  </record>
+
+  <record name="plone.icon.person-video3">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon person-video3</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/person-video3.svg</value>
+  </record>
+
+  <record name="plone.icon.person-workspace">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon person-workspace</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/person-workspace.svg</value>
+  </record>
+
+  <record name="plone.icon.pinterest">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon pinterest</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/pinterest.svg</value>
+  </record>
+
+  <record name="plone.icon.radioactive">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon radioactive</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/radioactive.svg</value>
+  </record>
+
+  <record name="plone.icon.signal">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon signal</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/signal.svg</value>
+  </record>
+
+  <record name="plone.icon.snapchat">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon snapchat</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/snapchat.svg</value>
+  </record>
+
+  <record name="plone.icon.spotify">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon spotify</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/spotify.svg</value>
+  </record>
+
+  <record name="plone.icon.stack-overflow">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon stack-overflow</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/stack-overflow.svg</value>
+  </record>
+
+  <record name="plone.icon.strava">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon strava</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/strava.svg</value>
+  </record>
+
+  <record name="plone.icon.vimeo">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon vimeo</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/vimeo.svg</value>
+  </record>
+
+  <record name="plone.icon.webcam-fill">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon webcam-fill</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/webcam-fill.svg</value>
+  </record>
+
+  <record name="plone.icon.webcam">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon webcam</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/webcam.svg</value>
+  </record>
+
+  <record name="plone.icon.windows">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon windows</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/windows.svg</value>
+  </record>
+
+  <record name="plone.icon.wordpress">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon wordpress</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/wordpress.svg</value>
+  </record>
+
+  <record name="plone.icon.yin-yang">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon yin-yang</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/yin-yang.svg</value>
+  </record>
+
+</registry>

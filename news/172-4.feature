@@ -1,0 +1,2 @@
+Register new icons.
+[thet]
