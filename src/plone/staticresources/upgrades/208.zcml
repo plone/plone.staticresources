@@ -1,6 +1,13 @@
 <configure xmlns="http://namespaces.zope.org/zope"
   xmlns:gs="http://namespaces.zope.org/genericsetup">
 
+  <gs:registerProfile name="208"
+    title="Update svg toolbar icons"
+    description="Configuration for version 208"
+    directory="profiles/208"
+    for="Products.CMFPlone.interfaces.IMigratingPloneSiteRoot"
+    provides="Products.GenericSetup.interfaces.EXTENSION" />
+
   <gs:upgradeSteps
     source="207"
     destination="208"
@@ -10,6 +17,10 @@
       title="Update last_compilation timestamp of bundles"
       import_profile="plone.staticresources:last_compilation"
       import_steps="plone.app.registry" />
+
+    <gs:upgradeDepends
+      title="Update svg toolbar icons"
+      import_profile="plone.staticresources.upgrades:208" />
 
   </gs:upgradeSteps>
 
