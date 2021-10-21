@@ -20,19 +20,15 @@ class HiddenProfiles(object):
             "plone.staticresources:last_compilation",
             "plone.staticresources:async",
             "plone.staticresources:uninstall",
-            "plone.staticresources.upgrades:2",
-            "plone.staticresources.upgrades:3",
-            "plone.staticresources.upgrades:4",
-            "plone.staticresources.upgrades:5",
-            "plone.staticresources.upgrades:6",
-            "plone.staticresources.upgrades:7",
-            "plone.staticresources.upgrades:8",
-            "plone.staticresources.upgrades:9",
-            "plone.staticresources.upgrades:10",
-            "plone.staticresources.upgrades:11",
-            "plone.staticresources.upgrades:12",
-            "plone.staticresources.upgrades:13",
-            "plone.staticresources.upgrades:14",
-            "plone.staticresources.upgrades:15",
-            "plone.staticresources.upgrades:16",
         ]
+
+    def getNonInstallableProducts(self):
+        """Hide the upgrades package from site-creation and quickinstaller.
+
+        Our upgrades profiles are defined in the directory 'upgrades'.
+        Plone sees this is a separate product.
+        So instead of adding each new upgrade profile to the list of
+        non installable profiles above, we can mark the upgrades product
+        as non installable.
+        """
+        return ["plone.staticresources.upgrades"]
