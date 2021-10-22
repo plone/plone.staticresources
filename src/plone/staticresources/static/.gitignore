@@ -9,9 +9,9 @@ components/bootstrap/docs
 components/jqtree/static
 components/backbone/docs
 components/backbone/test
+components/**/*.map
 tinymce-builded/tests
 **/__tests__
 **/node_modules
 **/bower_components
 **/test*
-*.map
