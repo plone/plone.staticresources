@@ -8,6 +8,40 @@ Changelog
 
 .. towncrier release notes start
 
+2.0.0a2 (2021-10-22)2.0.0a2 (2021-10-22)
+--------------------
+
+New features:
+
+
+- Created last_compilation profile as only place with last_compilation values.
+  Moved the last_compilation values out of the default profile.
+  Then we do not need a complete profile when we add an upgrade step for updating the last_compilation date of a bundle.
+  [mauritsvanrees] (172-1)
+- Hide the upgrades package from site-creation and quickinstaller.
+  This way, we do not need to add each new upgrade profile to the list of non installable products.
+  [mauritsvanrees] (172-2)
+- Upgrade to Mockup 4.0.2.
+  [thet] (172-3)
+- Register new icons.
+  [thet] (172-4)
+- Adapt gitignore to only include necessary and registered dependencies.
+  [thet] (174-1)
+- Update Bootstrap to 5.1.1
+  Update Bootstrap Icons to 1.5.0
+  [petschki] (#164)
+
+
+Bug fixes:
+
+
+- Fix underscore version to 1.9.1 due to incompatibilities with backbone.paginator. (174-5)
+- Add missing upgrade step for datatables.net-autofill resource location.
+  [thet] (174-6)
+- Update svg toolbar icons
+  [agitator] (#165)
+
+
 2.0.0a1 (2021-06-14)
 --------------------
 
