@@ -8,7 +8,7 @@ Changelog
 
 .. towncrier release notes start
 
-2.0.0a2 (2021-10-22)2.0.0a2 (2021-10-22)
+2.0.0a2 (2021-10-22)
 --------------------
 
 New features:
