@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<registry>
+  <records prefix="plone.resources/datatables.net-autofill" interface='Products.CMFPlone.interfaces.IResourceRegistry'>
+    <value key="js">++plone++static/components/datatables.net-autofill/js/dataTables.autoFill.js</value>
+  </records>
+</registry>
