@@ -118,13 +118,13 @@ Although Patterns provide their own registered Resources, those are not register
 Instead, they are imported through native LESS and Require JS "entry points" that live in ``plone.staticresource``:
 
 - `plone/staticresources/static/plone.js
-  <https://github.com/plone/plone.staticresources/blob/master/src/plone/staticresources/static/plone.js>`_
+  <https://github.com/plone/plone.staticresources/blob/master/src/plone/staticresources/static/plone.js>`__
 - `plone/staticresources/static/plone.less
-  <https://github.com/plone/plone.staticresources/blob/master/src/plone/staticresources/static/plone.less>`_
+  <https://github.com/plone/plone.staticresources/blob/master/src/plone/staticresources/static/plone.less>`__
 - `plone/staticresources/static/plone-logged-in.js
-  <https://github.com/plone/plone.staticresources/blob/master/src/plone/staticresources/static/plone-logged-in.js>`_
+  <https://github.com/plone/plone.staticresources/blob/master/src/plone/staticresources/static/plone-logged-in.js>`__
 - `plone/staticresources/static/plone-logged-in.less
-  <https://github.com/plone/plone.staticresources/blob/master/src/plone/staticresources/static/plone-logged-in.less>`_
+  <https://github.com/plone/plone.staticresources/blob/master/src/plone/staticresources/static/plone-logged-in.less>`__
 
 When editing a pattern (e.g. in ``mockup`` package), it is important to know for which bundle it is registered, which can be done by checking where it is imported in the entry points above.
 The bundle name will be useful as parameter for ``plone-compile-resources`` script.
@@ -182,13 +182,13 @@ Entry Points
 The current list of registered patterns for each entry point is available in:
 
 - `plone/staticresources/static/plone.js
-  <https://github.com/plone/plone.staticresources/blob/master/src/plone/staticresources/static/plone.js>`_
+  <https://github.com/plone/plone.staticresources/blob/master/src/plone/staticresources/static/plone.js>`__
 - `plone/staticresources/static/plone.less
-  <https://github.com/plone/plone.staticresources/blob/master/src/plone/staticresources/static/plone.less>`_
+  <https://github.com/plone/plone.staticresources/blob/master/src/plone/staticresources/static/plone.less>`__
 - `plone/staticresources/static/plone-logged-in.js
-  <https://github.com/plone/plone.staticresources/blob/master/src/plone/staticresources/static/plone-logged-in.js>`_
+  <https://github.com/plone/plone.staticresources/blob/master/src/plone/staticresources/static/plone-logged-in.js>`__
 - `plone/staticresources/static/plone-logged-in.less
-  <https://github.com/plone/plone.staticresources/blob/master/src/plone/staticresources/static/plone-logged-in.less>`_
+  <https://github.com/plone/plone.staticresources/blob/master/src/plone/staticresources/static/plone-logged-in.less>`__
 
 Here's a snapshot:
 
