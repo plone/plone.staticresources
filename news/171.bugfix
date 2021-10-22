@@ -1,5 +1,0 @@
-Fix problem with fontello resources.
-Fixes #162 reverting commit 8ede7fae8c5f9987843f339d093a75e0d438609b
-Ref: #168
-Ref: #171
-[erral]
