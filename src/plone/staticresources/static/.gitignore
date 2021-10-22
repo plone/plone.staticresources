@@ -12,13 +12,13 @@ components/svg-country-flags/png100px
 components/svg-country-flags/png250px
 components/svg-country-flags/png1000px
 components/svg-country-flags/scripts
+components/**/*.map
 tinymce-builded/tests
 **/__tests__
 **/node_modules
 **/bower_components
 **/test*
 **/.github
-*.map
 .npmignore
 .eslint*
 .jscs*
