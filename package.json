@@ -13,5 +13,8 @@
     "mockup": "https://github.com/plone/mockup.git#4.0.2",
     "requirejs": "^2.3.6",
     "svg-country-flags": "^1.2.10"
+  },
+  "resolutions": {
+    "underscore": "1.9.1"
   }
 }
