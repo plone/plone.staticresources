@@ -8,6 +8,23 @@ Changelog
 
 .. towncrier release notes start
 
+1.4.4 (2021-10-22)
+------------------
+
+New features:
+
+
+- Upgrade Mockup to 3.7.2.
+  [thet] (#172)
+
+
+Bug fixes:
+
+
+- Add missing upgrade profiles to hidden profiles.
+  [thet] (#172)
+
+
 1.4.3 (2021-03-22)
 ------------------
 
