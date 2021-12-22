@@ -1,6 +1,0 @@
-<?xml version="1.0"?>
-<registry>
-  <record remove="True" name="plone.resources.requirejs"/>
-  <record remove="True" name="plone.resources.less-modify"/>
-  <record remove="True" name="plone.resources.less-variables"/>
-</registry>
