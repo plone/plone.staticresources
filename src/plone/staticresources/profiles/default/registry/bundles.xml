@@ -17,4 +17,14 @@
     <value key="load_defer">False</value>
   </records>
 
+  <records prefix="plone.bundles/plone-logged-in" interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+    <value key="merge_with">logged-in</value><!-- needs to be here -->
+    <value key="enabled">False</value>
+    <value key="expression">python: False</value>
+    <value key="jscompilation">++plone++static/plone-logged-in-compiled.min.js</value><!-- needs to be here -->
+    <value key="csscompilation"></value>
+    <value key="load_async">False</value>
+    <value key="load_defer">False</value>
+  </records>
+
 </registry>
