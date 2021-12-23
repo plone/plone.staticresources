@@ -5,20 +5,16 @@
     <value key="enabled">True</value>
     <value key="jscompilation">++plone++static/bundle-bootstrap/js/bootstrap.bundle.min.js</value>
     <value key="csscompilation"></value>
-    <value key="last_compilation"></value>
     <value key="load_async">False</value>
     <value key="load_defer">False</value>
-    <value key="compile">False</value>
   </records>
 
   <records prefix="plone.bundles/plone" interface='Products.CMFPlone.interfaces.IBundleRegistry'>
     <value key="enabled">True</value>
     <value key="jscompilation">++plone++static/bundle-plone/bundle.min.js</value>
     <value key="csscompilation"></value>
-    <value key="last_compilation"></value>
     <value key="load_async">False</value>
     <value key="load_defer">False</value>
-    <value key="compile">False</value>
   </records>
 
 </registry>
