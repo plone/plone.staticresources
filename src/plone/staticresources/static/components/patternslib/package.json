@@ -74,7 +74,7 @@
     "karma-safari-launcher": "^1.0.0",
     "karma-sourcemap-loader": "0.3.7",
     "karma-webpack": "^4.0.0-rc.5",
-    "node-sass": "^4.12.0",
+    "node-sass": "^7.0.0",
     "npm-force-resolutions": "0.0.3",
     "pegjs": "0.7.0",
     "puppeteer": "1.14.0",
