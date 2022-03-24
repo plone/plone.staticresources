@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Setup tests for this package."""
 from plone.registry.interfaces import IRegistry
 from plone.staticresources.testing import (
@@ -30,18 +29,13 @@ class TestSetup(unittest.TestCase):
 
         # Test availability of bundles and resources
         self.assertEqual(
-            self.registry.records.get("plone.resources/resourceregistry.js").value,
-            "++plone++static/resourceregistry.js",
+            self.registry.records.get("plone.bundles/bootstrap-js.jscompilation").value,
+            "++plone++static/bundle-bootstrap/js/bootstrap.bundle.min.js",
         )
 
         self.assertEqual(
-            self.registry.records.get("plone.resources/less.js").value,
-            "++plone++static/components/less/dist/less.js",
-        )
-
-        self.assertEqual(
-            self.registry.records.get("plone.resources/jquery.js").value,
-            "++plone++static/components/jquery/dist/jquery.min.js",
+            self.registry.records.get("plone.icon.activity").value,
+            "++plone++bootstrap-icons/activity.svg",
         )
 
     def test_uninstall(self):
@@ -49,17 +43,12 @@ class TestSetup(unittest.TestCase):
         self.installer.uninstall_product("plone.staticresources")
         self.assertFalse(self.installer.is_product_installed("plone.staticresources"))
 
-        # We keep all bundles - at least this one should be available.
+        # We keep the plone-logged-in bundle. Why?
         self.assertEqual(
-            self.registry.records.get("plone.resources/resourceregistry.js").value,
-            "++plone++static/resourceregistry.js",
+            self.registry.records.get("plone.bundles/plone-logged-in.jscompilation").value,
+            "++plone++static/plone-logged-in-compiled.min.js",
         )
 
         # This one is removed
-        self.assertEqual(self.registry.records.get("plone.resources/less.js"), None)
+        self.assertEqual(self.registry.records.get("plone.bundles/plone"), None)
 
-        # jquery is also kept is it's still necessary for Plone core.
-        self.assertEqual(
-            self.registry.records.get("plone.resources/jquery.js").value,
-            "++plone++static/components/jquery/dist/jquery.min.js",
-        )

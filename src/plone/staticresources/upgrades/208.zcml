@@ -14,11 +14,6 @@
     profile="plone.staticresources:default">
 
     <gs:upgradeDepends
-      title="Update last_compilation timestamp of bundles"
-      import_profile="plone.staticresources:last_compilation"
-      import_steps="plone.app.registry" />
-
-    <gs:upgradeDepends
       title="Update svg toolbar icons"
       import_profile="plone.staticresources.upgrades:208" />
 

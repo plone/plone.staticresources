@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Installer for the plone.staticresources package."""
 
 from setuptools import find_packages
@@ -55,7 +54,6 @@ setup(
     },
     entry_points="""
     [console_scripts]
-    plone-compile-resources = plone.staticresources._scripts.compile_resources:main
     plone-register-icons = plone.staticresources._scripts.register_icons:main
     plone-register-flags = plone.staticresources._scripts.register_flag_icons:main
     [z3c.autoinclude.plugin]

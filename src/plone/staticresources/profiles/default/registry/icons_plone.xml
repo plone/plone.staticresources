@@ -449,6 +449,13 @@
     <value key="resource">++plone++bootstrap-icons/arrow-counterclockwise.svg</value>
   </record>
 
+  <record name="plone.icon.plone-rearrange">
+    <field type="plone.registry.field.TextLine">
+      <title>Plone Icon rearrange</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/sort-down-alt.svg</value>
+  </record>
+
   <record name="plone.icon.plone-redirection">
     <field type="plone.registry.field.TextLine">
       <title>Plone Icon redirection</title>
@@ -573,6 +580,13 @@
       <title>Plone Icon sitemap</title>
     </field>
     <value key="resource">++plone++bootstrap-icons/diagram-3.svg</value>
+  </record>
+
+  <record name="plone.icon.plone-selection">
+    <field type="plone.registry.field.TextLine">
+      <title>Plone Icon selection</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/list-ul.svg</value>
   </record>
 
   <record name="plone.icon.plone-accessibility">
