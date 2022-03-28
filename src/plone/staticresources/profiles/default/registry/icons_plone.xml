@@ -225,6 +225,13 @@
     <value key="resource">++plone++bootstrap-icons/chevron-right.svg</value>
   </record>
 
+  <record name="plone.icon.plone-view">
+    <field type="plone.registry.field.TextLine">
+      <title>Plone Icon eye</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/eye.svg</value>
+  </record>
+
   <record name="plone.icon.plone-edit">
     <field type="plone.registry.field.TextLine">
       <title>Plone Icon edit</title>
