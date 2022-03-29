@@ -43,12 +43,6 @@ class TestSetup(unittest.TestCase):
         self.installer.uninstall_product("plone.staticresources")
         self.assertFalse(self.installer.is_product_installed("plone.staticresources"))
 
-        # We keep the plone-logged-in bundle. Why?
-        self.assertEqual(
-            self.registry.records.get("plone.bundles/plone-logged-in.jscompilation").value,
-            "++plone++static/plone-logged-in-compiled.min.js",
-        )
-
         # This one is removed
         self.assertEqual(self.registry.records.get("plone.bundles/plone"), None)
 
