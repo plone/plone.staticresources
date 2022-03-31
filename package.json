@@ -10,7 +10,7 @@
     "dependencies": {
         "bootstrap": "^5.1.3",
         "bootstrap-icons": "^1.8.1",
-        "mockup": "https://github.com/plone/mockup.git#ec28be774483717b08311131307a61ab2f542428",
+        "mockup": "https://github.com/plone/mockup.git#61f2446ac8e51d417e86c73710f029f999162005",
         "svg-country-flags": "^1.2.10"
     },
     "devDependencies": {
