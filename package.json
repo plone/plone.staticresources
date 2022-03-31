@@ -47,8 +47,6 @@
         "underscore": "1.13.2"
     },
     "browserslist": [
-        ">0.2%",
-        "ie >= 11",
-        "not dead"
+        "defaults"
     ]
 }
