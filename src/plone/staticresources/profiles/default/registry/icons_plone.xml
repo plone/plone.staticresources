@@ -227,7 +227,7 @@
 
   <record name="plone.icon.plone-view">
     <field type="plone.registry.field.TextLine">
-      <title>Plone Icon eye</title>
+      <title>Plone Icon view</title>
     </field>
     <value key="resource">++plone++bootstrap-icons/eye.svg</value>
   </record>
