@@ -2043,12 +2043,19 @@ backbone.paginator@1.0.0:
     backbone "~0.9.2"
     underscore "1.3.3"
 
-backbone@1.1.2, backbone@~0.9.2:
-  version "1.1.2"
-  resolved "https://registry.yarnpkg.com/backbone/-/backbone-1.1.2.tgz#c2c04c66bf87268fb82c177acebeff7d37ba6f2d"
-  integrity sha1-wsBMZr+HJo+4LBd6zr7/fTe6by0=
+backbone@1.4.1:
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/backbone/-/backbone-1.4.1.tgz#099a78184bc07b034048a8332229c2ccca1e3e62"
+  integrity sha512-ADy1ztN074YkWbHi8ojJVFe3vAanO/lrzMGZWUClIP7oDD/Pjy2vrASraUP+2EVCfIiTtCW4FChVow01XneivA==
   dependencies:
-    underscore ">=1.5.0"
+    underscore ">=1.8.3"
+
+backbone@~0.9.2:
+  version "0.9.10"
+  resolved "https://registry.yarnpkg.com/backbone/-/backbone-0.9.10.tgz#12b841c29c12a55ef37d582803a0f7fb35094f8a"
+  integrity sha1-ErhBwpwSpV7zfVgoA6D3+zUJT4o=
+  dependencies:
+    underscore ">=1.4.3"
 
 balanced-match@^1.0.0:
   version "1.0.2"
@@ -2117,7 +2124,7 @@ bootstrap-icons@^1.8.1:
   resolved "https://registry.yarnpkg.com/bootstrap-icons/-/bootstrap-icons-1.8.1.tgz#773c1625bcbf3e86090ea9da4386c2c6459c5582"
   integrity sha512-IXUqislddPJfwq6H+2nTkHyr9epO9h6u1AG0OZCx616w+TgzeoCjfmI3qJMQqt1J586gN2IxzB4M99Ip4sTZ1w==
 
-bootstrap@^5.1.1, bootstrap@^5.1.3:
+bootstrap@^5.1.3:
   version "5.1.3"
   resolved "https://registry.yarnpkg.com/bootstrap/-/bootstrap-5.1.3.tgz#ba081b0c130f810fa70900acbc1c6d3c28fa8f34"
   integrity sha512-fcQztozJ8jToQWXxVuEyXWW+dSo8AiXWKwiSSrKWsRB/Qt+Ewwza+JWoLKiTuQLaEPhdNAJ7+Dosc9DOIqNy7Q==
@@ -4039,16 +4046,16 @@ mkdirp@^1.0.4:
   resolved "https://registry.yarnpkg.com/mkdirp/-/mkdirp-1.0.4.tgz#3eb5ed62622756d79a5f0e2a221dfebad75c2f7e"
   integrity sha512-vVqVZQyf3WLx2Shd0qJ9xuvqgAyKPLAiqITEtqW0oIUjzo3PePDd6fW9iFz30ef7Ysp/oiWqbhszeGWW2T6Gzw==
 
-"mockup@https://github.com/plone/mockup.git#61f2446ac8e51d417e86c73710f029f999162005":
+"mockup@https://github.com/plone/mockup.git#f5d2bd0cb74edb362c93a4d4b4e7532f0855cde6":
   version "5.0.0"
-  resolved "https://github.com/plone/mockup.git#61f2446ac8e51d417e86c73710f029f999162005"
+  resolved "https://github.com/plone/mockup.git#f5d2bd0cb74edb362c93a4d4b4e7532f0855cde6"
   dependencies:
     "@patternslib/pat-code-editor" "^2.1.1"
     "@patternslib/pat-content-browser" "git+https://github.com/plone/pat-content-browser.git#a6d146bea74a64ba802663d00887b6b8fd7eef59"
     "@patternslib/patternslib" "^7.4.0"
-    backbone "1.1.2"
+    backbone "1.4.1"
     backbone.paginator "1.0.0"
-    bootstrap "^5.1.1"
+    bootstrap "^5.1.3"
     bootstrap-icons "^1.8.1"
     cs-jqtree-contextmenu "0.1.0"
     datatables.net "^1.11.5"
@@ -5448,7 +5455,12 @@ type-is@~1.6.17, type-is@~1.6.18:
     media-typer "0.3.0"
     mime-types "~2.1.24"
 
-underscore@1.13.2, underscore@1.3.3, underscore@>=1.5.0, underscore@^1.13.2:
+underscore@1.3.3:
+  version "1.3.3"
+  resolved "https://registry.yarnpkg.com/underscore/-/underscore-1.3.3.tgz#47ac53683daf832bfa952e1774417da47817ae42"
+  integrity sha1-R6xTaD2vgyv6lS4XdEF9pHgXrkI=
+
+underscore@>=1.4.3, underscore@>=1.8.3, underscore@^1.13.2:
   version "1.13.2"
   resolved "https://registry.yarnpkg.com/underscore/-/underscore-1.13.2.tgz#276cea1e8b9722a8dbed0100a407dda572125881"
   integrity sha512-ekY1NhRzq0B08g4bGuX4wd2jZx5GnKz6mKSqFL4nqBlfyMGiG10gDFhDTMEfYmDL6Jy0FUIZp7wiRB+0BP7J2g==
