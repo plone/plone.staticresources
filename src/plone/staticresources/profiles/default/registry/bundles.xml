@@ -318,7 +318,7 @@
   <records prefix="plone.bundles/plone-fontello"
             interface='Products.CMFPlone.interfaces.IBundleRegistry'>
     <value key="depends">plone</value>
-    <value key="merge_with">default</value>
+    <value key="merge_with"></value>
     <value key="resources">
       <element>plone-fontello</element>
     </value>
@@ -333,7 +333,7 @@
   <records prefix="plone.bundles/plone-glyphicons"
             interface='Products.CMFPlone.interfaces.IBundleRegistry'>
     <value key="depends">plone</value>
-    <value key="merge_with">default</value>
+    <value key="merge_with"></value>
     <value key="resources">
       <element>plone-glyphicons</element>
     </value>

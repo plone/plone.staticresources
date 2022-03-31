@@ -1,0 +1,28 @@
+<configure xmlns="http://namespaces.zope.org/zope"
+  xmlns:gs="http://namespaces.zope.org/genericsetup">
+
+  <gs:registerProfile name="17"
+    title="Update bundles"
+    description='Configuration for version 17'
+    directory="profiles/17"
+    for="Products.CMFPlone.interfaces.IMigratingPloneSiteRoot"
+    provides="Products.GenericSetup.interfaces.EXTENSION" />
+
+  <gs:upgradeSteps
+    source="16"
+    destination="17"
+    profile="plone.staticresources:default">
+
+    <gs:upgradeDepends
+      title="Do not merge plone-fontello and glyphicons web font bundles in production mode."
+      import_profile="plone.staticresources.upgrades:17"
+      />
+
+    <gs:upgradeDepends
+      title="Update last_compilation timestamp of bundles"
+      import_profile="plone.staticresources:last_compilation"
+      import_steps="plone.app.registry" />
+
+  </gs:upgradeSteps>
+
+</configure>

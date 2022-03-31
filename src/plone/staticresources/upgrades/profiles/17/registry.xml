@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<registry>
+
+  <records prefix="plone.bundles/plone-fontello"
+            interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+    <value key="merge_with"></value>
+  </records>
+
+  <records prefix="plone.bundles/plone-glyphicons"
+            interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+    <value key="merge_with"></value>
+  </records>
+
+</registry>
