@@ -8,6 +8,26 @@ Changelog
 
 .. towncrier release notes start
 
+1.4.5 (2022-04-01)
+------------------
+
+Bug fixes:
+
+
+- Fix icon font loading.
+
+  Fix issue with Glyphicons and Fontello font loading on Portals where the portal root is a level higher.
+  The fonts are now loaded relative to the CSS requesting them.
+
+  Fixes: https://github.com/plone/plone.staticresources/issues/162
+  Fixes: https://github.com/plone/plone.staticresources/issues/203
+
+  Ref: https://github.com/plone/plone.staticresources/pull/168
+  Ref: https://github.com/plone/plone.staticresources/pull/171
+  Ref: https://github.com/plone/plone.staticresources/pull/175
+  Ref: https://community.plone.org/t/deployments-not-rooted-fail-to-load-the-fontello-icons/15047/12?u=thet (#203)
+
+
 1.4.4 (2021-10-22)
 ------------------
 
