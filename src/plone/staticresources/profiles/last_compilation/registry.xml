@@ -13,7 +13,7 @@
     <value key="last_compilation">2020-11-09 13:00:00</value>
   </records>
   <records prefix="plone.bundles/plone-editor-tools" interface='Products.CMFPlone.interfaces.IBundleRegistry'>
-    <value key="last_compilation">2021-02-19 14:44:00</value>
+    <value key="last_compilation">2022-04-01 11:00:00</value>
   </records>
   <records prefix="plone.bundles/plone-tinymce" interface='Products.CMFPlone.interfaces.IBundleRegistry'>
     <value key="last_compilation">2020-10-28 14:00:00</value>
