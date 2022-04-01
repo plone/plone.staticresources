@@ -29876,7 +29876,14 @@ define('mockup-patterns-structure-url/js/views/app',[
         url: self.options.collectionUrl,
       });
 
-      self.setAllCookieSettings();
+      // initialize table columns
+      self.activeColumns = self.getCookieSetting(
+        self.activeColumnsCookie,
+        self.activeColumns
+      );
+
+      // initialize page size via attribute
+      self.collection.paginator_ui.perPage = parseInt(this.getCookieSetting('perPage', 15));
 
       self.selectedCollection = new SelectedCollection();
       self.tableView = new TableView({app: self});
@@ -30393,17 +30400,6 @@ define('mockup-patterns-structure-url/js/views/app',[
           'value': val
         })
       );
-    },
-    setAllCookieSettings: function() {
-      this.activeColumns = this.getCookieSetting(
-        this.activeColumnsCookie,
-        this.activeColumns
-      );
-      var perPage = this.getCookieSetting('perPage', 15);
-      if (typeof(perPage) === 'string') {
-        perPage = parseInt(perPage);
-      }
-      this.collection.howManyPer(perPage);
     }
   });
 
@@ -30714,5 +30710,5 @@ require([
   'use strict';
 });
 
-define("/home/_thet/data/dev/plone/buildout.coredev/src/plone.staticresources/src/plone/staticresources/static/plone-editor-tools.js", function(){});
+define("/Volumes/WORKSPACE2/buildout.coredev-5.2/src/plone.staticresources/src/plone/staticresources/static/plone-editor-tools.js", function(){});
 

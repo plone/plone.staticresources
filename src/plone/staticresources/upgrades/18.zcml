@@ -1,0 +1,16 @@
+<configure xmlns="http://namespaces.zope.org/zope"
+  xmlns:gs="http://namespaces.zope.org/genericsetup">
+
+  <gs:upgradeSteps
+    source="17"
+    destination="18"
+    profile="plone.staticresources:default">
+
+    <gs:upgradeDepends
+      title="Update last_compilation timestamp of bundles"
+      import_profile="plone.staticresources:last_compilation"
+      import_steps="plone.app.registry" />
+
+  </gs:upgradeSteps>
+
+</configure>
