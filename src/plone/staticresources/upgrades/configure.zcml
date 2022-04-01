@@ -18,5 +18,6 @@
   <include file="15.zcml" />
   <include file="16.zcml" />
   <include file="17.zcml" />
+  <include file="18.zcml" />
 
 </configure>
