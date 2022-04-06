@@ -4046,9 +4046,9 @@ mkdirp@^1.0.4:
   resolved "https://registry.yarnpkg.com/mkdirp/-/mkdirp-1.0.4.tgz#3eb5ed62622756d79a5f0e2a221dfebad75c2f7e"
   integrity sha512-vVqVZQyf3WLx2Shd0qJ9xuvqgAyKPLAiqITEtqW0oIUjzo3PePDd6fW9iFz30ef7Ysp/oiWqbhszeGWW2T6Gzw==
 
-"mockup@https://github.com/plone/mockup.git#41e19ed1db8557e780b5b75288e2f7bc84e52bac":
+"mockup@https://github.com/plone/mockup.git#3bcced114a27fe636606dd2f1fd145689c3398fb":
   version "5.0.0"
-  resolved "https://github.com/plone/mockup.git#41e19ed1db8557e780b5b75288e2f7bc84e52bac"
+  resolved "https://github.com/plone/mockup.git#3bcced114a27fe636606dd2f1fd145689c3398fb"
   dependencies:
     "@patternslib/pat-code-editor" "^2.1.1"
     "@patternslib/pat-content-browser" "git+https://github.com/plone/pat-content-browser.git#a6d146bea74a64ba802663d00887b6b8fd7eef59"
