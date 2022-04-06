@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+
+<registry>
+
+  <record name="plone.icon.contenttype">
+    <field type="plone.registry.field.TextLine">
+      <title>Plone Contenttype</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/file.svg</value>
+  </record>
+
+  <record name="plone.icon.contenttype/event">
+    <field type="plone.registry.field.TextLine">
+      <title>Plone Event</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/calendar-event.svg</value>
+  </record>
+
+  <record name="plone.icon.contenttype/news-item">
+    <field type="plone.registry.field.TextLine">
+      <title>Plone News Item</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/file-earmark-richtext.svg</value>
+  </record>
+
+  <record name="plone.icon.contenttype/document">
+    <field type="plone.registry.field.TextLine">
+      <title>Plone Document</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/file-earmark-text.svg</value>
+  </record>
+
+  <record name="plone.icon.contenttype/image">
+    <field type="plone.registry.field.TextLine">
+      <title>Plone Image</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/file-earmark-image.svg</value>
+  </record>
+
+  <record name="plone.icon.contenttype/file">
+    <field type="plone.registry.field.TextLine">
+      <title>Plone File</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/file-earmark.svg</value>
+  </record>
+
+  <record name="plone.icon.contenttype/link">
+    <field type="plone.registry.field.TextLine">
+      <title>Plone Link</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/link-45deg.svg</value>
+  </record>
+
+  <record name="plone.icon.contenttype/collection">
+    <field type="plone.registry.field.TextLine">
+      <title>Plone Collection</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/collection.svg</value>
+  </record>
+
+  <record name="plone.icon.contenttype/folder">
+    <field type="plone.registry.field.TextLine">
+      <title>Plone Folder</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/folder.svg</value>
+  </record>
+
+</registry>

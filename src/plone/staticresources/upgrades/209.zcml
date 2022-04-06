@@ -14,7 +14,7 @@
     profile="plone.staticresources:default">
 
     <gs:upgradeDepends
-      title="Update svg toolbar icons"
+      title="Update various icons"
       import_profile="plone.staticresources.upgrades:209" />
 
   </gs:upgradeSteps>

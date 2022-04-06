@@ -1,0 +1,160 @@
+<?xml version="1.0"?>
+
+<registry>
+
+  <record name="plone.icon.mimetype-application">
+    <field type="plone.registry.field.TextLine">
+      <title>Mimetype Application (generic)</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/file-earmark-code.svg</value>
+  </record>
+
+  <record name="plone.icon.mimetype-application/pdf">
+    <field type="plone.registry.field.TextLine">
+      <title>Mimetype application/pdf</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/file-earmark-pdf.svg</value>
+  </record>
+
+  <record name="plone.icon.mimetype-application/xml">
+    <field type="plone.registry.field.TextLine">
+      <title>Mimetype application/xml</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/file-earmark-code.svg</value>
+  </record>
+
+  <record name="plone.icon.mimetype-application/x-tar">
+    <field type="plone.registry.field.TextLine">
+      <title>Mimetype application/x-tar</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/file-earmark-zip.svg</value>
+  </record>
+
+  <record name="plone.icon.mimetype-application/zip">
+    <field type="plone.registry.field.TextLine">
+      <title>Mimetype application/zip</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/file-earmark-zip.svg</value>
+  </record>
+
+  <record name="plone.icon.mimetype-application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+    <field type="plone.registry.field.TextLine">
+      <title>Mimetype MS Word</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/file-earmark-richtext.svg</value>
+  </record>
+
+  <record name="plone.icon.mimetype-application/msword">
+    <field type="plone.registry.field.TextLine">
+      <title>Mimetype MS Word</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/file-earmark-richtext.svg</value>
+  </record>
+
+  <record name="plone.icon.mimetype-application/vnd.oasis.opendocument.text">
+    <field type="plone.registry.field.TextLine">
+      <title>Mimetype Open Document</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/file-earmark-richtext.svg</value>
+  </record>
+
+  <record name="plone.icon.mimetype-application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+    <field type="plone.registry.field.TextLine">
+      <title>Mimetype MS Excel</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/file-earmark-spreadsheet.svg</value>
+  </record>
+
+  <record name="plone.icon.mimetype-application/vnd.ms-excel">
+    <field type="plone.registry.field.TextLine">
+      <title>Mimetype MS Excel</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/file-earmark-spreadsheet.svg</value>
+  </record>
+
+  <record name="plone.icon.mimetype-application/vnd.oasis.opendocument.spreadsheet">
+    <field type="plone.registry.field.TextLine">
+      <title>Mimetype Opendocument Spreadsheet</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/file-earmark-spreadsheet.svg</value>
+  </record>
+
+  <record name="plone.icon.mimetype-application/vnd.ms-powerpoint">
+    <field type="plone.registry.field.TextLine">
+      <title>Mimetype Presentation</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/file-earmark-slides.svg</value>
+  </record>
+
+  <record name="plone.icon.mimetype-application/vnd.openxmlformats-officedocument.presentationml.presentation">
+    <field type="plone.registry.field.TextLine">
+      <title>Mimetype Presentation</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/file-earmark-slides.svg</value>
+  </record>
+
+  <record name="plone.icon.mimetype-application/vnd.oasis.opendocument.presentation">
+    <field type="plone.registry.field.TextLine">
+      <title>Mimetype Presentation</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/file-earmark-slides.svg</value>
+  </record>
+
+  <record name="plone.icon.mimetype-application/vnd.apple.keynote">
+    <field type="plone.registry.field.TextLine">
+      <title>Mimetype Presentation</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/file-earmark-slides.svg</value>
+  </record>
+
+  <record name="plone.icon.mimetype-audio">
+    <field type="plone.registry.field.TextLine">
+      <title>Mimetype Audio (generic)</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/file-earmark-music.svg</value>
+  </record>
+
+  <record name="plone.icon.mimetype-image">
+    <field type="plone.registry.field.TextLine">
+      <title>Mimetype Image (generic)</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/file-earmark-image.svg</value>
+  </record>
+
+  <record name="plone.icon.mimetype-image/jpeg">
+    <field type="plone.registry.field.TextLine">
+      <title>Mimetype image/jpeg</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/file-earmark-image.svg</value>
+  </record>
+
+  <record name="plone.icon.mimetype-message">
+    <field type="plone.registry.field.TextLine">
+      <title>Mimetype Message (generic)</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/file-earmark-text.svg</value>
+  </record>
+
+  <record name="plone.icon.mimetype-multipart">
+    <field type="plone.registry.field.TextLine">
+      <title>Mimetype Multipart (generic)</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/file-earmark-binary.svg</value>
+  </record>
+
+  <record name="plone.icon.mimetype-text">
+    <field type="plone.registry.field.TextLine">
+      <title>Mimetype Text (generic)</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/file-earmark-text.svg</value>
+  </record>
+
+  <record name="plone.icon.mimetype-video">
+    <field type="plone.registry.field.TextLine">
+      <title>Mimetype Video (generic)</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/file-earmark-play.svg</value>
+  </record>
+
+
+</registry>
