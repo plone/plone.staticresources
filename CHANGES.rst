@@ -8,6 +8,38 @@ Changelog
 
 .. towncrier release notes start
 
+2.0.0a3 (2022-04-08)
+--------------------
+
+Breaking changes:
+
+
+- New version with Mockup ES6 support and removed TTW compilation (PLIP 3211). (#119)
+
+
+New features:
+
+
+- Restructure searchbox markup for mobile navigation as offcanvas sidebar.
+  [agitator] (#202)
+- Make pat-inject from patternslib available
+  [agitator] (#208)
+- Adding support for images in liveSearch results.
+  [agitator] (#217)
+
+
+Bug fixes:
+
+
+- Italian translations have been updated [yurj] (#178)
+- Remove obsolete plone-logged-in bundle.
+  [pbauer] (#205)
+- Add mimetype icons and change pdf icon
+  [pbauer] (#215)
+- Update `icons_bootstrap.xml` and `iconmap.json`, also automate this for future updates.
+  [jensens] (#216)
+
+
 2.0.0a2 (2021-10-22)
 --------------------
 
