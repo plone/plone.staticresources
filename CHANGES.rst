@@ -8,6 +8,16 @@ Changelog
 
 .. towncrier release notes start
 
+1.4.6 (2022-04-28)
+------------------
+
+Bug fixes:
+
+
+- pat-structure fix duplicate rendering
+  [petschki] (#210)
+
+
 1.4.5 (2022-04-01)
 ------------------
 
