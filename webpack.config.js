@@ -1,6 +1,6 @@
 process.traceDeprecation = true;
 const path = require("path");
-const mockup_config = require("mockup/webpack.config.js");
+const mockup_config = require("@plone/mockup/webpack.config.js");
 const CopyPlugin = require("copy-webpack-plugin");
 
 module.exports = async (env, argv) => {
