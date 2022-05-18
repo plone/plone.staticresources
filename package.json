@@ -9,7 +9,6 @@
     },
     "dependencies": {
         "@plone/mockup": "^5.0.0-alpha.7",
-        "bootstrap": "^5.1.3",
         "bootstrap-icons": "^1.8.1",
         "svg-country-flags": "^1.2.10"
     },
