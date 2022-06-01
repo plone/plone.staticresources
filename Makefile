@@ -1,7 +1,7 @@
 YARN   ?= npx yarn
 
 .PHONY: all
-all: update-icons
+all: build update-icons
 
 .PHONY: clean
 clean:
@@ -17,7 +17,7 @@ build: install
 	$(YARN) run build
 
 .PHONY: update-icons
-update-icons: build
+update-icons:
 	(cd src/plone/staticresources/_scripts && `which python3` register_icons.py)
 	(cd src/plone/staticresources/_scripts && `which python3` register_flag_icons.py)
 	(cd src/plone/staticresources/_scripts && `which python3` iconmap_json.py)

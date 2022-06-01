@@ -30,7 +30,7 @@ class TestSetup(unittest.TestCase):
         # Test availability of bundles and resources
         self.assertEqual(
             self.registry.records.get("plone.bundles/bootstrap-js.jscompilation").value,
-            "++plone++static/bundle-bootstrap/js/bootstrap.bundle.min.js",
+            "++plone++static/bundle-plone/bootstrap-remote.min.js",
         )
 
         self.assertEqual(
