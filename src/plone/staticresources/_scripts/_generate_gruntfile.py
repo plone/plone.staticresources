@@ -527,6 +527,17 @@ for bkey, bundle in bundles.items():
                     "in {}".format(bundle.__prefix__)
                 )
 
+            for js_file in js_files:
+                sed_id = "sed" + str(sed_count)
+                sed_task_ids.append("sed:{0}".format(sed_id))
+                sed_cfg_final += SED_CONFIG_TEMPLATE.format(
+                    path=js_file,
+                    name=sed_id,
+                    pattern=os.getcwd(),
+                    destination="",
+                )
+                sed_count += 1
+
             uc = UGLIFY_CONFIG_TEMPLATE.format(
                 bkey=bkey,
                 destination=js_target_path + "/" + js_target_name,
