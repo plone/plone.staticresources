@@ -1245,10 +1245,10 @@
     url-polyfill "^1.1.9"
     whatwg-fetch "^3.4.0"
 
-"@plone/mockup@5.0.0-alpha.7", "@plone/mockup@^5.0.0-alpha.7":
-  version "5.0.0-alpha.7"
-  resolved "https://registry.yarnpkg.com/@plone/mockup/-/mockup-5.0.0-alpha.7.tgz#4c0806d31bfbc83713e0d8127d369ab76013aa32"
-  integrity sha512-pYRVX/J7fJY2vI5jVArko0st2OfZVpyzfFASBox4C5BUJwXU4vo8m6EgEpD71ivZKta74lnZ02qIgezSavXxNg==
+"@plone/mockup@5.0.0-alpha.8", "@plone/mockup@^5.0.0-alpha.8":
+  version "5.0.0-alpha.8"
+  resolved "https://registry.yarnpkg.com/@plone/mockup/-/mockup-5.0.0-alpha.8.tgz#133e56b3ee0071f6ca2378230297117cd1d2cad1"
+  integrity sha512-XVBxWqTH45CwDm4c7gsDovWAEMabHGsxzy94YX1MhCPVUCq1qdAVwhZcgJK1DxKX79TFGlpArIEbZGYZrHWHiw==
   dependencies:
     "@patternslib/pat-code-editor" "^2.1.2"
     "@patternslib/patternslib" "8.1.0-alpha.1"
@@ -1257,8 +1257,8 @@
     bootstrap "^5.2.0-beta1"
     bootstrap-icons "^1.8.2"
     cs-jqtree-contextmenu "0.1.0"
-    datatables.net "^1.12.0"
-    datatables.net-bs5 "^1.12.0"
+    datatables.net "^1.12.1"
+    datatables.net-bs5 "^1.12.1"
     datatables.net-buttons "^2.2.3"
     datatables.net-buttons-bs5 "^2.2.3"
     datatables.net-colreorder "^1.5.6"
@@ -1282,7 +1282,7 @@
     sortablejs "^1.15.0"
     tinymce "^5.10.2"
     tinymce-i18n "^20.12.25"
-    underscore "git+https://github.com/jashkenas/underscore.git#75d257fa10131c3d65d870dd22095cb187cd1626"
+    underscore "^1.13.4"
 
 "@polka/url@^1.0.0-next.20":
   version "1.0.0-next.21"
@@ -2345,10 +2345,18 @@ cssesc@^3.0.0:
   resolved "https://registry.yarnpkg.com/cssesc/-/cssesc-3.0.0.tgz#37741919903b868565e1c09ea747445cd18983ee"
   integrity sha512-/Tb/JcjK111nNScGob5MNtsntNM1aCNUDipB/TkwZFhyDrrE47SOx/18wF2bbjgc3ZzCSKW1T5nt5EbFoAz/Vg==
 
-datatables.net-bs5@>=1.11.3, datatables.net-bs5@^1.12.0:
+datatables.net-bs5@>=1.11.3:
   version "1.12.0"
   resolved "https://registry.yarnpkg.com/datatables.net-bs5/-/datatables.net-bs5-1.12.0.tgz#8cef5579c096c5216afa423af0261acba62b4476"
   integrity sha512-8SR3gI2DtcrcFy03vu9MkGtIA61UfE725HvSujOOt+M4v+n0Wf9bsIbvUe2sGDlB4gVQreB0YHNSNamc3053tQ==
+  dependencies:
+    datatables.net ">=1.11.3"
+    jquery ">=1.7"
+
+datatables.net-bs5@^1.12.1:
+  version "1.12.1"
+  resolved "https://registry.yarnpkg.com/datatables.net-bs5/-/datatables.net-bs5-1.12.1.tgz#b05d4bcaed77f6b77df0b50eaf1d5ec8e5d476bd"
+  integrity sha512-CcQCImfmH4YZk7I0aC0kTiNPyfHJ2ueGgOh/kFB9KqsZD8bNJy2A88gC6hn9A7TbmmenOL+K3Q1ti7G8yqi8SQ==
   dependencies:
     datatables.net ">=1.11.3"
     jquery ">=1.7"
@@ -2453,10 +2461,17 @@ datatables.net-select@>=1.3.3, datatables.net-select@^1.4.0:
     datatables.net ">=1.11.3"
     jquery ">=1.7"
 
-datatables.net@>=1.11.3, datatables.net@^1.10.15, datatables.net@^1.12.0:
+datatables.net@>=1.11.3, datatables.net@^1.10.15:
   version "1.12.0"
   resolved "https://registry.yarnpkg.com/datatables.net/-/datatables.net-1.12.0.tgz#a1306fd222d964bd47ea6c9fea606c1dea8e358b"
   integrity sha512-oCKzEqv7kDGOpdE4WE+hTEKgYZ0+pnQ6jDl/fr2HQKlb1AaNTWaeG/3skoGk51fyf80ET/bwlFyMI3hgvKv71Q==
+  dependencies:
+    jquery ">=1.7"
+
+datatables.net@^1.12.1:
+  version "1.12.1"
+  resolved "https://registry.yarnpkg.com/datatables.net/-/datatables.net-1.12.1.tgz#3e625e49a3341f605b0efb519fae94e37b278f24"
+  integrity sha512-e6XAMUoV41JdQPS/r9YRfRcmTPcCVvyZbWI+xog1Zg+kjVliMQbEkvWK5XFItmi64Cvwg+IqsZbTUJ1KSY3umA==
   dependencies:
     jquery ">=1.7"
 
@@ -5014,9 +5029,14 @@ type-is@~1.6.18:
     media-typer "0.3.0"
     mime-types "~2.1.24"
 
-underscore@>=1.8.3, underscore@^1.8.0, "underscore@git+https://github.com/jashkenas/underscore.git#75d257fa10131c3d65d870dd22095cb187cd1626":
+underscore@>=1.8.3, underscore@^1.8.0:
   version "1.13.3"
   resolved "git+https://github.com/jashkenas/underscore.git#75d257fa10131c3d65d870dd22095cb187cd1626"
+
+underscore@^1.13.4:
+  version "1.13.4"
+  resolved "https://registry.yarnpkg.com/underscore/-/underscore-1.13.4.tgz#7886b46bbdf07f768e0052f1828e1dcab40c0dee"
+  integrity sha512-BQFnUDuAQ4Yf/cYY5LNrK9NCJFKriaRbD9uR1fTeXnBeoa97W0i41qkZfGO9pSo8I5KzjAcSY2XYtdf0oKd7KQ==
 
 unicode-canonical-property-names-ecmascript@^2.0.0:
   version "2.0.0"
