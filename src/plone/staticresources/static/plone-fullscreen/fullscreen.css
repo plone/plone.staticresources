@@ -1,4 +1,7 @@
 
+.zoomable{
+  cursor: pointer;
+}
 .zoomable:fullscreen {
   width: 100%;
   display: grid;
@@ -18,7 +21,7 @@
   object-fit: contain;
   transform: none;
 }
-.zoomable:fullscreen .image-caption{
+.zoomable:fullscreen figcaption{
   color: white;
   width: 100%;
   display: block;
