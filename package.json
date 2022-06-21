@@ -8,7 +8,7 @@
         "build": "NODE_ENV=production webpack --config webpack.config.js"
     },
     "dependencies": {
-        "@plone/mockup": "^5.0.0-alpha.9",
+        "@plone/mockup": "^5.0.0-alpha.10",
         "bootstrap-icons": "^1.8.3",
         "svg-country-flags": "^1.2.10"
     },
@@ -41,8 +41,8 @@
         "yarn": "^1.22.18"
     },
     "resolutions": {
-        "@patternslib/patternslib": "8.1.0-alpha.1",
-        "@plone/mockup": "5.0.0-alpha.8"
+        "@patternslib/patternslib": "8.1.0",
+        "@plone/mockup": "5.0.0-alpha.10"
     },
     "browserslist": [
         "defaults"
