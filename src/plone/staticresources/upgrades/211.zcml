@@ -1,0 +1,22 @@
+<configure xmlns="http://namespaces.zope.org/zope"
+  xmlns:gs="http://namespaces.zope.org/genericsetup">
+
+  <gs:registerProfile name="210"
+    title="Update to Mockup with module federation."
+    description="Configuration for version 210"
+    directory="profiles/210"
+    for="Products.CMFPlone.interfaces.IMigratingPloneSiteRoot"
+    provides="Products.GenericSetup.interfaces.EXTENSION" />
+
+  <gs:upgradeSteps
+    source="210"
+    destination="211"
+    profile="plone.staticresources:default">
+
+    <gs:upgradeDepends
+      title="Add image fullscreen support"
+      import_profile="plone.staticresources.upgrades:211" />
+
+  </gs:upgradeSteps>
+
+</configure>
