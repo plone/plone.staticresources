@@ -1,2 +1,0 @@
-Update README.rst
-[petschki]

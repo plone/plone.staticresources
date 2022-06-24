@@ -1,2 +1,0 @@
-Update iconmap.json.
-[thet]

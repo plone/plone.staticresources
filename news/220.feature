@@ -1,2 +1,0 @@
-Update toolbar toggler.
-[agitator]

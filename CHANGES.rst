@@ -8,6 +8,48 @@ Changelog
 
 .. towncrier release notes start
 
+2.0.0b1 (2022-06-24)
+--------------------
+
+New features:
+
+
+- Integrate bootstrap and jquery bundles with module federation. They now live in the bundle-plone directory.
+  [thet] (222-1)
+- Makefile: Separate update-icons from build target.
+  [thet] (222-2)
+- Update iconmap.json.
+  [thet] (222-3)
+- Update README.rst
+  [petschki] (#213)
+- Update toolbar toggler.
+  [agitator] (#220)
+- Update to latest Mockup with module federation.
+  [thet] (#222)
+- Add image full screen support thru full screen API
+  [MrTango] (#226)
+
+
+Bug fixes:
+
+
+- structure pattern fixes:
+
+  - row actions cut/copy/default_page
+  - datatable manual sorting
+
+  [petschki] (#224)
+- Fix popover positioning in structure pattern.
+  [petschki] (#225)
+- Refactor pat-recurrence:
+
+  - remove jquerytools.overlay -> use `pat-plone-modal` instead
+  - remove jquerytools.calendar -> use native <input type="date" />
+  - update forms to Bootstrap 5
+
+  [petschki] (#227)
+
+
 2.0.0a3 (2022-04-08)
 --------------------
 

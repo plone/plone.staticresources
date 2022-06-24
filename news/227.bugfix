@@ -1,7 +1,0 @@
-Refactor pat-recurrence:
-
-- remove jquerytools.overlay -> use `pat-plone-modal` instead
-- remove jquerytools.calendar -> use native <input type="date" />
-- update forms to Bootstrap 5
-
-[petschki]
