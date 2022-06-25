@@ -1,10 +1,10 @@
 <configure xmlns="http://namespaces.zope.org/zope"
   xmlns:gs="http://namespaces.zope.org/genericsetup">
 
-  <gs:registerProfile name="210"
-    title="Update to Mockup with module federation."
-    description="Configuration for version 210"
-    directory="profiles/210"
+  <gs:registerProfile name="211"
+    title="Add image fullscreen support"
+    description="Configuration for version 211"
+    directory="profiles/211"
     for="Products.CMFPlone.interfaces.IMigratingPloneSiteRoot"
     provides="Products.GenericSetup.interfaces.EXTENSION" />
 
