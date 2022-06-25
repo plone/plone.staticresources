@@ -1,0 +1,22 @@
+<configure xmlns="http://namespaces.zope.org/zope"
+  xmlns:gs="http://namespaces.zope.org/genericsetup">
+
+  <gs:registerProfile name="211"
+    title="Add image fullscreen support"
+    description="Configuration for version 211"
+    directory="profiles/211"
+    for="Products.CMFPlone.interfaces.IMigratingPloneSiteRoot"
+    provides="Products.GenericSetup.interfaces.EXTENSION" />
+
+  <gs:upgradeSteps
+    source="210"
+    destination="211"
+    profile="plone.staticresources:default">
+
+    <gs:upgradeDepends
+      title="Add image fullscreen support"
+      import_profile="plone.staticresources.upgrades:211" />
+
+  </gs:upgradeSteps>
+
+</configure>
