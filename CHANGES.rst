@@ -8,6 +8,16 @@ Changelog
 
 .. towncrier release notes start
 
+2.0.0b2 (2022-06-27)
+--------------------
+
+Bug fixes:
+
+
+- Add Upgrade Stept for image full screen support
+  [1letter] (#229)
+
+
 2.0.0b1 (2022-06-24)
 --------------------
 
