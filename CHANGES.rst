@@ -8,6 +8,17 @@ Changelog
 
 .. towncrier release notes start
 
+2.0.0b3 (2022-06-27)
+--------------------
+
+Bug fixes:
+
+
+- Previous release is not installable, for unknown reasons.
+  Rerelease, now also as wheel.  Maybe this helps.
+  [maurits] (#200)
+
+
 2.0.0b2 (2022-06-27)
 --------------------
 
