@@ -1,0 +1,2 @@
+Fix `exclude_from_nav` in `pat-structure` for items without metadata information.
+[petschki]

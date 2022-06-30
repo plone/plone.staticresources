@@ -8,7 +8,7 @@
         "build": "NODE_ENV=production webpack --config webpack.config.js"
     },
     "dependencies": {
-        "@plone/mockup": "^5.0.0-alpha.10",
+        "@plone/mockup": "^5.0.0-alpha.11",
         "bootstrap-icons": "^1.8.3",
         "svg-country-flags": "^1.2.10"
     },
