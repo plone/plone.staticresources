@@ -1909,9 +1909,10 @@
     url-polyfill "^1.1.9"
     whatwg-fetch "^3.4.0"
 
-"@plone/mockup@github:plone/mockup#register-globally-thet":
-  version "5.0.0-alpha.12"
-  resolved "https://codeload.github.com/plone/mockup/tar.gz/4cd878ed86db4a11225474eb6c50813d9e08a8fe"
+"@plone/mockup@^5.0.0-alpha.13":
+  version "5.0.0-alpha.13"
+  resolved "https://registry.yarnpkg.com/@plone/mockup/-/mockup-5.0.0-alpha.13.tgz#7184c25ca54a9ee26804dcfcee38a32aece006e5"
+  integrity sha512-d119sLZC/pMqTIT7JZEiqe3KvAH6xDW5fJvAWyoz5q6ebm2ZXfY98tSGk1j0yrXrF8XgRow4jX62OI6qGcYlIw==
   dependencies:
     "@patternslib/pat-code-editor" "^3.0.0"
     "@patternslib/patternslib" "9.0.0-beta.0"
