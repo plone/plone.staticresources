@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
 <registry>
   <records remove="True" prefix="plone.bundles/plone" interface='Products.CMFPlone.interfaces.IBundleRegistry'/>
-  <records remove="True" prefix="plone.bundles/bootstrap-js" interface='Products.CMFPlone.interfaces.IBundleRegistry'/>
+  <records remove="True" prefix="plone.bundles/plone-fullscreen" interface='Products.CMFPlone.interfaces.IBundleRegistry'/>
 </registry>
