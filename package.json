@@ -9,7 +9,7 @@
         "stats": "NODE_ENV=production webpack --config webpack.config.js --json > stats.json"
     },
     "dependencies": {
-        "@plone/mockup": "github:plone/mockup#register-globally-thet",
+        "@plone/mockup": "^5.0.0-alpha.13",
         "bootstrap-icons": "^1.8.3",
         "svg-country-flags": "^1.2.10"
     },
