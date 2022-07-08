@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<registry>
+
+  <records prefix="plone.bundles/jquery" interface="Products.CMFPlone.interfaces.IBundleRegistry" remove="true" />
+  <records prefix="plone.bundles/bootstrap-js" interface="Products.CMFPlone.interfaces.IBundleRegistry" remove="true" />
+
+</registry>
