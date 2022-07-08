@@ -1,0 +1,22 @@
+<configure xmlns="http://namespaces.zope.org/zope"
+  xmlns:gs="http://namespaces.zope.org/genericsetup">
+
+  <gs:registerProfile name="212"
+    title="Remove obsolete jquery and bootstrap-js bundles"
+    description="Configuration for version 212"
+    directory="profiles/212"
+    for="Products.CMFPlone.interfaces.IMigratingPloneSiteRoot"
+    provides="Products.GenericSetup.interfaces.EXTENSION" />
+
+  <gs:upgradeSteps
+    source="211"
+    destination="212"
+    profile="plone.staticresources:default">
+
+    <gs:upgradeDepends
+      title="Remove obsolete jquery and bootstrap-js bundles"
+      import_profile="plone.staticresources.upgrades:212" />
+
+  </gs:upgradeSteps>
+
+</configure>
