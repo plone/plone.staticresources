@@ -8,6 +8,28 @@ Changelog
 
 .. towncrier release notes start
 
+2.0.0b4 (2022-07-20)
+--------------------
+
+New features:
+
+
+- Mockup update: register jquery and bootstrap globally.
+  [petschki] (#231)
+- Upgrade to @plone/mockup 5.0.0-alpha.17. (#232)
+
+
+Bug fixes:
+
+
+- Fix `exclude_from_nav` in `pat-structure` for items without metadata information.
+  [petschki] (#230)
+- Fix tinymce link/image modals.
+  [petschki] (#233)
+- Mockup update: `pat-relateditems` customizable templates.
+  [petschki] (#234)
+
+
 2.0.0b3 (2022-06-27)
 --------------------
 
