@@ -8,6 +8,16 @@ Changelog
 
 .. towncrier release notes start
 
+2.0.0b5 (2022-07-22)
+--------------------
+
+New features:
+
+
+- Update Bootstrap -> 5.2.0 and Boostrap Icons -> 1.9.1
+  [petschki] (#236)
+
+
 2.0.0b4 (2022-07-20)
 --------------------
 
