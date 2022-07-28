@@ -1,0 +1,2 @@
+Fix adding fields to fieldsets, and drag and drops between fieldsets. Prevent adding fields to fieldsets from behaviors.
+[frapell]
