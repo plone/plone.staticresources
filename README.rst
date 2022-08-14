@@ -39,25 +39,21 @@ Bundle build analyzation
 https://survivejs.com/webpack/optimizing/build-analysis/
 https://formidable.com/blog/2018/finding-webpack-duplicates-with-inspectpack-plugin/
 
-Build the stats.json file:
+Build the stats.json file::
 
-```
-npx yarn stats
-```
+   npx yarn stats
 
-Check dependency tree and why which package was included:
+Check dependency tree and why which package was included
 https://www.npmjs.com/package/whybundled
+::
 
-```
-npx whybundled stats.json
-```
+   npx whybundled stats.json
 
 Visualize dependency tree and analyze bundle size:
 https://www.npmjs.com/package/webpack-bundle-analyzer
+::
 
-```
-npx webpack-bundle-analyzer stats.json
-```
+   npx webpack-bundle-analyzer stats.json
 
 
 License
