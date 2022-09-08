@@ -8,6 +8,20 @@ Changelog
 
 .. towncrier release notes start
 
+2.0.0b6 (2022-09-09)
+--------------------
+
+Bug fixes:
+
+
+- Update mockup = 5.0.0-alpha.19
+  [petschki] (#239)
+- Update mockup = 5.0.0-alpha.20: Minor TinyMCE styling fixes
+  [MrTango, petschki] (#242)
+- Update mockup = 5.0.0-alpha.21
+  [petschki, thet] (#243)
+
+
 2.0.0b5 (2022-07-22)
 --------------------
 
