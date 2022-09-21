@@ -2114,16 +2114,16 @@
     url-polyfill "^1.1.9"
     whatwg-fetch "^3.4.0"
 
-"@plone/mockup@^5.0.0-alpha.21":
-  version "5.0.0-alpha.21"
-  resolved "https://registry.yarnpkg.com/@plone/mockup/-/mockup-5.0.0-alpha.21.tgz#ce1d8456a7d35d02eed25d0c52fbc2b1e06ef0cf"
-  integrity sha512-VvHJkOAAWtnJYxExzeSU42UpT58VkjAfwfbleOAQllTcpMo+EijoMwgZK7oK/kWKwgSiVlm0EjERJzeK5UvNcQ==
+"@plone/mockup@^5.0.0-alpha.22":
+  version "5.0.0-alpha.22"
+  resolved "https://registry.yarnpkg.com/@plone/mockup/-/mockup-5.0.0-alpha.22.tgz#389070607312f34bef5da99a7660a97bd0b52f1b"
+  integrity sha512-ZFkPjXfFDuKLuZJbEQiK+1rwCllaeps1I+IPDhIKFPGHF95AYwp+3iVPC2nVdYiteN3U/AMkvjz1Vaxu4S1TFA==
   dependencies:
     "@patternslib/pat-code-editor" "^3.0.0"
     "@patternslib/patternslib" "9.1.0-beta.0"
     backbone "1.4.1"
     backbone.paginator "2.0.8"
-    bootstrap "^5.2.0"
+    bootstrap "^5.2.1"
     bootstrap-icons "^1.9.1"
     cs-jqtree-contextmenu "0.1.0"
     datatables.net "^1.12.1"
@@ -3255,10 +3255,10 @@ bootstrap-icons@^1.9.1:
   resolved "https://registry.yarnpkg.com/bootstrap-icons/-/bootstrap-icons-1.9.1.tgz#cf22d91a25447645e45c49ebde4e56eafdfe761b"
   integrity sha512-d4ZkO30MIkAhQ2nNRJqKXJVEQorALGbLWTuRxyCTJF96lRIV6imcgMehWGJUiJMJhglN0o2tqLIeDnMdiQEE9g==
 
-bootstrap@^5.2.0:
-  version "5.2.0"
-  resolved "https://registry.yarnpkg.com/bootstrap/-/bootstrap-5.2.0.tgz#838727fb60f1630db370fe57c63cbcf2962bb3d3"
-  integrity sha512-qlnS9GL6YZE6Wnef46GxGv1UpGGzAwO0aPL1yOjzDIJpeApeMvqV24iL+pjr2kU4dduoBA9fINKWKgMToobx9A==
+bootstrap@^5.2.1:
+  version "5.2.1"
+  resolved "https://registry.yarnpkg.com/bootstrap/-/bootstrap-5.2.1.tgz#45f97ff05cbe828bad807b014d8425f3aeb8ec3a"
+  integrity sha512-UQi3v2NpVPEi1n35dmRRzBJFlgvWHYwyem6yHhuT6afYF+sziEt46McRbT//kVXZ7b1YUYEVGdXEH74Nx3xzGA==
 
 boxen@^7.0.0:
   version "7.0.0"
