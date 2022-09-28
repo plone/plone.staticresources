@@ -11,7 +11,7 @@
     "dependencies": {
         "@plone/mockup": "^5.0.0-alpha.22",
         "bootstrap-icons": "^1.9.1",
-        "svg-country-flags": "^1.2.10"
+        "svg-country-flags": "git+https://github.com/hampusborgos/country-flags.git"
     },
     "devDependencies": {
         "@patternslib/dev": "^2.4.0",
