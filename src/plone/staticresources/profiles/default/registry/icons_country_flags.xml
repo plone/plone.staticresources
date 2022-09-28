@@ -56,13 +56,6 @@
   <value key="resource">++plone++country-flag-icons/am.svg</value>
 </record>
 
-<record name="plone.icon.countryflag/an">
-  <field type="plone.registry.field.TextLine">
-    <title>Country Icon Flag netherlands antilles</title>
-  </field>
-  <value key="resource">++plone++country-flag-icons/an.svg</value>
-</record>
-
 <record name="plone.icon.countryflag/ao">
   <field type="plone.registry.field.TextLine">
     <title>Country Icon Flag angola</title>
@@ -303,7 +296,7 @@
 
 <record name="plone.icon.countryflag/cg">
   <field type="plone.registry.field.TextLine">
-    <title>Country Icon Flag congo</title>
+    <title>Country Icon Flag republic of the congo</title>
   </field>
   <value key="resource">++plone++country-flag-icons/cg.svg</value>
 </record>
@@ -345,7 +338,7 @@
 
 <record name="plone.icon.countryflag/cn">
   <field type="plone.registry.field.TextLine">
-    <title>Country Icon Flag china</title>
+    <title>Country Icon Flag china (people's republic of china)</title>
   </field>
   <value key="resource">++plone++country-flag-icons/cn.svg</value>
 </record>
@@ -926,7 +919,7 @@
 
 <record name="plone.icon.countryflag/la">
   <field type="plone.registry.field.TextLine">
-    <title>Country Icon Flag lao people's democratic republic</title>
+    <title>Country Icon Flag laos (lao people's democratic republic)</title>
   </field>
   <value key="resource">++plone++country-flag-icons/la.svg</value>
 </record>
@@ -1052,7 +1045,7 @@
 
 <record name="plone.icon.countryflag/mk">
   <field type="plone.registry.field.TextLine">
-    <title>Country Icon Flag macedonia, the former yugoslav republic of</title>
+    <title>Country Icon Flag north macedonia</title>
   </field>
   <value key="resource">++plone++country-flag-icons/mk.svg</value>
 </record>
@@ -1640,7 +1633,7 @@
 
 <record name="plone.icon.countryflag/tw">
   <field type="plone.registry.field.TextLine">
-    <title>Country Icon Flag taiwan</title>
+    <title>Country Icon Flag taiwan (republic of china)</title>
   </field>
   <value key="resource">++plone++country-flag-icons/tw.svg</value>
 </record>
@@ -1731,7 +1724,7 @@
 
 <record name="plone.icon.countryflag/vn">
   <field type="plone.registry.field.TextLine">
-    <title>Country Icon Flag viet nam</title>
+    <title>Country Icon Flag vietnam</title>
   </field>
   <value key="resource">++plone++country-flag-icons/vn.svg</value>
 </record>
@@ -1750,18 +1743,18 @@
   <value key="resource">++plone++country-flag-icons/wf.svg</value>
 </record>
 
-<record name="plone.icon.countryflag/xk">
-  <field type="plone.registry.field.TextLine">
-    <title>Country Icon Flag kosovo</title>
-  </field>
-  <value key="resource">++plone++country-flag-icons/xk.svg</value>
-</record>
-
 <record name="plone.icon.countryflag/ws">
   <field type="plone.registry.field.TextLine">
     <title>Country Icon Flag samoa</title>
   </field>
   <value key="resource">++plone++country-flag-icons/ws.svg</value>
+</record>
+
+<record name="plone.icon.countryflag/xk">
+  <field type="plone.registry.field.TextLine">
+    <title>Country Icon Flag kosovo</title>
+  </field>
+  <value key="resource">++plone++country-flag-icons/xk.svg</value>
 </record>
 
 <record name="plone.icon.countryflag/ye">
