@@ -8,6 +8,18 @@ Changelog
 
 .. towncrier release notes start
 
+2.0.0b7 (2022-10-03)
+--------------------
+
+New features:
+
+
+- Update Bootstrap 5.2.1
+  [petschki] (#246)
+- Upgrade to Mockup 5.0.0-alpha.23.
+  [thet] (#249)
+
+
 2.0.0b6 (2022-09-09)
 --------------------
 
