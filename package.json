@@ -9,18 +9,13 @@
         "stats": "NODE_ENV=production webpack --config webpack.config.js --json > stats.json"
     },
     "dependencies": {
-        "@plone/mockup": "^5.0.0-alpha.22",
+        "@plone/mockup": "^5.0.0-alpha.23",
         "bootstrap-icons": "^1.9.1",
         "svg-country-flags": "^1.2.10"
     },
     "devDependencies": {
-        "@patternslib/dev": "^2.4.0",
-        "copy-webpack-plugin": "^11.0.0",
-        "webpack": "^5.74.0",
-        "webpack-bundle-analyzer": "^4.5.0",
-        "webpack-cli": "^4.10.0",
-        "whybundled": "^2.0.0",
-        "yarn": "^1.22.18"
+        "@patternslib/dev": "^2.7.2",
+        "copy-webpack-plugin": "^11.0.0"
     },
     "resolutions": {},
     "browserslist": [
