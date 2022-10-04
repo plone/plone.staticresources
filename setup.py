@@ -14,7 +14,7 @@ long_description = "\n\n".join(
 
 setup(
     name="plone.staticresources",
-    version="2.0.0b8.dev0",
+    version="2.0.0b8",
     description="Static resources for Plone",
     long_description=long_description,
     classifiers=[

@@ -8,6 +8,18 @@ Changelog
 
 .. towncrier release notes start
 
+2.0.0b8 (2022-10-04)
+--------------------
+
+New features:
+
+
+- Use successor repository of ``svg-country-flags``
+  [petschki] (#248)
+- Upgrade to Bootstrap 5.2.2.
+  [petschki] (#250)
+
+
 2.0.0b7 (2022-10-03)
 --------------------
 
