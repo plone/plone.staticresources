@@ -2246,9 +2246,9 @@
     url-polyfill "^1.1.9"
     whatwg-fetch "^3.4.0"
 
-"@plone/mockup@git+https://github.com/plone/mockup.git#petschki-recurrence-paging-fix":
+"@plone/mockup@git+https://github.com/plone/mockup.git#petschki-recurrence-weeklyweekdays-fix":
   version "5.0.0-alpha.24"
-  resolved "git+https://github.com/plone/mockup.git#a011ba26cdcd87244015b94d1253d70ffde5cb63"
+  resolved "git+https://github.com/plone/mockup.git#5d288c7fb9e25ee695a9bca0c35460f9259c4a7d"
   dependencies:
     "@patternslib/pat-code-editor" "^3.0.0"
     "@patternslib/patternslib" "9.7.0-alpha.2"
