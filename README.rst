@@ -22,6 +22,9 @@ How to upgrade the resources in this package
 
 4. Run ``make all`` to compile the bundles and map Bootstrap icons to the registry files
    located in ``src/plone/staticresources/profiles/default/registry/icons_*.xml``.
+   NOTE: When you get the following error: ``ModuleNotFoundError: No module named 'lxml'`` you have to
+   install ``lxml`` in your local virtualenv/pyenv in order to generate
+   the icon registry files.
 
 5. Submit a Pull Request and run the tests on Jenkins.
 
