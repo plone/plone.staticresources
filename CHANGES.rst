@@ -8,6 +8,16 @@ Changelog
 
 .. towncrier release notes start
 
+2.0.0b9 (2022-11-14)
+--------------------
+
+New features:
+
+
+- Upgrade Mockup to 5.0.0-alpha.26.
+  [thet] (#251)
+
+
 2.0.0b8 (2022-10-04)
 --------------------
 
