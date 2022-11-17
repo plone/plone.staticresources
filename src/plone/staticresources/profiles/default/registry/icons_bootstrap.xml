@@ -1,6 +1,34 @@
 <?xml version="1.0"?>
 <registry>
 
+  <record name="plone.icon.0-circle-fill">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon 0-circle-fill</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/0-circle-fill.svg</value>
+  </record>
+
+  <record name="plone.icon.0-circle">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon 0-circle</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/0-circle.svg</value>
+  </record>
+
+  <record name="plone.icon.0-square-fill">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon 0-square-fill</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/0-square-fill.svg</value>
+  </record>
+
+  <record name="plone.icon.0-square">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon 0-square</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/0-square.svg</value>
+  </record>
+
   <record name="plone.icon.1-circle-fill">
     <field type="plone.registry.field.TextLine">
       <title>Bootstrap Icon 1-circle-fill</title>
@@ -370,6 +398,13 @@
       <title>Bootstrap Icon alt</title>
     </field>
     <value key="resource">++plone++bootstrap-icons/alt.svg</value>
+  </record>
+
+  <record name="plone.icon.amd">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon amd</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/amd.svg</value>
   </record>
 
   <record name="plone.icon.android">
@@ -2101,6 +2136,153 @@
     <value key="resource">++plone++bootstrap-icons/bug.svg</value>
   </record>
 
+  <record name="plone.icon.building-add">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon building-add</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/building-add.svg</value>
+  </record>
+
+  <record name="plone.icon.building-check">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon building-check</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/building-check.svg</value>
+  </record>
+
+  <record name="plone.icon.building-dash">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon building-dash</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/building-dash.svg</value>
+  </record>
+
+  <record name="plone.icon.building-down">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon building-down</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/building-down.svg</value>
+  </record>
+
+  <record name="plone.icon.building-exclamation">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon building-exclamation</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/building-exclamation.svg</value>
+  </record>
+
+  <record name="plone.icon.building-fill-add">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon building-fill-add</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/building-fill-add.svg</value>
+  </record>
+
+  <record name="plone.icon.building-fill-check">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon building-fill-check</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/building-fill-check.svg</value>
+  </record>
+
+  <record name="plone.icon.building-fill-dash">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon building-fill-dash</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/building-fill-dash.svg</value>
+  </record>
+
+  <record name="plone.icon.building-fill-down">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon building-fill-down</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/building-fill-down.svg</value>
+  </record>
+
+  <record name="plone.icon.building-fill-exclamation">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon building-fill-exclamation</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/building-fill-exclamation.svg</value>
+  </record>
+
+  <record name="plone.icon.building-fill-gear">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon building-fill-gear</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/building-fill-gear.svg</value>
+  </record>
+
+  <record name="plone.icon.building-fill-lock">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon building-fill-lock</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/building-fill-lock.svg</value>
+  </record>
+
+  <record name="plone.icon.building-fill-slash">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon building-fill-slash</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/building-fill-slash.svg</value>
+  </record>
+
+  <record name="plone.icon.building-fill-up">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon building-fill-up</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/building-fill-up.svg</value>
+  </record>
+
+  <record name="plone.icon.building-fill-x">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon building-fill-x</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/building-fill-x.svg</value>
+  </record>
+
+  <record name="plone.icon.building-fill">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon building-fill</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/building-fill.svg</value>
+  </record>
+
+  <record name="plone.icon.building-gear">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon building-gear</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/building-gear.svg</value>
+  </record>
+
+  <record name="plone.icon.building-lock">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon building-lock</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/building-lock.svg</value>
+  </record>
+
+  <record name="plone.icon.building-slash">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon building-slash</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/building-slash.svg</value>
+  </record>
+
+  <record name="plone.icon.building-up">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon building-up</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/building-up.svg</value>
+  </record>
+
+  <record name="plone.icon.building-x">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon building-x</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/building-x.svg</value>
+  </record>
+
   <record name="plone.icon.building">
     <field type="plone.registry.field.TextLine">
       <title>Bootstrap Icon building</title>
@@ -2108,11 +2290,39 @@
     <value key="resource">++plone++bootstrap-icons/building.svg</value>
   </record>
 
+  <record name="plone.icon.buildings-fill">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon buildings-fill</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/buildings-fill.svg</value>
+  </record>
+
+  <record name="plone.icon.buildings">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon buildings</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/buildings.svg</value>
+  </record>
+
   <record name="plone.icon.bullseye">
     <field type="plone.registry.field.TextLine">
       <title>Bootstrap Icon bullseye</title>
     </field>
     <value key="resource">++plone++bootstrap-icons/bullseye.svg</value>
+  </record>
+
+  <record name="plone.icon.bus-front-fill">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon bus-front-fill</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/bus-front-fill.svg</value>
+  </record>
+
+  <record name="plone.icon.bus-front">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon bus-front</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/bus-front.svg</value>
   </record>
 
   <record name="plone.icon.c-circle-fill">
@@ -4446,6 +4656,160 @@
     <value key="resource">++plone++bootstrap-icons/dash.svg</value>
   </record>
 
+  <record name="plone.icon.database-add">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon database-add</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/database-add.svg</value>
+  </record>
+
+  <record name="plone.icon.database-check">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon database-check</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/database-check.svg</value>
+  </record>
+
+  <record name="plone.icon.database-dash">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon database-dash</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/database-dash.svg</value>
+  </record>
+
+  <record name="plone.icon.database-down">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon database-down</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/database-down.svg</value>
+  </record>
+
+  <record name="plone.icon.database-exclamation">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon database-exclamation</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/database-exclamation.svg</value>
+  </record>
+
+  <record name="plone.icon.database-fill-add">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon database-fill-add</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/database-fill-add.svg</value>
+  </record>
+
+  <record name="plone.icon.database-fill-check">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon database-fill-check</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/database-fill-check.svg</value>
+  </record>
+
+  <record name="plone.icon.database-fill-dash">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon database-fill-dash</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/database-fill-dash.svg</value>
+  </record>
+
+  <record name="plone.icon.database-fill-down">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon database-fill-down</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/database-fill-down.svg</value>
+  </record>
+
+  <record name="plone.icon.database-fill-exclamation">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon database-fill-exclamation</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/database-fill-exclamation.svg</value>
+  </record>
+
+  <record name="plone.icon.database-fill-gear">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon database-fill-gear</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/database-fill-gear.svg</value>
+  </record>
+
+  <record name="plone.icon.database-fill-lock">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon database-fill-lock</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/database-fill-lock.svg</value>
+  </record>
+
+  <record name="plone.icon.database-fill-slash">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon database-fill-slash</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/database-fill-slash.svg</value>
+  </record>
+
+  <record name="plone.icon.database-fill-up">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon database-fill-up</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/database-fill-up.svg</value>
+  </record>
+
+  <record name="plone.icon.database-fill-x">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon database-fill-x</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/database-fill-x.svg</value>
+  </record>
+
+  <record name="plone.icon.database-fill">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon database-fill</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/database-fill.svg</value>
+  </record>
+
+  <record name="plone.icon.database-gear">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon database-gear</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/database-gear.svg</value>
+  </record>
+
+  <record name="plone.icon.database-lock">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon database-lock</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/database-lock.svg</value>
+  </record>
+
+  <record name="plone.icon.database-slash">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon database-slash</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/database-slash.svg</value>
+  </record>
+
+  <record name="plone.icon.database-up">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon database-up</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/database-up.svg</value>
+  </record>
+
+  <record name="plone.icon.database-x">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon database-x</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/database-x.svg</value>
+  </record>
+
+  <record name="plone.icon.database">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon database</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/database.svg</value>
+  </record>
+
   <record name="plone.icon.device-hdd-fill">
     <field type="plone.registry.field.TextLine">
       <title>Bootstrap Icon device-hdd-fill</title>
@@ -5027,6 +5391,20 @@
     <value key="resource">++plone++bootstrap-icons/emoji-wink.svg</value>
   </record>
 
+  <record name="plone.icon.envelope-at-fill">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon envelope-at-fill</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/envelope-at-fill.svg</value>
+  </record>
+
+  <record name="plone.icon.envelope-at">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon envelope-at</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/envelope-at.svg</value>
+  </record>
+
   <record name="plone.icon.envelope-check-fill">
     <field type="plone.registry.field.TextLine">
       <title>Bootstrap Icon envelope-check-fill</title>
@@ -5221,6 +5599,20 @@
       <title>Bootstrap Icon ethernet</title>
     </field>
     <value key="resource">++plone++bootstrap-icons/ethernet.svg</value>
+  </record>
+
+  <record name="plone.icon.ev-front-fill">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon ev-front-fill</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/ev-front-fill.svg</value>
+  </record>
+
+  <record name="plone.icon.ev-front">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon ev-front</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/ev-front.svg</value>
   </record>
 
   <record name="plone.icon.ev-station-fill">
@@ -7071,6 +7463,34 @@
     <value key="resource">++plone++bootstrap-icons/github.svg</value>
   </record>
 
+  <record name="plone.icon.globe-americas">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon globe-americas</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/globe-americas.svg</value>
+  </record>
+
+  <record name="plone.icon.globe-asia-australia">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon globe-asia-australia</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/globe-asia-australia.svg</value>
+  </record>
+
+  <record name="plone.icon.globe-central-south-asia">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon globe-central-south-asia</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/globe-central-south-asia.svg</value>
+  </record>
+
+  <record name="plone.icon.globe-europe-africa">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon globe-europe-africa</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/globe-europe-africa.svg</value>
+  </record>
+
   <record name="plone.icon.globe">
     <field type="plone.registry.field.TextLine">
       <title>Bootstrap Icon globe</title>
@@ -7568,6 +7988,48 @@
     <value key="resource">++plone++bootstrap-icons/hourglass.svg</value>
   </record>
 
+  <record name="plone.icon.house-add-fill">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon house-add-fill</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/house-add-fill.svg</value>
+  </record>
+
+  <record name="plone.icon.house-add">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon house-add</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/house-add.svg</value>
+  </record>
+
+  <record name="plone.icon.house-check-fill">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon house-check-fill</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/house-check-fill.svg</value>
+  </record>
+
+  <record name="plone.icon.house-check">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon house-check</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/house-check.svg</value>
+  </record>
+
+  <record name="plone.icon.house-dash-fill">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon house-dash-fill</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/house-dash-fill.svg</value>
+  </record>
+
+  <record name="plone.icon.house-dash">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon house-dash</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/house-dash.svg</value>
+  </record>
+
   <record name="plone.icon.house-door-fill">
     <field type="plone.registry.field.TextLine">
       <title>Bootstrap Icon house-door-fill</title>
@@ -7582,11 +8044,53 @@
     <value key="resource">++plone++bootstrap-icons/house-door.svg</value>
   </record>
 
+  <record name="plone.icon.house-down-fill">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon house-down-fill</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/house-down-fill.svg</value>
+  </record>
+
+  <record name="plone.icon.house-down">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon house-down</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/house-down.svg</value>
+  </record>
+
+  <record name="plone.icon.house-exclamation-fill">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon house-exclamation-fill</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/house-exclamation-fill.svg</value>
+  </record>
+
+  <record name="plone.icon.house-exclamation">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon house-exclamation</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/house-exclamation.svg</value>
+  </record>
+
   <record name="plone.icon.house-fill">
     <field type="plone.registry.field.TextLine">
       <title>Bootstrap Icon house-fill</title>
     </field>
     <value key="resource">++plone++bootstrap-icons/house-fill.svg</value>
+  </record>
+
+  <record name="plone.icon.house-gear-fill">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon house-gear-fill</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/house-gear-fill.svg</value>
+  </record>
+
+  <record name="plone.icon.house-gear">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon house-gear</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/house-gear.svg</value>
   </record>
 
   <record name="plone.icon.house-heart-fill">
@@ -7603,11 +8107,81 @@
     <value key="resource">++plone++bootstrap-icons/house-heart.svg</value>
   </record>
 
+  <record name="plone.icon.house-lock-fill">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon house-lock-fill</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/house-lock-fill.svg</value>
+  </record>
+
+  <record name="plone.icon.house-lock">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon house-lock</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/house-lock.svg</value>
+  </record>
+
+  <record name="plone.icon.house-slash-fill">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon house-slash-fill</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/house-slash-fill.svg</value>
+  </record>
+
+  <record name="plone.icon.house-slash">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon house-slash</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/house-slash.svg</value>
+  </record>
+
+  <record name="plone.icon.house-up-fill">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon house-up-fill</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/house-up-fill.svg</value>
+  </record>
+
+  <record name="plone.icon.house-up">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon house-up</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/house-up.svg</value>
+  </record>
+
+  <record name="plone.icon.house-x-fill">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon house-x-fill</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/house-x-fill.svg</value>
+  </record>
+
+  <record name="plone.icon.house-x">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon house-x</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/house-x.svg</value>
+  </record>
+
   <record name="plone.icon.house">
     <field type="plone.registry.field.TextLine">
       <title>Bootstrap Icon house</title>
     </field>
     <value key="resource">++plone++bootstrap-icons/house.svg</value>
+  </record>
+
+  <record name="plone.icon.houses-fill">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon houses-fill</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/houses-fill.svg</value>
+  </record>
+
+  <record name="plone.icon.houses">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon houses</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/houses.svg</value>
   </record>
 
   <record name="plone.icon.hr">
@@ -8723,6 +9297,13 @@
     <value key="resource">++plone++bootstrap-icons/nut.svg</value>
   </record>
 
+  <record name="plone.icon.nvidia">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon nvidia</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/nvidia.svg</value>
+  </record>
+
   <record name="plone.icon.octagon-fill">
     <field type="plone.registry.field.TextLine">
       <title>Bootstrap Icon octagon-fill</title>
@@ -9101,6 +9682,13 @@
     <value key="resource">++plone++bootstrap-icons/percent.svg</value>
   </record>
 
+  <record name="plone.icon.person-add">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon person-add</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/person-add.svg</value>
+  </record>
+
   <record name="plone.icon.person-badge-fill">
     <field type="plone.registry.field.TextLine">
       <title>Bootstrap Icon person-badge-fill</title>
@@ -9157,11 +9745,102 @@
     <value key="resource">++plone++bootstrap-icons/person-dash.svg</value>
   </record>
 
+  <record name="plone.icon.person-down">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon person-down</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/person-down.svg</value>
+  </record>
+
+  <record name="plone.icon.person-exclamation">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon person-exclamation</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/person-exclamation.svg</value>
+  </record>
+
+  <record name="plone.icon.person-fill-add">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon person-fill-add</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/person-fill-add.svg</value>
+  </record>
+
+  <record name="plone.icon.person-fill-check">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon person-fill-check</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/person-fill-check.svg</value>
+  </record>
+
+  <record name="plone.icon.person-fill-dash">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon person-fill-dash</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/person-fill-dash.svg</value>
+  </record>
+
+  <record name="plone.icon.person-fill-down">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon person-fill-down</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/person-fill-down.svg</value>
+  </record>
+
+  <record name="plone.icon.person-fill-exclamation">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon person-fill-exclamation</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/person-fill-exclamation.svg</value>
+  </record>
+
+  <record name="plone.icon.person-fill-gear">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon person-fill-gear</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/person-fill-gear.svg</value>
+  </record>
+
+  <record name="plone.icon.person-fill-lock">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon person-fill-lock</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/person-fill-lock.svg</value>
+  </record>
+
+  <record name="plone.icon.person-fill-slash">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon person-fill-slash</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/person-fill-slash.svg</value>
+  </record>
+
+  <record name="plone.icon.person-fill-up">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon person-fill-up</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/person-fill-up.svg</value>
+  </record>
+
+  <record name="plone.icon.person-fill-x">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon person-fill-x</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/person-fill-x.svg</value>
+  </record>
+
   <record name="plone.icon.person-fill">
     <field type="plone.registry.field.TextLine">
       <title>Bootstrap Icon person-fill</title>
     </field>
     <value key="resource">++plone++bootstrap-icons/person-fill.svg</value>
+  </record>
+
+  <record name="plone.icon.person-gear">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon person-gear</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/person-gear.svg</value>
   </record>
 
   <record name="plone.icon.person-heart">
@@ -9185,6 +9864,13 @@
     <value key="resource">++plone++bootstrap-icons/person-lines-fill.svg</value>
   </record>
 
+  <record name="plone.icon.person-lock">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon person-lock</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/person-lock.svg</value>
+  </record>
+
   <record name="plone.icon.person-plus-fill">
     <field type="plone.registry.field.TextLine">
       <title>Bootstrap Icon person-plus-fill</title>
@@ -9206,11 +9892,39 @@
     <value key="resource">++plone++bootstrap-icons/person-rolodex.svg</value>
   </record>
 
+  <record name="plone.icon.person-slash">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon person-slash</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/person-slash.svg</value>
+  </record>
+
   <record name="plone.icon.person-square">
     <field type="plone.registry.field.TextLine">
       <title>Bootstrap Icon person-square</title>
     </field>
     <value key="resource">++plone++bootstrap-icons/person-square.svg</value>
+  </record>
+
+  <record name="plone.icon.person-up">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon person-up</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/person-up.svg</value>
+  </record>
+
+  <record name="plone.icon.person-vcard-fill">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon person-vcard-fill</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/person-vcard-fill.svg</value>
+  </record>
+
+  <record name="plone.icon.person-vcard">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon person-vcard</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/person-vcard.svg</value>
   </record>
 
   <record name="plone.icon.person-video">
@@ -9913,6 +10627,13 @@
     <value key="resource">++plone++bootstrap-icons/reddit.svg</value>
   </record>
 
+  <record name="plone.icon.regex">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon regex</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/regex.svg</value>
+  </record>
+
   <record name="plone.icon.repeat-1">
     <field type="plone.registry.field.TextLine">
       <title>Bootstrap Icon repeat-1</title>
@@ -10002,6 +10723,34 @@
       <title>Bootstrap Icon robot</title>
     </field>
     <value key="resource">++plone++bootstrap-icons/robot.svg</value>
+  </record>
+
+  <record name="plone.icon.rocket-fill">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon rocket-fill</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/rocket-fill.svg</value>
+  </record>
+
+  <record name="plone.icon.rocket-takeoff-fill">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon rocket-takeoff-fill</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/rocket-takeoff-fill.svg</value>
+  </record>
+
+  <record name="plone.icon.rocket-takeoff">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon rocket-takeoff</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/rocket-takeoff.svg</value>
+  </record>
+
+  <record name="plone.icon.rocket">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon rocket</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/rocket.svg</value>
   </record>
 
   <record name="plone.icon.router-fill">
@@ -10100,6 +10849,13 @@
       <title>Bootstrap Icon scissors</title>
     </field>
     <value key="resource">++plone++bootstrap-icons/scissors.svg</value>
+  </record>
+
+  <record name="plone.icon.scooter">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon scooter</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/scooter.svg</value>
   </record>
 
   <record name="plone.icon.screwdriver">
@@ -10424,6 +11180,174 @@
     <value key="resource">++plone++bootstrap-icons/shuffle.svg</value>
   </record>
 
+  <record name="plone.icon.sign-dead-end-fill">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon sign-dead-end-fill</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/sign-dead-end-fill.svg</value>
+  </record>
+
+  <record name="plone.icon.sign-dead-end">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon sign-dead-end</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/sign-dead-end.svg</value>
+  </record>
+
+  <record name="plone.icon.sign-do-not-enter-fill">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon sign-do-not-enter-fill</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/sign-do-not-enter-fill.svg</value>
+  </record>
+
+  <record name="plone.icon.sign-do-not-enter">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon sign-do-not-enter</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/sign-do-not-enter.svg</value>
+  </record>
+
+  <record name="plone.icon.sign-intersection-fill">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon sign-intersection-fill</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/sign-intersection-fill.svg</value>
+  </record>
+
+  <record name="plone.icon.sign-intersection-side-fill">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon sign-intersection-side-fill</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/sign-intersection-side-fill.svg</value>
+  </record>
+
+  <record name="plone.icon.sign-intersection-side">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon sign-intersection-side</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/sign-intersection-side.svg</value>
+  </record>
+
+  <record name="plone.icon.sign-intersection-t-fill">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon sign-intersection-t-fill</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/sign-intersection-t-fill.svg</value>
+  </record>
+
+  <record name="plone.icon.sign-intersection-t">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon sign-intersection-t</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/sign-intersection-t.svg</value>
+  </record>
+
+  <record name="plone.icon.sign-intersection-y-fill">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon sign-intersection-y-fill</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/sign-intersection-y-fill.svg</value>
+  </record>
+
+  <record name="plone.icon.sign-intersection-y">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon sign-intersection-y</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/sign-intersection-y.svg</value>
+  </record>
+
+  <record name="plone.icon.sign-intersection">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon sign-intersection</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/sign-intersection.svg</value>
+  </record>
+
+  <record name="plone.icon.sign-merge-left-fill">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon sign-merge-left-fill</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/sign-merge-left-fill.svg</value>
+  </record>
+
+  <record name="plone.icon.sign-merge-left">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon sign-merge-left</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/sign-merge-left.svg</value>
+  </record>
+
+  <record name="plone.icon.sign-merge-right-fill">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon sign-merge-right-fill</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/sign-merge-right-fill.svg</value>
+  </record>
+
+  <record name="plone.icon.sign-merge-right">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon sign-merge-right</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/sign-merge-right.svg</value>
+  </record>
+
+  <record name="plone.icon.sign-no-left-turn-fill">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon sign-no-left-turn-fill</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/sign-no-left-turn-fill.svg</value>
+  </record>
+
+  <record name="plone.icon.sign-no-left-turn">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon sign-no-left-turn</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/sign-no-left-turn.svg</value>
+  </record>
+
+  <record name="plone.icon.sign-no-parking-fill">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon sign-no-parking-fill</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/sign-no-parking-fill.svg</value>
+  </record>
+
+  <record name="plone.icon.sign-no-parking">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon sign-no-parking</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/sign-no-parking.svg</value>
+  </record>
+
+  <record name="plone.icon.sign-no-right-turn-fill">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon sign-no-right-turn-fill</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/sign-no-right-turn-fill.svg</value>
+  </record>
+
+  <record name="plone.icon.sign-no-right-turn">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon sign-no-right-turn</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/sign-no-right-turn.svg</value>
+  </record>
+
+  <record name="plone.icon.sign-railroad-fill">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon sign-railroad-fill</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/sign-railroad-fill.svg</value>
+  </record>
+
+  <record name="plone.icon.sign-railroad">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon sign-railroad</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/sign-railroad.svg</value>
+  </record>
+
   <record name="plone.icon.sign-stop-fill">
     <field type="plone.registry.field.TextLine">
       <title>Bootstrap Icon sign-stop-fill</title>
@@ -10583,6 +11507,13 @@
       <title>Bootstrap Icon sim</title>
     </field>
     <value key="resource">++plone++bootstrap-icons/sim.svg</value>
+  </record>
+
+  <record name="plone.icon.sina-weibo">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon sina-weibo</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/sina-weibo.svg</value>
   </record>
 
   <record name="plone.icon.skip-backward-btn-fill">
@@ -11173,6 +12104,20 @@
     <value key="resource">++plone++bootstrap-icons/strava.svg</value>
   </record>
 
+  <record name="plone.icon.stripe">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon stripe</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/stripe.svg</value>
+  </record>
+
+  <record name="plone.icon.subscript">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon subscript</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/subscript.svg</value>
+  </record>
+
   <record name="plone.icon.subtract">
     <field type="plone.registry.field.TextLine">
       <title>Bootstrap Icon subtract</title>
@@ -11285,6 +12230,13 @@
     <value key="resource">++plone++bootstrap-icons/sunset.svg</value>
   </record>
 
+  <record name="plone.icon.superscript">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon superscript</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/superscript.svg</value>
+  </record>
+
   <record name="plone.icon.symmetry-horizontal">
     <field type="plone.registry.field.TextLine">
       <title>Bootstrap Icon symmetry-horizontal</title>
@@ -11360,6 +12312,20 @@
       <title>Bootstrap Icon tags</title>
     </field>
     <value key="resource">++plone++bootstrap-icons/tags.svg</value>
+  </record>
+
+  <record name="plone.icon.taxi-front-fill">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon taxi-front-fill</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/taxi-front-fill.svg</value>
+  </record>
+
+  <record name="plone.icon.taxi-front">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon taxi-front</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/taxi-front.svg</value>
   </record>
 
   <record name="plone.icon.telegram">
@@ -11467,6 +12433,13 @@
     <value key="resource">++plone++bootstrap-icons/telephone.svg</value>
   </record>
 
+  <record name="plone.icon.tencent-qq">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon tencent-qq</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/tencent-qq.svg</value>
+  </record>
+
   <record name="plone.icon.terminal-dash">
     <field type="plone.registry.field.TextLine">
       <title>Bootstrap Icon terminal-dash</title>
@@ -11549,6 +12522,13 @@
       <title>Bootstrap Icon text-right</title>
     </field>
     <value key="resource">++plone++bootstrap-icons/text-right.svg</value>
+  </record>
+
+  <record name="plone.icon.text-wrap">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon text-wrap</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/text-wrap.svg</value>
   </record>
 
   <record name="plone.icon.textarea-resize">
@@ -11850,6 +12830,13 @@
       <title>Bootstrap Icon tree</title>
     </field>
     <value key="resource">++plone++bootstrap-icons/tree.svg</value>
+  </record>
+
+  <record name="plone.icon.trello">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon trello</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/trello.svg</value>
   </record>
 
   <record name="plone.icon.triangle-fill">
@@ -12452,6 +13439,13 @@
       <title>Bootstrap Icon wifi</title>
     </field>
     <value key="resource">++plone++bootstrap-icons/wifi.svg</value>
+  </record>
+
+  <record name="plone.icon.wikipedia">
+    <field type="plone.registry.field.TextLine">
+      <title>Bootstrap Icon wikipedia</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/wikipedia.svg</value>
   </record>
 
   <record name="plone.icon.wind">
