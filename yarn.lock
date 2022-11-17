@@ -2267,10 +2267,10 @@
     codejar "^3.6.0"
     prismjs "^1.28.0"
 
-"@patternslib/patternslib@9.7.0-alpha.5":
-  version "9.7.0-alpha.5"
-  resolved "https://registry.yarnpkg.com/@patternslib/patternslib/-/patternslib-9.7.0-alpha.5.tgz#1fe363cc73deebee608cc6a19b7540024a74a07e"
-  integrity sha512-hqtpZTCl9WHxiB7TTX3BPbSRJWU1d8Y8WJp42SwtPotth8X73F/r/vV/x1mVFJzk/oQ2vJfVzLAfYg4xmB+NMA==
+"@patternslib/patternslib@9.7.0":
+  version "9.7.0"
+  resolved "https://registry.yarnpkg.com/@patternslib/patternslib/-/patternslib-9.7.0.tgz#8ec17230897ef3065fc323cdb75e497bb3fad5ef"
+  integrity sha512-t29m3k+Wy1AKBQYrXcxmLKwbnwdg4MU0FoyfR++BgcpVexjwbtlj77XTFeHYZm/TG6YYS1/3PMl8OdIiGJW16A==
   dependencies:
     "@fullcalendar/adaptive" "^5.11.3"
     "@fullcalendar/core" "^5.11.3"
@@ -2281,7 +2281,7 @@
     "@fullcalendar/timegrid" "^5.11.3"
     "@juggle/resize-observer" "^3.4.0"
     "@stomp/stompjs" "^6.1.2"
-    dompurify "^2.4.0"
+    dompurify "^2.4.1"
     google-code-prettify "^1.0.5"
     highlight.js "<11"
     imagesloaded "^4.1.4"
@@ -2289,10 +2289,10 @@
     jquery "^3.6.1"
     jquery-jcrop "^0.9.13"
     luxon "2.4.0"
-    marked "^4.1.1"
+    marked "^4.2.2"
     masonry-layout "^4.2.2"
     moment "^2.29.4"
-    moment-timezone "^0.5.38"
+    moment-timezone "^0.5.39"
     photoswipe "^4.1.3"
     pikaday "^1.8.0"
     prettier "^2.7.1"
@@ -2309,17 +2309,17 @@
     url-polyfill "^1.1.9"
     whatwg-fetch "^3.4.0"
 
-"@plone/mockup@^5.0.0-alpha.26":
-  version "5.0.0-alpha.26"
-  resolved "https://registry.yarnpkg.com/@plone/mockup/-/mockup-5.0.0-alpha.26.tgz#41ff201c2fb0fb9b93426bfee1a0cd754dd34055"
-  integrity sha512-fr/AyslPudCid5sAFJ1ks2U2a0KJmCmz1Gx3N+xWiidYuOqbrG4esPcTiNP65plff2hBCH4hx5Pt5FyW8xSK4g==
+"@plone/mockup@^5.0.0-alpha.27":
+  version "5.0.0-alpha.27"
+  resolved "https://registry.yarnpkg.com/@plone/mockup/-/mockup-5.0.0-alpha.27.tgz#8f33445542e8261636c15ae317c2561a44d2bb7a"
+  integrity sha512-b00NEBTn2gxIKyppc8+VCV77l0I7MnxZXSLmm6EAtoS1iD9X4O0jNcKm0VEUkOEM2BNXOxGr6dPB6FHBYfpw6A==
   dependencies:
     "@patternslib/pat-code-editor" "^3.0.0"
-    "@patternslib/patternslib" "9.7.0-alpha.5"
+    "@patternslib/patternslib" "9.7.0"
     backbone "1.4.1"
     backbone.paginator "2.0.8"
     bootstrap "^5.2.2"
-    bootstrap-icons "^1.9.1"
+    bootstrap-icons "^1.10.0"
     cs-jqtree-contextmenu "0.1.0"
     datatables.net "^1.12.1"
     datatables.net-bs5 "^1.12.1"
@@ -3419,10 +3419,10 @@ bonjour-service@^1.0.11:
     fast-deep-equal "^3.1.3"
     multicast-dns "^7.2.4"
 
-bootstrap-icons@^1.9.1:
-  version "1.9.1"
-  resolved "https://registry.yarnpkg.com/bootstrap-icons/-/bootstrap-icons-1.9.1.tgz#cf22d91a25447645e45c49ebde4e56eafdfe761b"
-  integrity sha512-d4ZkO30MIkAhQ2nNRJqKXJVEQorALGbLWTuRxyCTJF96lRIV6imcgMehWGJUiJMJhglN0o2tqLIeDnMdiQEE9g==
+bootstrap-icons@^1.10.0:
+  version "1.10.2"
+  resolved "https://registry.yarnpkg.com/bootstrap-icons/-/bootstrap-icons-1.10.2.tgz#6a5729e0475e007ed82d752225645e4e6fec48d7"
+  integrity sha512-PTPYadRn1AMGr+QTSxe4ZCc+Wzv9DGZxbi3lNse/dajqV31n2/wl/7NX78ZpkvFgRNmH4ogdIQPQmxAfhEV6nA==
 
 bootstrap@^5.2.2:
   version "5.2.2"
@@ -4569,10 +4569,10 @@ domexception@^4.0.0:
   dependencies:
     webidl-conversions "^7.0.0"
 
-dompurify@^2.4.0:
-  version "2.4.0"
-  resolved "https://registry.yarnpkg.com/dompurify/-/dompurify-2.4.0.tgz#c9c88390f024c2823332615c9e20a453cf3825dd"
-  integrity sha512-Be9tbQMZds4a3C6xTmz68NlMfeONA//4dOavl/1rNw50E+/QO0KVpbcU0PcaW0nsQxurXls9ZocqFxk8R2mWEA==
+dompurify@^2.4.1:
+  version "2.4.1"
+  resolved "https://registry.yarnpkg.com/dompurify/-/dompurify-2.4.1.tgz#f9cb1a275fde9af6f2d0a2644ef648dd6847b631"
+  integrity sha512-ewwFzHzrrneRjxzmK6oVz/rZn9VWspGFRDb4/rRtIsM1n36t9AKma/ye8syCpcw+XJ25kOK/hOG7t1j2I2yBqA==
 
 dot-prop@^5.1.0:
   version "5.3.0"
@@ -7209,7 +7209,7 @@ map-obj@^4.0.0:
   resolved "https://registry.yarnpkg.com/map-obj/-/map-obj-4.3.0.tgz#9304f906e93faae70880da102a9f1df0ea8bb05a"
   integrity sha512-hdN1wVrZbb29eBGiGjJbeP8JbKjq1urkHJ/LIP/NY48MZ1QVXUsQBV1G1zvYFHn1XE06cwjBsOI2K3Ulnj1YXQ==
 
-marked@^4.1.1:
+marked@^4.2.2:
   version "4.2.2"
   resolved "https://registry.yarnpkg.com/marked/-/marked-4.2.2.tgz#1d2075ad6cdfe42e651ac221c32d949a26c0672a"
   integrity sha512-JjBTFTAvuTgANXx82a5vzK9JLSMoV6V3LBVn4Uhdso6t7vXrGx7g1Cd2r6NYSsxrYbQGFCMqBDhFHyK5q2UvcQ==
@@ -7369,10 +7369,10 @@ modify-values@^1.0.0:
   resolved "https://registry.yarnpkg.com/modify-values/-/modify-values-1.0.1.tgz#b3939fa605546474e3e3e3c63d64bd43b4ee6022"
   integrity sha512-xV2bxeN6F7oYjZWTe/YPAy6MN2M+sL4u/Rlm2AHCIVGfo2p1yGmBHQ6vHehl4bRTZBdHu3TSkWdYgkwpYzAGSw==
 
-moment-timezone@^0.5.38:
-  version "0.5.38"
-  resolved "https://registry.yarnpkg.com/moment-timezone/-/moment-timezone-0.5.38.tgz#9674a5397b8be7c13de820fd387d8afa0f725aad"
-  integrity sha512-nMIrzGah4+oYZPflDvLZUgoVUO4fvAqHstvG3xAUnMolWncuAiLDWNnJZj6EwJGMGfb1ZcuTFE6GI3hNOVWI/Q==
+moment-timezone@^0.5.39:
+  version "0.5.39"
+  resolved "https://registry.yarnpkg.com/moment-timezone/-/moment-timezone-0.5.39.tgz#342625a3b98810f04c8f4ea917e448d3525e600b"
+  integrity sha512-hoB6suq4ISDj7BDgctiOy6zljBsdYT0++0ZzZm9rtxIvJhIbQ3nmbgSWe7dNFGurl6/7b1OUkHlmN9JWgXVz7w==
   dependencies:
     moment ">= 2.9.0"
 
