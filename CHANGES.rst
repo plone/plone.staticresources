@@ -8,6 +8,16 @@ Changelog
 
 .. towncrier release notes start
 
+2.0.1 (2022-11-18)
+------------------
+
+Bug fixes:
+
+
+- Fix missing upgrade step.
+  [petschki] (#0)
+
+
 2.0.0 (2022-11-18)
 ------------------
 
