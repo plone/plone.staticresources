@@ -2265,10 +2265,9 @@
     url-polyfill "^1.1.9"
     whatwg-fetch "^3.4.0"
 
-"@plone/mockup@^5.0.0-beta.3":
+"@plone/mockup@git+https://github.com/plone/mockup.git#cbd0364c80d5576a7506a50a33f5af1592167c6d":
   version "5.0.0-beta.3"
-  resolved "https://registry.yarnpkg.com/@plone/mockup/-/mockup-5.0.0-beta.3.tgz#307090ef53b83989c8c1656e3473164f526a7485"
-  integrity sha512-BHgwZe3KIjtjNA6q6e1HTlVHct5Kd0DUvVzPOk+1IZIIG73NGbcxT/KCGw53krXufj+K6GzAMR5kbV7vRQnVBg==
+  resolved "git+https://github.com/plone/mockup.git#cbd0364c80d5576a7506a50a33f5af1592167c6d"
   dependencies:
     "@patternslib/pat-code-editor" "^3.0.0"
     "@patternslib/patternslib" "9.7.0"
