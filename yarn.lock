@@ -2265,10 +2265,10 @@
     url-polyfill "^1.1.9"
     whatwg-fetch "^3.4.0"
 
-"@plone/mockup@^5.0.0-beta.3":
-  version "5.0.0-beta.3"
-  resolved "https://registry.yarnpkg.com/@plone/mockup/-/mockup-5.0.0-beta.3.tgz#307090ef53b83989c8c1656e3473164f526a7485"
-  integrity sha512-BHgwZe3KIjtjNA6q6e1HTlVHct5Kd0DUvVzPOk+1IZIIG73NGbcxT/KCGw53krXufj+K6GzAMR5kbV7vRQnVBg==
+"@plone/mockup@^5.0.0-beta.4":
+  version "5.0.0-beta.4"
+  resolved "https://registry.yarnpkg.com/@plone/mockup/-/mockup-5.0.0-beta.4.tgz#dc2a3e4f70e662fe297c838a0823391a119ca224"
+  integrity sha512-LnzcYKkgjT6/qfgcizQtLLVgMkRteaQsV7bmD68F3XBgyC/10fzgmzCVMQjpr4ZWktQs+UZBL7koeJyBx/1t+w==
   dependencies:
     "@patternslib/pat-code-editor" "^3.0.0"
     "@patternslib/patternslib" "9.7.0"
@@ -3373,7 +3373,7 @@ bonjour-service@^1.0.11:
     fast-deep-equal "^3.1.3"
     multicast-dns "^7.2.4"
 
-bootstrap-icons@^1.10.0:
+bootstrap-icons@^1.10.0, bootstrap-icons@^1.10.2:
   version "1.10.2"
   resolved "https://registry.yarnpkg.com/bootstrap-icons/-/bootstrap-icons-1.10.2.tgz#6a5729e0475e007ed82d752225645e4e6fec48d7"
   integrity sha512-PTPYadRn1AMGr+QTSxe4ZCc+Wzv9DGZxbi3lNse/dajqV31n2/wl/7NX78ZpkvFgRNmH4ogdIQPQmxAfhEV6nA==
