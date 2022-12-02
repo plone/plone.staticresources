@@ -8,6 +8,18 @@ Changelog
 
 .. towncrier release notes start
 
+2.0.2 (2022-12-02)
+------------------
+
+Bug fixes:
+
+
+- Upgrade mockup -> 5.0.0-beta.3 (Bootstrap -> 5.2.3).
+  [petschki] (#256)
+- Update mockup -> 5.0.0-beta.4
+  [petschki] (#257)
+
+
 2.0.1 (2022-11-18)
 ------------------
 
