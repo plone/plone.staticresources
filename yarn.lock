@@ -2271,10 +2271,10 @@
     spectrum-colorpicker "^1.8.0"
     tippy.js "^6.3.7"
 
-"@plone/mockup@^5.0.0-beta.6":
-  version "5.0.0-beta.6"
-  resolved "https://registry.yarnpkg.com/@plone/mockup/-/mockup-5.0.0-beta.6.tgz#e1ae45906ea59f42dabfaa55595e73cf02f8f4e6"
-  integrity sha512-A/77sQP8gv18N+rFP5z538XJNKheZAok4hoNN9V5d7cnoMHyZQ3R59M3nO/cgjmUvnU9uU8oof3AVrsP0uwEpw==
+"@plone/mockup@^5.0.0-beta.7":
+  version "5.0.0-beta.7"
+  resolved "https://registry.yarnpkg.com/@plone/mockup/-/mockup-5.0.0-beta.7.tgz#8dc0b2fb2557fe0af4af932fe27f4049c31404d8"
+  integrity sha512-Yy3nqCeg6xcaqqtNGy6q+TZ3028hXVZZ2Tp77+41y8+gSJXRAGqTyqyRtoWJtRIp4mGIMm5yrQWdVLO7dZKBjw==
   dependencies:
     "@patternslib/pat-code-editor" "^4.0.0"
     "@patternslib/patternslib" ">=9.8.0-beta.1"
