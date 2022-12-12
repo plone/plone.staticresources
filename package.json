@@ -14,7 +14,7 @@
         "svg-country-flags": "git+https://github.com/hampusborgos/country-flags.git"
     },
     "devDependencies": {
-        "@patternslib/dev": "^3.1.4",
+        "@patternslib/dev": "^3.1.7",
         "copy-webpack-plugin": "^11.0.0"
     },
     "resolutions": {},
