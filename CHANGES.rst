@@ -8,6 +8,16 @@ Changelog
 
 .. towncrier release notes start
 
+2.0.5 (2023-02-10)
+------------------
+
+Bug fixes:
+
+
+- Update mockup to 5.0.1
+  [petschki, thet] (#262)
+
+
 2.0.4 (2023-01-13)
 ------------------
 
