@@ -1,0 +1,3 @@
+Fix recurrence widget to correctly display time in RDATE rule after changing
+the start time of an event.
+[petschki]
