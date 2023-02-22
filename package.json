@@ -17,7 +17,9 @@
         "@patternslib/dev": "^3.1.10",
         "copy-webpack-plugin": "^11.0.0"
     },
-    "resolutions": {},
+    "resolutions": {
+        "datatables.net": "1.12.1"
+    },
     "browserslist": [
         "defaults"
     ]
