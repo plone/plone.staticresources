@@ -59,5 +59,5 @@ setup(
     plone-register-flags = plone.staticresources._scripts.register_flag_icons:main
     [z3c.autoinclude.plugin]
     target = plone
-    """,  # noqa
+    """,
 )
