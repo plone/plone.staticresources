@@ -8,6 +8,16 @@ Changelog
 
 .. towncrier release notes start
 
+2.1.0 (2023-03-05)
+------------------
+
+New features:
+
+
+- - Upgrade to Mockup 5.1.0-alpha.0 with Bootstrap 5.3 and dark mode support.
+    [toalba, thet] (#1282)
+
+
 2.0.6 (2023-02-22)
 ------------------
 
