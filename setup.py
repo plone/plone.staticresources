@@ -36,7 +36,7 @@ setup(
     author_email="plone-developers@lists.sourceforge.net",
     url="https://github.com/plone/plone.staticresources",
     license="GPL version 2",
-    packages=find_packages("src", exclude=["ez_setup"]),
+    packages=find_packages("src"),
     namespace_packages=["plone"],
     package_dir={"": "src"},
     python_requires=">=3.8",
