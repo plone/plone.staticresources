@@ -1,0 +1,2 @@
+Remove deprecated argument `ez_setup` in `setup.py`.
+[gforcada]
