@@ -8,6 +8,16 @@ Changelog
 
 .. towncrier release notes start
 
+2.0.7 (2023-03-21)
+------------------
+
+Bug fixes:
+
+
+- Upgrade ``mockup==5.0.6``
+  [petschki] (#271)
+
+
 2.0.6 (2023-02-22)
 ------------------
 
