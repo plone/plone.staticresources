@@ -8,6 +8,16 @@ Changelog
 
 .. towncrier release notes start
 
+2.0.8 (2023-03-30)
+------------------
+
+Bug fixes:
+
+
+- Update `mockup==5.0.8`. Fixes `pat-recurrence` UI issues.
+  [petschki] (#272)
+
+
 2.0.7 (2023-03-21)
 ------------------
 
