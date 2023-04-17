@@ -1,5 +1,7 @@
 from lxml import etree
+
 import json
+
 
 FILES = [
     r"../profiles/default/registry/icons_bootstrap.xml",

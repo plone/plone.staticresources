@@ -1,19 +1,23 @@
-<configure xmlns="http://namespaces.zope.org/zope"
-  xmlns:gs="http://namespaces.zope.org/genericsetup">
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:gs="http://namespaces.zope.org/genericsetup"
+    >
 
-  <gs:registerProfile name="202"
-    title="Update bundles"
-    description='Configuration for version 202'
-    directory="profiles/202"
-    for="Products.CMFPlone.interfaces.IMigratingPloneSiteRoot"
-    provides="Products.GenericSetup.interfaces.EXTENSION" />
+  <gs:registerProfile
+      name="202"
+      title="Update bundles"
+      description="Configuration for version 202"
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      for="Products.CMFPlone.interfaces.IMigratingPloneSiteRoot"
+      directory="profiles/202"
+      />
 
   <gs:upgradeDepends
-    source="201"
-    destination="202"
-    profile="plone.staticresources:default"
-    title="Add plone-fontello and glyphicons web font as separate bundles"
-    import_profile="plone.staticresources.upgrades:202"
-    />
+      title="Add plone-fontello and glyphicons web font as separate bundles"
+      profile="plone.staticresources:default"
+      source="201"
+      destination="202"
+      import_profile="plone.staticresources.upgrades:202"
+      />
 
 </configure>

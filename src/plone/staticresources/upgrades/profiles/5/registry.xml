@@ -1,11 +1,15 @@
-<?xml version='1.0' encoding='UTF-8'?>
+<?xml version="1.0" encoding="utf-8"?>
 <registry>
-  <records prefix="plone.resources/plone-datatables" interface='Products.CMFPlone.interfaces.IResourceRegistry'>
+  <records interface="Products.CMFPlone.interfaces.IResourceRegistry"
+           prefix="plone.resources/plone-datatables"
+  >
     <value key="css">
       <element>++plone++static/plone-datatables.less</element>
     </value>
   </records>
-  <records prefix="plone.bundles/plone-datatables" interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+  <records interface="Products.CMFPlone.interfaces.IBundleRegistry"
+           prefix="plone.bundles/plone-datatables"
+  >
     <value key="last_compilation">2020-01-29 15:30:00</value>
   </records>
 </registry>

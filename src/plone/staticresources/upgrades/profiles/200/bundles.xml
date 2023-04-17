@@ -1,11 +1,14 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <registry>
 
-  <records prefix="plone.bundles/plone-legacy"
-            interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+  <records interface="Products.CMFPlone.interfaces.IBundleRegistry"
+           prefix="plone.bundles/plone-legacy"
+  >
     <value key="depends">plone</value>
     <value key="merge_with">default</value>
-    <value key="resources" purge="false">
+    <value key="resources"
+           purge="false"
+    >
       <element>bootstrap-js</element>
     </value>
     <value key="jscompilation">++plone++static/plone-legacy-compiled.js</value>

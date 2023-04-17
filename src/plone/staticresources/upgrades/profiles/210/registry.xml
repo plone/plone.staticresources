@@ -1,11 +1,17 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <registry>
 
-  <records prefix="plone.bundles/jquery" interface="Products.CMFPlone.interfaces.IBundleRegistry" purge="False">
+  <records interface="Products.CMFPlone.interfaces.IBundleRegistry"
+           prefix="plone.bundles/jquery"
+           purge="False"
+  >
     <value key="jscompilation">++plone++static/bundle-plone/jquery-remote.min.js</value>
   </records>
 
-  <records prefix="plone.bundles/bootstrap-js" interface="Products.CMFPlone.interfaces.IBundleRegistry" purge="False">
+  <records interface="Products.CMFPlone.interfaces.IBundleRegistry"
+           prefix="plone.bundles/bootstrap-js"
+           purge="False"
+  >
     <value key="jscompilation">++plone++static/bundle-plone/bootstrap-remote.min.js</value>
   </records>
 
