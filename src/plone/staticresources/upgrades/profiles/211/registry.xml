@@ -1,7 +1,9 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <registry>
 
-  <records prefix="plone.bundles/plone-fullscreen" interface="Products.CMFPlone.interfaces.IBundleRegistry">
+  <records interface="Products.CMFPlone.interfaces.IBundleRegistry"
+           prefix="plone.bundles/plone-fullscreen"
+  >
     <value key="enabled">True</value>
     <value key="jscompilation">++plone++static/plone-fullscreen/fullscreen.js</value>
     <value key="csscompilation">++plone++static/plone-fullscreen/fullscreen.css</value>

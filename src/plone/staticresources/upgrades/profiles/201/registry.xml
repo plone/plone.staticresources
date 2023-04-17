@@ -1,4 +1,7 @@
-<?xml version='1.0' encoding='UTF-8'?>
+<?xml version="1.0" encoding="utf-8"?>
 <registry>
-  <records remove="True" prefix="plone.bundles/resourceregistryt" interface='Products.CMFPlone.interfaces.IBundleRegistry' />
+  <records interface="Products.CMFPlone.interfaces.IBundleRegistry"
+           prefix="plone.bundles/resourceregistryt"
+           remove="True"
+  />
 </registry>

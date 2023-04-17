@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
-import os
 import json
+import os
+
 
 this_dir = os.path.dirname(os.path.realpath(__file__))
 
@@ -8,9 +8,7 @@ this_dir = os.path.dirname(os.path.realpath(__file__))
 DATA_FILE_COUNTRY = "{dir}/../static/icons-country-flags/countries.json".format(
     dir=this_dir
 )
-OUTPUT_FILE_COUNTRY = (
-    "{dir}/../profiles/default/registry/icons_country_flags.xml".format(dir=this_dir)
-)
+OUTPUT_FILE_COUNTRY = f"{this_dir}/../profiles/default/registry/icons_country_flags.xml"
 
 DEFAULT_PATTERN_COUNTRY = """
 <record name="plone.icon.countryflag">
@@ -36,7 +34,7 @@ DATA_FILE_LANGUAGE = "{dir}/../static/icons-language-flags/languages.json".forma
     dir=this_dir
 )
 OUTPUT_FILE_LANGUAGE = (
-    "{dir}/../profiles/default/registry/icons_language_flags.xml".format(dir=this_dir)
+    f"{this_dir}/../profiles/default/registry/icons_language_flags.xml"
 )
 
 DEFAULT_PATTERN_LANGUAGE = """
@@ -59,11 +57,10 @@ PATTERN_LANGUAGE = """
 
 
 def registry_writer(datafile, output, default_pattern, pattern):
-
     entries = []
     entries.append(default_pattern)
 
-    with open(datafile, "r") as countries:
+    with open(datafile) as countries:
         data = countries.read()
         countries_data = json.loads(data)
 
@@ -84,7 +81,6 @@ def registry_writer(datafile, output, default_pattern, pattern):
 
 
 def main():
-
     registry_writer(
         DATA_FILE_COUNTRY, OUTPUT_FILE_COUNTRY, DEFAULT_PATTERN_COUNTRY, PATTERN_COUNTRY
     )

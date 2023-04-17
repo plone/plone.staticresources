@@ -1,31 +1,45 @@
-<?xml version='1.0' encoding='UTF-8'?>
+<?xml version="1.0" encoding="utf-8"?>
 <registry>
-  <records prefix="plone.resources/plone-moment" interface='Products.CMFPlone.interfaces.IResourceRegistry'>
+  <records interface="Products.CMFPlone.interfaces.IResourceRegistry"
+           prefix="plone.resources/plone-moment"
+  >
     <value key="js">++resource++plone-moment.js</value>
   </records>
-  <records prefix="plone.resources/plone-editor-tools" interface='Products.CMFPlone.interfaces.IResourceRegistry'>
+  <records interface="Products.CMFPlone.interfaces.IResourceRegistry"
+           prefix="plone.resources/plone-editor-tools"
+  >
     <value key="js">++resource++plone-editor-tools.js</value>
     <value key="css">
       <element>++plone++static/plone-editor-tools.less</element>
     </value>
   </records>
-  <records prefix="plone.resources/plone-tinymce" interface='Products.CMFPlone.interfaces.IResourceRegistry'>
+  <records interface="Products.CMFPlone.interfaces.IResourceRegistry"
+           prefix="plone.resources/plone-tinymce"
+  >
     <value key="js">++resource++plone-tinymce.js</value>
     <value key="css">
       <element>++plone++static/plone-tinymce.less</element>
     </value>
   </records>
-  <records prefix="plone.resources/plone-datatables" interface='Products.CMFPlone.interfaces.IResourceRegistry'>
+  <records interface="Products.CMFPlone.interfaces.IResourceRegistry"
+           prefix="plone.resources/plone-datatables"
+  >
     <value key="js">++resource++plone-datatables.js</value>
   </records>
 
-  <records prefix="plone.bundles/plone-base" interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+  <records interface="Products.CMFPlone.interfaces.IBundleRegistry"
+           prefix="plone.bundles/plone-base"
+  >
     <value key="last_compilation">2019-10-28 12:36:00</value>
   </records>
 
-  <records prefix="plone.bundles/plone" interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+  <records interface="Products.CMFPlone.interfaces.IBundleRegistry"
+           prefix="plone.bundles/plone"
+  >
     <value key="last_compilation">2019-10-28 12:36:00</value>
-    <value key="stub_js_modules" purge="False">
+    <value key="stub_js_modules"
+           purge="False"
+    >
       <element>jquery.browser</element>
       <element>logging</element>
       <element>mockup-patterns-base</element>
@@ -39,7 +53,9 @@
     </value>
   </records>
 
-  <records prefix="plone.bundles/plone-logged-in" interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+  <records interface="Products.CMFPlone.interfaces.IBundleRegistry"
+           prefix="plone.bundles/plone-logged-in"
+  >
     <value key="last_compilation">2019-10-28 12:36:00</value>
     <value key="stub_js_modules">
       <element>backbone</element>
@@ -72,8 +88,9 @@
     </value>
   </records>
 
-  <records prefix="plone.bundles/plone-moment"
-            interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+  <records interface="Products.CMFPlone.interfaces.IBundleRegistry"
+           prefix="plone.bundles/plone-moment"
+  >
     <value key="depends">plone-base</value>
     <value key="merge_with">default</value>
     <value key="resources">
@@ -100,8 +117,9 @@
     </value>
   </records>
 
-  <records prefix="plone.bundles/plone-editor-tools"
-            interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+  <records interface="Products.CMFPlone.interfaces.IBundleRegistry"
+           prefix="plone.bundles/plone-editor-tools"
+  >
     <value key="depends">plone</value>
     <value key="merge_with">logged-in</value>
     <value key="resources">
@@ -146,8 +164,9 @@
     </value>
   </records>
 
-  <records prefix="plone.bundles/plone-tinymce"
-            interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+  <records interface="Products.CMFPlone.interfaces.IBundleRegistry"
+           prefix="plone.bundles/plone-tinymce"
+  >
     <value key="depends">plone</value>
     <value key="merge_with">logged-in</value>
     <value key="resources">
@@ -192,15 +211,16 @@
     </value>
   </records>
 
-  <records prefix="plone.bundles/plone-datatables"
-            interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+  <records interface="Products.CMFPlone.interfaces.IBundleRegistry"
+           prefix="plone.bundles/plone-datatables"
+  >
     <value key="depends">plone-base</value>
     <value key="merge_with">default</value>
     <value key="resources">
       <element>plone-datatables</element>
     </value>
     <value key="enabled">False</value>
-    <value key="expression"></value>
+    <value key="expression" />
     <value key="jscompilation">++plone++static/plone-datatables-compiled.min.js</value>
     <value key="csscompilation">++plone++static/plone-datatables-compiled.css</value>
     <value key="last_compilation">2019-10-28 12:36:00</value>
@@ -222,7 +242,9 @@
     </value>
   </records>
 
-  <records prefix="plone.bundles/filemanager" interface='Products.CMFPlone.interfaces.IBundleRegistry'>
+  <records interface="Products.CMFPlone.interfaces.IBundleRegistry"
+           prefix="plone.bundles/filemanager"
+  >
     <value key="last_compilation">2019-10-28 12:36:00</value>
   </records>
 

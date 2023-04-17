@@ -1,15 +1,19 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <registry>
 
-  <records prefix="plone.bundles/plone" interface="Products.CMFPlone.interfaces.IBundleRegistry">
+  <records interface="Products.CMFPlone.interfaces.IBundleRegistry"
+           prefix="plone.bundles/plone"
+  >
     <value key="enabled">True</value>
     <value key="jscompilation">++plone++static/bundle-plone/bundle.min.js</value>
-    <value key="csscompilation"></value>
+    <value key="csscompilation" />
     <value key="load_async">False</value>
     <value key="load_defer">False</value>
   </records>
 
-  <records prefix="plone.bundles/plone-fullscreen" interface="Products.CMFPlone.interfaces.IBundleRegistry">
+  <records interface="Products.CMFPlone.interfaces.IBundleRegistry"
+           prefix="plone.bundles/plone-fullscreen"
+  >
     <value key="enabled">True</value>
     <value key="jscompilation">++plone++static/plone-fullscreen/fullscreen.js</value>
     <value key="csscompilation">++plone++static/plone-fullscreen/fullscreen.css</value>

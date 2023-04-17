@@ -7,7 +7,6 @@ import plone.staticresources
 
 
 class PloneStaticresourcesLayer(PloneSandboxLayer):
-
     defaultBases = (PLONE_FIXTURE,)
 
     def setUpZope(self, app, configurationContext):
