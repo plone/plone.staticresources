@@ -42,6 +42,10 @@ profile = "plone"
 [tool.black]
 target-version = ["py38"]
 
+[tool.codespell]
+skip = "*.min.js,*.min.js.map,yarn.lock,*.svg,*.json,*icons_country_flags.xml"
+
+
 [tool.dependencychecker]
 Zope = [
   # Zope own provided namespaces

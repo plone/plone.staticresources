@@ -2,4 +2,7 @@
 # https://github.com/plone/meta/tree/master/config/default
 [meta]
 template = "default"
-commit-id = "812af4e9"
+commit-id = "7032e1d4"
+
+[codespell]
+skip = "*.min.js,*.min.js.map,yarn.lock,*.svg,*.json,*icons_country_flags.xml"
