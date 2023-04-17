@@ -1784,9 +1784,10 @@
     spectrum-colorpicker "^1.8.0"
     tippy.js "^6.3.7"
 
-"@plone/mockup@plone/mockup#master":
-  version "5.1.0-alpha.1"
-  resolved "https://codeload.github.com/plone/mockup/tar.gz/5a5f9591d4dd07d063442f5171fb6706b902efdd"
+"@plone/mockup@^5.1.0-alpha.2":
+  version "5.1.0-alpha.2"
+  resolved "https://registry.yarnpkg.com/@plone/mockup/-/mockup-5.1.0-alpha.2.tgz#69f2103352b2da94f8e8c5cf67ae7fbc9cdbb3bf"
+  integrity sha512-mtyUxSOTk7sHob7DXXti7R0F47gaU83C8pBb2x65MFmGNiibwzk7AXCfoffptmJUt3MsE3OB8PXT/vbKOp0ZMQ==
   dependencies:
     "@patternslib/pat-code-editor" "^4.0.0"
     "@patternslib/patternslib" "^9.8.2"
