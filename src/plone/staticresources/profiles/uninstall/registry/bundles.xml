@@ -1,5 +1,11 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <registry>
-  <records remove="True" prefix="plone.bundles/plone" interface='Products.CMFPlone.interfaces.IBundleRegistry'/>
-  <records remove="True" prefix="plone.bundles/plone-fullscreen" interface='Products.CMFPlone.interfaces.IBundleRegistry'/>
+  <records interface="Products.CMFPlone.interfaces.IBundleRegistry"
+           prefix="plone.bundles/plone"
+           remove="True"
+  />
+  <records interface="Products.CMFPlone.interfaces.IBundleRegistry"
+           prefix="plone.bundles/plone-fullscreen"
+           remove="True"
+  />
 </registry>

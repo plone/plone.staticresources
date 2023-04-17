@@ -1,20 +1,27 @@
-<configure xmlns="http://namespaces.zope.org/zope"
-  xmlns:gs="http://namespaces.zope.org/genericsetup">
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:gs="http://namespaces.zope.org/genericsetup"
+    >
 
-  <gs:registerProfile name="11"
-    title="Update bundles"
-    description='Configuration for version 11'
-    directory="profiles/11"
-    for="Products.CMFPlone.interfaces.IMigratingPloneSiteRoot"
-    provides="Products.GenericSetup.interfaces.EXTENSION" />
+  <gs:registerProfile
+      name="11"
+      title="Update bundles"
+      description="Configuration for version 11"
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      for="Products.CMFPlone.interfaces.IMigratingPloneSiteRoot"
+      directory="profiles/11"
+      />
 
-  <gs:upgradeSteps source="10"
-    destination="11"
-    profile="plone.staticresources:default">
+  <gs:upgradeSteps
+      profile="plone.staticresources:default"
+      source="10"
+      destination="11"
+      >
 
     <gs:upgradeDepends
-      title="Update bundles"
-      import_profile="plone.staticresources.upgrades:11" />
+        title="Update bundles"
+        import_profile="plone.staticresources.upgrades:11"
+        />
 
   </gs:upgradeSteps>
 

@@ -1,9 +1,16 @@
 graft src/plone
 graft docs
 include *.rst
+include .coveragerc
 include .yarnrc
-include package.json
 global-exclude *.pyc
 include pyproject.toml
 recursive-exclude news *
 exclude news
+exclude .prettierrc.json
+exclude Makefile
+exclude babel.config.js
+exclude package.json
+exclude requirements.txt
+exclude webpack.config.js
+exclude yarn.lock

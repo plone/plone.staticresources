@@ -1,8 +1,6 @@
 """Setup tests for this package."""
 from plone.registry.interfaces import IRegistry
-from plone.staticresources.testing import (
-    PLONE_STATICRESOURCES_INTEGRATION_TESTING,
-)
+from plone.staticresources.testing import PLONE_STATICRESOURCES_INTEGRATION_TESTING
 from zope.component import getMultiAdapter
 from zope.component import getUtility
 
@@ -19,7 +17,7 @@ class TestSetup(unittest.TestCase):
         self.portal = self.layer["portal"]
         self.request = self.layer["request"]
         self.installer = getMultiAdapter(
-            (self.portal, self.request), name=u"prefs_install_products_form"
+            (self.portal, self.request), name="prefs_install_products_form"
         )
         self.registry = getUtility(IRegistry)
 
