@@ -8,6 +8,30 @@ Changelog
 
 .. towncrier release notes start
 
+2.1.1 (2023-04-18)
+------------------
+
+New features:
+
+
+- Upgrade to mockup 5.1.0-alpha.2 and Bootstrap Icons 1.10.4 (no resource changed)
+  [petschki] (#277)
+
+
+Bug fixes:
+
+
+- Remove deprecated argument `ez_setup` in `setup.py`.
+  [gforcada] (#1)
+
+
+Internal:
+
+
+- Update configuration files.
+  [plone devs] (7032e1d4)
+
+
 2.1.0 (2023-03-05)
 ------------------
 
