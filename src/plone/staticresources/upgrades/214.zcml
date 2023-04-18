@@ -1,21 +1,27 @@
-<configure xmlns="http://namespaces.zope.org/zope"
-  xmlns:gs="http://namespaces.zope.org/genericsetup">
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:gs="http://namespaces.zope.org/genericsetup"
+    >
 
-  <gs:registerProfile name="214"
-    title="Update svg bootstrap icons"
-    description="Configuration for version 214"
-    directory="profiles/214"
-    for="Products.CMFPlone.interfaces.IMigratingPloneSiteRoot"
-    provides="Products.GenericSetup.interfaces.EXTENSION" />
+  <gs:registerProfile
+      name="214"
+      title="Update svg bootstrap icons"
+      description="Configuration for version 214"
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      for="Products.CMFPlone.interfaces.IMigratingPloneSiteRoot"
+      directory="profiles/214"
+      />
 
   <gs:upgradeSteps
-    source="213"
-    destination="214"
-    profile="plone.staticresources:default">
+      profile="plone.staticresources:default"
+      source="213"
+      destination="214"
+      >
 
     <gs:upgradeDepends
-      title="Update bootstrap icons"
-      import_profile="plone.staticresources.upgrades:214" />
+        title="Update bootstrap icons"
+        import_profile="plone.staticresources.upgrades:214"
+        />
 
   </gs:upgradeSteps>
 
