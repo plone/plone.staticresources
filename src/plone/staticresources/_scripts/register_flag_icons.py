@@ -11,21 +11,21 @@ DATA_FILE_COUNTRY = "{dir}/../static/icons-country-flags/countries.json".format(
 OUTPUT_FILE_COUNTRY = f"{this_dir}/../profiles/default/registry/icons_country_flags.xml"
 
 DEFAULT_PATTERN_COUNTRY = """
-<record name="plone.icon.countryflag">
-  <field type="plone.registry.field.TextLine">
-    <title>Country Icon Flag Default</title>
-  </field>
-  <value key="resource">++plone++bootstrap-icons/flag.svg</value>
-</record>
+  <record name="plone.icon.countryflag">
+    <field type="plone.registry.field.TextLine">
+      <title>Country Icon Flag Default</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/flag.svg</value>
+  </record>
 """
 
 PATTERN_COUNTRY = """
-<record name="plone.icon.countryflag/##KEY##">
-  <field type="plone.registry.field.TextLine">
-    <title>Country Icon Flag ##NAME##</title>
-  </field>
-  <value key="resource">++plone++country-flag-icons/##KEY##.svg</value>
-</record>
+  <record name="plone.icon.countryflag/##KEY##">
+    <field type="plone.registry.field.TextLine">
+      <title>Country Icon Flag ##NAME##</title>
+    </field>
+    <value key="resource">++plone++country-flag-icons/##KEY##.svg</value>
+  </record>
 """
 
 
@@ -38,21 +38,21 @@ OUTPUT_FILE_LANGUAGE = (
 )
 
 DEFAULT_PATTERN_LANGUAGE = """
-<record name="plone.icon.languageflag">
-  <field type="plone.registry.field.TextLine">
-    <title>Language Icon Flag Default</title>
-  </field>
-  <value key="resource">++plone++bootstrap-icons/flag.svg</value>
-</record>
+  <record name="plone.icon.languageflag">
+    <field type="plone.registry.field.TextLine">
+      <title>Language Icon Flag Default</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/flag.svg</value>
+  </record>
 """
 
 PATTERN_LANGUAGE = """
-<record name="plone.icon.languageflag/##KEY##">
-  <field type="plone.registry.field.TextLine">
-    <title>Language Icon Flag ##NAME##</title>
-  </field>
-  <value key="resource">++plone++language-flag-icons/##KEY##.svg</value>
-</record>
+  <record name="plone.icon.languageflag/##KEY##">
+    <field type="plone.registry.field.TextLine">
+      <title>Language Icon Flag ##NAME##</title>
+    </field>
+    <value key="resource">++plone++language-flag-icons/##KEY##.svg</value>
+  </record>
 """
 
 
@@ -73,7 +73,9 @@ def registry_writer(datafile, output, default_pattern, pattern):
     if entries:
         with open(output, "w") as f:
             f.write(
-                '<?xml version="1.0"?>\n<registry>' + "".join(entries) + "\n</registry>"
+                '<?xml version="1.0" encoding="utf-8"?>\n<registry>'
+                + "".join(entries)
+                + "\n</registry>\n"
             )
             f.close()
     print("Done.")

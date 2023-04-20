@@ -8,7 +8,7 @@ OUTPUT_FILE = "{dir}/../profiles/default/registry/icons_bootstrap.xml".format(
     dir=this_dir
 )
 
-registry_template = """<?xml version="1.0"?>
+registry_template = """<?xml version="1.0" encoding="utf-8"?>
 <registry>
 {}
 </registry>
