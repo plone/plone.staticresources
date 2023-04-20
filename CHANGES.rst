@@ -8,6 +8,23 @@ Changelog
 
 .. towncrier release notes start
 
+2.0.10 (2023-04-20)
+-------------------
+
+Bug fixes:
+
+
+- Update `mockup=5.0.10`.
+  [petschki] (#280)
+
+
+Internal:
+
+
+- Update configuration files.
+  [plone devs] (812af4e9)
+
+
 2.0.9 (2023-04-12)
 ------------------
 
