@@ -1,0 +1,5 @@
+Use fixed versions instead of version ranges in package.json.
+
+Since plone.staticresources should contain deterministically reproducible
+builds use fixed versions and not version ranges in package.json. For example
+use `"@plone/mockup": "5.0.11"` instead of `"@plone/mockup": "^5.0.11"`.
