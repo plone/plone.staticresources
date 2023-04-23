@@ -9,12 +9,12 @@
         "stats": "NODE_ENV=production webpack --config webpack.config.js --json > stats.json"
     },
     "dependencies": {
-        "@plone/mockup": "^5.1.0-alpha.2",
+        "@plone/mockup": "^5.1.0-alpha.3",
         "bootstrap-icons": "^1.10.4",
         "svg-country-flags": "git+https://github.com/hampusborgos/country-flags.git"
     },
     "devDependencies": {
-        "@patternslib/dev": "^3.1.10",
+        "@patternslib/dev": "^3.3.1",
         "copy-webpack-plugin": "^11.0.0"
     },
     "resolutions": {
