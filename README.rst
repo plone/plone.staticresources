@@ -20,6 +20,9 @@ How to upgrade the resources in this package
    on `npmjs <https://www.npmjs.org/@plone/mockup>`_.
 
 3. Update dependency versions (eg. new mockup release) in ``package.json`` here.
+   Use `yarn upgrade-interactive --latest` for conveniently update all the versions in package.json at once.
+   Since plone.staticresources should contain deterministically reproducible builds use fixed versions and not version ranges in package.json.
+   For example use `"@plone/mockup": "5.0.11"` instead of `"@plone/mockup": "^5.0.11"`.
 
 4. Run ``make all`` to compile the bundles and map Bootstrap icons to the registry files
    located in ``src/plone/staticresources/profiles/default/registry/icons_*.xml``.
