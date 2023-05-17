@@ -1741,7 +1741,7 @@
     whybundled "^2.0.0"
     yarn "^1.22.19"
 
-"@patternslib/pat-code-editor@^4.0.0":
+"@patternslib/pat-code-editor@4.0.1":
   version "4.0.1"
   resolved "https://registry.yarnpkg.com/@patternslib/pat-code-editor/-/pat-code-editor-4.0.1.tgz#a36681d46dc5eb69da12bbe253873f7dd99057c3"
   integrity sha512-fYReaMlVsUw9uSFOklGoEezVD+rkYd6uiGSLkFk4y2mkTTslKlYDhKBxUkbUEAmUtWFgzRVr3tG4P8AEpRiyQw==
@@ -1749,10 +1749,10 @@
     codejar "^3.6.0"
     highlight.js "<11"
 
-"@patternslib/patternslib@^9.8.3":
-  version "9.8.3"
-  resolved "https://registry.yarnpkg.com/@patternslib/patternslib/-/patternslib-9.8.3.tgz#67122e17174e603f83764929d09a4cf6dc5f98cb"
-  integrity sha512-fjBO1Zvk4bF/DRB+2b+721k5JxazrDo+SmOXawvbhawe/NNge2Kd2SA+IUQ3L4Roia4gVSW/yBWDy3pvZM77BQ==
+"@patternslib/patternslib@9.9.0-beta.1":
+  version "9.9.0-beta.1"
+  resolved "https://registry.yarnpkg.com/@patternslib/patternslib/-/patternslib-9.9.0-beta.1.tgz#d7e35d76a58cb01caf4cdea0e158ff6fc61b73d4"
+  integrity sha512-3rCZA1NP7QNLTv1rKP9ANWdNsqExGgUBAKxotlzqyN/wV+68LuuoIc2/9+z11Z44KUrvA5pSEQAEGmTJwJeJQQ==
   dependencies:
     "@fullcalendar/adaptive" "^5.11.3"
     "@fullcalendar/core" "^5.11.3"
@@ -1762,19 +1762,19 @@
     "@fullcalendar/luxon2" "^5.11.3"
     "@fullcalendar/timegrid" "^5.11.3"
     "@stomp/stompjs" "^7.0.0"
-    dompurify "^3.0.1"
+    dompurify "^3.0.3"
     highlight.js "<11"
     imagesloaded "^4.1.4"
     jquery "^3.6.4"
     jquery-jcrop "^0.9.13"
-    luxon "2.4.0"
-    marked "^4.2.12"
+    luxon "3.3.0"
+    marked "^4.3.0"
     masonry-layout "^4.2.2"
     moment "^2.29.4"
-    moment-timezone "^0.5.41"
+    moment-timezone "^0.5.43"
     photoswipe "^4.1.3"
     pikaday "^1.8.0"
-    prettier "^2.8.4"
+    prettier "^2.8.8"
     screenfull "^6.0.2"
     select2 "^3.5.1"
     showdown "^2.1.0"
@@ -1784,17 +1784,17 @@
     spectrum-colorpicker "^1.8.0"
     tippy.js "^6.3.7"
 
-"@plone/mockup@5.0.11":
-  version "5.0.11"
-  resolved "https://registry.yarnpkg.com/@plone/mockup/-/mockup-5.0.11.tgz#783dc0d39d34c38378fbc75f3d4b42877255ca1e"
-  integrity sha512-ILZXzAmFla5xtiU76xcN4zdKX965/Bx29tEkZMew3p8j5Wc7mF8D+fRUXDJujsqoAE4sWxjW74XPuRn9NStIDg==
+"@plone/mockup@5.0.12":
+  version "5.0.12"
+  resolved "https://registry.yarnpkg.com/@plone/mockup/-/mockup-5.0.12.tgz#f6e2db9355db88ca5eb7156aad90ffc16b4720fd"
+  integrity sha512-hhmvMIs82l7K1sbaKcF7tVx+06wfCU2VYbhEcVcxacDnZdBvaGiHOFafSCsyXNfCkXUIUwcAD/CKKAAQ18QDXg==
   dependencies:
-    "@patternslib/pat-code-editor" "^4.0.0"
-    "@patternslib/patternslib" "^9.8.3"
+    "@patternslib/pat-code-editor" "4.0.1"
+    "@patternslib/patternslib" "9.9.0-beta.1"
     backbone "1.4.1"
     backbone.paginator "2.0.8"
     bootstrap "^5.2.3"
-    bootstrap-icons "^1.10.4"
+    bootstrap-icons "1.10.4"
     cs-jqtree-contextmenu "0.1.0"
     datatables.net "1.12.1"
     datatables.net-bs5 "1.12.1"
@@ -1815,7 +1815,7 @@
     jquery "^3.6.4"
     jquery-form "4.3.0"
     jquery.browser "0.1.0"
-    js-cookie "^3.0.4"
+    js-cookie "^3.0.5"
     select2 "git+https://github.com/ivaynberg/select2.git#3.5.4"
     sortablejs "^1.15.0"
     tinymce "^5.10.7"
@@ -2850,7 +2850,7 @@ bonjour-service@^1.0.11:
     fast-deep-equal "^3.1.3"
     multicast-dns "^7.2.5"
 
-bootstrap-icons@1.10.4, bootstrap-icons@^1.10.4:
+bootstrap-icons@1.10.4:
   version "1.10.4"
   resolved "https://registry.yarnpkg.com/bootstrap-icons/-/bootstrap-icons-1.10.4.tgz#97f991eeb215ba8b63474b5fc508be599f2f7931"
   integrity sha512-eI3HyIUmpGKRiRv15FCZccV+2sreGE2NnmH8mtxV/nPOzQVu0sPEj8HhF1MwjJ31IhjF0rgMvtYOX5VqIzcb/A==
@@ -4007,10 +4007,10 @@ domexception@^4.0.0:
   dependencies:
     webidl-conversions "^7.0.0"
 
-dompurify@^3.0.1:
-  version "3.0.2"
-  resolved "https://registry.yarnpkg.com/dompurify/-/dompurify-3.0.2.tgz#bc4c7c011c825e7704341a285461d8d407d9429a"
-  integrity sha512-B8c6JdiEpxAKnd8Dm++QQxJL4lfuc757scZtcapj6qjTjrQzyq5iAyznLKVvK+77eYNiFblHBlt7MM0fOeqoKw==
+dompurify@^3.0.3:
+  version "3.0.3"
+  resolved "https://registry.yarnpkg.com/dompurify/-/dompurify-3.0.3.tgz#4b115d15a091ddc96f232bcef668550a2f6f1430"
+  integrity sha512-axQ9zieHLnAnHh0sfAamKYiqXMJAVwu+LM/alQ7WDagoWessyWvMSFyW65CqF3owufNu8HBcE4cM2Vflu7YWcQ==
 
 dot-prop@^5.1.0:
   version "5.3.0"
@@ -6241,10 +6241,10 @@ jquery@>=1.7, jquery@>=1.7.2, jquery@^3.6.0, jquery@^3.6.3, jquery@^3.6.4:
   resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.6.4.tgz#ba065c188142100be4833699852bf7c24dc0252f"
   integrity sha512-v28EW9DWDFpzcD9O5iyJXg3R3+q+mET5JhnjJzQUZMHOv67bpSIHq81GEYpPNZHG+XXHsfSme3nxp/hndKEcsQ==
 
-js-cookie@^3.0.4:
-  version "3.0.4"
-  resolved "https://registry.yarnpkg.com/js-cookie/-/js-cookie-3.0.4.tgz#9ae3c5f6eb34d2292d76e0579fabfe7c872e1fae"
-  integrity sha512-tlu5VGqPFMP5eBefnmszCFZkPXG2n527NRN9XdNtN6FZ5n/0e98TdDm8BOz290OIIsxtXb9XTJjfqE6gVhOHQw==
+js-cookie@^3.0.5:
+  version "3.0.5"
+  resolved "https://registry.yarnpkg.com/js-cookie/-/js-cookie-3.0.5.tgz#0b7e2fd0c01552c58ba86e0841f94dc2557dcdbc"
+  integrity sha512-cEiJEAEoIbWfCZYKWhVwFuvPX1gETRYPw6LlaTKoxD3s2AkXzkCjnp6h0V77ozyqj0jakteJ4YqDJT830+lVGw==
 
 js-sdsl@^4.1.4:
   version "4.4.0"
@@ -6602,10 +6602,10 @@ lru-cache@^6.0.0:
   dependencies:
     yallist "^4.0.0"
 
-luxon@2.4.0:
-  version "2.4.0"
-  resolved "https://registry.yarnpkg.com/luxon/-/luxon-2.4.0.tgz#9435806545bb32d4234dab766ab8a3d54847a765"
-  integrity sha512-w+NAwWOUL5hO0SgwOHsMBAmZ15SoknmQXhSO0hIbJCAmPKSsGeK8MlmhYh2w6Iib38IxN2M+/ooXWLbeis7GuA==
+luxon@3.3.0:
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/luxon/-/luxon-3.3.0.tgz#d73ab5b5d2b49a461c47cedbc7e73309b4805b48"
+  integrity sha512-An0UCfG/rSiqtAIiBPO0Y9/zAnHUZxAMiCpTd5h2smgsj7GGmcenvrvww2cqNA8/4A5ZrD1gJpHN2mIHZQF+Mg==
 
 macos-release@^3.1.0:
   version "3.1.0"
@@ -6641,7 +6641,7 @@ map-obj@^4.0.0:
   resolved "https://registry.yarnpkg.com/map-obj/-/map-obj-4.3.0.tgz#9304f906e93faae70880da102a9f1df0ea8bb05a"
   integrity sha512-hdN1wVrZbb29eBGiGjJbeP8JbKjq1urkHJ/LIP/NY48MZ1QVXUsQBV1G1zvYFHn1XE06cwjBsOI2K3Ulnj1YXQ==
 
-marked@^4.2.12:
+marked@^4.3.0:
   version "4.3.0"
   resolved "https://registry.yarnpkg.com/marked/-/marked-4.3.0.tgz#796362821b019f734054582038b116481b456cf3"
   integrity sha512-PRsaiG84bK+AMvxziE/lCFss8juXjNaWzVbN5tXAm4XjeaS9NAHhop+PjQxz2A9h8Q4M/xGmzP8vqNwy6JeK0A==
@@ -6789,7 +6789,7 @@ modify-values@^1.0.0:
   resolved "https://registry.yarnpkg.com/modify-values/-/modify-values-1.0.1.tgz#b3939fa605546474e3e3e3c63d64bd43b4ee6022"
   integrity sha512-xV2bxeN6F7oYjZWTe/YPAy6MN2M+sL4u/Rlm2AHCIVGfo2p1yGmBHQ6vHehl4bRTZBdHu3TSkWdYgkwpYzAGSw==
 
-moment-timezone@^0.5.41:
+moment-timezone@^0.5.43:
   version "0.5.43"
   resolved "https://registry.yarnpkg.com/moment-timezone/-/moment-timezone-0.5.43.tgz#3dd7f3d0c67f78c23cd1906b9b2137a09b3c4790"
   integrity sha512-72j3aNyuIsDxdF1i7CEgV2FfxM1r6aaqJyLB2vwb33mXYyoyLly+F1zbWqhA3/bVIoJ4szlUoMbUnVdid32NUQ==
@@ -7434,10 +7434,15 @@ prelude-ls@~1.1.2:
   resolved "https://registry.yarnpkg.com/prelude-ls/-/prelude-ls-1.1.2.tgz#21932a549f5e52ffd9a827f570e04be62a97da54"
   integrity sha512-ESF23V4SKG6lVSGZgYNpbsiaAkdab6ZgOxe52p7+Kid3W3u3bxR4Vfd/o21dmN7jSt0IwgZ4v5MUd26FEtXE9w==
 
-prettier@^2.8.4, prettier@^2.8.7:
+prettier@^2.8.7:
   version "2.8.7"
   resolved "https://registry.yarnpkg.com/prettier/-/prettier-2.8.7.tgz#bb79fc8729308549d28fe3a98fce73d2c0656450"
   integrity sha512-yPngTo3aXUUmyuTjeTUT75txrf+aMh9FiD7q9ZE/i6r0bPb22g4FsE6Y338PQX1bmfy08i9QQCB7/rcUAVntfw==
+
+prettier@^2.8.8:
+  version "2.8.8"
+  resolved "https://registry.yarnpkg.com/prettier/-/prettier-2.8.8.tgz#e8c5d7e98a4305ffe3de2e1fc4aca1a71c28b1da"
+  integrity sha512-tdN8qQGvNjw4CHbY+XXk0JgCXn9QiF21a55rBe5LJAU+kDyC4WQn4+awm2Xfk2lQMk5fKup9XgzTZtGkjBdP9Q==
 
 pretty-format@^29.5.0:
   version "29.5.0"
