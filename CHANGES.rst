@@ -8,6 +8,25 @@ Changelog
 
 .. towncrier release notes start
 
+2.0.11 (2023-05-17)
+-------------------
+
+Bug fixes:
+
+
+- Upgrade to Mockup 5.0.11 and @patternslib/dev 3.3.1.
+  [thet] (#282)
+- Use fixed versions instead of version ranges in package.json.
+
+  Since plone.staticresources should contain deterministically reproducible
+  builds use fixed versions and not version ranges in package.json. For example
+  use `"@plone/mockup": "5.0.11"` instead of `"@plone/mockup": "^5.0.11"`. (#282)
+- Update bundles interfaces (from CMFPlone to plone.base)
+  [gforcada] (#286)
+- Update Mockup `5.0.12 <https://github.com/plone/mockup/releases/tag/5.0.12>`_
+  [petschki] (#290)
+
+
 2.0.10 (2023-04-20)
 -------------------
 
