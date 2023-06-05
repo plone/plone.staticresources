@@ -8,6 +8,16 @@ Changelog
 
 .. towncrier release notes start
 
+2.1.3 (2023-06-05)
+------------------
+
+New features:
+
+
+- Bootstrap 5.3 final release.
+  [petschki] (#292)
+
+
 2.1.2.1 (2023-05-17)
 --------------------
 
