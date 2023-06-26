@@ -44,13 +44,15 @@ setup(
     zip_safe=False,
     install_requires=[
         "Products.GenericSetup",
+        "lxml",
         "setuptools",
+        "plone.base",
         "plone.resource",
     ],
     extras_require={
         "test": [
             "plone.app.testing",
-            "plone.testing",
+            "plone.registry",
         ],
     },
     entry_points="""
