@@ -1,22 +1,22 @@
 """Installer for the plone.staticresources package."""
 
+from pathlib import Path
 from setuptools import find_packages
 from setuptools import setup
 
 
-long_description = "\n\n".join(
-    [
-        open("README.rst").read(),
-        open("CHANGES.rst").read(),
-    ]
+long_description = (
+    f"{Path('README.rst').read_text()}\n{Path('CHANGES.rst').read_text()}"
 )
-
 
 setup(
     name="plone.staticresources",
     version="2.1.4.dev0",
     description="Static resources for Plone",
     long_description=long_description,
+    long_description_content_type="text/x-rst",
+    # Get more strings from
+    # https://pypi.org/classifiers/
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Environment :: Web Environment",
@@ -44,13 +44,15 @@ setup(
     zip_safe=False,
     install_requires=[
         "Products.GenericSetup",
+        "lxml",
         "setuptools",
+        "plone.base",
         "plone.resource",
     ],
     extras_require={
         "test": [
             "plone.app.testing",
-            "plone.testing",
+            "plone.registry",
         ],
     },
     entry_points="""
