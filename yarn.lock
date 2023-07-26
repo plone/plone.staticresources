@@ -2,6 +2,14 @@
 # yarn lockfile v1
 
 
+"@11ty/eleventy-upgrade-help@2":
+  version "2.0.5"
+  resolved "https://registry.yarnpkg.com/@11ty/eleventy-upgrade-help/-/eleventy-upgrade-help-2.0.5.tgz#2db0a2971aaaf40d5da2d8cfea5b4a15c93433ce"
+  integrity sha512-sIH/ObNN2QDyd9Tqzb4N5gKuhgmq7VDO5o/GNpD+jMwCmMFumUiCoNcpp1tlRonuNp7IAVrXIg6SYDp6aqvQUw==
+  dependencies:
+    chalk "^4.1.1"
+    semver "^7.3.5"
+
 "@ampproject/remapping@^2.2.0":
   version "2.2.1"
   resolved "https://registry.yarnpkg.com/@ampproject/remapping/-/remapping-2.2.1.tgz#99e8e11851128b8702cd57c33684f1d0f260b630"
@@ -1980,16 +1988,17 @@
     spectrum-colorpicker "^1.8.0"
     tippy.js "^6.3.7"
 
-"@plone/mockup@5.1.1":
-  version "5.1.1"
-  resolved "https://registry.yarnpkg.com/@plone/mockup/-/mockup-5.1.1.tgz#36776257384a8db074e31247590f9b98f2959e0d"
-  integrity sha512-owlp/gun2lQaXioX0JaW4PI5PMSwK/iOl1dUVi336Ev9v+TiRp+ws9fySclbv9rWqQDAPQfpIYN7SpA16avkWA==
+"@plone/mockup@5.1.2":
+  version "5.1.2"
+  resolved "https://registry.yarnpkg.com/@plone/mockup/-/mockup-5.1.2.tgz#8ec4e1676987f7121f179cc983dc910edc8e1f89"
+  integrity sha512-09imlokcJ7qDVUMSZFqF7lgJp0hK1oqiRURYN2zOyHbbhCIxT9aDVNNCkRoqHDqLUy+SaHiVT7Vzm1X58LPXXg==
   dependencies:
+    "@11ty/eleventy-upgrade-help" "2"
     "@patternslib/pat-code-editor" "4.0.1"
     "@patternslib/patternslib" "^9.9.4"
     backbone "1.4.1"
     backbone.paginator "2.0.8"
-    bootstrap "5.3.0"
+    bootstrap "5.3.1"
     bootstrap-icons "1.10.5"
     cs-jqtree-contextmenu "0.1.0"
     datatables.net "1.12.1"
@@ -3065,10 +3074,10 @@ bootstrap-icons@1.10.5:
   resolved "https://registry.yarnpkg.com/bootstrap-icons/-/bootstrap-icons-1.10.5.tgz#5a1bbb1bb2212397d416587db1d422cc9501847c"
   integrity sha512-oSX26F37V7QV7NCE53PPEL45d7EGXmBgHG3pDpZvcRaKVzWMqIRL9wcqJUyEha1esFtM3NJzvmxFXDxjJYD0jQ==
 
-bootstrap@5.3.0:
-  version "5.3.0"
-  resolved "https://registry.yarnpkg.com/bootstrap/-/bootstrap-5.3.0.tgz#0718a7cc29040ee8dbf1bd652b896f3436a87c29"
-  integrity sha512-UnBV3E3v4STVNQdms6jSGO2CvOkjUMdDAVR2V5N4uCMdaIkaQjbcEAMqRimDHIs4uqBYzDAKCQwCB+97tJgHQw==
+bootstrap@5.3.1:
+  version "5.3.1"
+  resolved "https://registry.yarnpkg.com/bootstrap/-/bootstrap-5.3.1.tgz#8ca07040ad15d7f75891d1504cf14c5dedfb1cfe"
+  integrity sha512-jzwza3Yagduci2x0rr9MeFSORjcHpt0lRZukZPZQJT1Dth5qzV7XcgGqYzi39KGAVYR8QEDVoO0ubFKOxzMG+g==
 
 boxen@^7.0.0:
   version "7.1.0"
@@ -3240,7 +3249,7 @@ chalk@^2.0.0:
     escape-string-regexp "^1.0.5"
     supports-color "^5.3.0"
 
-chalk@^4.0.0, chalk@^4.1.0:
+chalk@^4.0.0, chalk@^4.1.0, chalk@^4.1.1:
   version "4.1.2"
   resolved "https://registry.yarnpkg.com/chalk/-/chalk-4.1.2.tgz#aac4e2b7734a740867aeb16bf02aad556a1e7a01"
   integrity sha512-oKnbhFyRIXpUuez8iBMmyEa4nbj4IOQyuhc/wy9kY7/WVPcwIO9VA668Pu8RkO7+0G76SLROeyw9CpQ061i4mA==
