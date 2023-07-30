@@ -8,6 +8,16 @@ Changelog
 
 .. towncrier release notes start
 
+2.1.5 (2023-07-30)
+------------------
+
+Bug fixes:
+
+
+- Upgrade various dependencies.
+  [petschki] (#300)
+
+
 2.1.4 (2023-07-26)
 ------------------
 
