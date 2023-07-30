@@ -125,7 +125,6 @@ python-dateutil = ['dateutil']
 #    "gitpython = ['git']",
 #    "pygithub = ['github']",
 #  ]
-#  """
 ##
 
 [tool.check-manifest]
