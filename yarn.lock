@@ -1832,18 +1832,17 @@
     spectrum-colorpicker "^1.8.0"
     tippy.js "^6.3.7"
 
-"@plone/mockup@5.1.4":
+"@plone/mockup@plone/mockup#bs-5.3.2":
   version "5.1.4"
-  resolved "https://registry.yarnpkg.com/@plone/mockup/-/mockup-5.1.4.tgz#c036bd027208160f3800c394c13fa8b424138776"
-  integrity sha512-ZKnNo1KnOxTgUxSHj84lM/No22ppQ3zx/+e9yy4Q72t5ZvFDO0k4U8O3Yo867uJ4vjgiXFmrHWMaGMl4mbi8Cg==
+  resolved "https://codeload.github.com/plone/mockup/tar.gz/f62e8f91c2a6093d04e17b046dc6791367f5130a"
   dependencies:
     "@11ty/eleventy-upgrade-help" "2"
     "@patternslib/pat-code-editor" "4.0.1"
     "@patternslib/patternslib" "^9.9.5"
     backbone "1.4.1"
     backbone.paginator "2.0.8"
-    bootstrap "5.3.1"
-    bootstrap-icons "1.10.5"
+    bootstrap "5.3.2"
+    bootstrap-icons "1.11.1"
     cs-jqtree-contextmenu "0.1.0"
     datatables.net "1.12.1"
     datatables.net-bs5 "1.12.1"
@@ -2945,15 +2944,15 @@ bonjour-service@^1.0.11:
     fast-deep-equal "^3.1.3"
     multicast-dns "^7.2.5"
 
-bootstrap-icons@1.10.5:
-  version "1.10.5"
-  resolved "https://registry.yarnpkg.com/bootstrap-icons/-/bootstrap-icons-1.10.5.tgz#5a1bbb1bb2212397d416587db1d422cc9501847c"
-  integrity sha512-oSX26F37V7QV7NCE53PPEL45d7EGXmBgHG3pDpZvcRaKVzWMqIRL9wcqJUyEha1esFtM3NJzvmxFXDxjJYD0jQ==
+bootstrap-icons@1.11.1:
+  version "1.11.1"
+  resolved "https://registry.yarnpkg.com/bootstrap-icons/-/bootstrap-icons-1.11.1.tgz#79e32494871d8c98e9d14f4bcdc278cee9b1dafd"
+  integrity sha512-F0DDp7nKUX+x/QtpfRZ+XHFya60ng9nfdpdS59vDDfs4Uhuxp7zym/QavMsu/xx51txkoM9eVmpE7D08N35blw==
 
-bootstrap@5.3.1:
-  version "5.3.1"
-  resolved "https://registry.yarnpkg.com/bootstrap/-/bootstrap-5.3.1.tgz#8ca07040ad15d7f75891d1504cf14c5dedfb1cfe"
-  integrity sha512-jzwza3Yagduci2x0rr9MeFSORjcHpt0lRZukZPZQJT1Dth5qzV7XcgGqYzi39KGAVYR8QEDVoO0ubFKOxzMG+g==
+bootstrap@5.3.2:
+  version "5.3.2"
+  resolved "https://registry.yarnpkg.com/bootstrap/-/bootstrap-5.3.2.tgz#97226583f27aae93b2b28ab23f4c114757ff16ae"
+  integrity sha512-D32nmNWiQHo94BKHLmOrdjlL05q1c8oxbtBphQFb9Z5to6eGRDCm0QgeaZ4zFBHzfg2++rqa2JkqCcxDy0sH0g==
 
 boxen@^7.0.0:
   version "7.1.1"
