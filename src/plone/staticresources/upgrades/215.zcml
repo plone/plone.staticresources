@@ -1,0 +1,28 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:gs="http://namespaces.zope.org/genericsetup"
+    >
+
+  <gs:registerProfile
+      name="215"
+      title="Update svg bootstrap icons"
+      description="Configuration for version 214 (Bootstrap icons 1.11.1)"
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      for="Products.CMFPlone.interfaces.IMigratingPloneSiteRoot"
+      directory="profiles/215"
+      />
+
+  <gs:upgradeSteps
+      profile="plone.staticresources:default"
+      source="214"
+      destination="215"
+      >
+
+    <gs:upgradeDepends
+        title="Update bootstrap icons (version 1.11.1)"
+        import_profile="plone.staticresources.upgrades:215"
+        />
+
+  </gs:upgradeSteps>
+
+</configure>
