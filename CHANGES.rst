@@ -8,6 +8,16 @@ Changelog
 
 .. towncrier release notes start
 
+2.2.0a1 (2023-10-24)
+--------------------
+
+New features:
+
+
+- Update TinyMCE to version 6.
+  [petschki] (#307)
+
+
 2.1.7 (2023-09-19)
 ------------------
 
