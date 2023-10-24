@@ -3,6 +3,17 @@ plone.staticresources
 
 This add-on contains Fonts, Icons and JavaScript used by Plone Classic-UI.
 
+Version Information
+-------------------
+
+- Version 2.2.x -> Plone 6.1
+- Version 2.1.x -> Plone 6.0
+- Version 1.x   -> Plone 5.2
+
+Note on Version 2.2.x:
+
+This version introduces TinyMCE 6. It is also compatible with ``Plone>=6.0.7``.
+
 
 How to upgrade the resources in this package
 --------------------------------------------
