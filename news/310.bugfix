@@ -1,0 +1,3 @@
+Fix image/link modals when more than one TinyMCE instance is in the form.
+See https://github.com/plone/mockup/issues/1351
+[petschki]
