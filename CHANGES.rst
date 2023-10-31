@@ -8,6 +8,17 @@ Changelog
 
 .. towncrier release notes start
 
+2.2.0a2 (2023-10-31)
+--------------------
+
+Bug fixes:
+
+
+- Fix image/link modals when more than one TinyMCE instance is in the form.
+  See https://github.com/plone/mockup/issues/1351
+  [petschki] (#310)
+
+
 2.2.0a1 (2023-10-24)
 --------------------
 
