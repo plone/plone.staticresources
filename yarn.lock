@@ -2063,10 +2063,10 @@
     spectrum-colorpicker "^1.8.0"
     tippy.js "^6.3.7"
 
-"@plone/mockup@5.2.0-alpha.1":
-  version "5.2.0-alpha.1"
-  resolved "https://registry.yarnpkg.com/@plone/mockup/-/mockup-5.2.0-alpha.1.tgz#6bfce87844531e9d90b7983885e1ef2f7ea96fb7"
-  integrity sha512-61W5gkiN6uPakyHpFU/jgUFZAMZzBIv3LShmh4dCVgntkzkInB5Zk2hvrBHVpy1PIBC9f5IVVCjjT8FOZs+BXg==
+"@plone/mockup@5.2.0-alpha.2":
+  version "5.2.0-alpha.2"
+  resolved "https://registry.yarnpkg.com/@plone/mockup/-/mockup-5.2.0-alpha.2.tgz#f27ef2074773c7a942fdd8917d35714823d115be"
+  integrity sha512-DxmRt970S3DtPZt09+AtiNwfc6wd+dpLNZyz39tmSOhenBAq/O/1DkGjONCdN59lLN/oMkG3WSf1ybVSD9fG9g==
   dependencies:
     "@11ty/eleventy-upgrade-help" "2"
     "@patternslib/pat-code-editor" "4.0.1"
