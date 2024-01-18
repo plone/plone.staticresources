@@ -10,7 +10,7 @@
     },
     "dependencies": {
         "@plone/mockup": "5.2.0-alpha.3",
-        "bootstrap-icons": "1.11.2",
+        "bootstrap-icons": "1.11.3",
         "svg-country-flags": "git+https://github.com/hampusborgos/country-flags.git"
     },
     "devDependencies": {
