@@ -8,6 +8,17 @@ Changelog
 
 .. towncrier release notes start
 
+2.2.0a4 (2024-01-22)
+--------------------
+
+Bug fixes:
+
+
+- Update Bootstrap Icons -> 1.11.3.
+  Upgrade dependencies.
+  [petschki] (#317)
+
+
 2.2.0a3 (2023-12-12)
 --------------------
 
