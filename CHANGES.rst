@@ -8,6 +8,16 @@ Changelog
 
 .. towncrier release notes start
 
+2.1.7.post0 (2024-02-05)
+------------------------
+
+Bug fixes:
+
+
+- Use final interface locations, otherwise it fails
+  [gforcada]
+
+
 2.1.7 (2023-09-19)
 ------------------
 
