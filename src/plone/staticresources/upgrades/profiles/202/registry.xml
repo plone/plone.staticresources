@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <registry>
 
-  <records interface="Products.CMFPlone.interfaces.IResourceRegistry"
+  <records interface="plone.base.interfaces.resources.IResourceRegistry"
            prefix="plone.resources/plone-fontello"
   >
     <value key="css">
@@ -9,7 +9,7 @@
     </value>
   </records>
 
-  <records interface="Products.CMFPlone.interfaces.IResourceRegistry"
+  <records interface="plone.base.interfaces.resources.IResourceRegistry"
            prefix="plone.resources/plone-glyphicons"
   >
     <value key="css">
@@ -17,7 +17,7 @@
     </value>
   </records>
 
-  <records interface="Products.CMFPlone.interfaces.IBundleRegistry"
+  <records interface="plone.base.interfaces.resources.IBundleRegistry"
            prefix="plone.bundles/plone-fontello"
   >
     <value key="depends">plone</value>
@@ -32,7 +32,7 @@
     <value key="last_compilation">2021-03-17 15:00:00</value>
   </records>
 
-  <records interface="Products.CMFPlone.interfaces.IBundleRegistry"
+  <records interface="plone.base.interfaces.resources.IBundleRegistry"
            prefix="plone.bundles/plone-glyphicons"
   >
     <value key="depends">plone</value>
