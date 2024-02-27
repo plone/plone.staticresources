@@ -1811,10 +1811,9 @@
   resolved "https://registry.yarnpkg.com/@pkgjs/parseargs/-/parseargs-0.11.0.tgz#a77ea742fab25775145434eb1d2328cf5013ac33"
   integrity sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==
 
-"@plone/mockup@5.2.0-alpha.4":
+"@plone/mockup@plone/mockup#tinymce-imagemodal-fix":
   version "5.2.0-alpha.4"
-  resolved "https://registry.yarnpkg.com/@plone/mockup/-/mockup-5.2.0-alpha.4.tgz#24ef7e5f92d6045b7f5e2d020c4522e5ee6ac8d9"
-  integrity sha512-Rx/Ese5yOZf3fZpkKy67W2lsau36bmQNjN44ZrnH0u7SziEp7DSJXL3LAxf5l4loZLNWhKXsZP3uGX9nfhCPxw==
+  resolved "https://codeload.github.com/plone/mockup/tar.gz/d7c1ae7f4992dd0874a64d11ef561f597b2f96db"
   dependencies:
     "@11ty/eleventy-upgrade-help" "2"
     "@patternslib/pat-code-editor" "4.0.1"
