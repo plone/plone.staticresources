@@ -8,6 +8,16 @@ Changelog
 
 .. towncrier release notes start
 
+2.1.12 (2024-02-27)
+-------------------
+
+Bug fixes:
+
+
+- update `mockup=5.1.11`: pat-tinymce image editing fix.
+  [petschki] (#324)
+
+
 2.1.11 (2024-02-26)
 -------------------
 
