@@ -8,6 +8,16 @@ Changelog
 
 .. towncrier release notes start
 
+2.2.0a5 (2024-02-27)
+--------------------
+
+Bug fixes:
+
+
+- Update `mockup=5.2.0-alpha.4`
+  [petschki] (#323)
+
+
 2.2.0a4 (2024-01-22)
 --------------------
 
