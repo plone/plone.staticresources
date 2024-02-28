@@ -8,6 +8,16 @@ Changelog
 
 .. towncrier release notes start
 
+2.1.13 (2024-02-28)
+-------------------
+
+Bug fixes:
+
+
+- Fix `datatables.net` version resolution.
+  [petschki] (#326)
+
+
 2.1.12 (2024-02-27)
 -------------------
 
