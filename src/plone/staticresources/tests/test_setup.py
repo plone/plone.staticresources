@@ -1,4 +1,5 @@
 """Setup tests for this package."""
+
 from plone.registry.interfaces import IRegistry
 from plone.staticresources.testing import PLONE_STATICRESOURCES_INTEGRATION_TESTING
 from zope.component import getMultiAdapter
