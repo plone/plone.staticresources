@@ -8,6 +8,23 @@ Changelog
 
 .. towncrier release notes start
 
+2.1.14 (2024-04-24)
+-------------------
+
+Bug fixes:
+
+
+- Update JS dependencies
+  [petschki] (#0)
+
+
+Internal:
+
+
+- Update configuration files.
+  [plone devs]
+
+
 2.1.13 (2024-02-28)
 -------------------
 
