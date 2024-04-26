@@ -8,6 +8,31 @@ Changelog
 
 .. towncrier release notes start
 
+2.2.0a7 (2024-04-26)
+--------------------
+
+New features:
+
+
+- TinyMCE 7
+
+  Upgrade to TinyMCE 7 without any breaking changes in core Plone.
+  If you have custom TinyMCE plugins, please check with https://www.tiny.cloud/docs/tinymce/latest/migration-from-6x/
+  if you need to upgrade your code.
+  [petschki] (#333)
+
+
+Bug fixes:
+
+
+- Upgrade `mockup==5.2.0-alpha.7`.
+  For more information please see
+  https://github.com/plone/mockup/blob/master/CHANGES.md#520-alpha7-2024-04-25
+  [petschki] (#333)
+- Upgrade JS (dev)dependencies.
+  [petschki] (#334)
+
+
 2.2.0a6 (2024-02-28)
 --------------------
 
