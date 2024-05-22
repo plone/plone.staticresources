@@ -15,7 +15,11 @@
     },
     "devDependencies": {
         "@patternslib/dev": "3.6.1",
-        "copy-webpack-plugin": "11.0.0"
+        "copy-webpack-plugin": "11.0.0",
+        "svelte": "^4.0.5",
+        "svelte-loader": "^3.1.9",
+        "svelte-scrollto": "^0.2.0",
+        "svg-inline-loader": "^0.8.2"
     },
     "resolutions": {
         "datatables.net": "<1.13",
