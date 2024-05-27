@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<registry>
+
+  <record name="plone.icon.plone-rearrange">
+    <field type="plone.registry.field.TextLine">
+      <title>Plone Icon rearrange</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/sort-down-alt.svg</value>
+  </record>
+
+  <record name="plone.icon.plone-selection">
+    <field type="plone.registry.field.TextLine">
+      <title>Plone Icon selection</title>
+    </field>
+    <value key="resource">++plone++bootstrap-icons/list-ul.svg</value>
+  </record>
+
+</registry>
