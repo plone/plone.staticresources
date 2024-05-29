@@ -3,26 +3,12 @@
     xmlns:gs="http://namespaces.zope.org/genericsetup"
     >
 
-  <gs:registerProfile
-      name="216"
-      title="Import PLIP 3211 icon changes"
-      description="Imports plone-rearrange and plone-selection icons for migrated sites"
-      provides="Products.GenericSetup.interfaces.EXTENSION"
-      for="Products.CMFPlone.interfaces.IMigratingPloneSiteRoot"
-      directory="profiles/216"
-      />
-
-  <gs:upgradeSteps
-      profile="plone.staticresources:default"
+  <gs:upgradeStep
       source="215"
       destination="216"
-      >
-
-    <gs:upgradeDepends
-        title="Import plone-rearrange and plone-selection icons"
-        import_profile="plone.staticresources.upgrades:216"
-        />
-
-  </gs:upgradeSteps>
+      title="Import PLIP 3211 icon changes"
+      profile="plone.staticresources:default"
+      handler=".upgrade_v215_to_v216"
+      />
 
 </configure>
