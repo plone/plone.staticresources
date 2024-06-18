@@ -9,15 +9,16 @@
         "stats": "NODE_ENV=production webpack --config webpack.config.js --json > stats.json"
     },
     "dependencies": {
-        "@plone/mockup": "5.2.0-alpha.10",
+        "@plone/mockup": "git+https://github.com/plone/mockup.git#pat-content-browser-upload",
         "bootstrap-icons": "1.11.3",
         "svg-country-flags": "git+https://github.com/hampusborgos/country-flags.git"
     },
     "devDependencies": {
         "@patternslib/dev": "3.6.1",
         "copy-webpack-plugin": "11.0.0",
-        "svelte": "^4.0.5",
-        "svelte-loader": "^3.1.9",
+        "svelte": "^4.2.18",
+        "svelte-keydown": "^0.7.0",
+        "svelte-loader": "^3.2.3",
         "svelte-scrollto": "^0.2.0",
         "svg-inline-loader": "^0.8.2"
     },
