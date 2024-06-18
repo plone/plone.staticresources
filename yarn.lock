@@ -1832,9 +1832,9 @@
   resolved "https://registry.yarnpkg.com/@pkgjs/parseargs/-/parseargs-0.11.0.tgz#a77ea742fab25775145434eb1d2328cf5013ac33"
   integrity sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==
 
-"@plone/mockup@plone/mockup#pat-content-browser-upload":
+"@plone/mockup@git+https://github.com/plone/mockup.git#pat-content-browser-upload":
   version "5.2.0-alpha.7"
-  resolved "https://codeload.github.com/plone/mockup/tar.gz/94f28b91b1ae58617ecc0c89224c3d3051148d07"
+  resolved "git+https://github.com/plone/mockup.git#a93f7736eb0fc622ac9e407905d40dbb053031c4"
   dependencies:
     "@11ty/eleventy-upgrade-help" "2"
     "@patternslib/pat-code-editor" "4.0.1"
@@ -1866,8 +1866,8 @@
     js-cookie "^3.0.5"
     select2 "git+https://github.com/ivaynberg/select2.git#3.5.4"
     sortablejs "^1.15.2"
-    tinymce "^7.0.1"
-    tinymce-i18n "24.3.11"
+    tinymce "^7.1.2"
+    tinymce-i18n "24.6.10"
     underscore "^1.13.6"
 
 "@pnpm/config.env-replace@^1.1.0":
@@ -8791,10 +8791,15 @@ svelte-hmr@^0.14.2:
   resolved "https://registry.yarnpkg.com/svelte-hmr/-/svelte-hmr-0.14.12.tgz#a127aec02f1896500b10148b2d4d21ddde39973f"
   integrity sha512-4QSW/VvXuqVcFZ+RhxiR8/newmwOCTlbYIezvkeN6302YFRE8cXy0naamHcjz8Y9Ce3ITTZtrHrIL0AGfyo61w==
 
-svelte-loader@^3.1.9:
-  version "3.2.0"
-  resolved "https://registry.yarnpkg.com/svelte-loader/-/svelte-loader-3.2.0.tgz#3a84b281ea629ae9d2567ae41a53f0770270e296"
-  integrity sha512-pxsNMC/1JHdQ63M0Zw5cS8dN299nvMiU2ze8yWPLlov/xBNXElEEM22so2q/vJDUyP0ZCrCVMV1d/tlWwxMRLA==
+svelte-keydown@^0.7.0:
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/svelte-keydown/-/svelte-keydown-0.7.0.tgz#4960d1dc1c115db2fd8857e9e4d4eb2a4657174f"
+  integrity sha512-AKl3o0M9eHqpH6H4xA9VPFqp/0P/suBj3jUR19ZnqewQrqq5opd7Vvo06SLg3onpXyqfm8pWbDl2m/yF4pVgMw==
+
+svelte-loader@^3.2.3:
+  version "3.2.3"
+  resolved "https://registry.yarnpkg.com/svelte-loader/-/svelte-loader-3.2.3.tgz#d452ac982c6652edcfe438628b0e72ac9e24d65a"
+  integrity sha512-ntitVuO0EneIlw5Zsn/GNnxu8+KkqbfrsjEGvk7qrd67IA24OBVqY9p0NjUGlpewPxGL3iD4z/8VA+hM9AsZxA==
   dependencies:
     loader-utils "^2.0.4"
     svelte-dev-helper "^1.1.9"
@@ -8812,10 +8817,10 @@ svelte@3.x:
   resolved "https://registry.yarnpkg.com/svelte/-/svelte-3.59.2.tgz#a137b28e025a181292b2ae2e3dca90bf8ec73aec"
   integrity sha512-vzSyuGr3eEoAtT/A6bmajosJZIUWySzY2CzB3w2pgPvnkUjGqlDnsNnA0PMO+mMAhuyMul6C2uuZzY6ELSkzyA==
 
-svelte@^4.0.5:
-  version "4.2.17"
-  resolved "https://registry.yarnpkg.com/svelte/-/svelte-4.2.17.tgz#e8f4d70be8cac6bf4dbfa89ca2fcb1a99445933f"
-  integrity sha512-N7m1YnoXtRf5wya5Gyx3TWuTddI4nAyayyIWFojiWV5IayDYNV5i2mRp/7qNGol4DtxEYxljmrbgp1HM6hUbmQ==
+svelte@^4.2.18:
+  version "4.2.18"
+  resolved "https://registry.yarnpkg.com/svelte/-/svelte-4.2.18.tgz#33dbce74e83eb6dcc54dbea25f9758b1d8e8bb78"
+  integrity sha512-d0FdzYIiAePqRJEb90WlJDkjUEx42xhivxN8muUBmfZnP+tzUgz12DJ2hRJi8sIHCME7jeK1PTMgKPSfTd8JrA==
   dependencies:
     "@ampproject/remapping" "^2.2.1"
     "@jridgewell/sourcemap-codec" "^1.4.15"
@@ -8931,15 +8936,15 @@ timezone-mock@^1.3.6:
   resolved "https://registry.yarnpkg.com/timezone-mock/-/timezone-mock-1.3.6.tgz#44e4c5aeb57e6c07ae630a05c528fc4d9aab86f4"
   integrity sha512-YcloWmZfLD9Li5m2VcobkCDNVaLMx8ohAb/97l/wYS3m+0TIEK5PFNMZZfRcusc6sFjIfxu8qcJT0CNnOdpqmg==
 
-tinymce-i18n@24.3.11:
-  version "24.3.11"
-  resolved "https://registry.yarnpkg.com/tinymce-i18n/-/tinymce-i18n-24.3.11.tgz#499c1c9118dc3d79f294182c0de9da8123c1c7ce"
-  integrity sha512-FH2TSbFwGi2sBejiwT5j+YPlCZ/UDtiWlh/IhcjfExEnYq10eZthTe8n1upk4zl6ICNOr9d37RHkAysM5d8ceg==
+tinymce-i18n@24.6.10:
+  version "24.6.10"
+  resolved "https://registry.yarnpkg.com/tinymce-i18n/-/tinymce-i18n-24.6.10.tgz#3dc5eef09438121b6582c7150b898b6c7832d889"
+  integrity sha512-ep/G6gOwldM6IQQLwofUY7k0sxohYCv9ssjxyJuOtWXSegvgqkL05bHUqP/TEOYqfXZovBEm5AsAXuJ2lKhmoQ==
 
-tinymce@^7.0.1:
-  version "7.0.1"
-  resolved "https://registry.yarnpkg.com/tinymce/-/tinymce-7.0.1.tgz#743f4003027a13497654a5ce5ca74793815386f7"
-  integrity sha512-0a7DJnhniBx2psRuKcVQ9g4hujN6PAR4fPS0NSF1T1luH1RBDZVVEn2pGND6Ly+AW1lUm/cHOHjsasqBelMhbw==
+tinymce@^7.1.2:
+  version "7.1.2"
+  resolved "https://registry.yarnpkg.com/tinymce/-/tinymce-7.1.2.tgz#cb40e527dc03d6a0547a23c91231a946e50dae03"
+  integrity sha512-I/M5WRyEJjwIhyIv6FhkvZS1mWNbb0sIEvDkP8akBnuV1X78mkNhi6Kz9FBBbHzy61U3pmXgzyCSaDZfdQbCSg==
 
 tippy.js@^6.3.7:
   version "6.3.7"
