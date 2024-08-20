@@ -8,6 +8,16 @@ Changelog
 
 .. towncrier release notes start
 
+2.2.0a9 (2024-08-20)
+--------------------
+
+Bug fixes:
+
+
+- Latest `mockup = 5.2.0-alpha.9`. See https://github.com/plone/mockup/releases/tag/5.2.0-alpha.9 for detailed changenotes.
+  [petschki] (#348)
+
+
 2.2.0a8 (2024-07-16)
 --------------------
 
