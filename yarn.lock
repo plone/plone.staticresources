@@ -1992,10 +1992,9 @@
   resolved "https://registry.yarnpkg.com/@pkgjs/parseargs/-/parseargs-0.11.0.tgz#a77ea742fab25775145434eb1d2328cf5013ac33"
   integrity sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==
 
-"@plone/mockup@5.2.0-alpha.9":
+"@plone/mockup@plone/mockup#tinymce_change_event":
   version "5.2.0-alpha.9"
-  resolved "https://registry.yarnpkg.com/@plone/mockup/-/mockup-5.2.0-alpha.9.tgz#5c2e0c06386bbacf309132c3e35657a21895e204"
-  integrity sha512-P6+wzVYQzj/mhXAEFpaAPolji9Z0rrTsIhf3KOUQ9O+HPZe9KYByo6tR0SMwHCa7IHXmdW27ev52rU00zvNw1A==
+  resolved "https://codeload.github.com/plone/mockup/tar.gz/fa37873aacbbd57d97403754dce61bcc07dad2ef"
   dependencies:
     "@11ty/eleventy-upgrade-help" "2"
     "@patternslib/pat-code-editor" "4.0.1"
