@@ -1,6 +1,6 @@
 {
     "name": "plone.staticresources",
-    "version": "2.1.5",
+    "version": "2.1.15",
     "description": "Static resources for Plone",
     "repository": "git@github.com:plone/plone.staticresources.git",
     "license": "BSD-3-Clause",
@@ -9,13 +9,13 @@
         "stats": "NODE_ENV=production webpack --config webpack.config.js --json > stats.json"
     },
     "dependencies": {
-        "@plone/mockup": "5.1.13",
+        "@plone/mockup": "plone/mockup#5.1.x-maintenance",
         "bootstrap-icons": "1.11.3",
         "svg-country-flags": "git+https://github.com/hampusborgos/country-flags.git"
     },
     "devDependencies": {
         "@patternslib/dev": "3.6.1",
-        "copy-webpack-plugin": "11.0.0"
+        "copy-webpack-plugin": "12.0.2"
     },
     "resolutions": {
         "datatables.net": "<1.13",
