@@ -8,6 +8,16 @@ Changelog
 
 .. towncrier release notes start
 
+2.1.16 (2024-09-03)
+-------------------
+
+Bug fixes:
+
+
+- Upgrade dependencies and development resources.
+  [petschki] (#352)
+
+
 2.1.15 (2024-08-20)
 -------------------
 
