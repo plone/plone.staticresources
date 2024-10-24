@@ -8,6 +8,29 @@ Changelog
 
 .. towncrier release notes start
 
+2.2.0a11 (2024-10-24)
+---------------------
+
+New features:
+
+
+- New `pat-contentbrowser` pattern from `mockup==5.2.0-alpha.11`. See https://github.com/plone/mockup/releases/tag/5.2.0-alpha.11 for details.
+  [petschki] (#336)
+
+
+Bug fixes:
+
+
+- Update `mockup==5.2.0-alpha.12` - `mockup==5.2.0-alpha.16`.
+
+  https://github.com/plone/mockup/releases/tag/5.2.0-alpha.12
+  https://github.com/plone/mockup/releases/tag/5.2.0-alpha.13
+  https://github.com/plone/mockup/releases/tag/5.2.0-alpha.15
+  https://github.com/plone/mockup/releases/tag/5.2.0-alpha.16
+
+  [petschki] (#337)
+
+
 2.2.0a10 (2024-08-26)
 ---------------------
 
