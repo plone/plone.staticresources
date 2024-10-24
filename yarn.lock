@@ -1826,10 +1826,10 @@
   resolved "https://registry.yarnpkg.com/@pkgjs/parseargs/-/parseargs-0.11.0.tgz#a77ea742fab25775145434eb1d2328cf5013ac33"
   integrity sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==
 
-"@plone/mockup@5.2.0-alpha.11":
-  version "5.2.0-alpha.11"
-  resolved "https://registry.yarnpkg.com/@plone/mockup/-/mockup-5.2.0-alpha.11.tgz#187630a40237c5a699eedc900bea8bd36b087479"
-  integrity sha512-fFY1c5e84T3L8F5bQZMKu0mfBFXmIuyCQbuHvjBKk8hlr+zgo8E6fstkJo9mQci5+QDbfluA9x4rc59Sc8VrBA==
+"@plone/mockup@5.2.0-alpha.16":
+  version "5.2.0-alpha.16"
+  resolved "https://registry.yarnpkg.com/@plone/mockup/-/mockup-5.2.0-alpha.16.tgz#5bdc1c5fb2e7feff58ee355aac8c15ce9cd0afbb"
+  integrity sha512-toSCOeNHvAc2i3GBPMoD+Jt9LUS3zUic8KRKGzdpr44qUsA4rIOP/qdLG03pxRbfnwkzLyggzJ74C8NFBBJB3Q==
   dependencies:
     "@11ty/eleventy-upgrade-help" "2"
     "@patternslib/pat-code-editor" "4.0.1"
@@ -1855,7 +1855,7 @@
     datatables.net-select "1.4.0"
     datatables.net-select-bs5 "1.4.0"
     dropzone "5.9.3"
-    jqtree "1.8.4"
+    jqtree "1.8.5"
     jquery "^3.7.1"
     jquery-form "4.3.0"
     jquery.browser "0.1.0"
@@ -5915,7 +5915,12 @@ jiti@^1.19.1:
   resolved "https://registry.yarnpkg.com/jiti/-/jiti-1.21.6.tgz#6c7f7398dd4b3142767f9a168af2f317a428d268"
   integrity sha512-2yTgeWTWzMWkHu6Jp9NKgePDaYHbntiwvYuuJLbbN9vl7DC9DvXKOB2BC3ZZ92D3cvV/aflH0osDfwpHepQ53w==
 
-jqtree@1.8.4, jqtree@>=0.16:
+jqtree@1.8.5:
+  version "1.8.5"
+  resolved "https://registry.yarnpkg.com/jqtree/-/jqtree-1.8.5.tgz#cc519ddcecf4e7ca01cea00b2f0ac61d697625b3"
+  integrity sha512-qR9+it1cJ/uUzXu5ikE9qSRVlNLuj/rkJAsgDahLyuckVJdub8r+/ZsrFVVvBwntEuwvG3p76ceDC4oDBpSkbg==
+
+jqtree@>=0.16:
   version "1.8.4"
   resolved "https://registry.yarnpkg.com/jqtree/-/jqtree-1.8.4.tgz#cca57cf91685cad11126ebb75c82ef594bf14495"
   integrity sha512-ZI5pqZ6QDAUv+pSdjtye7029x1ZRi+T0WuiUWB7LPtQUEa17fEZC9KpAt8+jbFwyootRySyRqKbgPr4Ce55idg==
@@ -8227,10 +8232,10 @@ svelte-keydown@^0.7.0:
   resolved "https://registry.yarnpkg.com/svelte-keydown/-/svelte-keydown-0.7.0.tgz#4960d1dc1c115db2fd8857e9e4d4eb2a4657174f"
   integrity sha512-AKl3o0M9eHqpH6H4xA9VPFqp/0P/suBj3jUR19ZnqewQrqq5opd7Vvo06SLg3onpXyqfm8pWbDl2m/yF4pVgMw==
 
-svelte-loader@^3.2.3:
-  version "3.2.3"
-  resolved "https://registry.yarnpkg.com/svelte-loader/-/svelte-loader-3.2.3.tgz#d452ac982c6652edcfe438628b0e72ac9e24d65a"
-  integrity sha512-ntitVuO0EneIlw5Zsn/GNnxu8+KkqbfrsjEGvk7qrd67IA24OBVqY9p0NjUGlpewPxGL3iD4z/8VA+hM9AsZxA==
+svelte-loader@^3.2.4:
+  version "3.2.4"
+  resolved "https://registry.yarnpkg.com/svelte-loader/-/svelte-loader-3.2.4.tgz#0d05ae1f95aec6d480ee86e80e9f756ac419e694"
+  integrity sha512-e0HdDnkYH/MDx4/IfTSka5AOFg9yYJcPuoZJB5x0l60fkHjVjNvrrxr+rJegDG9J7ZymmdHt00/hdLw+QF299w==
   dependencies:
     loader-utils "^2.0.4"
     svelte-dev-helper "^1.1.9"
