@@ -1,0 +1,3 @@
+Fix `pat-contentbrowser` for `CatalogSource` widgets.
+See https://github.com/plone/mockup/releases/tag/5.2.0-beta.1
+[petschki]
