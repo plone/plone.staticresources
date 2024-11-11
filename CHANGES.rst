@@ -8,6 +8,17 @@ Changelog
 
 .. towncrier release notes start
 
+2.2.0b2 (2024-11-11)
+--------------------
+
+Bug fixes:
+
+
+- Fix `pat-contentbrowser` for `CatalogSource` widgets.
+  See https://github.com/plone/mockup/releases/tag/5.2.0-beta.1
+  [petschki] (#359)
+
+
 2.2.0b1 (2024-10-31)
 --------------------
 
