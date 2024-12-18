@@ -8,6 +8,16 @@ Changelog
 
 .. towncrier release notes start
 
+2.1.17 (2024-12-18)
+-------------------
+
+Internal:
+
+
+- Latest `mockup==5.1.15`. See https://github.com/plone/mockup/releases/tag/5.1.15
+  [petschki] (#363)
+
+
 2.1.16 (2024-09-03)
 -------------------
 
