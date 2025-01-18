@@ -1,51 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <registry>
-  <records interface="Products.CMFPlone.interfaces.IBundleRegistry"
+  <records interface="plone.base.interfaces.IBundleRegistry"
            prefix="plone.bundles/plone-base"
   >
     <value key="last_compilation">2020-07-05 18:00:00</value>
   </records>
-  <records interface="Products.CMFPlone.interfaces.IBundleRegistry"
+  <records interface="plone.base.interfaces.IBundleRegistry"
            prefix="plone.bundles/plone"
   >
     <value key="last_compilation">2020-07-05 18:00:00</value>
   </records>
-  <records interface="Products.CMFPlone.interfaces.IBundleRegistry"
+  <records interface="plone.base.interfaces.IBundleRegistry"
            prefix="plone.bundles/plone-logged-in"
   >
     <value key="last_compilation">2020-07-05 18:00:00</value>
   </records>
-  <records interface="Products.CMFPlone.interfaces.IBundleRegistry"
+  <records interface="plone.base.interfaces.IBundleRegistry"
            prefix="plone.bundles/plone-datatables"
   >
     <value key="last_compilation">2020-07-05 18:00:00</value>
   </records>
-  <records interface="Products.CMFPlone.interfaces.IBundleRegistry"
+  <records interface="plone.base.interfaces.IBundleRegistry"
            prefix="plone.bundles/plone-editor-tools"
   >
     <value key="last_compilation">2020-07-05 18:00:00</value>
   </records>
-  <records interface="Products.CMFPlone.interfaces.IBundleRegistry"
+  <records interface="plone.base.interfaces.IBundleRegistry"
            prefix="plone.bundles/plone-moment"
   >
     <value key="last_compilation">2020-07-05 18:00:00</value>
   </records>
-  <records interface="Products.CMFPlone.interfaces.IBundleRegistry"
+  <records interface="plone.base.interfaces.IBundleRegistry"
            prefix="plone.bundles/plone-tinymce"
   >
     <value key="last_compilation">2020-07-05 18:00:00</value>
   </records>
-  <records interface="Products.CMFPlone.interfaces.IBundleRegistry"
+  <records interface="plone.base.interfaces.IBundleRegistry"
            prefix="plone.bundles/resourceregistry"
   >
     <value key="last_compilation">2020-07-05 18:00:00</value>
   </records>
-  <records interface="Products.CMFPlone.interfaces.IBundleRegistry"
+  <records interface="plone.base.interfaces.IBundleRegistry"
            prefix="plone.bundles/thememapper"
   >
     <value key="last_compilation">2020-07-05 18:00:00</value>
   </records>
-  <records interface="Products.CMFPlone.interfaces.IBundleRegistry"
+  <records interface="plone.base.interfaces.IBundleRegistry"
            prefix="plone.bundles/filemanager"
   >
     <value key="last_compilation">2020-07-05 18:00:00</value>

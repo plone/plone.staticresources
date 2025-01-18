@@ -8,7 +8,7 @@
       title="Add image fullscreen support"
       description="Configuration for version 211"
       provides="Products.GenericSetup.interfaces.EXTENSION"
-      for="Products.CMFPlone.interfaces.IMigratingPloneSiteRoot"
+      for="plone.base.interfaces.IMigratingPloneSiteRoot"
       directory="profiles/211"
       />
 
