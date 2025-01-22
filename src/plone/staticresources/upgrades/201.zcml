@@ -8,7 +8,7 @@
       title="Update bundles"
       description="Configuration for version 201"
       provides="Products.GenericSetup.interfaces.EXTENSION"
-      for="Products.CMFPlone.interfaces.IMigratingPloneSiteRoot"
+      for="plone.base.interfaces.IMigratingPloneSiteRoot"
       directory="profiles/201"
       />
 

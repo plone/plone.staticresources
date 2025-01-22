@@ -6,42 +6,42 @@
     </field>
     <value>++plone++static/components/requirejs/bin/r.js</value>
   </record>
-  <records interface="Products.CMFPlone.interfaces.IResourceRegistry"
+  <records interface="plone.base.interfaces.IResourceRegistry"
            prefix="plone.resources/jquery.form"
   >
     <value key="js">++plone++static/components/jquery-form/src/jquery.form.js</value>
   </records>
-  <records interface="Products.CMFPlone.interfaces.IBundleRegistry"
+  <records interface="plone.base.interfaces.IBundleRegistry"
            prefix="plone.bundles/filemanager"
   >
     <value key="last_compilation">2019-10-27 10:00:00</value>
   </records>
-  <records interface="Products.CMFPlone.interfaces.IBundleRegistry"
+  <records interface="plone.base.interfaces.IBundleRegistry"
            prefix="plone.bundles/plone"
   >
     <value key="last_compilation">2019-10-27 10:00:00</value>
   </records>
-  <records interface="Products.CMFPlone.interfaces.IBundleRegistry"
+  <records interface="plone.base.interfaces.IBundleRegistry"
            prefix="plone.bundles/plone-base"
   >
     <value key="last_compilation">2019-10-27 10:00:00</value>
   </records>
-  <records interface="Products.CMFPlone.interfaces.IBundleRegistry"
+  <records interface="plone.base.interfaces.IBundleRegistry"
            prefix="plone.bundles/plone-legacy"
   >
     <value key="last_compilation">2019-10-27 10:00:00</value>
   </records>
-  <records interface="Products.CMFPlone.interfaces.IBundleRegistry"
+  <records interface="plone.base.interfaces.IBundleRegistry"
            prefix="plone.bundles/plone-logged-in"
   >
     <value key="last_compilation">2019-10-27 10:00:00</value>
   </records>
-  <records interface="Products.CMFPlone.interfaces.IBundleRegistry"
+  <records interface="plone.base.interfaces.IBundleRegistry"
            prefix="plone.bundles/resourceregistry"
   >
     <value key="last_compilation">2019-10-27 10:00:00</value>
   </records>
-  <records interface="Products.CMFPlone.interfaces.IBundleRegistry"
+  <records interface="plone.base.interfaces.IBundleRegistry"
            prefix="plone.bundles/thememapper"
   >
     <value key="last_compilation">2019-10-27 10:00:00</value>

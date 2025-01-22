@@ -50,11 +50,14 @@ setup(
         "setuptools",
         "plone.base",
         "plone.resource",
+        "zope.i18nmessageid",
+        "zope.interface",
     ],
     extras_require={
         "test": [
             "plone.app.testing",
             "plone.registry",
+            "zope.component",
         ],
     },
     entry_points="""

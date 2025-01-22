@@ -8,7 +8,7 @@
       title="Update Bundles"
       description="Configuration for version 2"
       provides="Products.GenericSetup.interfaces.EXTENSION"
-      for="Products.CMFPlone.interfaces.IMigratingPloneSiteRoot"
+      for="plone.base.interfaces.IMigratingPloneSiteRoot"
       directory="profiles/2"
       />
 

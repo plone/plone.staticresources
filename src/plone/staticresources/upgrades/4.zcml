@@ -8,7 +8,7 @@
       title="Change r.js and less.js paths for TTW compilation"
       description="Configuration for version 4"
       provides="Products.GenericSetup.interfaces.EXTENSION"
-      for="Products.CMFPlone.interfaces.IMigratingPloneSiteRoot"
+      for="plone.base.interfaces.IMigratingPloneSiteRoot"
       directory="profiles/4"
       />
 

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <registry>
-  <records interface="Products.CMFPlone.interfaces.IResourceRegistry"
+  <records interface="plone.base.interfaces.IResourceRegistry"
            prefix="plone.resources/plone-moment"
   >
     <value key="js">++resource++plone-moment.js</value>
   </records>
-  <records interface="Products.CMFPlone.interfaces.IResourceRegistry"
+  <records interface="plone.base.interfaces.IResourceRegistry"
            prefix="plone.resources/plone-editor-tools"
   >
     <value key="js">++resource++plone-editor-tools.js</value>
@@ -13,7 +13,7 @@
       <element>++plone++static/plone-editor-tools.less</element>
     </value>
   </records>
-  <records interface="Products.CMFPlone.interfaces.IResourceRegistry"
+  <records interface="plone.base.interfaces.IResourceRegistry"
            prefix="plone.resources/plone-tinymce"
   >
     <value key="js">++resource++plone-tinymce.js</value>
@@ -21,19 +21,19 @@
       <element>++plone++static/plone-tinymce.less</element>
     </value>
   </records>
-  <records interface="Products.CMFPlone.interfaces.IResourceRegistry"
+  <records interface="plone.base.interfaces.IResourceRegistry"
            prefix="plone.resources/plone-datatables"
   >
     <value key="js">++resource++plone-datatables.js</value>
   </records>
 
-  <records interface="Products.CMFPlone.interfaces.IBundleRegistry"
+  <records interface="plone.base.interfaces.IBundleRegistry"
            prefix="plone.bundles/plone-base"
   >
     <value key="last_compilation">2019-10-28 12:36:00</value>
   </records>
 
-  <records interface="Products.CMFPlone.interfaces.IBundleRegistry"
+  <records interface="plone.base.interfaces.IBundleRegistry"
            prefix="plone.bundles/plone"
   >
     <value key="last_compilation">2019-10-28 12:36:00</value>
@@ -53,7 +53,7 @@
     </value>
   </records>
 
-  <records interface="Products.CMFPlone.interfaces.IBundleRegistry"
+  <records interface="plone.base.interfaces.IBundleRegistry"
            prefix="plone.bundles/plone-logged-in"
   >
     <value key="last_compilation">2019-10-28 12:36:00</value>
@@ -88,7 +88,7 @@
     </value>
   </records>
 
-  <records interface="Products.CMFPlone.interfaces.IBundleRegistry"
+  <records interface="plone.base.interfaces.IBundleRegistry"
            prefix="plone.bundles/plone-moment"
   >
     <value key="depends">plone-base</value>
@@ -117,7 +117,7 @@
     </value>
   </records>
 
-  <records interface="Products.CMFPlone.interfaces.IBundleRegistry"
+  <records interface="plone.base.interfaces.IBundleRegistry"
            prefix="plone.bundles/plone-editor-tools"
   >
     <value key="depends">plone</value>
@@ -164,7 +164,7 @@
     </value>
   </records>
 
-  <records interface="Products.CMFPlone.interfaces.IBundleRegistry"
+  <records interface="plone.base.interfaces.IBundleRegistry"
            prefix="plone.bundles/plone-tinymce"
   >
     <value key="depends">plone</value>
@@ -211,7 +211,7 @@
     </value>
   </records>
 
-  <records interface="Products.CMFPlone.interfaces.IBundleRegistry"
+  <records interface="plone.base.interfaces.IBundleRegistry"
            prefix="plone.bundles/plone-datatables"
   >
     <value key="depends">plone-base</value>
@@ -242,7 +242,7 @@
     </value>
   </records>
 
-  <records interface="Products.CMFPlone.interfaces.IBundleRegistry"
+  <records interface="plone.base.interfaces.IBundleRegistry"
            prefix="plone.bundles/filemanager"
   >
     <value key="last_compilation">2019-10-28 12:36:00</value>
