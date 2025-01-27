@@ -1528,7 +1528,7 @@
 
   <record name="plone.icon.countryflag/sz">
     <field type="plone.registry.field.TextLine">
-      <title>Country Icon Flag swaziland</title>
+      <title>Country Icon Flag kingdom of eswatini</title>
     </field>
     <value key="resource">++plone++country-flag-icons/sz.svg</value>
   </record>
@@ -1612,7 +1612,7 @@
 
   <record name="plone.icon.countryflag/tr">
     <field type="plone.registry.field.TextLine">
-      <title>Country Icon Flag turkey</title>
+      <title>Country Icon Flag republic of türkiye</title>
     </field>
     <value key="resource">++plone++country-flag-icons/tr.svg</value>
   </record>
