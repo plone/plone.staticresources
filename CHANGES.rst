@@ -8,6 +8,24 @@ Changelog
 
 .. towncrier release notes start
 
+2.2.0b4 (2025-01-27)
+--------------------
+
+Bug fixes:
+
+
+- Fix TinyMCE Link/Image modal in inline mode. (mockup==5.2.0-beta.3)
+  [petschki] (#364)
+- Update `mockup=5.2.0-beta.4`: (See https://github.com/plone/mockup/releases/tag/5.2.0-beta.4)
+
+  TinyMCE - 7.6.1
+
+  `pat-contentbrowser` - Fix horizontal column scrolling when deeply nested folders.
+
+  [petschki] (#367)
+- Fix DeprecationWarnings. [maurits] (#4090)
+
+
 2.2.0b3 (2024-12-18)
 --------------------
 
