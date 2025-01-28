@@ -8,6 +8,16 @@ Changelog
 
 .. towncrier release notes start
 
+2.2.0b5 (2025-01-28)
+--------------------
+
+Bug fixes:
+
+
+- Update `mockup=5.2.0-beta.5`. See https://github.com/plone/mockup/releases/tag/5.2.0-beta.5
+  [petschki] (#368)
+
+
 2.2.0b4 (2025-01-27)
 --------------------
 
