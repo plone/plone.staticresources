@@ -1850,10 +1850,10 @@
   resolved "https://registry.yarnpkg.com/@pkgjs/parseargs/-/parseargs-0.11.0.tgz#a77ea742fab25775145434eb1d2328cf5013ac33"
   integrity sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==
 
-"@plone/mockup@5.2.0-beta.4":
-  version "5.2.0-beta.4"
-  resolved "https://registry.yarnpkg.com/@plone/mockup/-/mockup-5.2.0-beta.4.tgz#2fd219df628a145bd411da2d4a0087f3180f5bc6"
-  integrity sha512-N0Qv9b7s9Au4FMdwF2gr81W1F7Qq0DkdMIbyXi3ComofVX6W2H2s3CNybB6mvhjahTOLtOVq/2rIxOJlvl5q/g==
+"@plone/mockup@5.2.0-beta.5":
+  version "5.2.0-beta.5"
+  resolved "https://registry.yarnpkg.com/@plone/mockup/-/mockup-5.2.0-beta.5.tgz#6e17b84fb06ba88bb2777e8abf942f91d75b59f1"
+  integrity sha512-jXKjnwMeMvUbbljEfISQqGCxJeR5YhsK5XPzWEGzp48X7QaYDFIyfOPrbkRSB1pkC5G/HUxPawk9UNdfCyJr4Q==
   dependencies:
     "@11ty/eleventy-upgrade-help" "2"
     "@patternslib/pat-code-editor" "4.0.1"
