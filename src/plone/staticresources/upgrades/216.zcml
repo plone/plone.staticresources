@@ -1,0 +1,14 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:gs="http://namespaces.zope.org/genericsetup"
+    >
+
+  <gs:upgradeStep
+      source="215"
+      destination="216"
+      title="Import PLIP 3211 icon changes"
+      profile="plone.staticresources:default"
+      handler=".upgrade_v215_to_v216"
+      />
+
+</configure>
