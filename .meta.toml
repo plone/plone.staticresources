@@ -3,19 +3,10 @@
 # See the inline comments on how to expand/tweak this configuration file
 [meta]
 template = "default"
-commit-id = "50e16ae1"
+commit-id = "2.0.1.dev0"
 
 [pyproject]
 codespell_skip = "*.min.js,*.min.js.map,*.svg,yarn.lock,*.json,*/icons_country_flags.xml"
 
 [tox]
-constraints_file = "https://dist.plone.org/release/6.1-latest/constraints.txt"
-
-[github]
-py_versions = "[\"3.12\", \"3.10\"]"
-jobs = [
-   "qa",
-   "test",
-   "coverage",
-   "release_ready",
-]
+test_matrix = {"6.2" = ["3.13"], "6.1" = ["3.10"]}
