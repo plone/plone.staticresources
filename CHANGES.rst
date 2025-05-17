@@ -8,6 +8,15 @@ Changelog
 
 .. towncrier release notes start
 
+2.1.18 (2025-05-17)
+-------------------
+
+Internal:
+
+
+- Upgrade mockup to 5.1.17. See https://github.com/plone/mockup/releases/tag/5.1.17 @thet
+
+
 2.1.17 (2024-12-18)
 -------------------
 
