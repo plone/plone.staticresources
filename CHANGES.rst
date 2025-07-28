@@ -14,7 +14,7 @@ Changelog
 Bug fixes:
 
 
-- Update mockup=5.4.1. See https://github.com/plone/mockup/releases/tag/5.4.3. @petschki
+- Update mockup=5.4.3. See https://github.com/plone/mockup/releases/tag/5.4.3. @petschki
 
 
 2.3.1 (2025-06-24)
