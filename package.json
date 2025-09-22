@@ -9,7 +9,7 @@
         "stats": "NODE_ENV=production webpack --config webpack.config.js --json > stats.json"
     },
     "dependencies": {
-        "@plone/mockup": "plone/mockup#selecteditems-post-request",
+        "@plone/mockup": "git+https://github.com/plone/mockup.git#selecteditems-post-request",
         "bootstrap-icons": "1.13.1",
         "svg-country-flags": "git+https://github.com/hampusborgos/country-flags.git"
     },
