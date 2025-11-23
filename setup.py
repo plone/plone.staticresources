@@ -1,7 +1,6 @@
 """Installer for the plone.staticresources package."""
 
 from pathlib import Path
-from setuptools import find_packages
 from setuptools import setup
 
 
@@ -11,7 +10,7 @@ long_description = (
 
 setup(
     name="plone.staticresources",
-    version="2.3.5.dev0",
+    version="3.0.0.dev0",
     description="Static resources for Plone",
     long_description=long_description,
     long_description_content_type="text/x-rst",
@@ -21,12 +20,9 @@ setup(
         "Development Status :: 5 - Production/Stable",
         "Environment :: Web Environment",
         "Framework :: Plone",
-        "Framework :: Plone :: 6.0",
-        "Framework :: Plone :: 6.1",
+        "Framework :: Plone :: 6.2",
         "Framework :: Plone :: Core",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 3.8",
-        "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: 3.12",
@@ -38,16 +34,12 @@ setup(
     author_email="plone-developers@lists.sourceforge.net",
     url="https://github.com/plone/plone.staticresources",
     license="GPL version 2",
-    packages=find_packages("src"),
-    namespace_packages=["plone"],
-    package_dir={"": "src"},
-    python_requires=">=3.8",
+    python_requires=">=3.10",
     include_package_data=True,
     zip_safe=False,
     install_requires=[
         "Products.GenericSetup",
         "lxml",
-        "setuptools",
         "plone.base",
         "plone.resource",
         "zope.i18nmessageid",
