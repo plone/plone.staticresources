@@ -8,6 +8,19 @@ Changelog
 
 .. towncrier release notes start
 
+3.0.0a2 (2025-12-22)
+--------------------
+
+New features:
+
+
+- Update mockup=5.5.0. See https://github.com/plone/mockup/releases/tag/5.5.0
+
+  TinyMCE v8
+
+  @petschki
+
+
 3.0.0a1 (2025-11-29)
 --------------------
 
