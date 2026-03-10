@@ -2,7 +2,6 @@ from lxml import etree
 
 import json
 
-
 FILES = [
     r"../profiles/default/registry/icons_bootstrap.xml",
     r"../profiles/default/registry/icons_contenttype.xml",
