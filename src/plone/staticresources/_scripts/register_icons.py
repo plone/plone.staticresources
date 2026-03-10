@@ -1,6 +1,5 @@
 import os
 
-
 this_dir = os.path.dirname(os.path.realpath(__file__))
 
 ICONS_DIR = f"{this_dir}/../static/icons-bootstrap"

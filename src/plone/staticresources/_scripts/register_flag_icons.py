@@ -1,7 +1,6 @@
 import json
 import os
 
-
 this_dir = os.path.dirname(os.path.realpath(__file__))
 
 # Part Register Country Flag Icons
