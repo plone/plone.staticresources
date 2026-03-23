@@ -13,4 +13,5 @@ exclude Makefile
 exclude babel.config.js
 exclude requirements.txt
 exclude webpack.config.js
-exclude yarn.lock
+exclude pnpm-lock.yaml
+exclude .npmrc
