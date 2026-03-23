@@ -9,7 +9,7 @@
         "stats": "NODE_ENV=production webpack --config webpack.config.js --json > stats.json"
     },
     "dependencies": {
-        "@plone/mockup": "5.5.1",
+        "@plone/mockup": "plone/mockup#master",
         "bootstrap-icons": "1.13.1",
         "svg-country-flags": "git+https://github.com/hampusborgos/country-flags.git"
     },
@@ -22,24 +22,21 @@
         "svelte-scrollto": "^0.2.0",
         "svg-inline-loader": "^0.8.2"
     },
-    "resolutions": {
-        "datatables.net": "<1.13",
-        "datatables.net-bs5": "<1.13",
-        "datatables.net-buttons": "<2.3",
-        "datatables.net-buttons-bs5": "<2.3",
-        "datatables.net-colreorder": "<1.6",
-        "datatables.net-colreorder-bs5": "<1.6",
-        "datatables.net-fixedcolumns": "<4.2",
-        "datatables.net-fixedcolumns-bs5": "<4.2",
-        "datatables.net-fixedheader": "<3.3",
-        "datatables.net-fixedheader-bs5": "<3.3",
-        "datatables.net-rowreorder": "<1.3",
-        "datatables.net-rowreorder-bs5": "<1.3",
-        "datatables.net-select": "<1.5",
-        "datatables.net-select-bs5": "<1.5"
-    },
     "browserslist": [
         "defaults"
     ],
-    "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
+    "packageManager": "pnpm@10.32.1+sha512.a706938f0e89ac1456b6563eab4edf1d1faf3368d1191fc5c59790e96dc918e4456ab2e67d613de1043d2e8c81f87303e6b40d4ffeca9df15ef1ad567348f2be",
+    "pnpm": {
+        "overrides": {
+            "slick-carousel": "git+https://github.com/kenwheeler/slick.git#d0716f19aa730006ee80ab026625fb1107816a97"
+        },
+        "ignoredBuiltDependencies": [
+            "@parcel/watcher",
+            "@patternslib/dev",
+            "yarn"
+        ],
+        "onlyBuiltDependencies": [
+            "@plone/mockup"
+        ]
+    }
 }
