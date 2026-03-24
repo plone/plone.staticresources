@@ -1,4 +1,4 @@
-YARN   ?= npx yarn
+PNPM = pnpm
 
 .PHONY: all
 all: build update-icons
@@ -10,11 +10,11 @@ clean:
 	rm -Rf src/plone/staticresources/static/bundle-plone/*
 
 install: clean
-	$(YARN) install
+	$(PNPM) install
 
 .PHONY: build
 build: install
-	$(YARN) run build
+	$(PNPM) run build
 
 .PHONY: update-icons
 update-icons:

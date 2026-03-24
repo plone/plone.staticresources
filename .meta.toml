@@ -3,10 +3,10 @@
 # See the inline comments on how to expand/tweak this configuration file
 [meta]
 template = "default"
-commit-id = "2.5.1"
+commit-id = "2.6.0"
 
 [pyproject]
-codespell_skip = "*.min.js,*.min.js.map,*.svg,yarn.lock,*.json,*/icons_country_flags.xml"
+codespell_skip = "*.min.js,*.min.js.map,*.svg,pnpm-lock.yaml,*.json,*/icons_country_flags.xml"
 
 [tox]
 test_matrix = {"6.2" = ["*"]}

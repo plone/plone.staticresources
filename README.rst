@@ -6,6 +6,7 @@ This add-on contains Fonts, Icons and JavaScript used by Plone Classic-UI.
 Version Information
 -------------------
 
+- Version 3.x   -> Plone 7.0
 - Version 2.2.x -> Plone 6.1
 - Version 2.1.x -> Plone 6.0
 - Version 1.x   -> Plone 5.2
@@ -31,7 +32,7 @@ How to upgrade the resources in this package
    on `npmjs <https://www.npmjs.org/@plone/mockup>`_.
 
 3. Update dependency versions (eg. new mockup release) in ``package.json`` here.
-   Use `yarn upgrade-interactive --latest` for conveniently update all the versions in package.json at once.
+   Use `pnpm upgrade --interactive --latest` for conveniently update all the versions in package.json at once.
    Since plone.staticresources should contain deterministically reproducible builds use fixed versions and not version ranges in package.json.
    For example use `"@plone/mockup": "5.0.11"` instead of `"@plone/mockup": "^5.0.11"`.
 
@@ -56,7 +57,7 @@ https://formidable.com/blog/2018/finding-webpack-duplicates-with-inspectpack-plu
 
 Build the stats.json file::
 
-   npx yarn stats
+   pnpm stats
 
 Check dependency tree and why which package was included
 https://www.npmjs.com/package/whybundled
