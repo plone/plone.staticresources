@@ -16,7 +16,7 @@
     "devDependencies": {
         "@patternslib/dev": "3.8.1",
         "copy-webpack-plugin": "14.0.0",
-        "svelte": "^5.54.0",
+        "svelte": "^5.55.0",
         "svelte-keydown": "^0.7.0",
         "svelte-loader": "^3.2.4",
         "svelte-scrollto": "^0.2.0",
