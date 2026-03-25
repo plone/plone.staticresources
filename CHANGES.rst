@@ -8,6 +8,22 @@ Changelog
 
 .. towncrier release notes start
 
+3.0.0a5 (2026-03-25)
+--------------------
+
+New features:
+
+
+- Update mockup to feature release `5.6.x`. See changelog https://github.com/plone/mockup/blob/5.6.1/CHANGES.md
+
+
+Bug fixes:
+
+
+- Fix `pat-contentbrowser` for more intuitive select button styling.  @petschki (#1567)
+- Fix `pat-structure` for datatables v2 changes.  @petschki
+
+
 3.0.0a4 (2026-03-24)
 --------------------
 
