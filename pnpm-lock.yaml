@@ -12,8 +12,8 @@ importers:
   .:
     dependencies:
       '@plone/mockup':
-        specifier: 5.6.2
-        version: 5.6.2(@popperjs/core@2.11.8)(posthtml@0.16.7)(react@19.2.4)
+        specifier: 5.6.3
+        version: 5.6.3(@popperjs/core@2.11.8)(posthtml@0.16.7)(react@19.2.4)
       bootstrap-icons:
         specifier: 1.13.1
         version: 1.13.1
@@ -1458,8 +1458,8 @@ packages:
     resolution: {integrity: sha512-QNqXyfVS2wm9hweSYD2O7F0G06uurj9kZ96TRQE5Y9hU7+tgdZwIkbAKc5Ocy1HxEY2kuDQa6cQ1WRs/O5LFKA==}
     engines: {node: ^12.20.0 || ^14.18.0 || >=16.0.0}
 
-  '@plone/mockup@5.6.2':
-    resolution: {integrity: sha512-hwvbnBmtUit57hMF1fd0AHuLR++YSV/6bKb3jCwo4V9g2jE+nFiVhOytRaAUe94mVIpTrQ1sm9/Z+3B06xKP8w==}
+  '@plone/mockup@5.6.3':
+    resolution: {integrity: sha512-wrvUWCJRzfiz+WMyBhekpkwJBByd815C0FdUoA8+Gzb3ZRymXWbJyVor7XqO3JKv99Xur8RPIzwET2MBpH7eFA==}
     engines: {node: '>=22'}
 
   '@plone/registry@2.7.1':
@@ -7135,7 +7135,7 @@ snapshots:
 
   '@pkgr/core@0.2.9': {}
 
-  '@plone/mockup@5.6.2(@popperjs/core@2.11.8)(posthtml@0.16.7)(react@19.2.4)':
+  '@plone/mockup@5.6.3(@popperjs/core@2.11.8)(posthtml@0.16.7)(react@19.2.4)':
     dependencies:
       '@11ty/eleventy-upgrade-help': 3.0.2(posthtml@0.16.7)
       '@patternslib/pat-code-editor': 4.0.1
