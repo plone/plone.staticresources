@@ -8,6 +8,15 @@ Changelog
 
 .. towncrier release notes start
 
+3.0.0rc1 (2026-05-05)
+---------------------
+
+Bug fixes:
+
+
+- Fix vertical scrolling in `pat-toolbar`.  @petschki (#3908)
+
+
 3.0.0a6 (2026-04-30)
 --------------------
 
