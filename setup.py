@@ -9,7 +9,7 @@ long_description = (
 
 setup(
     name="plone.staticresources",
-    version="3.0.0",
+    version="3.0.1.dev0",
     description="Static resources for Plone",
     long_description=long_description,
     long_description_content_type="text/x-rst",
