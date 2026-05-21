@@ -2350,10 +2350,10 @@
   resolved "https://registry.yarnpkg.com/@pkgjs/parseargs/-/parseargs-0.11.0.tgz#a77ea742fab25775145434eb1d2328cf5013ac33"
   integrity sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==
 
-"@plone/mockup@5.4.8":
-  version "5.4.8"
-  resolved "https://registry.yarnpkg.com/@plone/mockup/-/mockup-5.4.8.tgz#4e075369740c4939de84fa7e6244d79059a721aa"
-  integrity sha512-E2HG1aLgrKAnpvknfcQVKIeCeUZmMITExkdG6sa0IUy/HuMvqi0Bc2EJAlu941mfO3h1YOd0ivXL20Kk5WZNLQ==
+"@plone/mockup@5.4.9":
+  version "5.4.9"
+  resolved "https://registry.yarnpkg.com/@plone/mockup/-/mockup-5.4.9.tgz#dbc562a89cb0295ca93ad48f6e72fc14b964c577"
+  integrity sha512-6fT9MoK1493Isn9x+xffYG3GXIy9Bra5Xv0yz3S8xI47zEWkk82igxxg1r/xnO3rGoi2bHC9mGP7be55N3XKtA==
   dependencies:
     "@11ty/eleventy-upgrade-help" "3.0.2"
     "@patternslib/pat-code-editor" "4.0.1"
@@ -2386,7 +2386,7 @@
     js-cookie "^3.0.7"
     select2 "git+https://github.com/ivaynberg/select2.git#3.5.4"
     sortablejs "^1.15.6"
-    tinymce "7.9.2"
+    tinymce "7.9.3"
     tinymce-i18n "25.11.17"
     underscore "^1.13.8"
 
@@ -8703,10 +8703,10 @@ tinymce-i18n@25.11.17:
   resolved "https://registry.yarnpkg.com/tinymce-i18n/-/tinymce-i18n-25.11.17.tgz#4af30adf61e3cff6bed6f847d47aae0bbd10251c"
   integrity sha512-Fi5hGRDL9o42VsdahgNgHRHO/4ClAAqIew45QMu8sa5LQT2wTaVPf/tAXnVDHxR7c6NWZQmZp/E18LosxLq42A==
 
-tinymce@7.9.2:
-  version "7.9.2"
-  resolved "https://registry.yarnpkg.com/tinymce/-/tinymce-7.9.2.tgz#d47db80fade57da2d54c4a086675d3570c65ce0a"
-  integrity sha512-zS2gn2CPQmZhUqLzkhwYH+WGsx/DIRY/mS18RVzsIcuQg2lN2uzaqoHSJU6DdMUpvXBtBFnLNpumC3QrDwLBzA==
+tinymce@7.9.3:
+  version "7.9.3"
+  resolved "https://registry.yarnpkg.com/tinymce/-/tinymce-7.9.3.tgz#74f0a04bdf662f90910512d3fe792f0d5f1111e3"
+  integrity sha512-Mtm54U5YJ6Pyo/GaAx+JSHXTGEuxrg2AowVWCD9zy1eBolp5Ub7S1rTtsyQdxhPegfhLuR3VLiTKGw1tacv09g==
 
 tippy.js@^6.3.7:
   version "6.3.7"
