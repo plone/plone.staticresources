@@ -14,4 +14,5 @@ exclude babel.config.js
 exclude requirements.txt
 exclude webpack.config.js
 exclude pnpm-lock.yaml
+exclude pnpm-workspace.yaml
 exclude .npmrc
