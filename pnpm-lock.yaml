@@ -4,16 +4,13 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-overrides:
-  slick-carousel: git+https://github.com/kenwheeler/slick.git#d0716f19aa730006ee80ab026625fb1107816a97
-
 importers:
 
   .:
     dependencies:
       '@plone/mockup':
-        specifier: 5.6.4
-        version: 5.6.4(@popperjs/core@2.11.8)(posthtml@0.16.7)(react@19.2.4)
+        specifier: 5.6.5
+        version: 5.6.5(@popperjs/core@2.11.8)(posthtml@0.16.7)(react@19.2.4)
       bootstrap-icons:
         specifier: 1.13.1
         version: 1.13.1
@@ -22,7 +19,7 @@ importers:
         version: https://codeload.github.com/hampusborgos/country-flags/tar.gz/c09927e63705529bbf59ca6684cd9b23225dddad
     devDependencies:
       '@patternslib/dev':
-        specifier: 4.0.0
+        specifier: ^4.0.0
         version: 4.0.0(@types/node@25.8.0)(conventional-commits-filter@5.0.0)(conventional-commits-parser@6.4.0)(jiti@2.7.0)(postcss@8.5.14)(tslib@2.8.1)(typescript@5.9.3)
       copy-webpack-plugin:
         specifier: 14.0.0
@@ -1414,8 +1411,8 @@ packages:
   '@patternslib/pat-code-editor@4.0.1':
     resolution: {integrity: sha512-fYReaMlVsUw9uSFOklGoEezVD+rkYd6uiGSLkFk4y2mkTTslKlYDhKBxUkbUEAmUtWFgzRVr3tG4P8AEpRiyQw==}
 
-  '@patternslib/patternslib@9.10.4':
-    resolution: {integrity: sha512-+BTSWhd1QCjMabatesmEiaxf1qX9d0j9WN3IbrFezBUMRjqg6CXY+rTcEg6FkFoEKiw8d5xS0UEOwOFhEXlxgg==}
+  '@patternslib/patternslib@9.10.6':
+    resolution: {integrity: sha512-D8K0LT9GF6xeZLGKOEf5Zp6HzG5JLWS45wG2SKTx/lOTTc6Tv6bH9WkboMkOTfFLHl1ptAr6rPQp7zXNVrwXHQ==}
     engines: {node: '>=22'}
 
   '@peculiar/asn1-cms@2.7.0':
@@ -1467,8 +1464,8 @@ packages:
     resolution: {integrity: sha512-QNqXyfVS2wm9hweSYD2O7F0G06uurj9kZ96TRQE5Y9hU7+tgdZwIkbAKc5Ocy1HxEY2kuDQa6cQ1WRs/O5LFKA==}
     engines: {node: ^12.20.0 || ^14.18.0 || >=16.0.0}
 
-  '@plone/mockup@5.6.4':
-    resolution: {integrity: sha512-f6WRX+0AmEEckqF/47Gvqq3kqO22m7+eFA27yz3i6bzIA491jrd+mTVQsdZ7GmleNFokPmRru7xs6FBueNuekw==}
+  '@plone/mockup@5.6.5':
+    resolution: {integrity: sha512-2dXkRuGhL2S5q4LG1P/Dr1T/YGbXgmt4vxWm4t9et6f1Vv93wVqlLLZCWe1/CAi+goVWZwMDdq62wXvdgqP4dw==}
     engines: {node: '>=22'}
 
   '@plone/registry@2.7.2':
@@ -1857,7 +1854,7 @@ packages:
     resolution: {integrity: sha512-NuHqBY1PB/D8xU6s/thBgOAiAP7HOYDQ32+BFZILJ8ivkUkAHQnWfn6WhL79Owj1qmUnoN/YPhktdIoucipkAQ==}
 
   Select2@https://codeload.github.com/ivaynberg/select2/tar.gz/95a977f674b6938af55ec5f28b7772df93786c5c:
-    resolution: {tarball: https://codeload.github.com/ivaynberg/select2/tar.gz/95a977f674b6938af55ec5f28b7772df93786c5c}
+    resolution: {gitHosted: true, tarball: https://codeload.github.com/ivaynberg/select2/tar.gz/95a977f674b6938af55ec5f28b7772df93786c5c}
     version: 3.5.4
 
   accepts@1.3.8:
@@ -2638,8 +2635,8 @@ packages:
     resolution: {integrity: sha512-GrwoxYN+uWlzO8uhUXRl0P+kHE4GtVPfYzVLcUxPL7KNdHKj66vvlhiweIHqYYXWlw+T8iLMp42Lm67ghw4WMQ==}
     engines: {node: '>= 4'}
 
-  dompurify@3.4.4:
-    resolution: {integrity: sha512-r8K7KGKEcztXfA/nfabSYB2hg9tDphORJTdf8xprN/luSLGmNhOBN8dm1/SYjqLLet6YUFEXOcrdTuwryp/Bew==}
+  dompurify@3.4.8:
+    resolution: {integrity: sha512-yb1cEmaOum7wFvOCSQxyfgVlv5D47Rc30iZWoMpbDIWTnJ6grDDQyu2KFJzB2k7u0pMuJcQ1zphH//fFnw2tjQ==}
 
   domutils@2.8.0:
     resolution: {integrity: sha512-w96Cjofp72M5IIhpjgobBimYEfoPjx1Vx0BSX9P30WBdZW2WIKU0T1Bd0kz2eNZ9ikjKgHbEyKx8BB6H1L3h3A==}
@@ -3613,9 +3610,8 @@ packages:
   jquery@3.7.1:
     resolution: {integrity: sha512-m4avr8yL8kmFN8psrbFFFmB/If14iN5o9nw/NgnnM+kybDJpRsAynV2BsfpTYrTRysYUdADVD7CkUUizgkpLfg==}
 
-  js-cookie@3.0.7:
-    resolution: {integrity: sha512-z/wZZgDrkNV1eA0ULjM/F9/50Ya8fbzgKneSpoPsXSGd0KnpdtHfOZWK+GcwLk+EZbS4F9RBhU+K2RgzuDaItw==}
-    engines: {node: '>=20'}
+  js-cookie@3.0.8:
+    resolution: {integrity: sha512-yeJd4aNAdYZQjaon2bpD/Gb0B/omw7HQOsynXXcOiWVCacbBcPlgn8S/d1X6blFSaHao7ozqtW7NZW19xpCtIw==}
 
   js-tokens@4.0.0:
     resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
@@ -3767,8 +3763,8 @@ packages:
     resolution: {integrity: sha512-jumlc0BIUrS3qJGgIkWZsyfAM7NCWiBcCDhnd+3NNM5KbBmLTgHVfWBcg6W+rLUsIpzpERPsvwUP7CckAQSOoA==}
     engines: {node: '>=12'}
 
-  luxon@3.6.1:
-    resolution: {integrity: sha512-tJLxrKJhO2ukZ5z0gyjY1zPh3Rh88Ej9P7jNrZiHMUXHae1yvI2imgOZtL1TO8TW6biMMKfTtAOoEJANgtWBMQ==}
+  luxon@3.7.2:
+    resolution: {integrity: sha512-vtEhXh/gNjI9Yg1u4jX/0YVPMvxzHuGgCm6tC5kZyb08yjGWGnqAjGJvcXbqQR2P3MyMEFnRbpcdFS6PBcLqew==}
     engines: {node: '>=12'}
 
   macos-release@3.4.0:
@@ -4610,13 +4606,13 @@ packages:
     engines: {node: '>=14.16'}
 
   slick-carousel@https://codeload.github.com/kenwheeler/slick/tar.gz/d0716f19aa730006ee80ab026625fb1107816a97:
-    resolution: {tarball: https://codeload.github.com/kenwheeler/slick/tar.gz/d0716f19aa730006ee80ab026625fb1107816a97}
+    resolution: {gitHosted: true, tarball: https://codeload.github.com/kenwheeler/slick/tar.gz/d0716f19aa730006ee80ab026625fb1107816a97}
     version: 1.8.1
     peerDependencies:
       jquery: '>=1.8.0'
 
   slides@https://codeload.github.com/Patternslib/slides/tar.gz/9319c68a208f92b7f21f4239916ca05429b9e139:
-    resolution: {tarball: https://codeload.github.com/Patternslib/slides/tar.gz/9319c68a208f92b7f21f4239916ca05429b9e139}
+    resolution: {gitHosted: true, tarball: https://codeload.github.com/Patternslib/slides/tar.gz/9319c68a208f92b7f21f4239916ca05429b9e139}
     version: 0.1.1
 
   smart-buffer@4.2.0:
@@ -4798,7 +4794,7 @@ packages:
     engines: {node: '>=18'}
 
   svg-country-flags@https://codeload.github.com/hampusborgos/country-flags/tar.gz/c09927e63705529bbf59ca6684cd9b23225dddad:
-    resolution: {tarball: https://codeload.github.com/hampusborgos/country-flags/tar.gz/c09927e63705529bbf59ca6684cd9b23225dddad}
+    resolution: {gitHosted: true, tarball: https://codeload.github.com/hampusborgos/country-flags/tar.gz/c09927e63705529bbf59ca6684cd9b23225dddad}
     version: 1.2.10
 
   svg-inline-loader@0.8.2:
@@ -4898,11 +4894,11 @@ packages:
     resolution: {integrity: sha512-pn99VhoACYR8nFHhxqix+uvsbXineAasWm5ojXoN8xEwK5Kd3/TrhNn1wByuD52UxWRLy8pu+kRMniEi6Eq9Zg==}
     engines: {node: '>=12.0.0'}
 
-  tinymce-i18n@26.4.6:
-    resolution: {integrity: sha512-5lD8EEwe5nxEZISJLvRlaiZlt7sJA4rA0YhOLRdzXh5d1adHPXQe+CIkgKKGhYqVFeYCyshWGZLU0PoUF2sRKg==}
+  tinymce-i18n@26.5.18:
+    resolution: {integrity: sha512-FVoXajqDbh1CC6fGbS7zlYtHKCA0Tv2+QugvTHOdAtgnAUVP0LEEEZIIyIf3qpy3PckuynYPnRrYnKw6IQxO5g==}
 
-  tinymce@8.5.0:
-    resolution: {integrity: sha512-DnKEfPNQnOJc8Ca1roZBs/GSbkAZyIIbC4p8eHZyZQi85OSAXtiVNYMaRxo4mzsGKpa0sA4/Us4KXQkX8q7w2A==}
+  tinymce@8.6.0:
+    resolution: {integrity: sha512-qODYoNL4cPIzNFpkEEQDm3DWI78I/nQXIPwUMHRN+q/LyT9Wzt7xis2Nfhk88kV6sibp6MJXPSaUDVNe02ZB/w==}
 
   tippy.js@6.3.7:
     resolution: {integrity: sha512-E1d3oP2emgJ9dRQZdf3Kkn0qJgI6ZLpyS5z6ZkY1DF3kaQaBsGZsndEpHwx+eC+tYM41HaSNvNtLx8tU57FzTQ==}
@@ -6304,10 +6300,10 @@ snapshots:
       '@fullcalendar/common': 5.11.5
       tslib: 2.8.1
 
-  '@fullcalendar/luxon2@5.11.5(luxon@3.6.1)':
+  '@fullcalendar/luxon2@5.11.5(luxon@3.7.2)':
     dependencies:
       '@fullcalendar/common': 5.11.5
-      luxon: 3.6.1
+      luxon: 3.7.2
       tslib: 2.8.1
 
   '@fullcalendar/premium-common@5.11.5':
@@ -7071,22 +7067,22 @@ snapshots:
       codejar: 3.7.0
       highlight.js: 10.7.3
 
-  '@patternslib/patternslib@9.10.4':
+  '@patternslib/patternslib@9.10.6':
     dependencies:
       '@fullcalendar/adaptive': 5.11.5
       '@fullcalendar/core': 5.11.5
       '@fullcalendar/daygrid': 5.11.5
       '@fullcalendar/interaction': 5.11.5
       '@fullcalendar/list': 5.11.5
-      '@fullcalendar/luxon2': 5.11.5(luxon@3.6.1)
+      '@fullcalendar/luxon2': 5.11.5(luxon@3.7.2)
       '@fullcalendar/timegrid': 5.11.5
       '@stomp/stompjs': 7.3.0
-      dompurify: 3.4.4
+      dompurify: 3.4.8
       highlight.js: 10.7.3
       imagesloaded: 4.1.4
       jquery: 3.7.1
       jquery-jcrop: 0.9.15
-      luxon: 3.6.1
+      luxon: 3.7.2
       marked: 15.0.12
       masonry-layout: 4.2.2
       moment: 2.30.1
@@ -7204,11 +7200,11 @@ snapshots:
 
   '@pkgr/core@0.2.9': {}
 
-  '@plone/mockup@5.6.4(@popperjs/core@2.11.8)(posthtml@0.16.7)(react@19.2.4)':
+  '@plone/mockup@5.6.5(@popperjs/core@2.11.8)(posthtml@0.16.7)(react@19.2.4)':
     dependencies:
       '@11ty/eleventy-upgrade-help': 3.0.2(posthtml@0.16.7)
       '@patternslib/pat-code-editor': 4.0.1
-      '@patternslib/patternslib': 9.10.4
+      '@patternslib/patternslib': 9.10.6
       '@plone/registry': 2.7.2(react@19.2.4)
       backbone: 1.6.1
       backbone.paginator: 2.0.8
@@ -7234,11 +7230,13 @@ snapshots:
       jquery: 3.7.1
       jquery-form: 4.3.0
       jquery.browser: 0.1.0
-      js-cookie: 3.0.7
+      js-cookie: 3.0.8
       select2: Select2@https://codeload.github.com/ivaynberg/select2/tar.gz/95a977f674b6938af55ec5f28b7772df93786c5c
+      slick-carousel: https://codeload.github.com/kenwheeler/slick/tar.gz/d0716f19aa730006ee80ab026625fb1107816a97(jquery@3.7.1)
+      slides: https://codeload.github.com/Patternslib/slides/tar.gz/9319c68a208f92b7f21f4239916ca05429b9e139
       sortablejs: 1.15.7
-      tinymce: 8.5.0
-      tinymce-i18n: 26.4.6
+      tinymce: 8.6.0
+      tinymce-i18n: 26.5.18
       underscore: 1.13.8
     transitivePeerDependencies:
       - '@popperjs/core'
@@ -7451,7 +7449,7 @@ snapshots:
 
   '@types/ora@3.2.0':
     dependencies:
-      ora: 5.4.1
+      ora: 9.3.0
 
   '@types/parse-path@7.1.0':
     dependencies:
@@ -7463,7 +7461,7 @@ snapshots:
 
   '@types/resolve@1.17.1':
     dependencies:
-      '@types/node': 12.20.55
+      '@types/node': 25.8.0
 
   '@types/retry@0.12.2': {}
 
@@ -8440,7 +8438,7 @@ snapshots:
     dependencies:
       domelementtype: 2.3.0
 
-  dompurify@3.4.4:
+  dompurify@3.4.8:
     optionalDependencies:
       '@types/trusted-types': 2.0.7
 
@@ -9603,7 +9601,7 @@ snapshots:
 
   jquery@3.7.1: {}
 
-  js-cookie@3.0.7: {}
+  js-cookie@3.0.8: {}
 
   js-tokens@4.0.0: {}
 
@@ -9755,7 +9753,7 @@ snapshots:
 
   lru-cache@7.18.3: {}
 
-  luxon@3.6.1: {}
+  luxon@3.7.2: {}
 
   macos-release@3.4.0: {}
 
@@ -10881,9 +10879,9 @@ snapshots:
       fdir: 6.5.0(picomatch@4.0.4)
       picomatch: 4.0.4
 
-  tinymce-i18n@26.4.6: {}
+  tinymce-i18n@26.5.18: {}
 
-  tinymce@8.5.0: {}
+  tinymce@8.6.0: {}
 
   tippy.js@6.3.7:
     dependencies:

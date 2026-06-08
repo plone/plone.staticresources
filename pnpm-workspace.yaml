@@ -1,0 +1,13 @@
+allowBuilds:
+  '@parcel/watcher': true
+  '@patternslib/dev': true
+  '@plone/mockup': true
+  unrs-resolver: true
+  yarn: false
+
+minimumReleaseAgeExclude:
+  - "@plone/mockup"
+
+shamefullyHoist: true
+nodeLinker: "hoisted"
+blockExoticSubdeps: false
