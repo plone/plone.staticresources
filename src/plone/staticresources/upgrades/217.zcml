@@ -1,0 +1,17 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:gs="http://namespaces.zope.org/genericsetup"
+    >
+
+  <gs:upgradeSteps
+      profile="plone.staticresources:default"
+      source="216"
+      destination="217"
+      >
+    <gs:upgradeStep
+        title="Add missing icons"
+        handler=".update_all_icons"
+        />
+  </gs:upgradeSteps>
+
+</configure>

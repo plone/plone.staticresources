@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <metadata>
-  <version>216</version>
+  <version>217</version>
   <dependencies>
     <dependency>profile-plone.resource:default</dependency>
   </dependencies>
