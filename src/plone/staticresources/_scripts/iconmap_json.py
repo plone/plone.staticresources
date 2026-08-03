@@ -1,18 +1,23 @@
 from lxml import etree
+from pathlib import Path
 
 import json
 
+module_dir = Path(__file__).parent
+base_path = module_dir / ".." / "profiles" / "default" / "registry"
+
+
 FILES = [
-    r"../profiles/default/registry/icons_bootstrap.xml",
-    r"../profiles/default/registry/icons_contenttype.xml",
-    r"../profiles/default/registry/icons_country_flags.xml",
-    r"../profiles/default/registry/icons_language_flags.xml",
-    r"../profiles/default/registry/icons_mimetype.xml",
-    r"../profiles/default/registry/icons_plone.xml",
-    r"../profiles/default/registry/icons_toolbar.xml",
+    base_path / "icons_bootstrap.xml",
+    base_path / "icons_contenttype.xml",
+    base_path / "icons_country_flags.xml",
+    base_path / "icons_language_flags.xml",
+    base_path / "icons_mimetype.xml",
+    base_path / "icons_plone.xml",
+    base_path / "icons_toolbar.xml",
 ]
 
-PATH_ICONMAP = "../static/iconmap.json"
+PATH_ICONMAP = module_dir / ".." / "static" / "iconmap.json"
 
 
 def main():

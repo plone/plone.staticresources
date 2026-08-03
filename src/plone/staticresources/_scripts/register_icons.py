@@ -1,10 +1,12 @@
+from pathlib import Path
+
 import os
 
-this_dir = os.path.dirname(os.path.realpath(__file__))
+this_dir = Path(__file__).parent
 
-ICONS_DIR = f"{this_dir}/../static/icons-bootstrap"
-OUTPUT_FILE = "{dir}/../profiles/default/registry/icons_bootstrap.xml".format(
-    dir=this_dir
+ICONS_DIR = this_dir / ".." / "static" / "icons-bootstrap"
+OUTPUT_FILE = (
+    this_dir / ".." / "profiles" / "default" / "registry" / "icons_bootstrap.xml"
 )
 
 registry_template = """<?xml version="1.0" encoding="utf-8"?>
