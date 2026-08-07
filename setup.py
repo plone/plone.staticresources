@@ -43,6 +43,7 @@ setup(
         "lxml",
         "plone.base",
         "plone.resource",
+        "zope.component",
         "zope.i18nmessageid",
         "zope.interface",
     ],

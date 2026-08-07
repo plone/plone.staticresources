@@ -1,13 +1,14 @@
-import json
-import os
+from pathlib import Path
 
-this_dir = os.path.dirname(os.path.realpath(__file__))
+import json
+
+this_dir = Path(__file__).parent
 
 # Part Register Country Flag Icons
-DATA_FILE_COUNTRY = "{dir}/../static/icons-country-flags/countries.json".format(
-    dir=this_dir
+DATA_FILE_COUNTRY = this_dir / ".." / "static" / "icons-country-flags/countries.json"
+OUTPUT_FILE_COUNTRY = (
+    this_dir / ".." / "profiles" / "default" / "registry" / "icons_country_flags.xml"
 )
-OUTPUT_FILE_COUNTRY = f"{this_dir}/../profiles/default/registry/icons_country_flags.xml"
 
 DEFAULT_PATTERN_COUNTRY = """
   <record name="plone.icon.countryflag">
@@ -29,11 +30,9 @@ PATTERN_COUNTRY = """
 
 
 # Part Register Language Flag Icons
-DATA_FILE_LANGUAGE = "{dir}/../static/icons-language-flags/languages.json".format(
-    dir=this_dir
-)
+DATA_FILE_LANGUAGE = this_dir / ".." / "static" / "icons-language-flags/languages.json"
 OUTPUT_FILE_LANGUAGE = (
-    f"{this_dir}/../profiles/default/registry/icons_language_flags.xml"
+    this_dir / ".." / "profiles" / "default" / "registry" / "icons_language_flags.xml"
 )
 
 DEFAULT_PATTERN_LANGUAGE = """
