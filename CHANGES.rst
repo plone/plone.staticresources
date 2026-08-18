@@ -8,6 +8,23 @@ Changelog
 
 .. towncrier release notes start
 
+3.0.4 (2026-08-18)
+------------------
+
+Bug fixes:
+
+
+- Add missing icons to the registry.
+  Also provide a upgrade utility to add any missing icons in the future.
+  @thet
+- Remove unused requirements.txt file.
+- Update scripts: Improve update-icons target.
+
+  Use a virtual environment and install lxml for the update-icons target to make
+  it work without manually installing dependencies.
+- Update scripts: Use pathlib to construct filesystem paths.
+
+
 3.0.3 (2026-07-14)
 ------------------
 
