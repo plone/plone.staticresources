@@ -8,6 +8,15 @@ Changelog
 
 .. towncrier release notes start
 
+3.0.6 (2026-09-09)
+------------------
+
+Internal:
+
+
+- Update Mockup to 5.6.10. @thet
+
+
 3.0.5 (2026-08-26)
 ------------------
 
