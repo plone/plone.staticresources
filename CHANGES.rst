@@ -8,6 +8,23 @@ Changelog
 
 .. towncrier release notes start
 
+3.0.8 (2026-09-16)
+------------------
+
+New features:
+
+
+- Update Mockup to 5.6.13 and @patternslib/dev to 4.1.0. @thet
+
+
+Internal:
+
+
+- Update GitHub action dependencies. @thet
+- Update JS infrastructure, use pnpm v12, use strict versions. @thet
+- pnpm: Trust internal packages mockup, @patternslib/patternslib and @patternslib/dev. @thet
+
+
 3.0.7 (2026-09-15)
 ------------------
 
