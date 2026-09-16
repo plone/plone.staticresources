@@ -6,7 +6,9 @@ allowBuilds:
   yarn: false
 
 minimumReleaseAgeExclude:
-  - "@plone/mockup"
+  - '@plone/mockup'
+  - '@patternslib/dev'
+  - '@patternslib/patternslib'
 
 shamefullyHoist: true
 nodeLinker: "hoisted"
