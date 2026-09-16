@@ -16,12 +16,12 @@
     "devDependencies": {
         "@patternslib/dev": "4.1.0",
         "copy-webpack-plugin": "14.0.0",
-        "svelte": "^5.57.0",
-        "svelte-loader": "^3.2.4",
-        "svg-inline-loader": "^0.8.2"
+        "svelte": "5.57.0",
+        "svelte-loader": "3.2.4",
+        "svg-inline-loader": "0.8.2"
     },
     "browserslist": [
         "defaults"
     ],
-    "packageManager": "pnpm@11.5.2+sha512.71c631e382066efc25625d5cf029075de07b61b37f6e27350fbd84b1bda5864c8c1967adc280776b45c30a715c0359a3be08fef42d5bb09e2b99029979692916"
+    "packageManager": "pnpm@12.3.4"
 }
