@@ -10,6 +10,7 @@ exclude .coveragerc
 exclude package.json
 exclude .prettierrc.json
 exclude Makefile
+prune scripts
 exclude babel.config.js
 exclude webpack.config.js
 exclude pnpm-lock.yaml

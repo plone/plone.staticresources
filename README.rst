@@ -36,6 +36,12 @@ Run::
 This downloads and installs the latest versions of these packages.
 The commits and changelog entries are automatically made.
 
+Run ``make -k all`` to update all resources and continue with the other
+updates if one fails. The command still reports failure if any update fails.
+
+The update targets invoke POSIX shell scripts in ``scripts/`` from the
+repository root.
+
 See the Makefile for more information.
 
 Then submit a Pull Request and run the tests on Jenkins.
