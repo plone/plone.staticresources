@@ -13,23 +13,14 @@ MOCKUP_VERSION=${2:-}
 
 if [ -z "${MOCKUP_VERSION}" ]; then
     if [ "$PRERELEASE" = true ]; then
-        echo "🧪 Get the most recently published Mockup pre-release from GitHub."
-        RELEASES='[]'
-        PAGE=1
-        while :; do
-            RELEASE_PAGE=$(curl -fsSL "https://api.github.com/repos/plone/mockup/releases?per_page=100&page=$PAGE")
-            RELEASES=$(printf '%s\n%s' "$RELEASES" "$RELEASE_PAGE" | jq -s '.[0] + .[1]')
-            if [ "$(printf '%s' "$RELEASE_PAGE" | jq 'length')" -lt 100 ]; then
-                break
-            fi
-            PAGE=$((PAGE + 1))
-        done
+        echo "🧪 Find the newest published Mockup pre-release among the first 100 GitHub releases."
+        RELEASES=$(curl -fsSL "https://api.github.com/repos/plone/mockup/releases?per_page=100&page=1")
         RELEASE=$(printf '%s' "$RELEASES" | jq '
             map(select(.prerelease == true and .draft == false))
             | max_by(.published_at)
         ')
         if [ "$RELEASE" = null ]; then
-            echo "No published Mockup pre-release found." >&2
+            echo "No published Mockup pre-release found among the first 100 GitHub releases." >&2
             exit 1
         fi
     else

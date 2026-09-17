@@ -37,7 +37,7 @@ update-mockup: install
 	@sh scripts/update_mockup.sh "$(BUNDLE_DIR)" "$(MOCKUP_VERSION)"
 
 
-# Download the newest published Mockup pre-release.
+# Download the newest published Mockup pre-release among the first 100 GitHub releases.
 .PHONY: update-mockup-prerelease
 update-mockup-prerelease: install
 	@sh scripts/update_mockup.sh --prerelease "$(BUNDLE_DIR)" "$(MOCKUP_VERSION)"
