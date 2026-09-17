@@ -2,12 +2,40 @@
 # Invoked by make from the repository root.
 set -e
 
+PRERELEASE=false
+if [ "${1:-}" = "--prerelease" ]; then
+    PRERELEASE=true
+    shift
+fi
+
 BUNDLE_DIR=${1:?BUNDLE_DIR is required}
 MOCKUP_VERSION=${2:-}
 
 if [ -z "${MOCKUP_VERSION}" ]; then
-    echo "🧪 Get the latest Mockup version from GitHub (no pre-release)."
-    RELEASE=$(curl -fsSL https://api.github.com/repos/plone/mockup/releases/latest)
+    if [ "$PRERELEASE" = true ]; then
+        echo "🧪 Get the most recently published Mockup pre-release from GitHub."
+        RELEASES='[]'
+        PAGE=1
+        while :; do
+            RELEASE_PAGE=$(curl -fsSL "https://api.github.com/repos/plone/mockup/releases?per_page=100&page=$PAGE")
+            RELEASES=$(printf '%s\n%s' "$RELEASES" "$RELEASE_PAGE" | jq -s '.[0] + .[1]')
+            if [ "$(printf '%s' "$RELEASE_PAGE" | jq 'length')" -lt 100 ]; then
+                break
+            fi
+            PAGE=$((PAGE + 1))
+        done
+        RELEASE=$(printf '%s' "$RELEASES" | jq '
+            map(select(.prerelease == true and .draft == false))
+            | max_by(.published_at)
+        ')
+        if [ "$RELEASE" = null ]; then
+            echo "No published Mockup pre-release found." >&2
+            exit 1
+        fi
+    else
+        echo "🧪 Get the latest Mockup version from GitHub (no pre-release)."
+        RELEASE=$(curl -fsSL https://api.github.com/repos/plone/mockup/releases/latest)
+    fi
     MOCKUP_VERSION=$(printf '%s' "$RELEASE" | jq -er '.tag_name | strings | select(length > 0)')
     echo "🏷️  Mockup version is: ${MOCKUP_VERSION}"
 fi
