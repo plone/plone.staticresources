@@ -32,7 +32,7 @@ fi
 
 echo "🧪 Git add and commit."
 # Add changelog entry
-towncrier create +update-mockup.feature \
+./.venv/bin/towncrier create +update-mockup.feature \
     --content "Update Mockup to ${MOCKUP_VERSION}."
 # Add with a `*` in case a number was appended due to a naming conflict.
 git add news/+update-mockup.feature*

@@ -18,9 +18,10 @@ clean:
 	rm -Rf .venv
 
 
+.PHONY: install
 ./.venv/bin/python install:
 	`which python3` -m venv .venv
-	./.venv/bin/pip install lxml
+	./.venv/bin/pip install lxml towncrier
 
 
 # Download a Mockup universal bundle from GitHub releases and replace
@@ -32,7 +33,7 @@ clean:
 # `MOCKUP_VERSION=5.7.0-alpha.2 make update-mockup`
 #
 .PHONY: update-mockup
-update-mockup:
+update-mockup: install
 	@sh scripts/update_mockup.sh "$(BUNDLE_DIR)" "$(MOCKUP_VERSION)"
 
 

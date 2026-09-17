@@ -42,7 +42,7 @@ fi
 
 echo "🧪 Git add and commit."
 # Add changelog entry
-towncrier create +update-bootstrap-icons.feature \
+./.venv/bin/towncrier create +update-bootstrap-icons.feature \
     --content "Update Bootstrap Icons to ${BOOTSTRAP_ICONS_VERSION}."
 # Add with a `*` in case a number was appended due to a naming conflict.
 git add news/+update-bootstrap-icons.feature*

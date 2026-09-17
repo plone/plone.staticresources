@@ -36,7 +36,7 @@ fi
 
 echo "🧪 Git add and commit."
 # Add changelog entry
-towncrier create +update-country-flags.feature \
+./.venv/bin/towncrier create +update-country-flags.feature \
     --content "Update country flags icons to commit $COUNTRY_FLAGS_REVISION."
 # Add with a `*` in case a number was appended due to a naming conflict.
 git add news/+update-country-flags.feature*
