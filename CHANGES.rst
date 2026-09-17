@@ -8,6 +8,15 @@ Changelog
 
 .. towncrier release notes start
 
+3.0.9 (2026-09-17)
+------------------
+
+New features:
+
+
+- Update Mockup to 5.6.14 and @patternslib/dev to 4.2.0. @petschki
+
+
 3.0.8 (2026-09-16)
 ------------------
 
