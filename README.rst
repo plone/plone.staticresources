@@ -37,7 +37,9 @@ This downloads and installs the latest versions of these packages.
 The commits and changelog entries are automatically made.
 
 Run ``make update-mockup-prerelease`` to install the most recently published
-Mockup pre-release, without specifying a version.
+Mockup pre-release among the first 100 releases returned by GitHub, without
+specifying a version. This fails if that batch contains no published
+pre-release; subsequent pages are not searched.
 ``make update-mockup`` continues to select stable releases.
 An explicit ``MOCKUP_VERSION`` overrides automatic selection for either target.
 
