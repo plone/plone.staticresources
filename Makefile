@@ -37,6 +37,12 @@ update-mockup: install
 	@sh scripts/update_mockup.sh "$(BUNDLE_DIR)" "$(MOCKUP_VERSION)"
 
 
+# Download the newest published Mockup pre-release.
+.PHONY: update-mockup-prerelease
+update-mockup-prerelease: install
+	@sh scripts/update_mockup.sh --prerelease "$(BUNDLE_DIR)" "$(MOCKUP_VERSION)"
+
+
 # Download bootstrap-icons from GitHub releases and replace the existing one.
 #
 # You can use the `BOOTSTRAP_ICONS_VERSION` environment variable to download a
