@@ -11,11 +11,14 @@ REVISION=$(curl -fsSL https://api.github.com/repos/hampusborgos/country-flags/co
 COUNTRY_FLAGS_REVISION=$(printf '%s' "$REVISION" | jq -er '.sha | strings | select(test("^[0-9a-f]{40}$"))')
 wget "https://github.com/hampusborgos/country-flags/archive/$COUNTRY_FLAGS_REVISION.zip" -O country-flags.zip 1> /dev/null 2> /dev/null
 unzip country-flags.zip > /dev/null
+# Use the package version for the changelog and commit message.
+COUNTRY_FLAGS_VERSION=$(jq -er '.version | strings | select(length > 0)' "country-flags-$COUNTRY_FLAGS_REVISION/package.json")
+echo "🏷️  Country flags version is: ${COUNTRY_FLAGS_VERSION}"
 # Replace the old country flags with the new ones.
 rm -Rf "${COUNTRY_FLAGS_DIR}"
 mv "country-flags-$COUNTRY_FLAGS_REVISION" "${COUNTRY_FLAGS_DIR}"
 # Cleanup.
-rm country-flags.zip
+#rm country-flags.zip
 
 echo "🔰 Register flag icons"
 ./.venv/bin/python src/plone/staticresources/_scripts/register_flag_icons.py
@@ -37,12 +40,12 @@ fi
 echo "🧪 Git add and commit."
 # Add changelog entry
 ./.venv/bin/towncrier create +update-country-flags.feature \
-    --content "Update country flags icons to commit $COUNTRY_FLAGS_REVISION."
+    --content "Update country flags icons to ${COUNTRY_FLAGS_VERSION}."
 # Add with a `*` in case a number was appended due to a naming conflict.
 git add news/+update-country-flags.feature*
 
 # commit
-git commit -m"Update country flags icons." > /dev/null
+git commit -m"Update country flags icons to ${COUNTRY_FLAGS_VERSION}." > /dev/null
 
 # Spit out info.
 echo ""
@@ -50,6 +53,6 @@ echo "📦 Country flags icons static folder size is: "
 cd "${COUNTRY_FLAGS_DIR}"
 du -sh
 echo ""
-echo "🚀 Updated country flags icons."
+echo "🚀 Updated country flags icons to ${COUNTRY_FLAGS_VERSION}."
 echo "‼️ Don't forget to create an upgrade step for the new icons (see upgrade 217 for an example) ‼️"
 echo ""

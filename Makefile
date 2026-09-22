@@ -51,7 +51,9 @@ update-bootstrap-icons: install
 
 # Download country-flags from GitHub and replace the existing one.
 #
-# Country flags have no releases, so resolve main to an exact commit.
+# Country flags have no releases, so we cannot download a specific version.
+# Anyways, the package.json file include a version specifier, which is used for
+# the changelog entry and commit message.
 .PHONY: update-country-flags
 update-country-flags: install
 	@sh scripts/update_country_flags.sh "$(COUNTRY_FLAGS_DIR)"
