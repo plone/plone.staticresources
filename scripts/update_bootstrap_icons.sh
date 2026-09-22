@@ -5,25 +5,26 @@ set -e
 BOOTSTRAP_ICONS_DIR=${1:?BOOTSTRAP_ICONS_DIR is required}
 BOOTSTRAP_ICONS_VERSION=${2:-}
 
-if [ -z "${BOOTSTRAP_ICONS_VERSION}" ]; then
-    echo "🧪 Get the latest Bootstrap Icons version from GitHub (no pre-release)."
-    RELEASE=$(curl -fsSL https://api.github.com/repos/twbs/icons/releases/latest)
-    BOOTSTRAP_ICONS_VERSION=$(printf '%s' "$RELEASE" | jq -er '.tag_name | strings | select(length > 0)')
-    echo "🏷️  Bootstrap Icons version is: ${BOOTSTRAP_ICONS_VERSION}"
+. "$(dirname "$0")/npm.sh"
+
+TMP_DIR=$(mktemp -d)
+trap 'rm -Rf "$TMP_DIR"' EXIT
+
+if [ -n "${BOOTSTRAP_ICONS_VERSION}" ]; then
+    # Accept GitHub tag names like `v1.13.1`, too.
+    echo "🧪 Download Bootstrap Icons ${BOOTSTRAP_ICONS_VERSION#v} from npm."
+    npm_fetch bootstrap-icons "${BOOTSTRAP_ICONS_VERSION#v}" "$TMP_DIR"
+else
+    echo "🧪 Download the latest Bootstrap Icons from npm (no pre-release)."
+    npm_fetch bootstrap-icons latest "$TMP_DIR"
 fi
+BOOTSTRAP_ICONS_VERSION=$NPM_VERSION
+echo "🏷️  Bootstrap Icons version is: ${BOOTSTRAP_ICONS_VERSION}"
 
-BOOTSTRAP_ICONS_BASENAME=bootstrap-icons-${BOOTSTRAP_ICONS_VERSION#v}
-
-echo "🧪 Copy bootstrap-icons from GitHub."
-
-# Download the Bootstrap Icons bundle.
-wget "https://github.com/twbs/icons/releases/download/${BOOTSTRAP_ICONS_VERSION}/${BOOTSTRAP_ICONS_BASENAME}.zip" 1> /dev/null 2> /dev/null
-unzip "${BOOTSTRAP_ICONS_BASENAME}.zip" > /dev/null
-# Replace the old Bootstrap Icons bundle with the new one.
+# Replace the old Bootstrap Icons with the new ones. Only the SVG icons are
+# used; the sprite and the icon font are not copied.
 rm -Rf "${BOOTSTRAP_ICONS_DIR}"
-mv "${BOOTSTRAP_ICONS_BASENAME}" "${BOOTSTRAP_ICONS_DIR}"
-# Cleanup.
-rm "${BOOTSTRAP_ICONS_BASENAME}.zip"
+mv "$TMP_DIR/package/icons" "${BOOTSTRAP_ICONS_DIR}"
 
 echo "✳️ Register bootstrap icons"
 ./.venv/bin/python src/plone/staticresources/_scripts/register_icons.py

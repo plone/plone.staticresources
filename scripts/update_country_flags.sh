@@ -4,21 +4,33 @@ set -e
 
 COUNTRY_FLAGS_DIR=${1:?COUNTRY_FLAGS_DIR is required}
 
+COUNTRY_FLAGS_REPO=https://github.com/hampusborgos/country-flags
+
+TMP_DIR=$(mktemp -d)
+trap 'rm -Rf "$TMP_DIR"' EXIT
+
 echo "🧪 Copy country-flags from GitHub."
 
-# Get the commit hash and download that exact revision.
-REVISION=$(curl -fsSL https://api.github.com/repos/hampusborgos/country-flags/commits/main)
-COUNTRY_FLAGS_REVISION=$(printf '%s' "$REVISION" | jq -er '.sha | strings | select(test("^[0-9a-f]{40}$"))')
-wget "https://github.com/hampusborgos/country-flags/archive/$COUNTRY_FLAGS_REVISION.zip" -O country-flags.zip 1> /dev/null 2> /dev/null
-unzip country-flags.zip > /dev/null
+# The npm package svg-country-flags is outdated, so get the commit hash of the
+# main branch (without using the rate limited GitHub API) and download that
+# exact revision.
+COUNTRY_FLAGS_REVISION=$(git ls-remote "$COUNTRY_FLAGS_REPO" refs/heads/main | cut -f1)
+if ! printf '%s' "$COUNTRY_FLAGS_REVISION" | grep -Eq '^[0-9a-f]{40}$'; then
+    echo "❌ Cannot get the main branch revision of ${COUNTRY_FLAGS_REPO}." >&2
+    exit 1
+fi
+if ! curl -fsSL "${COUNTRY_FLAGS_REPO}/archive/${COUNTRY_FLAGS_REVISION}.tar.gz" \
+    | tar -xzf - -C "$TMP_DIR"; then
+    echo "❌ Cannot download or extract country-flags ${COUNTRY_FLAGS_REVISION}." >&2
+    exit 1
+fi
+COUNTRY_FLAGS_SRC="$TMP_DIR/country-flags-${COUNTRY_FLAGS_REVISION}"
 # Use the package version for the changelog and commit message.
-COUNTRY_FLAGS_VERSION=$(jq -er '.version | strings | select(length > 0)' "country-flags-$COUNTRY_FLAGS_REVISION/package.json")
+COUNTRY_FLAGS_VERSION=$(jq -er '.version | strings | select(length > 0)' "${COUNTRY_FLAGS_SRC}/package.json")
 echo "🏷️  Country flags version is: ${COUNTRY_FLAGS_VERSION}"
 # Replace the old country flags with the new ones.
 rm -Rf "${COUNTRY_FLAGS_DIR}"
-mv "country-flags-$COUNTRY_FLAGS_REVISION" "${COUNTRY_FLAGS_DIR}"
-# Cleanup.
-#rm country-flags.zip
+mv "${COUNTRY_FLAGS_SRC}" "${COUNTRY_FLAGS_DIR}"
 
 echo "🔰 Register flag icons"
 ./.venv/bin/python src/plone/staticresources/_scripts/register_flag_icons.py

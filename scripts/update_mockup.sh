@@ -2,45 +2,42 @@
 # Invoked by make from the repository root.
 set -e
 
-PRERELEASE=false
-if [ "${1:-}" = "--prerelease" ]; then
-    PRERELEASE=true
-    shift
-fi
-
 BUNDLE_DIR=${1:?BUNDLE_DIR is required}
 MOCKUP_VERSION=${2:-}
+MOCKUP_DIST_TAG=${3:-latest}
 
-if [ -z "${MOCKUP_VERSION}" ]; then
-    if [ "$PRERELEASE" = true ]; then
-        echo "🧪 Find the newest published Mockup pre-release among the first 100 GitHub releases."
-        RELEASES=$(curl -fsSL "https://api.github.com/repos/plone/mockup/releases?per_page=100&page=1")
-        RELEASE=$(printf '%s' "$RELEASES" | jq '
-            map(select(.prerelease == true and .draft == false))
-            | max_by(.published_at)
-        ')
-        if [ "$RELEASE" = null ]; then
-            echo "No published Mockup pre-release found among the first 100 GitHub releases." >&2
-            exit 1
-        fi
-    else
-        echo "🧪 Get the latest Mockup version from GitHub (no pre-release)."
-        RELEASE=$(curl -fsSL https://api.github.com/repos/plone/mockup/releases/latest)
+. "$(dirname "$0")/npm.sh"
+
+TMP_DIR=$(mktemp -d)
+trap 'rm -Rf "$TMP_DIR"' EXIT
+
+if [ -n "${MOCKUP_VERSION}" ]; then
+    echo "🧪 Download Mockup ${MOCKUP_VERSION} from npm."
+    npm_fetch @plone/mockup "${MOCKUP_VERSION}" "$TMP_DIR"
+else
+    echo "🧪 Download Mockup with dist-tag '${MOCKUP_DIST_TAG}' from npm."
+    npm_fetch @plone/mockup "${MOCKUP_DIST_TAG}" "$TMP_DIR"
+fi
+MOCKUP_VERSION=$NPM_VERSION
+echo "🏷️  Mockup version is: ${MOCKUP_VERSION}"
+
+# The npm package also contains the sources. Make sure it contains the webpack
+# built bundle, which is registered in the resource registry.
+MOCKUP_DIST="$TMP_DIR/package/dist"
+for file in bundle.min.js remote.min.js; do
+    if [ ! -s "${MOCKUP_DIST}/${file}" ]; then
+        echo "❌ The npm package of Mockup ${MOCKUP_VERSION} contains no built bundle (dist/${file} is missing or empty)." >&2
+        exit 1
     fi
-    MOCKUP_VERSION=$(printf '%s' "$RELEASE" | jq -er '.tag_name | strings | select(length > 0)')
-    echo "🏷️  Mockup version is: ${MOCKUP_VERSION}"
+done
+if [ -z "$(ls -A "${MOCKUP_DIST}/chunks" 2> /dev/null)" ]; then
+    echo "❌ The npm package of Mockup ${MOCKUP_VERSION} contains no built bundle (dist/chunks/ is missing or empty)." >&2
+    exit 1
 fi
 
-echo "🧪 Copy bundle from GitHub."
-
-# Download the Mockup bundle.
-wget "https://github.com/plone/mockup/releases/download/${MOCKUP_VERSION}/mockup-bundle-${MOCKUP_VERSION}.zip" 1> /dev/null 2> /dev/null
-unzip "mockup-bundle-${MOCKUP_VERSION}.zip" > /dev/null
 # Replace the old Mockup bundle with the new one.
 rm -Rf "${BUNDLE_DIR}"
-mv "mockup-bundle-${MOCKUP_VERSION}" "${BUNDLE_DIR}"
-# Cleanup.
-rm "mockup-bundle-${MOCKUP_VERSION}.zip"
+mv "${MOCKUP_DIST}" "${BUNDLE_DIR}"
 
 echo "🧪 Check for resource changes."
 git add "${BUNDLE_DIR}"
