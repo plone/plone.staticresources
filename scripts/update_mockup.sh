@@ -9,6 +9,7 @@ MOCKUP_VERSION=${2:-}
 MOCKUP_CHANNEL=${3:-latest}
 
 . "$(dirname "$0")/npm.sh"
+. "$(dirname "$0")/version_info.sh"
 
 TMP_DIR=$(mktemp -d)
 trap 'rm -Rf "$TMP_DIR"' EXIT
@@ -57,6 +58,10 @@ if git diff --cached --quiet -- "${BUNDLE_DIR}"; then
 fi
 
 echo "🧪 Git add and commit."
+set_version_info mockup "$(jq -n --arg version "$MOCKUP_VERSION" '{
+    version: $version,
+    source: "https://www.npmjs.com/package/@plone/mockup/v/\($version)"
+}')"
 # Add changelog entry
 ./.venv/bin/towncrier create +update-mockup.feature \
     --content "Update Mockup to ${MOCKUP_VERSION}."

@@ -3,6 +3,7 @@ graft docs
 include *.rst
 global-exclude *.pyc
 include pyproject.toml
+include resource-versions.json
 recursive-exclude news *
 exclude news
 exclude .coveragerc

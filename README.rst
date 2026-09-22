@@ -72,6 +72,10 @@ updates if one fails. The command still reports failure if any update fails.
 The update targets invoke POSIX shell scripts in ``scripts/`` from the
 repository root.
 
+The versions of the installed resources are recorded in
+``resource-versions.json`` and updated together with the resources.
+Run ``make versions`` to show them.
+
 See the Makefile for more information.
 
 Then submit a Pull Request and run the tests on Jenkins.

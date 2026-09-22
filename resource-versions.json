@@ -1,0 +1,15 @@
+{
+  "bootstrap-icons": {
+    "source": "https://www.npmjs.com/package/bootstrap-icons/v/1.13.1",
+    "version": "1.13.1"
+  },
+  "country-flags": {
+    "revision": "c09927e63705529bbf59ca6684cd9b23225dddad",
+    "source": "https://github.com/hampusborgos/country-flags/tree/c09927e63705529bbf59ca6684cd9b23225dddad",
+    "version": "1.2.10"
+  },
+  "mockup": {
+    "source": "https://www.npmjs.com/package/@plone/mockup/v/5.7.0-alpha.3",
+    "version": "5.7.0-alpha.3"
+  }
+}

@@ -6,6 +6,7 @@ BOOTSTRAP_ICONS_DIR=${1:?BOOTSTRAP_ICONS_DIR is required}
 BOOTSTRAP_ICONS_VERSION=${2:-}
 
 . "$(dirname "$0")/npm.sh"
+. "$(dirname "$0")/version_info.sh"
 
 TMP_DIR=$(mktemp -d)
 trap 'rm -Rf "$TMP_DIR"' EXIT
@@ -42,6 +43,10 @@ if git diff --cached --quiet -- "${BOOTSTRAP_ICONS_DIR}" \
 fi
 
 echo "🧪 Git add and commit."
+set_version_info bootstrap-icons "$(jq -n --arg version "$BOOTSTRAP_ICONS_VERSION" '{
+    version: $version,
+    source: "https://www.npmjs.com/package/bootstrap-icons/v/\($version)"
+}')"
 # Add changelog entry
 ./.venv/bin/towncrier create +update-bootstrap-icons.feature \
     --content "Update Bootstrap Icons to ${BOOTSTRAP_ICONS_VERSION}."

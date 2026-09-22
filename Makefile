@@ -16,6 +16,12 @@ REQUIRED_COMMANDS = curl git jq tar python3
 all: update-mockup update-bootstrap-icons update-country-flags
 
 
+# Show the versions of the installed resources.
+.PHONY: versions
+versions:
+	@jq . resource-versions.json
+
+
 .PHONY: clean
 clean:
 	rm -Rf .venv

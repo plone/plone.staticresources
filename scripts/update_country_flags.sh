@@ -6,6 +6,8 @@ COUNTRY_FLAGS_DIR=${1:?COUNTRY_FLAGS_DIR is required}
 
 COUNTRY_FLAGS_REPO=https://github.com/hampusborgos/country-flags
 
+. "$(dirname "$0")/version_info.sh"
+
 TMP_DIR=$(mktemp -d)
 trap 'rm -Rf "$TMP_DIR"' EXIT
 
@@ -50,6 +52,15 @@ if git diff --cached --quiet -- "${COUNTRY_FLAGS_DIR}" \
 fi
 
 echo "🧪 Git add and commit."
+# The upstream version is rarely bumped, so also record the exact revision.
+set_version_info country-flags "$(jq -n \
+    --arg version "$COUNTRY_FLAGS_VERSION" \
+    --arg revision "$COUNTRY_FLAGS_REVISION" \
+    --arg repo "$COUNTRY_FLAGS_REPO" '{
+    version: $version,
+    revision: $revision,
+    source: "\($repo)/tree/\($revision)"
+}')"
 # Add changelog entry
 ./.venv/bin/towncrier create +update-country-flags.feature \
     --content "Update country flags icons to ${COUNTRY_FLAGS_VERSION}."
