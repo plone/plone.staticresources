@@ -23,6 +23,23 @@ Note on Version 3.x:
 Version 3.0.0 switched to a PEP 420 native namespace package and requires ``Plone>=6.2`` and Python 3.10 or later.
 
 
+Prerequisites
+-------------
+
+The resource update targets below work on Linux and macOS. Install the
+following tools and make sure they are available on your ``PATH``:
+
+- curl
+- git
+- jq
+- make
+- Python 3 with venv support (on Debian/Ubuntu install ``python3-venv``).
+- tar
+
+Run ``make check-dependencies`` to verify them; the update targets run this
+check automatically and list any missing commands with installation hints.
+
+
 How to upgrade the resources in this package
 --------------------------------------------
 
@@ -36,11 +53,17 @@ Run::
 This downloads and installs the latest versions of these packages.
 The commits and changelog entries are automatically made.
 
-Run ``make update-mockup-prerelease`` to install the most recently published
-Mockup pre-release among the first 100 releases returned by GitHub, without
-specifying a version. This fails if that batch contains no published
-pre-release; subsequent pages are not searched.
-``make update-mockup`` continues to select stable releases.
+Mockup (``@plone/mockup``) and Bootstrap Icons (``bootstrap-icons``) are
+downloaded from the npm registry. ``make update-mockup`` installs the version
+with the npm dist-tag ``latest``.
+Country flags are downloaded from the ``main`` branch of the GitHub repository,
+because the npm package is outdated.
+None of the targets use the rate limited GitHub API.
+
+Run ``make update-mockup-prerelease`` to install the newest Mockup pre-release:
+the highest version among the npm dist-tags ``alpha``, ``beta`` and ``rc``,
+which is higher than ``latest``. Versions are compared by semver, so stale
+pre-release tags of older release lines are ignored.
 An explicit ``MOCKUP_VERSION`` overrides automatic selection for either target.
 
 Run ``make -k all`` to update all resources and continue with the other
