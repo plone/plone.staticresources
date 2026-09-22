@@ -4,7 +4,9 @@ set -e
 
 BUNDLE_DIR=${1:?BUNDLE_DIR is required}
 MOCKUP_VERSION=${2:-}
-MOCKUP_DIST_TAG=${3:-latest}
+# `latest` for the latest stable release or `prerelease` for the newest
+# pre-release. Ignored if MOCKUP_VERSION is set.
+MOCKUP_CHANNEL=${3:-latest}
 
 . "$(dirname "$0")/npm.sh"
 
@@ -14,9 +16,17 @@ trap 'rm -Rf "$TMP_DIR"' EXIT
 if [ -n "${MOCKUP_VERSION}" ]; then
     echo "🧪 Download Mockup ${MOCKUP_VERSION} from npm."
     npm_fetch @plone/mockup "${MOCKUP_VERSION}" "$TMP_DIR"
+elif [ "${MOCKUP_CHANNEL}" = prerelease ]; then
+    echo "🧪 Find the newest Mockup pre-release on npm."
+    if ! npm_prerelease @plone/mockup; then
+        echo "   Use e.g. MOCKUP_VERSION=5.7.0-alpha.3 to select a specific version." >&2
+        exit 1
+    fi
+    echo "🧪 Download Mockup ${NPM_PRERELEASE_VERSION} (dist-tag '${NPM_PRERELEASE_TAG}') from npm."
+    npm_fetch @plone/mockup "${NPM_PRERELEASE_VERSION}" "$TMP_DIR"
 else
-    echo "🧪 Download Mockup with dist-tag '${MOCKUP_DIST_TAG}' from npm."
-    npm_fetch @plone/mockup "${MOCKUP_DIST_TAG}" "$TMP_DIR"
+    echo "🧪 Download the latest Mockup release from npm."
+    npm_fetch @plone/mockup latest "$TMP_DIR"
 fi
 MOCKUP_VERSION=$NPM_VERSION
 echo "🏷️  Mockup version is: ${MOCKUP_VERSION}"

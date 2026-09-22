@@ -11,9 +11,6 @@ COUNTRY_FLAGS_DIR = src/plone/staticresources/static/icons-country-flags
 # - python3 (including the venv and ensurepip modules)
 REQUIRED_COMMANDS = curl git jq tar python3
 
-# npm dist-tag used by `make update-mockup-prerelease`.
-MOCKUP_PRERELEASE_TAG ?= alpha
-
 
 .PHONY: all
 all: update-mockup update-bootstrap-icons update-country-flags
@@ -73,12 +70,12 @@ update-mockup: install
 	@sh scripts/update_mockup.sh "$(BUNDLE_DIR)" "$(MOCKUP_VERSION)" latest
 
 
-# Download the Mockup pre-release with the npm dist-tag `alpha`.
-# Use another dist-tag with e.g.:
-# `MOCKUP_PRERELEASE_TAG=beta make update-mockup-prerelease`
+# Download the newest Mockup pre-release from the npm registry: the highest
+# version among the dist-tags `alpha`, `beta` and `rc`, which is higher than
+# `latest`. Use `MOCKUP_VERSION` to select a specific version instead.
 .PHONY: update-mockup-prerelease
 update-mockup-prerelease: install
-	@sh scripts/update_mockup.sh "$(BUNDLE_DIR)" "$(MOCKUP_VERSION)" "$(MOCKUP_PRERELEASE_TAG)"
+	@sh scripts/update_mockup.sh "$(BUNDLE_DIR)" "$(MOCKUP_VERSION)" prerelease
 
 
 # Download bootstrap-icons from the npm registry and replace the existing one.

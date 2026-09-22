@@ -60,9 +60,10 @@ Country flags are downloaded from the ``main`` branch of the GitHub repository,
 because the npm package is outdated.
 None of the targets use the rate limited GitHub API.
 
-Run ``make update-mockup-prerelease`` to install the Mockup pre-release with the
-npm dist-tag ``alpha``. Use ``MOCKUP_PRERELEASE_TAG=beta`` to select another
-dist-tag.
+Run ``make update-mockup-prerelease`` to install the newest Mockup pre-release:
+the highest version among the npm dist-tags ``alpha``, ``beta`` and ``rc``,
+which is higher than ``latest``. Versions are compared by semver, so stale
+pre-release tags of older release lines are ignored.
 An explicit ``MOCKUP_VERSION`` overrides automatic selection for either target.
 
 Run ``make -k all`` to update all resources and continue with the other
