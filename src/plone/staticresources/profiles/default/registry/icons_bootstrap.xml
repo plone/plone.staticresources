@@ -4292,13 +4292,6 @@
     <value key="resource">++plone++bootstrap-icons/cloud-hail.svg</value>
   </record>
 
-  <record name="plone.icon.cloud-haze-1">
-    <field type="plone.registry.field.TextLine">
-      <title>Bootstrap Icon cloud-haze-1</title>
-    </field>
-    <value key="resource">++plone++bootstrap-icons/cloud-haze-1.svg</value>
-  </record>
-
   <record name="plone.icon.cloud-haze-fill">
     <field type="plone.registry.field.TextLine">
       <title>Bootstrap Icon cloud-haze-fill</title>
