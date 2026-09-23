@@ -1,0 +1,4 @@
+# Ignore the following resources which were copied from the original project,
+# but we don't want to include.
+icons-country-flags/.gitignore
+icons-country-flags/scripts/
