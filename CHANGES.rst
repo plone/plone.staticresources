@@ -8,6 +8,16 @@ Changelog
 
 .. towncrier release notes start
 
+2.3.9 (2026-11-09)
+------------------
+
+Bug fixes:
+
+
+- Update mockup=5.4.11. See https://github.com/plone/mockup/releases/tag/5.4.11.
+  Update bootstrap-icons=1.13.2. @petschki
+
+
 2.3.8 (2026-06-09)
 ------------------
 
