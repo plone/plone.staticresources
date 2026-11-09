@@ -8,6 +8,15 @@ Changelog
 
 .. towncrier release notes start
 
+3.0.10 (2026-11-09)
+-------------------
+
+Bug fixes:
+
+
+- Update Mockup to 5.6.15 (TinyMCE 8.9.3 security fix, Patternslib 9.11.1, Svelte 5.57.3). @petschki
+
+
 3.0.9 (2026-09-17)
 ------------------
 
