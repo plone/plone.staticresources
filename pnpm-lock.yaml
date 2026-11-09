@@ -110,11 +110,11 @@ importers:
   .:
     dependencies:
       '@plone/mockup':
-        specifier: 5.6.14
-        version: 5.6.14(@popperjs/core@2.11.8)(posthtml@0.16.7)(react@19.2.8)(supports-color@8.1.1)
+        specifier: 5.6.15
+        version: 5.6.15(@popperjs/core@2.11.8)(posthtml@0.16.7)(react@19.2.8)(supports-color@8.1.1)
       bootstrap-icons:
-        specifier: 1.13.1
-        version: 1.13.1
+        specifier: 1.13.2
+        version: 1.13.2
       svg-country-flags:
         specifier: github:hampusborgos/country-flags
         version: https://codeload.github.com/hampusborgos/country-flags/tar.gz/c09927e63705529bbf59ca6684cd9b23225dddad
@@ -126,11 +126,11 @@ importers:
         specifier: 14.0.0
         version: 14.0.0(webpack@5.111.0)
       svelte:
-        specifier: 5.57.0
-        version: 5.57.0
+        specifier: 5.57.3
+        version: 5.57.3
       svelte-loader:
         specifier: 3.2.4
-        version: 3.2.4(svelte@5.57.0)
+        version: 3.2.4(svelte@5.57.3)
       svg-inline-loader:
         specifier: 0.8.2
         version: 0.8.2
@@ -1589,8 +1589,8 @@ packages:
   '@patternslib/pat-code-editor@4.0.1':
     resolution: {integrity: sha512-fYReaMlVsUw9uSFOklGoEezVD+rkYd6uiGSLkFk4y2mkTTslKlYDhKBxUkbUEAmUtWFgzRVr3tG4P8AEpRiyQw==}
 
-  '@patternslib/patternslib@9.11.0':
-    resolution: {integrity: sha512-ef0tr67EgOUS0/f3izawkp7MUp7uvY/GFWzHYF2bG6VgTK21UeSMbMCAFGQBiBJOxmb3X/armgteRpq3bPsJFA==}
+  '@patternslib/patternslib@9.11.1':
+    resolution: {integrity: sha512-TtiHlBVNij8yP2fbHwqN1Cq/Zi7fmNWcjn7TJ3uWiZ0JdVAo0LA0ZzPR/jRPsrbzlpAhgvY/e2unxyfw+BpBTw==}
     engines: {node: '>=22'}
 
   '@peculiar/asn1-cms@2.9.4':
@@ -1652,8 +1652,8 @@ packages:
     resolution: {integrity: sha512-SEeaJLb3qBNF/OaXnaR1NmmBbFYk1zC0ZH/52fATcRPLFg/p791YrcyFFy44Bo9sLaGuSuLp5Q6axbb/O+v/RA==}
     engines: {node: ^14.18.0 || >=16.0.0}
 
-  '@plone/mockup@5.6.14':
-    resolution: {integrity: sha512-CGgW8mKoKunpMcpO8E37jKNDSasFl/n0drXfmKWabZPpKtbr6a3sGzkWhsS7Q7BxIEU9H9+A4nEGxjDe67owEw==}
+  '@plone/mockup@5.6.15':
+    resolution: {integrity: sha512-rkmwrCk0nGxi0sHEXrFNU+mVyJfeKs1otCUW52FrVwdDAES6Bld1uHe2LIl26oNs/qrMvJ/DiE44tBoSQc9QsQ==}
     engines: {node: '>=22'}
 
   '@plone/registry@2.7.3':
@@ -2417,8 +2417,8 @@ packages:
   bonjour-service@1.4.4:
     resolution: {integrity: sha512-jCZcVv7eoc4QesRscwEZtSROBen+6LpKAmBIsQYQrsAeVHLyMXWX/t6eIV5KiRZYNUBl8eVqImEEMQ8L5+c/Kw==}
 
-  bootstrap-icons@1.13.1:
-    resolution: {integrity: sha512-ijombt4v6bv5CLeXvRWKy7CuM3TRTuPEuGaGKvTV5cz65rQSY8RQ2JcHt6b90cBBAC7s8fsf2EkQDldzCoXUjw==}
+  bootstrap-icons@1.13.2:
+    resolution: {integrity: sha512-fAU1Ly3dH7hwRg+CB8EZ0Vl0fF80zgXHeUVJyfUOKzoURr+TbwISbCW5tKUoQLERaWYG2emTCybcPbD96hdD1A==}
 
   bootstrap@5.3.8:
     resolution: {integrity: sha512-HP1SZDqaLDPwsNiqRqi5NcP0SSXciX2s9E+RyqJIIqGo+vJeN5AJVM98CXmW/Wux0nQ5L7jeWUdplCEf0Ee+tg==}
@@ -2941,8 +2941,8 @@ packages:
     resolution: {integrity: sha512-GrwoxYN+uWlzO8uhUXRl0P+kHE4GtVPfYzVLcUxPL7KNdHKj66vvlhiweIHqYYXWlw+T8iLMp42Lm67ghw4WMQ==}
     engines: {node: '>= 4'}
 
-  dompurify@3.4.15:
-    resolution: {integrity: sha512-EUBjM+B+lkDE41iE82DDSCfkoPGfXx8IxFxPMjNzm/Uk4xDet77rTN9wqlxlVg71kK7XGuUMv6wUxJUwwv+Xyw==}
+  dompurify@3.4.17:
+    resolution: {integrity: sha512-B/pSlYVHQ58kqISD/yDjuJ1yfzI34m1gF4lAod2bwSRhiN4K5Cl3H8Af7hqB2PmTL911tdEudnnXn5FnhRoz0w==}
 
   domutils@2.8.0:
     resolution: {integrity: sha512-w96Cjofp72M5IIhpjgobBimYEfoPjx1Vx0BSX9P30WBdZW2WIKU0T1Bd0kz2eNZ9ikjKgHbEyKx8BB6H1L3h3A==}
@@ -4150,11 +4150,14 @@ packages:
     engines: {node: '>=10'}
     hasBin: true
 
-  moment-timezone@0.6.3:
-    resolution: {integrity: sha512-pVEPA/HCFHHbwJ130ywnzYuZpkEGcP6Daa/OwNebpA18MybeFHmQilAGGovXgWijQ8vQtmud9jZrziUBgsykfg==}
+  moment-timezone@0.6.6:
+    resolution: {integrity: sha512-LF5AAYsMduXFW2ungr/D9JqNq9ykZyhWgYG6wFtdGZW5ZlBDTBgTUFqW8EC7Fa+Dvs3IMZxlWkSR09sW2D/+0w==}
 
   moment@2.30.1:
     resolution: {integrity: sha512-uEmtNhbDOrWPFS+hdjFCBfy9f2YoyzRpwcl+DqpC6taX21FzsTLQVbMV/W7PzNSX6x/bhC1zA3c2UQ5NzH6how==}
+
+  moment@2.31.0:
+    resolution: {integrity: sha512-0acOTfMiWOheYS4eoWb80yYMb/JLvVv9SHbs2PehaDzfUG0Bw855SKyk0IKTnPGa5+U2bmi3W68l1+sGLX/pvw==}
 
   mrmime@2.0.1:
     resolution: {integrity: sha512-Y3wQdFg2Va6etvQ5I82yUhGdsKrcYox6p7FfL1LbK2J4V01F9TGlepTIhnK24t7koZibmg82KGglhA1XK5IsLQ==}
@@ -5024,8 +5027,8 @@ packages:
     peerDependencies:
       svelte: ^3.0.0 || ^4.0.0-next.0 || ^5.0.0-next.1
 
-  svelte@5.57.0:
-    resolution: {integrity: sha512-NdbDn7fl4be1ViUG0oq/lvG6OZy3oENolV2ONjiqqsfVoeAfzaQAKUcEX3MrQod/Bebv1PgwET9rfXhgn9s4Kg==}
+  svelte@5.57.3:
+    resolution: {integrity: sha512-5mAftM3SoDV9X0zdF386F9p2pv8iKOwi/KfBS1XnBAkVCKFzVOLHUoa8iGWAt4buoicLmyWVRpuuD5wplXOQsg==}
     engines: {node: '>=18'}
 
   svg-country-flags@https://codeload.github.com/hampusborgos/country-flags/tar.gz/c09927e63705529bbf59ca6684cd9b23225dddad:
@@ -5125,11 +5128,11 @@ packages:
     resolution: {integrity: sha512-wXR/dYpcqKmfWpEdZjiKJOwCNFndD0DMnrW/cYjVGttEkBfVgcLFHoNrlj47mjOVic9yyNu65alsgF4NQyTa2g==}
     engines: {node: '>=12.0.0'}
 
-  tinymce-i18n@26.9.7:
-    resolution: {integrity: sha512-ZLmWShvol2xL9UfpI+rLuimU6CiDg7XryJU3m/PS6hc/Y7KJNghtrMnhX3b1F9dVD8ybD3iyIIFLvCJRmlE4fA==}
+  tinymce-i18n@26.11.2:
+    resolution: {integrity: sha512-2QCB4Z0dlFhyrQHlP5soLaeIHn8KL/C4GZ8FRYMf5ZZGZutsyveWrOZXEEo6daTmcdLI8AVww1SVU7hAeoWXxg==}
 
-  tinymce@8.9.0:
-    resolution: {integrity: sha512-zh9NKpdF89vnqOB3VEkTHiPtltrY6i3vTEVF5+l7vLxMX6lBju7d0UV9wWV7Vm1NyO1PccDCwa6qxAb2pWSvfg==}
+  tinymce@8.9.3:
+    resolution: {integrity: sha512-T6Z541dm8R34/rgotB40/j2lwrE3eKARbaoet37/I4d3jq+S7Ul3Q7bNZUQY2WtXOvD9P5aTVbgcYI1nKQoGqg==}
 
   tippy.js@6.3.7:
     resolution: {integrity: sha512-E1d3oP2emgJ9dRQZdf3Kkn0qJgI6ZLpyS5z6ZkY1DF3kaQaBsGZsndEpHwx+eC+tYM41HaSNvNtLx8tU57FzTQ==}
@@ -7325,7 +7328,7 @@ snapshots:
       codejar: 3.7.0
       highlight.js: 10.7.3
 
-  '@patternslib/patternslib@9.11.0':
+  '@patternslib/patternslib@9.11.1':
     dependencies:
       '@fullcalendar/adaptive': 5.11.5
       '@fullcalendar/core': 5.11.5
@@ -7335,7 +7338,7 @@ snapshots:
       '@fullcalendar/luxon2': 5.11.5(luxon@3.7.2)
       '@fullcalendar/timegrid': 5.11.5
       '@stomp/stompjs': 7.3.0
-      dompurify: 3.4.15
+      dompurify: 3.4.17
       highlight.js: 10.7.3
       imagesloaded: 4.1.4
       jquery: 3.7.1
@@ -7343,8 +7346,8 @@ snapshots:
       luxon: 3.7.2
       marked: 15.0.12
       masonry-layout: 4.2.2
-      moment: 2.30.1
-      moment-timezone: 0.6.3
+      moment: 2.31.0
+      moment-timezone: 0.6.6
       photoswipe: 4.1.3
       pikaday: 1.8.2
       prettier: 2.8.8
@@ -7458,16 +7461,16 @@ snapshots:
 
   '@pkgr/core@0.3.6': {}
 
-  '@plone/mockup@5.6.14(@popperjs/core@2.11.8)(posthtml@0.16.7)(react@19.2.8)(supports-color@8.1.1)':
+  '@plone/mockup@5.6.15(@popperjs/core@2.11.8)(posthtml@0.16.7)(react@19.2.8)(supports-color@8.1.1)':
     dependencies:
       '@11ty/eleventy-upgrade-help': 3.0.2(posthtml@0.16.7)
       '@patternslib/pat-code-editor': 4.0.1
-      '@patternslib/patternslib': 9.11.0
+      '@patternslib/patternslib': 9.11.1
       '@plone/registry': 2.7.3(react@19.2.8)(supports-color@8.1.1)
       backbone: 1.6.1
       backbone.paginator: 2.0.8
       bootstrap: 5.3.8(@popperjs/core@2.11.8)
-      bootstrap-icons: 1.13.1
+      bootstrap-icons: 1.13.2
       cs-jqtree-contextmenu: 0.1.0(jquery@3.7.1)
       datatables.net: 2.3.8
       datatables.net-bs5: 2.3.8
@@ -7493,9 +7496,9 @@ snapshots:
       slick-carousel: https://codeload.github.com/kenwheeler/slick/tar.gz/d0716f19aa730006ee80ab026625fb1107816a97(jquery@3.7.1)
       slides: https://codeload.github.com/Patternslib/slides/tar.gz/9319c68a208f92b7f21f4239916ca05429b9e139
       sortablejs: 1.15.7
-      svelte: 5.57.0
-      tinymce: 8.9.0
-      tinymce-i18n: 26.9.7
+      svelte: 5.57.3
+      tinymce: 8.9.3
+      tinymce-i18n: 26.11.2
       underscore: 1.13.8
     transitivePeerDependencies:
       - '@popperjs/core'
@@ -8229,7 +8232,7 @@ snapshots:
       fast-deep-equal: 3.1.3
       multicast-dns: 7.2.5
 
-  bootstrap-icons@1.13.1: {}
+  bootstrap-icons@1.13.2: {}
 
   bootstrap@5.3.8(@popperjs/core@2.11.8):
     dependencies:
@@ -8750,7 +8753,7 @@ snapshots:
     dependencies:
       domelementtype: 2.3.0
 
-  dompurify@3.4.15:
+  dompurify@3.4.17:
     optionalDependencies:
       '@types/trusted-types': 2.0.7
 
@@ -10083,7 +10086,7 @@ snapshots:
     dependencies:
       '@jridgewell/trace-mapping': 0.3.31
       jest-worker: 27.5.1
-      schema-utils: 4.3.3
+      schema-utils: 4.5.0
       terser: 5.51.2
       webpack: 5.111.0(postcss@8.5.28)(uglify-js@3.19.3)(webpack-cli@7.2.3)
     optionalDependencies:
@@ -10094,11 +10097,13 @@ snapshots:
 
   mkdirp@1.0.4: {}
 
-  moment-timezone@0.6.3:
+  moment-timezone@0.6.6:
     dependencies:
       moment: 2.30.1
 
   moment@2.30.1: {}
+
+  moment@2.31.0: {}
 
   mrmime@2.0.1: {}
 
@@ -10974,18 +10979,18 @@ snapshots:
 
   svelte-dev-helper@1.1.9: {}
 
-  svelte-hmr@0.14.12(svelte@5.57.0):
+  svelte-hmr@0.14.12(svelte@5.57.3):
     dependencies:
-      svelte: 5.57.0
+      svelte: 5.57.3
 
-  svelte-loader@3.2.4(svelte@5.57.0):
+  svelte-loader@3.2.4(svelte@5.57.3):
     dependencies:
       loader-utils: 2.0.4
-      svelte: 5.57.0
+      svelte: 5.57.3
       svelte-dev-helper: 1.1.9
-      svelte-hmr: 0.14.12(svelte@5.57.0)
+      svelte-hmr: 0.14.12(svelte@5.57.3)
 
-  svelte@5.57.0:
+  svelte@5.57.3:
     dependencies:
       '@jridgewell/remapping': 2.3.5
       '@jridgewell/sourcemap-codec': 1.6.0
@@ -11068,9 +11073,9 @@ snapshots:
       fdir: 6.5.0(picomatch@4.0.7)
       picomatch: 4.0.7
 
-  tinymce-i18n@26.9.7: {}
+  tinymce-i18n@26.11.2: {}
 
-  tinymce@8.9.0: {}
+  tinymce@8.9.3: {}
 
   tippy.js@6.3.7:
     dependencies:
