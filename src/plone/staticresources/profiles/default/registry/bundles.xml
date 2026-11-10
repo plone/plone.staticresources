@@ -18,7 +18,7 @@
     <value key="jscompilation">++plone++static/plone-fullscreen/fullscreen.js</value>
     <value key="csscompilation">++plone++static/plone-fullscreen/fullscreen.css</value>
     <value key="load_async">False</value>
-    <value key="load_defer">False</value>
+    <value key="load_defer">True</value>
   </records>
 
 </registry>
